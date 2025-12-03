@@ -1,0 +1,42 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build .love",
+            "type": "shell",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\build.ps1"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Run (.love)",
+            "type": "shell",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-Command",
+                "& { $out = Join-Path -Path \"${workspaceFolder}\" -ChildPath \"build\"; $name = Split-Path -Leaf \"${workspaceFolder}\"; $name = $name + '.love'; $zipPath = Join-Path $out $name; if (-Not (Test-Path $zipPath)) { Write-Error '.love not found. Run \"Build .love\" first.'; exit 1 }; Start-Process -FilePath 'love.exe' -ArgumentList $zipPath -NoNewWindow }"
+            ]
+        }
+    ]
+}
