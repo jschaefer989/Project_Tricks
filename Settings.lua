@@ -5,7 +5,7 @@ Settings = object:extend()
 function Settings:new()
 end
 
-function Settings:load()
+function Settings:defaults()
     -- Load settings from a file or set defaults
     self:setupFullscreenMode()
 end

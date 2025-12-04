@@ -1,5 +1,5 @@
 function isEmpty(test)
-    return test == nil or test == ''
+    return test == nil or test == '' or (type(test) == 'table' and next(test) == nil)
 end
 
 function getRandomElementFromTable(tbl)
@@ -20,4 +20,12 @@ function getRandomElementFromTable(tbl)
     local randomKey = keys[randomIndex]
     -- Return the value associated with the random key from the original table
     return tbl[randomKey]
+end
+
+function ternary(condition, trueValue, falseValue)
+    if condition then
+        return trueValue
+    else
+        return falseValue
+    end
 end

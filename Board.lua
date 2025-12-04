@@ -12,6 +12,17 @@ function Board:new()
     self.enemyPoints = 0
 end
 
+function Board:loadFromTable(data)
+    self.discardUsed = data.discardUsed or 0
+    self.playerPoints = data.playerPoints or 0
+    self.enemyPoints = data.enemyPoints or 0
+
+    self.enemy = Enemy()
+    self.enemy.hand = data.enemy.hand or {}
+    self.enemy.deck = data.enemy.deck or {}
+    self.enemy.discardPile = data.enemy.discardPile or {}
+end
+
 function Board:drawBoard()
     local btnW, btnH = 140, 70
     local lblH = 30

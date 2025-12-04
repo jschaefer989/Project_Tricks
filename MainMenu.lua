@@ -1,6 +1,7 @@
 local object = require('Libraries.classic-master.classic')
 MainMenu = object:extend()
 local suit = require('Libraries.suit-master')
+require "Save"
 
 function MainMenu:new()
 end
@@ -17,17 +18,30 @@ function MainMenu:drawScreen()
     suit.layout:reset(panelX, labelY)
     suit.Label("Tricks", {align = "center"}, suit.layout:row(panelW, labelHeight))
     
-    -- Create a play button below
+    -- Create a continue button below the title
     local btnW, btnH = 200, 50
-    local playBtnY = labelY + labelHeight + 20
-    suit.layout:reset(panelX, playBtnY)
-    local playResult = suit.Button("Play", {}, suit.layout:row(btnW, btnH))
-    if playResult.hit then
+    local continueBtnY = labelY + labelHeight + 20
+    local saveExists = love.filesystem.getInfo("savegame.json")
+    if saveExists then
+        suit.layout:reset(panelX, continueBtnY)
+        local continueResult = suit.Button("Continue", {}, suit.layout:row(btnW, btnH))
+        if continueResult.hit then
+            Save.load()
+            GameManager:switchBasedOnGameState()
+        end
+    end
+
+    -- Create a new game button below the continue button
+    local newGameBtnY = ternary(saveExists, continueBtnY + btnH + 10, continueBtnY)
+    suit.layout:reset(panelX, newGameBtnY)
+    local newGameResult = suit.Button("New Game", {}, suit.layout:row(btnW, btnH))
+    if newGameResult.hit then
+        -- TODO: need an "are you sure?" prompt here
         GameManager:switchToBoard()
     end
 
-    -- Create a quit button directly below the play button
-    local quitBtnY = playBtnY + btnH + 10
+    -- Create a quit button below the new game button
+    local quitBtnY = newGameBtnY + btnH + 10
     suit.layout:reset(panelX, quitBtnY)
     local quitResult = suit.Button("Quit", {}, suit.layout:row(btnW, btnH))
     if quitResult.hit then

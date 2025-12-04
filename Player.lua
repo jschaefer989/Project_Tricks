@@ -10,6 +10,17 @@ function Player:new()
     self.discards = 3
 end
 
+function Player:loadFromTable(data)
+    self.name = data.name or "Player"
+    self.money = data.money or 0
+    self.experience = data.experience or 0
+    self.level = data.level or 1
+    self.discards = data.discards or 3
+    self.hand = data.hand or {}
+    self.deck = data.deck or {}
+    self.discardPile = data.discardPile or {}
+end
+
 function Player:getCardPower()
     local power = 0
     for i, card in ipairs(self.hand) do

@@ -14,7 +14,6 @@ GameManager = object:extend()
 
 function GameManager:new()
     self.gameState = GameStates.MAIN_MENU
-    self.settings = {}
     self.mainMenu = {}
     self.pauseMenu = {}
     self.board = {}
@@ -30,22 +29,36 @@ function GameManager:getCharacter(characterType)
     end
 end
 
+function GameManager:switchBasedOnGameState()
+    if self.gameState == GameStates.MAIN_MENU then
+        self:switchToMainMenu()
+    elseif self.gameState == GameStates.PLAYING then
+        self:switchToBoard()
+    elseif self.gameState == GameStates.PAUSE_MENU then
+        self:switchToPauseMenu()
+    elseif self.gameState == GameStates.WIN_SCREEN then
+        self:switchToWinScreen()
+    elseif self.gameState == GameStates.LOSE_SCREEN then
+        self:switchToLoseScreen()
+    end
+end
+
 function GameManager:switchToMainMenu()
     local mainMenuState = {
         update = function(dt)
             self.mainMenu:drawScreen()
         end,    
-        draw = function()
-            --push.start(push)
-            suit.draw()
-            --push.finish(push)
-        end,
     }
 
     self.gameState = GameStates.MAIN_MENU
-    self.settings = Settings()
-    self.settings:load()
-    self.mainMenu = MainMenu()
+    self.board = {}
+    self.winScreen = {}
+    self.loseScreen = {}
+
+    if isEmpty(self.mainMenu) then
+         self.mainMenu = MainMenu()
+    end
+
     GameStateManager:setState(mainMenuState)
 end
 
@@ -53,16 +66,15 @@ function GameManager:switchToPauseMenu()
     local pauseMenuState = {
         update = function(dt)
             self.pauseMenu:drawScreen()
-        end,    
-        draw = function()
-            --push.start(push)
-            suit.draw()
-            --push.finish(push)
         end,
     }
 
-    self.gameState = GameStates.PAUSE_MENU
-    self.pauseMenu = PauseMenu()
+    -- Game state needs to be the previous state in the pause menu so we save correctly
+    --self.gameState = GameStates.PAUSE_MENU
+    if isEmpty(self.pauseMenu) then
+        self.pauseMenu = PauseMenu()
+    end
+
     GameStateManager:setState(pauseMenuState)
 end
 
@@ -70,17 +82,18 @@ function GameManager:switchToBoard()
     local boardState = {
         update = function(dt)
             self.board:drawBoard()
-        end,    
-        draw = function()
-            --push.start(push)
-            suit.draw()
-            --push.finish(push)
         end,
     }
 
     self.gameState = GameStates.PLAYING
-    self.board = Board()
-    self.board.dealer:setup()
+    self.winScreen = {}
+    self.loseScreen = {}
+
+    if isEmpty(self.board) then
+        self.board = Board()
+        self.board.dealer:setup()
+    end
+
     GameStateManager:setState(boardState)
 end
 
@@ -88,16 +101,17 @@ function GameManager:switchToWinScreen()
     local winState = {
         update = function(dt)
             self.winScreen:drawScreen()
-        end,    
-        draw = function()
-            --push.start(push)
-            suit.draw()
-            --push.finish(push)
         end,
     }
 
     self.gameState = GameStates.WIN_SCREEN
-    self.winScreen = WinScreen()
+    self.board = {}
+    self.loseScreen = {}
+
+    if isEmpty(self.winScreen) then
+        self.winScreen = WinScreen()
+    end
+
     GameStateManager:setState(winState)
 end
 
@@ -105,15 +119,15 @@ function GameManager:switchToLoseScreen()
     local loseState = {
         update = function(dt)
             self.loseScreen:drawScreen()
-        end,    
-        draw = function()
-            --push.start(push)
-            suit.draw()
-            --push.finish(push)
         end,
     }
 
     self.gameState = GameStates.LOSE_SCREEN
-    self.loseScreen = LoseScreen()
+    self.board = {}
+    self.winScreen = {}
+
+    if isEmpty(self.loseScreen) then
+        self.loseScreen = LoseScreen()
+    end
     GameStateManager:setState(loseState)
 end

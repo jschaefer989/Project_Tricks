@@ -1,6 +1,8 @@
 local object = require('Libraries.classic-master.classic')
 PauseMenu = object:extend()
 local suit = require('Libraries.suit-master')
+local lovelyToasts = require("Libraries.Lovely-Toasts-main.lovelyToasts")
+require "Save"
 
 function PauseMenu:new()
 end
@@ -20,17 +22,29 @@ function PauseMenu:drawScreen()
 
     local panelY = labelY + labelHeight
 
-    -- Create a continue button below the player panel using layout row
+    -- Create a continue button below the label
     local btnW, btnH = 200, 50
-    local playBtnY = panelY  + 20
-    suit.layout:reset(panelX, playBtnY)
-    local btnResult = suit.Button("Continue", {}, suit.layout:row(btnW, btnH))
-    if btnResult.hit then
+    local continueBtnY = panelY + 20
+    suit.layout:reset(panelX, continueBtnY)
+    local continueResult = suit.Button("Continue", {}, suit.layout:row(btnW, btnH))
+    if continueResult.hit then
         GameStateManager:revertState()
     end
 
-    -- Create a quit button directly below the play button
-    local quitBtnY = playBtnY + btnH + 10
+    -- Create a save button below the continue button
+    local saveBtnY = continueBtnY + btnH + 10
+    suit.layout:reset(panelX, saveBtnY)
+    local saveResult = suit.Button("Save", {}, suit.layout:row(btnW, btnH))
+    if saveResult.hit then
+        if not Save.save() then
+            lovelyToasts.show("Error saving game!")
+        else
+            lovelyToasts.show("Game saved successfully.")
+        end
+    end
+
+    -- Create a quit button below the save button
+    local quitBtnY = saveBtnY + btnH + 10
     suit.layout:reset(panelX, quitBtnY)
     local quitResult = suit.Button("Quit", {}, suit.layout:row(btnW, btnH))
     if quitResult.hit then
