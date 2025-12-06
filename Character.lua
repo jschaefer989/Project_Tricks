@@ -31,3 +31,10 @@ end
 function Character:getCardFromDiscards(position)
     return self.discardPile[position]
 end
+
+function Character:addDiscardsToDeck()
+    for i, card in ipairs(self.discardPile) do
+        self:addToDeck(card)
+    end
+    self.discardPile = {}
+end

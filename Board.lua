@@ -1,6 +1,7 @@
 local object = require('Libraries.classic-master.classic')
 Board = object:extend()
 local suit = require('Libraries.suit-master')
+require "Draw"
 
 -- TODO: Refactor hardcoded layout values into constants or configuration
 
@@ -228,17 +229,7 @@ function Board:renderPlayerRow(startX, startY, contentW, btnW, btnH, lblH, padX,
     suit.Label("Your hand: " .. #playerHand, {align = "left"}, suit.layout:row(contentW, lblH))
     suit.layout:row(0,0)
     for i, card in ipairs(playerHand) do
-        local isSelected = card.selected
-        local btnText = card.rank .. " " .. card.suit .. " (Val: " .. card.value .. ", Pow: " .. card.power .. ")"
-        if isSelected then
-            btnText = "[X] " .. btnText
-        else
-            btnText = "[ ] " .. btnText
-        end
-        local btnHit = suit.Button(btnText, suit.layout:col(btnW, btnH)).hit
-        if btnHit then
-            card.selected = not card.selected
-        end
+        Draw:card(card, btnW, btnH)
     end
 end
 
@@ -316,8 +307,10 @@ function Board:getWinner()
 end
 
 function Board:endFight()
+    Player:deselectAllCards()
     local winner = self:getWinner()
     if winner == CharacterTypes.PLAYER then
+        self.enemy:removeAllCardsFromHand()
         Player:cashout(self.playerPoints)
         GameManager:switchToWinScreen()
     elseif winner == CharacterTypes.ENEMY then

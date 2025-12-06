@@ -7,10 +7,10 @@ local object = require('Libraries.classic-master.classic')
 Dealer = object:extend()
 
 function Dealer:new()
+    self.lootCards = {}
 end
 
 function Dealer:setup()
-    self:initializePlayerDeck()
     self:initializeEnemyDeck()
     self:dealCards(CharacterTypes.PLAYER)
     self:dealCards(CharacterTypes.ENEMY)
@@ -50,5 +50,45 @@ function Dealer:dealCards(characterType)
     for i = 1, character.numberOfHeldCards - #character.hand do
         local card = table.remove(character.deck)
         character:addToHand(card)
+    end
+end
+
+function Dealer:getLootCards()
+    self.lootCards = {}
+    for i = 1, Player.numberOfLootCards do
+        local card = getRandomElementFromTable(GameManager.board.enemy.discardPile)
+        if not self:hasLootCard(card) then
+            self:addLootCard(card)
+        else
+            i = i - 1 -- try again
+        end
+    end
+    return self.lootCards
+end
+
+function Dealer:addLootCard(card)
+    table.insert(self.lootCards, card)
+end
+
+function Dealer:hasLootCard(card)
+    for _, lootCard in ipairs(self.lootCards) do
+        if lootCard:isEqual(card) then
+            return true
+        end
+    end
+    return false
+end
+
+function Dealer:deselectAllCards()
+    for _, card in ipairs(self.lootCards) do
+        card.selected = false
+    end
+end
+
+function Dealer:addLootCardsToPlayer()
+    for _, card in ipairs(self.lootCards) do
+        if card.selected then 
+            Player:addToDeck(card)
+        end
     end
 end

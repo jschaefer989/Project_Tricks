@@ -9,6 +9,10 @@ function Card:new(suit, rank)
     self.selected = false
 end
 
+function Card:isEqual(otherCard)
+    return self.suit == otherCard.suit and self.rank == otherCard.rank
+end
+
 function Card:getPower(suit, rank)
     -- Handle trump cards
     if rank == Ranks.QUEEN or rank == Ranks.JACK or suit == Suits.DIAMONDS then

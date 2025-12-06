@@ -36,6 +36,7 @@ function MainMenu:drawScreen()
     suit.layout:reset(panelX, newGameBtnY)
     local newGameResult = suit.Button("New Game", {}, suit.layout:row(btnW, btnH))
     if newGameResult.hit then
+        self:initializeNewGame()
         -- TODO: need an "are you sure?" prompt here
         GameManager:switchToBoard()
     end
@@ -47,4 +48,9 @@ function MainMenu:drawScreen()
     if quitResult.hit then
         love.event.quit()
     end
+end
+
+function MainMenu:initializeNewGame()
+    -- TODO: might need to do more here
+    Dealer:initializePlayerDeck()
 end

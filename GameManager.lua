@@ -105,12 +105,15 @@ function GameManager:switchToWinScreen()
     }
 
     self.gameState = GameStates.WIN_SCREEN
-    self.board = {}
+    -- We need some data from the board to show stats and loot cards, so we keep it
+    --self.board = {}
     self.loseScreen = {}
 
     if isEmpty(self.winScreen) then
         self.winScreen = WinScreen()
     end
+
+    self.board.dealer:getLootCards()
 
     GameStateManager:setState(winState)
 end

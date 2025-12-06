@@ -8,6 +8,7 @@ function Player:new()
     self.experience = 0
     self.level = 1
     self.discards = 3
+    self.numberOfLootCards = 3
 end
 
 function Player:loadFromTable(data)
@@ -16,6 +17,7 @@ function Player:loadFromTable(data)
     self.experience = data.experience or 0
     self.level = data.level or 1
     self.discards = data.discards or 3
+    self.numberOfLootCards = data.numberOfLootCards or 3
     self.hand = data.hand or {}
     self.deck = data.deck or {}
     self.discardPile = data.discardPile or {}
@@ -78,4 +80,10 @@ end
 function Player:cashout(points)
     if points < 0 then return end
     self.money = self.money + points
+end
+
+function Player:deselectAllCards()
+    for _, card in ipairs(self.hand) do
+        card.selected = false
+    end
 end

@@ -7,7 +7,7 @@ end
 
 function Settings:defaults()
     -- Load settings from a file or set defaults
-    self:setupFullscreenMode()
+    self:setupWindowedMode()
 end
 
 function Settings:setupWindowedMode()
