@@ -1,94 +1,136 @@
-require "Enums"
-require "Card"
-require "GameManager"
-require "Helpers"
-
-local object = require('Libraries.classic-master.classic')
-Dealer = object:extend()
-
-function Dealer:new()
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local __TS__ObjectValues = ____lualib.__TS__ObjectValues
+local ____exports = {}
+local ____Enums = require("Enums")
+local Suits = ____Enums.Suits
+local Ranks = ____Enums.Ranks
+local CharacterTypes = ____Enums.CharacterTypes
+local ____Helpers = require("Helpers")
+local getRandomElementFromArray = ____Helpers.getRandomElementFromArray
+local getRandomElementFromTable = ____Helpers.getRandomElementFromTable
+local isEmpty = ____Helpers.isEmpty
+local ____Card = require("Card")
+local Card = ____Card.default
+____exports.default = __TS__Class()
+local Dealer = ____exports.default
+Dealer.name = "Dealer"
+function Dealer.prototype.____constructor(self, gameManager)
+    self.gameManager = gameManager
     self.lootCards = {}
 end
-
-function Dealer:setup()
+function Dealer.prototype.setup(self)
+    if #self.gameManager.player.deck == 0 then
+        ____exports.default:initializePlayerDeck(self.gameManager)
+    end
     self:initializeEnemyDeck()
-    self:dealCards(CharacterTypes.PLAYER)
-    self:dealCards(CharacterTypes.ENEMY)
+    ____exports.default:dealCards(self.gameManager, CharacterTypes.PLAYER)
+    ____exports.default:dealCards(self.gameManager, CharacterTypes.ENEMY)
 end
-
-function Dealer:initializePlayerDeck()
-    -- We're just gonna insert all of the cards into the player deck for now
-    -- Eventuall, we might want to let players pick their starting cards and then they'll
-    -- add to their deck based on what they loot from fights and get from shops
-    for suit in pairs(Suits) do
-        for rank in pairs(Ranks) do
-            Player:addToDeck(Card(suit, rank))
+function Dealer.initializePlayerDeck(self, gameManager)
+    for ____, suit in ipairs(__TS__ObjectValues(Suits)) do
+        for ____, rank in ipairs(__TS__ObjectValues(Ranks)) do
+            gameManager.player:addToDeck(__TS__New(Card, suit, rank))
         end
     end
-    self:shuffle(CharacterTypes.PLAYER)
+    ____exports.default:shuffle(gameManager, CharacterTypes.PLAYER)
 end
-
-function Dealer:initializeEnemyDeck()
-    for i = 1, GameManager.board.enemy.numberOfCardsInDeck do
-        local suit = getRandomElementFromTable(Suits)
-        local rank = getRandomElementFromTable(Ranks)
-        GameManager.board.enemy:addToDeck(Card(suit, rank))
+function Dealer.shuffle(self, gameManager, characterType)
+    local character = gameManager:getCharacter(characterType)
+    if isEmpty(character) then
+        return
     end
-    self:shuffle(CharacterTypes.ENEMY)
-end
-
-function Dealer:shuffle(characterType)    
-    local character = GameManager:getCharacter(characterType)
-    for i = #character.deck, 2, -1 do
-        local j = math.random(i)
-        character.deck[i], character.deck[j] = character.deck[j], character.deck[i]
-    end
-end
-
-function Dealer:dealCards(characterType)
-    local character = GameManager:getCharacter(characterType)
-    for i = 1, character.numberOfHeldCards - #character.hand do
-        local card = table.remove(character.deck)
-        character:addToHand(card)
+    do
+        local i = #character.deck - 1
+        while i >= 1 do
+            local j = math.floor(math.random() * (i + 1))
+            local temp = character.deck[i + 1]
+            character.deck[i + 1] = character.deck[j + 1]
+            character.deck[j + 1] = temp
+            i = i - 1
+        end
     end
 end
-
-function Dealer:getLootCards()
+function Dealer.dealCards(self, gameManager, characterType)
+    local character = gameManager:getCharacter(characterType)
+    if isEmpty(character) then
+        return
+    end
+    local cardsToDeal = character.numberOfHeldCards - #character.hand
+    do
+        local i = 0
+        while i < cardsToDeal do
+            local card = table.remove(character.deck)
+            if card then
+                character:addToHand(card)
+            end
+            i = i + 1
+        end
+    end
+end
+function Dealer.prototype.initializeEnemyDeck(self)
+    if not self.gameManager.board or not self.gameManager.board.enemy then
+        return
+    end
+    do
+        local i = 0
+        while i < self.gameManager.board.enemy.numberOfCardsInDeck do
+            do
+                local suit = getRandomElementFromTable(Suits)
+                local rank = getRandomElementFromTable(Ranks)
+                if isEmpty(suit) or isEmpty(rank) then
+                    goto __continue22
+                end
+                self.gameManager.board.enemy:addToDeck(__TS__New(Card, suit, rank))
+            end
+            ::__continue22::
+            i = i + 1
+        end
+    end
+    ____exports.default:shuffle(self.gameManager, CharacterTypes.ENEMY)
+end
+function Dealer.prototype.getLootCards(self)
+    if not self.gameManager.board or not self.gameManager.board.enemy then
+        return {}
+    end
     self.lootCards = {}
-    for i = 1, Player.numberOfLootCards do
-        local card = getRandomElementFromTable(GameManager.board.enemy.discardPile)
-        if not self:hasLootCard(card) then
-            self:addLootCard(card)
-        else
-            i = i - 1 -- try again
+    do
+        local i = 0
+        while i < self.gameManager.player.numberOfLootCards do
+            local card = getRandomElementFromArray(self.gameManager.board.enemy.discardPile)
+            if card and not self:hasLootCard(card) then
+                self:addLootCard(card)
+            else
+                i = i - 1
+            end
+            i = i + 1
         end
     end
     return self.lootCards
 end
-
-function Dealer:addLootCard(card)
-    table.insert(self.lootCards, card)
+function Dealer.prototype.addLootCard(self, card)
+    local ____self_lootCards_0 = self.lootCards
+    ____self_lootCards_0[#____self_lootCards_0 + 1] = card
 end
-
-function Dealer:hasLootCard(card)
-    for _, lootCard in ipairs(self.lootCards) do
+function Dealer.prototype.hasLootCard(self, card)
+    for ____, lootCard in ipairs(self.lootCards) do
         if lootCard:isEqual(card) then
             return true
         end
     end
     return false
 end
-
-function Dealer:deselectAllCards()
-    for _, card in ipairs(self.lootCards) do
+function Dealer.prototype.deselectAllCards(self)
+    for ____, card in ipairs(self.lootCards) do
         card.selected = false
     end
 end
-
-function Dealer:addLootCardsToPlayer()
-    for _, card in ipairs(self.lootCards) do
-        if card.selected then 
-            Player:addToDeck(card)
+function Dealer.prototype.addLootCardsToPlayer(self)
+    for ____, card in ipairs(self.lootCards) do
+        if card.selected then
+            self.gameManager.player:addToDeck(card)
         end
     end
 end
+return ____exports

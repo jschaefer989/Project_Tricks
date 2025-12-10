@@ -1,40 +1,40 @@
-local object = require('Libraries.classic-master.classic')
-Character = object:extend()
-
-function Character:new()
-    self.deck = { }
-    self.hand = { }
-    self.discardPile = { }
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+____exports.default = __TS__Class()
+local Character = ____exports.default
+Character.name = "Character"
+function Character.prototype.____constructor(self)
+    self.deck = {}
+    self.hand = {}
+    self.discardPile = {}
     self.numberOfHeldCards = 5
 end
-
-function Character:addToHand(card)
-    table.insert(self.hand, card)
+function Character.prototype.addToHand(self, card)
+    local ____self_hand_0 = self.hand
+    ____self_hand_0[#____self_hand_0 + 1] = card
 end
-
-function Character:getCardFromHand(position)
-    return self.hand[position]
+function Character.prototype.getCardFromHand(self, position)
+    return self.hand[position + 1]
 end
-
-function Character:addToDeck(card)
-    table.insert(self.deck, card)
+function Character.prototype.addToDeck(self, card)
+    local ____self_deck_1 = self.deck
+    ____self_deck_1[#____self_deck_1 + 1] = card
 end
-
-function Character:getCardFromDeck(position)
-    return self.deck[position]
-end 
-
-function Character:addToDiscards(card)
-    table.insert(self.discardPile, card)
+function Character.prototype.getCardFromDeck(self, position)
+    return self.deck[position + 1]
 end
-
-function Character:getCardFromDiscards(position)
-    return self.discardPile[position]
+function Character.prototype.addToDiscards(self, card)
+    local ____self_discardPile_2 = self.discardPile
+    ____self_discardPile_2[#____self_discardPile_2 + 1] = card
 end
-
-function Character:addDiscardsToDeck()
-    for i, card in ipairs(self.discardPile) do
+function Character.prototype.getCardFromDiscards(self, position)
+    return self.discardPile[position + 1]
+end
+function Character.prototype.addDiscardsToDeck(self)
+    for ____, card in ipairs(self.discardPile) do
         self:addToDeck(card)
     end
     self.discardPile = {}
 end
+return ____exports

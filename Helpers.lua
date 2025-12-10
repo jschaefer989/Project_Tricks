@@ -1,31 +1,27 @@
-function isEmpty(test)
-    return test == nil or test == '' or (type(test) == 'table' and next(test) == nil)
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+---
+-- @noSelfInFile
+function ____exports.isEmpty(test)
+    return test == nil or test == nil
 end
-
-function getRandomElementFromTable(tbl)
+function ____exports.getRandomElementFromTable(tbl)
     local keys = {}
-    -- Populate the 'keys' table with the named keys from 'tbl'
     for k in pairs(tbl) do
-        table.insert(keys, k)
+        keys[#keys + 1] = k
     end
-
-    -- If the table is empty, return nil
     if #keys == 0 then
-        return nil
+        return
     end
-
-    -- Get a random index from the 'keys' table
-    local randomIndex = math.random(1, #keys)
-    -- Get the random key
-    local randomKey = keys[randomIndex]
-    -- Return the value associated with the random key from the original table
+    local randomIndex = math.floor(math.random() * #keys)
+    local randomKey = keys[randomIndex + 1]
     return tbl[randomKey]
 end
-
-function ternary(condition, trueValue, falseValue)
-    if condition then
-        return trueValue
-    else
-        return falseValue
+function ____exports.getRandomElementFromArray(arr)
+    if #arr == 0 then
+        return
     end
+    local randomIndex = math.floor(math.random() * #arr)
+    return arr[randomIndex + 1]
 end
+return ____exports

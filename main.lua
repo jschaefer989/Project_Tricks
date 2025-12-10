@@ -1,24 +1,21 @@
 if pcall(require, "lldebugger") then require("lldebugger").start() end
 if pcall(require, "mobdebug") then require("mobdebug").start() end
-require "Dealer"
-require "GameManager"
-require "Enums"
-require "Settings"
+local ____lualib = require("lualib_bundle")
+local __TS__New = ____lualib.__TS__New
+local suit = require('Libraries.suit-master.suit')
+local GameStateManager = require("Libraries.GameStateManager-main.gamestateManager")
 local lovelyToasts = require("Libraries.Lovely-Toasts-main.lovelyToasts")
-local suit = require('Libraries.suit-master')
-
-GameManager = GameManager()
-Player = Player()
-Settings = Settings()
+local GameManager = require("GameManager").default
+local gameManager = __TS__New(GameManager)
 
 function love.load()    
     love.window.setTitle("Tricks")
     math.randomseed(os.time() + os.clock())
-    -- TODO: load settings properly
-    --GameManager.settings:loadFromTable(saveData.settings or {})
-    Settings:defaults()
 
-    GameManager:switchToMainMenu()
+    -- TODO: load settings properly
+    --global.GAME_MANAGER.settings:loadFromTable(saveData.settings or {})
+    gameManager.settings:defaults()
+    gameManager:switchToMainMenu()
 end
 
 function love.mousepressed(x, y, button)
@@ -27,10 +24,8 @@ end
 
 function love.draw()
     GameStateManager:draw()
-    --push.start(push)
     suit.draw()
     lovelyToasts.draw()
-    --push.finish(push)
 end
 
 function love.resize(w, h)
@@ -49,9 +44,9 @@ end
 function love.keypressed(key, scancode, isrepeat)
     GameStateManager:keypressed(key, scancode, isrepeat)
     
-    if GameManager.gameState ~= GameStates.MAIN_MENU then
+    if gameManager.gameState ~= "MAIN_MENU" then
         if key == "escape" then
-            GameManager:switchToPauseMenu()
+            gameManager:switchToPauseMenu()
         end
     end
 end

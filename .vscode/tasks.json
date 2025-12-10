@@ -37,6 +37,14 @@
                 "-Command",
                 "& { $out = Join-Path -Path \"${workspaceFolder}\" -ChildPath \"build\"; $name = Split-Path -Leaf \"${workspaceFolder}\"; $name = $name + '.love'; $zipPath = Join-Path $out $name; if (-Not (Test-Path $zipPath)) { Write-Error '.love not found. Run \"Build .love\" first.'; exit 1 }; Start-Process -FilePath 'love.exe' -ArgumentList $zipPath -NoNewWindow }"
             ]
+        },
+        {
+        "type": "npm",
+        "script": "dev",
+        "problemMatcher": "$tsc-watch",
+        "isBackground": true,
+        "presentation": { "reveal": "never" },
+        "group": { "kind": "build", "isDefault": true }
         }
     ]
 }

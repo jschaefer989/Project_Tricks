@@ -1,90 +1,140 @@
-local object = require('Libraries.classic-master.classic')
-WinScreen = object:extend()
-local suit = require('Libraries.suit-master')
-
-function WinScreen:new()
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local ____Draw = require("Draw")
+local Draw = ____Draw.default
+local ____Helpers = require("Helpers")
+local isEmpty = ____Helpers.isEmpty
+local suit = require("Libraries.suit-master.suit")
+____exports.default = __TS__Class()
+local WinScreen = ____exports.default
+WinScreen.name = "WinScreen"
+function WinScreen.prototype.____constructor(self, gameManager)
+    self.gameManager = gameManager
 end
-
-function WinScreen:drawScreen()
-    -- Display the victory message (centered)
+function WinScreen.prototype.drawScreen(self)
     local screenW = love.graphics.getWidth()
     local panelW = 240
     local labelY = 50
-
-    -- Render player info panel centered under the Victory label
     local panelX = (screenW - panelW) / 2
     local labelHeight = 36
-    -- Use layout row for the Victory label
     self:renderVictoryLabel()
-
     local panelY = labelY + labelHeight
     local panelH = self:renderPlayerInfoPanel(panelX, panelY, panelW)
-
-    -- Render Loot label above cards and get its height so we can place the Continue button below
     local lootStartY = panelY + panelH + 10
     local lootH = self:renderLootCards(panelX, lootStartY, panelW)
-
-    -- Create a continue button below the loot cards using layout row
     local continueBtnY = lootStartY + lootH + 10
     self:renderContinueButton(panelX, continueBtnY, panelW)
 end
-
-function WinScreen:renderVictoryLabel()
-    suit.layout:reset((love.graphics.getWidth() - 240) / 2, 50)
-    suit.Label("Victory!", {align = "center"}, suit.layout:row(240, 36))
+function WinScreen.prototype.renderVictoryLabel(self)
+    suit.layout:reset(
+        (love.graphics.getWidth() - 240) / 2,
+        50
+    )
+    suit.Label(
+        "Victory!",
+        {align = "center"},
+        suit.layout:row(240, 36)
+    )
 end
-
-function WinScreen:renderPlayerInfoPanel(x, y, panelW)
-    local name = Player.name or "Player"
-    local level = Player.level or 1
-    local exp = Player.experience or 0
-    local money = Player.money or 0
-
+function WinScreen.prototype.renderPlayerInfoPanel(self, x, y, panelW)
+    local name = self.gameManager.player.name or "Player"
+    local level = self.gameManager.player.level or 1
+    local exp = self.gameManager.player.experience or 0
+    local money = self.gameManager.player.money or 0
     suit.layout:reset(x, y)
-    suit.Label(name, {align = "center"}, suit.layout:row(panelW, 24))
-    suit.Label("Level: " .. level, {align = "left"}, suit.layout:row(panelW, 22))
-    suit.Label("XP: " .. exp, {align = "left"}, suit.layout:row(panelW, 22))
-    suit.Label("Money: " .. money, {align = "left"}, suit.layout:row(panelW, 22))
-
-    -- Return the computed panel height so callers can place elements below
+    suit.Label(
+        name,
+        {align = "center"},
+        suit.layout:row(panelW, 24)
+    )
+    suit.Label(
+        "Level: " .. tostring(level),
+        {align = "left"},
+        suit.layout:row(panelW, 22)
+    )
+    suit.Label(
+        "XP: " .. tostring(exp),
+        {align = "left"},
+        suit.layout:row(panelW, 22)
+    )
+    suit.Label(
+        "Money: " .. tostring(money),
+        {align = "left"},
+        suit.layout:row(panelW, 22)
+    )
     local totalHeight = 24 + 22 * 3
     return totalHeight
 end
-
-function WinScreen:renderLootCards(panelX, startY, panelW)
+function WinScreen.prototype.renderLootCards(self, panelX, startY, panelW)
     local labelH = 24
-    -- Place the Loot label at the start Y
     suit.layout:reset(panelX, startY)
-    suit.Label("Loot:", {align = "center"}, suit.layout:row(panelW, labelH))
-
-    local lootCards = GameManager.board.dealer and GameManager.board.dealer.lootCards or {}
+    suit.Label(
+        "Loot:",
+        {align = "center"},
+        suit.layout:row(panelW, labelH)
+    )
+    local lootCards = self.gameManager.board and self.gameManager.board.dealer and self.gameManager.board.dealer.lootCards or ({})
     local padding = 8
     local maxBtnW = 120
     local count = math.max(1, #lootCards)
     local btnW = math.floor((panelW - padding * (count - 1)) / count)
-    btnW = math.max(40, math.min(btnW, maxBtnW))
-    local btnH = math.floor(btnW * 1.4) -- card aspect ratio
-
-    -- Cards start below the label
+    btnW = math.max(
+        40,
+        math.min(btnW, maxBtnW)
+    )
+    local btnH = math.floor(btnW * 1.4)
     local cardsY = startY + labelH + 8
-    for i, card in ipairs(lootCards) do
-        local x = panelX + (i - 1) * (btnW + padding)
-        suit.layout:reset(x, cardsY)
-        Draw:card(card, btnW, btnH, true) -- true to allow selecting only one card
+    do
+        local i = 0
+        while i < #lootCards do
+            local card = lootCards[i + 1]
+            local x = panelX + i * (btnW + padding)
+            suit.layout:reset(x, cardsY)
+            Draw:card(
+                self.gameManager,
+                card,
+                btnW,
+                btnH,
+                true
+            )
+            i = i + 1
+        end
     end
-
     local totalHeight = labelH + 8 + btnH
     return totalHeight
 end
-
-function WinScreen:renderContinueButton(panelX, panelY, panelW)
-    local btnW, btnH = 200, 50
+function WinScreen.prototype.renderContinueButton(self, panelX, panelY, panelW)
+    local btnW = 200
+    local btnH = 50
     suit.layout:reset(panelX + (panelW - btnW) / 2, panelY)
-    local continueResult = suit.Button("Continue", {}, suit.layout:row(btnW, btnH))
-    if continueResult.hit then
-        Player:addDiscardsToDeck()
-        GameManager.board.dealer:addLootCardsToPlayer()
-        GameManager.board = {}
-        GameManager:switchToBoard() -- TODO: will need to go back to the map at some point
+    local continueResult = suit.Button(
+        "Continue",
+        {},
+        suit.layout:row(btnW, btnH)
+    )
+    if continueResult and continueResult.hit then
+        local ____ = self.gameManager.player.addDiscardsToDeck and self.gameManager.player:addDiscardsToDeck()
+        local ____isEmpty_2 = isEmpty
+        local ____opt_0 = self.gameManager.board
+        if not ____isEmpty_2(____opt_0 and ____opt_0.dealer) then
+            self.gameManager.board.dealer:addLootCardsToPlayer()
+        end
+        self.gameManager.board = nil
+        local ____ = self.gameManager.switchToBoard and self.gameManager:switchToBoard()
     end
 end
+function WinScreen.prototype.addLootCardsToPlayer(self)
+    local lootCards = self.gameManager.board and self.gameManager.board.dealer and self.gameManager.board.dealer.lootCards or ({})
+    do
+        local i = 0
+        while i < #lootCards do
+            local card = lootCards[i + 1]
+            if card.selected then
+                local ____ = self.gameManager.player.addToHand and self.gameManager.player:addToHand(card)
+            end
+            i = i + 1
+        end
+    end
+end
+return ____exports

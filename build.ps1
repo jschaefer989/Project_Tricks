@@ -11,14 +11,24 @@ $zipPath = Join-Path -Path $outPath -ChildPath $name
 if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
 
 # Exclude common dev files/folders
-$exclude = @('.git', '.vscode', '.luacheckrc')
+$exclude = @('.git', '.vscode', '.luacheckrc', 'node_modules', 'TSTL', 'build', '*.ts', '*.d.ts', 'tsconfig.json', 'package.json', 'package-lock.json', '*.ps1', '*.map')
 
 # Collect items while excluding dev folders/files. Avoid using 'return' inside the Where-Object scriptblock
 $items = Get-ChildItem -Path $PSScriptRoot -Recurse -Force | Where-Object {
     $fullname = $_.FullName
+    $relativePath = $_.FullName.Substring($PSScriptRoot.Length)
     $keep = $true
     foreach ($e in $exclude) {
-        if ($fullname -like "*\\$e*") { $keep = $false; break }
+        if ($e -like '*\*' -or $e -like '*/*') {
+            # Path-based exclusion
+            if ($fullname -like "*$e*") { $keep = $false; break }
+        } elseif ($e -like '*.*') {
+            # Extension-based exclusion
+            if ($_.Name -like $e) { $keep = $false; break }
+        } else {
+            # Folder name exclusion
+            if ($relativePath -like "*\$e\*" -or $relativePath -like "*\$e") { $keep = $false; break }
+        }
     }
     $keep
 }
