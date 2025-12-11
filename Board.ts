@@ -22,10 +22,10 @@ export default class Board {
     playerPoints: number
     enemyPoints: number
 
-    constructor(gameManager: GameManager) {
+    constructor(gameManager: GameManager, enemy?: Enemy) {
         this.gameManager = gameManager
         this.discardUsed = 0
-        this.enemy = new Enemy()
+        this.enemy = enemy ?? new Enemy()
         this.dealer = new Dealer(gameManager)
         this.playerPoints = 0
         this.enemyPoints = 0
@@ -37,9 +37,7 @@ export default class Board {
         this.enemyPoints = data.enemyPoints ?? 0
 
         this.enemy = new Enemy()
-        this.enemy.hand = data.enemy?.hand ?? []
-        this.enemy.deck = data.enemy?.deck ?? []
-        this.enemy.discardPile = data.enemy?.discardPile ?? []
+        this.enemy.load(data.enemy)
     }
 
     save(): BoardData {

@@ -9,7 +9,7 @@ local Ranks = ____Enums.Ranks
 local CharacterTypes = ____Enums.CharacterTypes
 local ____Helpers = require("Helpers")
 local getRandomElementFromArray = ____Helpers.getRandomElementFromArray
-local getRandomElementFromTable = ____Helpers.getRandomElementFromTable
+local getRandomElementFromEnum = ____Helpers.getRandomElementFromEnum
 local isEmpty = ____Helpers.isEmpty
 local ____Card = require("Card")
 local Card = ____Card.default
@@ -77,8 +77,8 @@ function Dealer.prototype.initializeEnemyDeck(self)
         local i = 0
         while i < self.gameManager.board.enemy.numberOfCardsInDeck do
             do
-                local suit = getRandomElementFromTable(Suits)
-                local rank = getRandomElementFromTable(Ranks)
+                local suit = getRandomElementFromEnum(Suits)
+                local rank = getRandomElementFromEnum(Ranks)
                 if isEmpty(suit) or isEmpty(rank) then
                     goto __continue22
                 end

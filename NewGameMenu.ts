@@ -86,7 +86,8 @@ export default class NewGameMenu {
         const playerName = this.nameInput.text.trim()
         if (playerName.length > 0) {
             this.gameManager.player.name = playerName
-            this.gameManager.switchToBoard()
+            this.gameManager.map.generateNewMap()
+            this.gameManager.switchToMap()
         }
     }
 }

@@ -12,7 +12,8 @@ export default class Save {
         const saveData = {
             gameState: gameManager.gameState,
             player: gameManager.player.save(),
-            board: gameManager.board ? gameManager.board.save() : undefined
+            board: gameManager.board ? gameManager.board.save() : undefined,
+            map: gameManager.map.save()
         }
         let dataString: any
         try {
@@ -44,10 +45,11 @@ export default class Save {
                 lovelyToasts.show("Error loading save data: " + err)
                 return false
             }
-            gameManager.gameState = saveData.gameState || GameStates.MAIN_MENU
-            gameManager.player.load(saveData.player || {})
+            gameManager.gameState = saveData.gameState ?? GameStates.MAIN_MENU
+            gameManager.player.load(saveData.player ?? {})
             gameManager.board = new Board(gameManager)
-            gameManager.board.load(saveData.board || {})
+            gameManager.board.load(saveData.board ?? {})
+            gameManager.map.load(saveData.map ?? {})
         }
         return true
     }

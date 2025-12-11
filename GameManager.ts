@@ -9,12 +9,17 @@ import WinScreen from "WinScreen"
 import LoseScreen from "LoseScreen"
 import Settings from "Settings"
 import Character from "Character"
-import { isEmpty } from "Helpers"
+import { exhaustiveGuard, isEmpty } from "Helpers"
 import * as GameStateManager from "Libraries.GameStateManager-main.gamestateManager"
 import Player from "Player"
+import Map from "Map"
+import Enemy from "Enemy"
+import * as suit from "Libraries.suit-master.suit"
+import Draw from "Draw"
 
 interface GameState {
     update: (dt: number) => void
+    draw?: () => void
 }
 
 export default class GameManager {
@@ -27,6 +32,7 @@ export default class GameManager {
     board?: Board
     winScreen?: WinScreen
     loseScreen?: LoseScreen
+    map: Map
 
     constructor() {
         this.gameState = GameStates.MAIN_MENU
@@ -38,6 +44,7 @@ export default class GameManager {
         this.board = undefined
         this.winScreen = undefined
         this.loseScreen = undefined
+        this.map = new Map(this)
     }
 
     getCharacter(characterType: string): Character | undefined {
@@ -58,7 +65,7 @@ export default class GameManager {
                 this.switchToNewGameMenu()
                 break
             case GameStates.PLAYING:
-                this.switchToBoard()
+                this.switchToBoard(this.board?.enemy)
                 break
             case GameStates.PAUSE_MENU:
                 this.switchToPauseMenu()
@@ -69,6 +76,11 @@ export default class GameManager {
             case GameStates.LOSE_SCREEN:
                 this.switchToLoseScreen()
                 break
+            case GameStates.MAP:
+                this.switchToMap()
+                break
+            default:
+                exhaustiveGuard(this.gameState)
         }
     }
 
@@ -83,6 +95,9 @@ export default class GameManager {
         this.board = undefined
         this.winScreen = undefined
         this.loseScreen = undefined
+
+        // Reset to white text for dark backgrounds
+        suit.theme.color.normal.fg = [1, 1, 1]
 
         if (isEmpty(this.mainMenu)) {
             this.mainMenu = new MainMenu(this)
@@ -100,6 +115,9 @@ export default class GameManager {
 
         this.gameState = GameStates.NEW_GAME_MENU
 
+        // Reset to white text for dark backgrounds
+        suit.theme.color.normal.fg = [1, 1, 1]
+
         if (isEmpty(this.newGameMenu)) {
             this.newGameMenu = new NewGameMenu(this)
         }
@@ -116,6 +134,10 @@ export default class GameManager {
 
         // Game state needs to be the previous state in the pause menu so we save correctly
         // this.gameState = GameStates.PAUSE_MENU
+
+        // Reset to white text for dark backgrounds
+        suit.theme.color.normal.fg = [1, 1, 1]
+
         if (isEmpty(this.pauseMenu)) {
             this.pauseMenu = new PauseMenu(this)
         }
@@ -123,7 +145,7 @@ export default class GameManager {
         GameStateManager.setState(pauseMenuState)
     }
 
-    switchToBoard(): void {
+    switchToBoard(enemy?: Enemy): void {
         const boardState: GameState = {
             update: (dt: number) => {
                 this.board?.drawBoard()
@@ -134,8 +156,11 @@ export default class GameManager {
         this.winScreen = undefined
         this.loseScreen = undefined
 
+        // Reset to white text for dark backgrounds
+        suit.theme.color.normal.fg = [1, 1, 1]
+
         if (isEmpty(this.board)) {
-            this.board = new Board(this)
+            this.board = new Board(this, enemy ?? new Enemy())
             this.board.dealer.setup()
         }
 
@@ -153,6 +178,9 @@ export default class GameManager {
         // We need some data from the board to show stats and loot cards, so we keep it
         // this.board = {}
         this.loseScreen = undefined
+
+        // Reset to white text for dark backgrounds
+        suit.theme.color.normal.fg = [1, 1, 1]
 
         if (isEmpty(this.winScreen)) {
             this.winScreen = new WinScreen(this)
@@ -174,10 +202,35 @@ export default class GameManager {
         this.board = undefined
         this.winScreen = undefined
 
+        // Reset to white text for dark backgrounds
+        suit.theme.color.normal.fg = [1, 1, 1]
+
         if (isEmpty(this.loseScreen)) {
             this.loseScreen = new LoseScreen()
         }
 
         GameStateManager.setState(loseState)
+    }
+
+    switchToMap(): void {
+        const mapState: GameState = {
+            update: (dt: number) => {
+                this.map.drawMap()
+            },
+            draw: () => {
+                this.map.drawBackground()
+            }
+        }
+
+        this.gameState = GameStates.MAP
+
+        this.board = undefined
+        this.winScreen = undefined
+        this.loseScreen = undefined
+
+        // Set dark text color for labels to be readable on light backgrounds
+        Draw.setThemeColors(0, 0, 0)
+
+        GameStateManager.setState(mapState)
     }
 }

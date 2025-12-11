@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
 import { Suits, Ranks, CharacterTypes } from "./Enums"
-import { getRandomElementFromArray, getRandomElementFromTable, isEmpty } from "./Helpers"
+import { getRandomElementFromArray, getRandomElementFromEnum, isEmpty } from "./Helpers"
 import Card from "./Card"
 import GameManager from "./GameManager"
 
@@ -70,8 +70,8 @@ export default class Dealer {
         }
 
         for (let i = 0; i < this.gameManager.board.enemy.numberOfCardsInDeck; i++) {
-            const suit = getRandomElementFromTable(Suits)
-            const rank = getRandomElementFromTable(Ranks)
+            const suit = getRandomElementFromEnum(Suits)
+            const rank = getRandomElementFromEnum(Ranks)
             if (isEmpty(suit) || isEmpty(rank)) {
                 continue
             }

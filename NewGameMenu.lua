@@ -85,7 +85,8 @@ function NewGameMenu.prototype.handleStartGame(self)
     local playerName = __TS__StringTrim(self.nameInput.text)
     if #playerName > 0 then
         self.gameManager.player.name = playerName
-        self.gameManager:switchToBoard()
+        self.gameManager.map:generateNewMap()
+        self.gameManager:switchToMap()
     end
 end
 return ____exports

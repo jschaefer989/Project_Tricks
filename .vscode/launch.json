@@ -10,13 +10,20 @@
             "name": "Debug LOVE",
             "program":
             {
-                "command": "C:\\Users\\jscha\\LOVE\\love.exe"
+                "command": "C:\\Program Files\\LOVE\\love.exe"
             },
             "args": 
             [
                 "${workspaceFolder}",
                 "vsc_debug"
             ],
+            "sourceRoot": "${workspaceFolder}",
+            "sourceMaps": [
+                {
+                    "sourceRoot": "${workspaceFolder}",
+                    "targetRoot": "${workspaceFolder}"
+                }
+            ]
         },
     ],
     

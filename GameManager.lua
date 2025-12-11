@@ -20,10 +20,18 @@ local LoseScreen = ____LoseScreen.default
 local ____Settings = require("Settings")
 local Settings = ____Settings.default
 local ____Helpers = require("Helpers")
+local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
 local GameStateManager = require("Libraries.GameStateManager-main.gamestateManager")
 local ____Player = require("Player")
 local Player = ____Player.default
+local ____Map = require("Map")
+local Map = ____Map.default
+local ____Enemy = require("Enemy")
+local Enemy = ____Enemy.default
+local suit = require("Libraries.suit-master.suit")
+local ____Draw = require("Draw")
+local Draw = ____Draw.default
 ____exports.default = __TS__Class()
 local GameManager = ____exports.default
 GameManager.name = "GameManager"
@@ -37,6 +45,7 @@ function GameManager.prototype.____constructor(self)
     self.board = nil
     self.winScreen = nil
     self.loseScreen = nil
+    self.map = __TS__New(Map, self)
 end
 function GameManager.prototype.getCharacter(self, characterType)
     repeat
@@ -67,7 +76,9 @@ function GameManager.prototype.switchBasedOnGameState(self)
         end
         ____cond6 = ____cond6 or ____switch6 == GameStates.PLAYING
         if ____cond6 then
-            self:switchToBoard()
+            local ____self_switchToBoard_4 = self.switchToBoard
+            local ____opt_2 = self.board
+            ____self_switchToBoard_4(self, ____opt_2 and ____opt_2.enemy)
             break
         end
         ____cond6 = ____cond6 or ____switch6 == GameStates.PAUSE_MENU
@@ -85,19 +96,28 @@ function GameManager.prototype.switchBasedOnGameState(self)
             self:switchToLoseScreen()
             break
         end
+        ____cond6 = ____cond6 or ____switch6 == GameStates.MAP
+        if ____cond6 then
+            self:switchToMap()
+            break
+        end
+        do
+            exhaustiveGuard(self.gameState)
+        end
     until true
 end
 function GameManager.prototype.switchToMainMenu(self)
     local mainMenuState = {update = function(____, dt)
-        local ____opt_2 = self.mainMenu
-        if ____opt_2 ~= nil then
-            ____opt_2:drawScreen()
+        local ____opt_5 = self.mainMenu
+        if ____opt_5 ~= nil then
+            ____opt_5:drawScreen()
         end
     end}
     self.gameState = GameStates.MAIN_MENU
     self.board = nil
     self.winScreen = nil
     self.loseScreen = nil
+    suit.theme.color.normal.fg = {1, 1, 1}
     if isEmpty(self.mainMenu) then
         self.mainMenu = __TS__New(MainMenu, self)
     end
@@ -105,12 +125,13 @@ function GameManager.prototype.switchToMainMenu(self)
 end
 function GameManager.prototype.switchToNewGameMenu(self)
     local newGameMenuState = {update = function(____, dt)
-        local ____opt_4 = self.newGameMenu
-        if ____opt_4 ~= nil then
-            ____opt_4:drawScreen()
+        local ____opt_7 = self.newGameMenu
+        if ____opt_7 ~= nil then
+            ____opt_7:drawScreen()
         end
     end}
     self.gameState = GameStates.NEW_GAME_MENU
+    suit.theme.color.normal.fg = {1, 1, 1}
     if isEmpty(self.newGameMenu) then
         self.newGameMenu = __TS__New(NewGameMenu, self)
     end
@@ -118,63 +139,87 @@ function GameManager.prototype.switchToNewGameMenu(self)
 end
 function GameManager.prototype.switchToPauseMenu(self)
     local pauseMenuState = {update = function(____, dt)
-        local ____opt_6 = self.pauseMenu
-        if ____opt_6 ~= nil then
-            ____opt_6:drawScreen()
+        local ____opt_9 = self.pauseMenu
+        if ____opt_9 ~= nil then
+            ____opt_9:drawScreen()
         end
     end}
+    suit.theme.color.normal.fg = {1, 1, 1}
     if isEmpty(self.pauseMenu) then
         self.pauseMenu = __TS__New(PauseMenu, self)
     end
     GameStateManager:setState(pauseMenuState)
 end
-function GameManager.prototype.switchToBoard(self)
+function GameManager.prototype.switchToBoard(self, enemy)
     local boardState = {update = function(____, dt)
-        local ____opt_8 = self.board
-        if ____opt_8 ~= nil then
-            ____opt_8:drawBoard()
+        local ____opt_11 = self.board
+        if ____opt_11 ~= nil then
+            ____opt_11:drawBoard()
         end
     end}
     self.gameState = GameStates.PLAYING
     self.winScreen = nil
     self.loseScreen = nil
+    suit.theme.color.normal.fg = {1, 1, 1}
     if isEmpty(self.board) then
-        self.board = __TS__New(Board, self)
+        self.board = __TS__New(
+            Board,
+            self,
+            enemy or __TS__New(Enemy)
+        )
         self.board.dealer:setup()
     end
     GameStateManager:setState(boardState)
 end
 function GameManager.prototype.switchToWinScreen(self)
     local winState = {update = function(____, dt)
-        local ____opt_10 = self.winScreen
-        if ____opt_10 ~= nil then
-            ____opt_10:drawScreen()
+        local ____opt_13 = self.winScreen
+        if ____opt_13 ~= nil then
+            ____opt_13:drawScreen()
         end
     end}
     self.gameState = GameStates.WIN_SCREEN
     self.loseScreen = nil
+    suit.theme.color.normal.fg = {1, 1, 1}
     if isEmpty(self.winScreen) then
         self.winScreen = __TS__New(WinScreen, self)
     end
-    local ____opt_12 = self.board
-    if ____opt_12 ~= nil then
-        ____opt_12.dealer:getLootCards()
+    local ____opt_15 = self.board
+    if ____opt_15 ~= nil then
+        ____opt_15.dealer:getLootCards()
     end
     GameStateManager:setState(winState)
 end
 function GameManager.prototype.switchToLoseScreen(self)
     local loseState = {update = function(____, dt)
-        local ____opt_14 = self.loseScreen
-        if ____opt_14 ~= nil then
-            ____opt_14:drawScreen()
+        local ____opt_17 = self.loseScreen
+        if ____opt_17 ~= nil then
+            ____opt_17:drawScreen()
         end
     end}
     self.gameState = GameStates.LOSE_SCREEN
     self.board = nil
     self.winScreen = nil
+    suit.theme.color.normal.fg = {1, 1, 1}
     if isEmpty(self.loseScreen) then
         self.loseScreen = __TS__New(LoseScreen)
     end
     GameStateManager:setState(loseState)
+end
+function GameManager.prototype.switchToMap(self)
+    local mapState = {
+        update = function(____, dt)
+            self.map:drawMap()
+        end,
+        draw = function()
+            self.map:drawBackground()
+        end
+    }
+    self.gameState = GameStates.MAP
+    self.board = nil
+    self.winScreen = nil
+    self.loseScreen = nil
+    Draw:setThemeColors(0, 0, 0)
+    GameStateManager:setState(mapState)
 end
 return ____exports

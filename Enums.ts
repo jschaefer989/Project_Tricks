@@ -5,6 +5,7 @@ export enum GameStates {
     PAUSE_MENU = "PAUSE_MENU",
     WIN_SCREEN = "WIN_SCREEN",
     LOSE_SCREEN = "LOSE_SCREEN",
+    MAP = "MAP",
 }
 export enum Suits {
     HEARTS = "HEARTS",
@@ -27,4 +28,16 @@ export enum Ranks {
 export enum CharacterTypes {
     PLAYER = "PLAYER",
     ENEMY = "ENEMY",
+}
+
+export enum MapNodeTypes {
+    BATTLE = "BATTLE",
+    SHOP = "SHOP",
+}
+
+export enum EnemyTypes {
+    GOBLIN = "GOBLIN",
+    ORC = "ORC",
+    TROLL = "TROLL",
+    DRAGON = "DRAGON",
 }

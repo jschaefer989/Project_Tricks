@@ -16,7 +16,7 @@ export default class Board {
     dealer: Dealer;
     playerPoints: number;
     enemyPoints: number;
-    constructor(gameManager: GameManager);
+    constructor(gameManager: GameManager, enemy?: Enemy);
     load(data: BoardData): void;
     save(): BoardData;
     drawBoard(): void;

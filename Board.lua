@@ -14,10 +14,10 @@ local suit = require("Libraries.suit-master.suit")
 ____exports.default = __TS__Class()
 local Board = ____exports.default
 Board.name = "Board"
-function Board.prototype.____constructor(self, gameManager)
+function Board.prototype.____constructor(self, gameManager, enemy)
     self.gameManager = gameManager
     self.discardUsed = 0
-    self.enemy = __TS__New(Enemy)
+    self.enemy = enemy or __TS__New(Enemy)
     self.dealer = __TS__New(Dealer, gameManager)
     self.playerPoints = 0
     self.enemyPoints = 0
@@ -27,15 +27,7 @@ function Board.prototype.load(self, data)
     self.playerPoints = data.playerPoints or 0
     self.enemyPoints = data.enemyPoints or 0
     self.enemy = __TS__New(Enemy)
-    local ____self_enemy_2 = self.enemy
-    local ____opt_0 = data.enemy
-    ____self_enemy_2.hand = ____opt_0 and ____opt_0.hand or ({})
-    local ____self_enemy_5 = self.enemy
-    local ____opt_3 = data.enemy
-    ____self_enemy_5.deck = ____opt_3 and ____opt_3.deck or ({})
-    local ____self_enemy_8 = self.enemy
-    local ____opt_6 = data.enemy
-    ____self_enemy_8.discardPile = ____opt_6 and ____opt_6.discardPile or ({})
+    self.enemy:load(data.enemy)
 end
 function Board.prototype.save(self)
     return {

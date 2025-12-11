@@ -19,7 +19,8 @@ function Save.save(self, gameManager)
     local saveData = {
         gameState = gameManager.gameState,
         player = gameManager.player:save(),
-        board = gameManager.board and gameManager.board:save() or nil
+        board = gameManager.board and gameManager.board:save() or nil,
+        map = gameManager.map:save()
     }
     local dataString
     do
@@ -68,10 +69,34 @@ function Save.load(self, gameManager)
                 return ____returnValue
             end
         end
-        gameManager.gameState = saveData.gameState or GameStates.MAIN_MENU
-        gameManager.player:load(saveData.player or ({}))
+        local ____gameManager_1 = gameManager
+        local ____saveData_gameState_0 = saveData.gameState
+        if ____saveData_gameState_0 == nil then
+            ____saveData_gameState_0 = GameStates.MAIN_MENU
+        end
+        ____gameManager_1.gameState = ____saveData_gameState_0
+        local ____self_3 = gameManager.player
+        local ____self_3_load_4 = ____self_3.load
+        local ____saveData_player_2 = saveData.player
+        if ____saveData_player_2 == nil then
+            ____saveData_player_2 = {}
+        end
+        ____self_3_load_4(____self_3, ____saveData_player_2)
         gameManager.board = __TS__New(Board, gameManager)
-        gameManager.board:load(saveData.board or ({}))
+        local ____self_6 = gameManager.board
+        local ____self_6_load_7 = ____self_6.load
+        local ____saveData_board_5 = saveData.board
+        if ____saveData_board_5 == nil then
+            ____saveData_board_5 = {}
+        end
+        ____self_6_load_7(____self_6, ____saveData_board_5)
+        local ____self_9 = gameManager.map
+        local ____self_9_load_10 = ____self_9.load
+        local ____saveData_map_8 = saveData.map
+        if ____saveData_map_8 == nil then
+            ____saveData_map_8 = {}
+        end
+        ____self_9_load_10(____self_9, ____saveData_map_8)
     end
     return true
 end

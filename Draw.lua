@@ -29,4 +29,25 @@ function Draw.card(self, gameManager, card, btnW, btnH, onlySelectOne)
         card.selected = not card.selected
     end
 end
+function Draw.loadImage(self, path)
+    local success, imageOrError = pcall(function() return love.graphics.newImage(path) end)
+    if success then
+        return imageOrError
+    end
+end
+function Draw.drawBackgroundImage(self, image)
+    local screenW = love.graphics.getWidth()
+    local screenH = love.graphics.getHeight()
+    love.graphics.draw(
+        image,
+        0,
+        0,
+        0,
+        screenW / image:getWidth(),
+        screenH / image:getHeight()
+    )
+end
+function Draw.setThemeColors(self, r, g, b)
+    suit.theme.color.normal.fg = {r, g, b}
+end
 return ____exports

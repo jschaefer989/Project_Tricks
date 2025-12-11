@@ -5,17 +5,38 @@ local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local ____Character = require("Character")
 local Character = ____Character.default
+local ____Enums = require("Enums")
+local EnemyTypes = ____Enums.EnemyTypes
 ____exports.default = __TS__Class()
 local Enemy = ____exports.default
 Enemy.name = "Enemy"
 __TS__ClassExtends(Enemy, Character)
-function Enemy.prototype.____constructor(self, numberOfHeldCards, numberOfCardsInDeck)
+function Enemy.prototype.____constructor(self, numberOfHeldCards, numberOfCardsInDeck, level, enemyType)
     Character.prototype.____constructor(self)
     self.numberOfHeldCards = numberOfHeldCards or 3
     self.numberOfCardsInDeck = numberOfCardsInDeck or 9
+    self.level = level or 1
+    self.enemyType = enemyType or EnemyTypes.GOBLIN
+end
+function Enemy.prototype.load(self, data)
+    self.hand = data and data.hand or ({})
+    self.deck = data and data.deck or ({})
+    self.discardPile = data and data.discardPile or ({})
+    self.level = data and data.level or 1
+    self.numberOfHeldCards = data and data.numberOfHeldCards or 3
+    self.numberOfCardsInDeck = data and data.numberOfCardsInDeck or 9
+    self.enemyType = data and data.enemyType or EnemyTypes.GOBLIN
 end
 function Enemy.prototype.save(self)
-    return {hand = self.hand, deck = self.deck, discardPile = self.discardPile}
+    return {
+        hand = self.hand,
+        deck = self.deck,
+        discardPile = self.discardPile,
+        level = self.level,
+        numberOfHeldCards = self.numberOfHeldCards,
+        numberOfCardsInDeck = self.numberOfCardsInDeck,
+        enemyType = self.enemyType
+    }
 end
 function Enemy.prototype.getCardPower(self)
     local power = 0
@@ -41,5 +62,29 @@ function Enemy.prototype.removeAllCardsFromHand(self)
             i = i - 1
         end
     end
+end
+function Enemy.prototype.getEnemyName(self)
+    repeat
+        local ____switch15 = self.enemyType
+        local ____cond15 = ____switch15 == EnemyTypes.GOBLIN
+        if ____cond15 then
+            return "Goblin"
+        end
+        ____cond15 = ____cond15 or ____switch15 == EnemyTypes.ORC
+        if ____cond15 then
+            return "Orc"
+        end
+        ____cond15 = ____cond15 or ____switch15 == EnemyTypes.TROLL
+        if ____cond15 then
+            return "Troll"
+        end
+        ____cond15 = ____cond15 or ____switch15 == EnemyTypes.DRAGON
+        if ____cond15 then
+            return "Dragon"
+        end
+        do
+            return "Unknown"
+        end
+    until true
 end
 return ____exports

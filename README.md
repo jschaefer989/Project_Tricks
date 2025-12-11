@@ -8,3 +8,4 @@ This project contains Typescript declaration files for the following Lua librari
 * Lovely Toasts
 * Push
 * GameStateManager
+* loaded_dice
