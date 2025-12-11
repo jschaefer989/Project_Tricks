@@ -2,7 +2,7 @@
 
 import GameManager from "GameManager"
 import * as suit from "Libraries.suit-master.suit"
-import { Save } from "Save"
+import Save from "Save"
 
 export default class MainMenu {
     gameManager: GameManager
@@ -42,8 +42,8 @@ export default class MainMenu {
         suit.layout.reset(panelX, newGameBtnY)
         const newGameResult = suit.Button("New Game", {}, ...suit.layout.row(btnW, btnH))
         if (newGameResult.hit) {
-            // TODO: need an "are you sure?" prompt here
-            this.gameManager.switchToBoard()
+            // TODO: need an are you sure prompt here
+            this.gameManager.switchToNewGameMenu()
         }
 
         // Create a quit button below the new game button

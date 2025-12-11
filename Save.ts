@@ -7,7 +7,7 @@ import * as lovelyToasts from "Libraries.Lovely-Toasts-main.lovelyToasts"
 import * as json from "Libraries.jsonlua-master"
 import GameManager from "./GameManager"
 
-export class Save {
+export default class Save {
     static save(gameManager: GameManager): boolean {
         const saveData = {
             gameState: gameManager.gameState,

@@ -4,6 +4,16 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Compile TypeScript",
+            "type": "shell",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "command": "npx tstl",
+            "problemMatcher": []
+        },
+        {
             "label": "Build .love",
             "type": "shell",
             "presentation": {
@@ -17,6 +27,23 @@
                 "Bypass",
                 "-File",
                 "${workspaceFolder}\\build.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Game",
+            "type": "shell",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\build-game.ps1"
             ],
             "problemMatcher": [],
             "group": {

@@ -7,6 +7,8 @@ local GameStates = ____Enums.GameStates
 local CharacterTypes = ____Enums.CharacterTypes
 local ____MainMenu = require("MainMenu")
 local MainMenu = ____MainMenu.default
+local ____NewGameMenu = require("NewGameMenu")
+local NewGameMenu = ____NewGameMenu.default
 local ____PauseMenu = require("PauseMenu")
 local PauseMenu = ____PauseMenu.default
 local ____Board = require("Board")
@@ -30,6 +32,7 @@ function GameManager.prototype.____constructor(self)
     self.player = __TS__New(Player)
     self.settings = __TS__New(Settings)
     self.mainMenu = nil
+    self.newGameMenu = nil
     self.pauseMenu = nil
     self.board = nil
     self.winScreen = nil
@@ -55,6 +58,11 @@ function GameManager.prototype.switchBasedOnGameState(self)
         local ____cond6 = ____switch6 == GameStates.MAIN_MENU
         if ____cond6 then
             self:switchToMainMenu()
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == GameStates.NEW_GAME_MENU
+        if ____cond6 then
+            self:switchToNewGameMenu()
             break
         end
         ____cond6 = ____cond6 or ____switch6 == GameStates.PLAYING
@@ -95,11 +103,24 @@ function GameManager.prototype.switchToMainMenu(self)
     end
     GameStateManager:setState(mainMenuState)
 end
-function GameManager.prototype.switchToPauseMenu(self)
-    local pauseMenuState = {update = function(____, dt)
-        local ____opt_4 = self.pauseMenu
+function GameManager.prototype.switchToNewGameMenu(self)
+    local newGameMenuState = {update = function(____, dt)
+        local ____opt_4 = self.newGameMenu
         if ____opt_4 ~= nil then
             ____opt_4:drawScreen()
+        end
+    end}
+    self.gameState = GameStates.NEW_GAME_MENU
+    if isEmpty(self.newGameMenu) then
+        self.newGameMenu = __TS__New(NewGameMenu, self)
+    end
+    GameStateManager:setState(newGameMenuState)
+end
+function GameManager.prototype.switchToPauseMenu(self)
+    local pauseMenuState = {update = function(____, dt)
+        local ____opt_6 = self.pauseMenu
+        if ____opt_6 ~= nil then
+            ____opt_6:drawScreen()
         end
     end}
     if isEmpty(self.pauseMenu) then
@@ -109,9 +130,9 @@ function GameManager.prototype.switchToPauseMenu(self)
 end
 function GameManager.prototype.switchToBoard(self)
     local boardState = {update = function(____, dt)
-        local ____opt_6 = self.board
-        if ____opt_6 ~= nil then
-            ____opt_6:drawBoard()
+        local ____opt_8 = self.board
+        if ____opt_8 ~= nil then
+            ____opt_8:drawBoard()
         end
     end}
     self.gameState = GameStates.PLAYING
@@ -125,9 +146,9 @@ function GameManager.prototype.switchToBoard(self)
 end
 function GameManager.prototype.switchToWinScreen(self)
     local winState = {update = function(____, dt)
-        local ____opt_8 = self.winScreen
-        if ____opt_8 ~= nil then
-            ____opt_8:drawScreen()
+        local ____opt_10 = self.winScreen
+        if ____opt_10 ~= nil then
+            ____opt_10:drawScreen()
         end
     end}
     self.gameState = GameStates.WIN_SCREEN
@@ -135,17 +156,17 @@ function GameManager.prototype.switchToWinScreen(self)
     if isEmpty(self.winScreen) then
         self.winScreen = __TS__New(WinScreen, self)
     end
-    local ____opt_10 = self.board
-    if ____opt_10 ~= nil then
-        ____opt_10.dealer:getLootCards()
+    local ____opt_12 = self.board
+    if ____opt_12 ~= nil then
+        ____opt_12.dealer:getLootCards()
     end
     GameStateManager:setState(winState)
 end
 function GameManager.prototype.switchToLoseScreen(self)
     local loseState = {update = function(____, dt)
-        local ____opt_12 = self.loseScreen
-        if ____opt_12 ~= nil then
-            ____opt_12:drawScreen()
+        local ____opt_14 = self.loseScreen
+        if ____opt_14 ~= nil then
+            ____opt_14:drawScreen()
         end
     end}
     self.gameState = GameStates.LOSE_SCREEN

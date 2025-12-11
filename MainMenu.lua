@@ -3,7 +3,7 @@ local __TS__Class = ____lualib.__TS__Class
 local ____exports = {}
 local suit = require("Libraries.suit-master.suit")
 local ____Save = require("Save")
-local Save = ____Save.Save
+local Save = ____Save.default
 ____exports.default = __TS__Class()
 local MainMenu = ____exports.default
 MainMenu.name = "MainMenu"
@@ -46,7 +46,7 @@ function MainMenu.prototype.drawScreen(self)
         suit.layout:row(btnW, btnH)
     )
     if newGameResult.hit then
-        self.gameManager:switchToBoard()
+        self.gameManager:switchToNewGameMenu()
     end
     local quitBtnY = newGameBtnY + btnH + 10
     suit.layout:reset(panelX, quitBtnY)

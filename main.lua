@@ -38,6 +38,7 @@ function love.update(dt)
 end
 
 function love.textinput(text)
+    suit.textinput(text)
     GameStateManager:textinput(text)
 end
 

@@ -10,8 +10,8 @@ local ____Helpers = require("Helpers")
 local isEmpty = ____Helpers.isEmpty
 local lovelyToasts = require("Libraries.Lovely-Toasts-main.lovelyToasts")
 local json = require("Libraries.jsonlua-master")
-____exports.Save = __TS__Class()
-local Save = ____exports.Save
+____exports.default = __TS__Class()
+local Save = ____exports.default
 Save.name = "Save"
 function Save.prototype.____constructor(self)
 end

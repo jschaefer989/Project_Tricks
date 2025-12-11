@@ -2,6 +2,7 @@
 
 import { GameStates, CharacterTypes } from "./Enums"
 import MainMenu from "MainMenu"
+import NewGameMenu from "NewGameMenu"
 import PauseMenu from "PauseMenu"
 import Board from "Board"
 import WinScreen from "WinScreen"
@@ -21,6 +22,7 @@ export default class GameManager {
     player: Player
     settings: Settings
     mainMenu?: MainMenu
+    newGameMenu?: NewGameMenu
     pauseMenu?: PauseMenu
     board?: Board
     winScreen?: WinScreen
@@ -31,6 +33,7 @@ export default class GameManager {
         this.player = new Player()
         this.settings = new Settings()
         this.mainMenu = undefined
+        this.newGameMenu = undefined
         this.pauseMenu = undefined
         this.board = undefined
         this.winScreen = undefined
@@ -50,6 +53,9 @@ export default class GameManager {
         switch (this.gameState) {
             case GameStates.MAIN_MENU:
                 this.switchToMainMenu()
+                break
+            case GameStates.NEW_GAME_MENU:
+                this.switchToNewGameMenu()
                 break
             case GameStates.PLAYING:
                 this.switchToBoard()
@@ -83,6 +89,22 @@ export default class GameManager {
         }
 
         GameStateManager.setState(mainMenuState)
+    }
+
+    switchToNewGameMenu(): void {
+        const newGameMenuState: GameState = {
+            update: (dt: number) => {
+                this.newGameMenu?.drawScreen()
+            }
+        }
+
+        this.gameState = GameStates.NEW_GAME_MENU
+
+        if (isEmpty(this.newGameMenu)) {
+            this.newGameMenu = new NewGameMenu(this)
+        }
+
+        GameStateManager.setState(newGameMenuState)
     }
 
     switchToPauseMenu(): void {

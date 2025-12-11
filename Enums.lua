@@ -2,6 +2,7 @@
 local ____exports = {}
 ____exports.GameStates = GameStates or ({})
 ____exports.GameStates.MAIN_MENU = "MAIN_MENU"
+____exports.GameStates.NEW_GAME_MENU = "NEW_GAME_MENU"
 ____exports.GameStates.PLAYING = "PLAYING"
 ____exports.GameStates.PAUSE_MENU = "PAUSE_MENU"
 ____exports.GameStates.WIN_SCREEN = "WIN_SCREEN"

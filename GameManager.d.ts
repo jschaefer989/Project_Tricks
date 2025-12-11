@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 import { GameStates } from "./Enums";
 import MainMenu from "MainMenu";
+import NewGameMenu from "NewGameMenu";
 import PauseMenu from "PauseMenu";
 import Board from "Board";
 import WinScreen from "WinScreen";
@@ -13,6 +14,7 @@ export default class GameManager {
     player: Player;
     settings: Settings;
     mainMenu?: MainMenu;
+    newGameMenu?: NewGameMenu;
     pauseMenu?: PauseMenu;
     board?: Board;
     winScreen?: WinScreen;
@@ -21,6 +23,7 @@ export default class GameManager {
     getCharacter(characterType: string): Character | undefined;
     switchBasedOnGameState(): void;
     switchToMainMenu(): void;
+    switchToNewGameMenu(): void;
     switchToPauseMenu(): void;
     switchToBoard(): void;
     switchToWinScreen(): void;

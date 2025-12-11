@@ -1,5 +1,6 @@
 export enum GameStates {
     MAIN_MENU = "MAIN_MENU",
+    NEW_GAME_MENU = "NEW_GAME_MENU",
     PLAYING = "PLAYING",
     PAUSE_MENU = "PAUSE_MENU",
     WIN_SCREEN = "WIN_SCREEN",

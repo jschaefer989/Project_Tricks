@@ -15,6 +15,13 @@
   },
   "tstl": {
     "luaTarget": "JIT",
+    "noResolvePaths": [
+      "Libraries.GameStateManager-main.gamestateManager",
+      "Libraries.Lovely-Toasts-main.lovelyToasts",
+      "Libraries.jsonlua-master",
+      "Libraries.push",
+      "Libraries.suit-master.suit"
+    ]
   },
   "include": [
     "*.ts",

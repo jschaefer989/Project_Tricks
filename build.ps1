@@ -10,32 +10,20 @@ $zipPath = Join-Path -Path $outPath -ChildPath $name
 
 if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
 
-# Exclude common dev files/folders
-$exclude = @('.git', '.vscode', '.luacheckrc', 'node_modules', 'TSTL', 'build', '*.ts', '*.d.ts', 'tsconfig.json', 'package.json', 'package-lock.json', '*.ps1', '*.map')
+# Include only necessary files - much faster than excluding
+$include = @('*.lua', 'Libraries')
 
-# Collect items while excluding dev folders/files. Avoid using 'return' inside the Where-Object scriptblock
-$items = Get-ChildItem -Path $PSScriptRoot -Recurse -Force | Where-Object {
-    $fullname = $_.FullName
-    $relativePath = $_.FullName.Substring($PSScriptRoot.Length)
-    $keep = $true
-    foreach ($e in $exclude) {
-        if ($e -like '*\*' -or $e -like '*/*') {
-            # Path-based exclusion
-            if ($fullname -like "*$e*") { $keep = $false; break }
-        } elseif ($e -like '*.*') {
-            # Extension-based exclusion
-            if ($_.Name -like $e) { $keep = $false; break }
-        } else {
-            # Folder name exclusion
-            if ($relativePath -like "*\$e\*" -or $relativePath -like "*\$e") { $keep = $false; break }
-        }
-    }
-    $keep
+# Collect only .lua files and Libraries folder
+$luaFiles = Get-ChildItem -Path $PSScriptRoot -Filter "*.lua" -File | Where-Object { $_.Name -ne 'lualib_bundle.lua' }
+$libFolder = Get-Item -Path "$PSScriptRoot\Libraries" -ErrorAction SilentlyContinue
+
+$paths = @($luaFiles | ForEach-Object { $_.FullName })
+if ($libFolder) {
+    $paths += $libFolder.FullName
 }
 
-$paths = $items | ForEach-Object { $_.FullName }
-if (@($paths).Count -eq 0) {
-    Write-Error "Nothing to archive. Check exclusions and workspace contents."
+if ($paths.Count -eq 0) {
+    Write-Error "Nothing to archive. Check workspace contents."
     exit 1
 }
 
@@ -44,7 +32,7 @@ try {
     $tmpName = [System.IO.Path]::GetRandomFileName()
     $zipTmp = Join-Path -Path $env:TEMP -ChildPath ($tmpName + '.zip')
     if (Test-Path $zipTmp) { Remove-Item -Force $zipTmp }
-    Compress-Archive -Path $paths -DestinationPath $zipTmp -Force -ErrorAction Stop
+    Compress-Archive -Path $paths -DestinationPath $zipTmp -CompressionLevel Fastest -Force -ErrorAction Stop
 
     # Move temp zip to final .love location with a few retries in case of transient locks
     $maxAttempts = 6

@@ -3,7 +3,7 @@
 import GameManager from "GameManager"
 import * as GameStateManager from "Libraries.GameStateManager-main.gamestateManager"
 import * as suit from "Libraries.suit-master.suit"
-import { Save } from "Save"
+import Save from "Save"
 
 /** @noSelfInFile */
 
