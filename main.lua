@@ -43,6 +43,7 @@ function love.textinput(text)
 end
 
 function love.keypressed(key, scancode, isrepeat)
+    suit.keypressed(key)
     GameStateManager:keypressed(key, scancode, isrepeat)
     
     if gameManager.gameState ~= "MAIN_MENU" then

@@ -1,0 +1,14 @@
+{
+  "name": "project-tricks",
+  "version": "1.0.0",
+  "description": "A Love2D game built with TypeScriptToLua",
+  "scripts": {
+    "build": "tstl",
+    "watch": "tstl --watch"
+  },
+  "devDependencies": {
+    "lua-types": "^2.13.1",
+    "typescript": "^5.3.3",
+    "typescript-to-lua": "^1.25.1"
+  }
+}
