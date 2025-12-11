@@ -386,6 +386,9 @@ function Board.prototype.handlePlay(self)
     Dealer:dealCards(self.gameManager, CharacterTypes.ENEMY)
 end
 function Board.prototype.handleDiscard(self)
+    if not self.gameManager.player:anySelectedCards() then
+        return
+    end
     self.gameManager.player:discard()
     self.discardUsed = self.discardUsed + 1
     Dealer:dealCards(self.gameManager, CharacterTypes.PLAYER)

@@ -324,6 +324,8 @@ export default class Board {
     }
 
     handleDiscard(): void {
+        if (!this.gameManager.player.anySelectedCards()) return
+
         this.gameManager.player.discard()
 
         this.discardUsed = this.discardUsed + 1
