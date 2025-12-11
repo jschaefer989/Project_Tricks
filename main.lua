@@ -10,6 +10,7 @@ local gameManager = __TS__New(GameManager)
 
 function love.load()    
     love.window.setTitle("Tricks")
+    love.keyboard.setKeyRepeat(true)
     math.randomseed(os.time() + os.clock())
 
     -- TODO: load settings properly

@@ -56,7 +56,10 @@ export default class NewGameMenu {
 
     renderPlayerNameField(panelX: number, inputY: number): void {
         suit.layout.reset(panelX, inputY)
-        suit.Input(this.nameInput, {}, ...suit.layout.row(inputW, inputH))
+        const inputResult = suit.Input(this.nameInput, {}, ...suit.layout.row(inputW, inputH))
+        if (inputResult.submitted) {
+            this.handleStartGame()
+        }
     }
 
     renderStartButton(panelX: number, inputY: number): number {

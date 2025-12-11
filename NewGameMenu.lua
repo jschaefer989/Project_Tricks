@@ -47,11 +47,14 @@ function NewGameMenu.prototype.renderPlayerNameLabel(self, panelX)
 end
 function NewGameMenu.prototype.renderPlayerNameField(self, panelX, inputY)
     suit.layout:reset(panelX, inputY)
-    suit.Input(
+    local inputResult = suit.Input(
         self.nameInput,
         {},
         suit.layout:row(inputW, inputH)
     )
+    if inputResult.submitted then
+        self:handleStartGame()
+    end
 end
 function NewGameMenu.prototype.renderStartButton(self, panelX, inputY)
     local startBtnY = inputY + inputH + 30
