@@ -20,7 +20,7 @@ export default class Map {
         this.tiers = []
         this.currentTierIndex = 0   
 
-        this.backgroundImage = Draw.loadImage("assets/map_background.png")
+        //this.backgroundImage = Draw.loadImage("assets/map_background.png")
     }
 
     load(data: MapData): void {
@@ -44,7 +44,7 @@ export default class Map {
     }
 
     drawBackground(): void {
-        Draw.drawBackgroundImage(this.backgroundImage)
+        // Draw.drawBackgroundImage(this.backgroundImage)
     }
 
     drawTiers(): void {
@@ -61,6 +61,12 @@ export default class Map {
             const newTier = new MapTier(this.gameManager)
             newTier.generateNodes(3) // Hardcoded to 3 nodes per tier for now
             this.tiers.push(newTier)
+        }
+    }
+
+    advanceToNextTier(): void {
+        if (this.currentTierIndex < this.tiers.length - 1) {
+            this.currentTierIndex++
         }
     }
 }

@@ -87,10 +87,10 @@ export default class Board {
         this.renderPlayerSelectedStatsPanel()
 
         // Player info (upper-right)
-        this.renderPlayerInfoPanel(padX, padY)
+        Draw.playerInfoPanel(this.gameManager.player)
 
         // Player deck visualization (bottom right)
-        this.renderPlayerDeckVisualization()
+        Draw.playerDeckVisualization(this.gameManager.player)
 
         // Discard counter (bottom center)
         this.renderDiscardCounter()
@@ -119,10 +119,18 @@ export default class Board {
         return Math.max(rowWidth(enemyHand.length), rowWidth(playerHand.length), 300)
     }
 
-    getCashout(): number {
+    getPlayerCashout(): number {
         const selectedValue = this.gameManager.player.getCardValue()
         const enemyValue = this.enemy.getCardValue()
         let cashout = selectedValue - enemyValue
+        if (cashout < 0) cashout = 0
+        return cashout
+    }
+
+    getEnemyCashout(): number {
+        const selectedValue = this.gameManager.player.getCardValue()
+        const enemyValue = this.enemy.getCardValue()
+        let cashout = enemyValue - selectedValue
         if (cashout < 0) cashout = 0
         return cashout
     }
@@ -150,7 +158,7 @@ export default class Board {
 
             suit.layout.reset(x, bottomY, 10, 10)
             suit.Label("You will slay your foe!", { align: "left" }, ...suit.layout.row(150, 40))
-            suit.Label("Your cashout: " + this.getCashout(), { align: "left" }, ...suit.layout.row(150, 30))
+            suit.Label("Your cashout: " + this.getPlayerCashout(), { align: "left" }, ...suit.layout.row(150, 30))
         }
     }
 
@@ -210,41 +218,6 @@ export default class Board {
         suit.Label("Power: " + selectedPower, { align: "center" }, ...suit.layout.row(panelW, 30))
     }
 
-    renderPlayerInfoPanel(padX: number, padY: number): void {
-        const name = this.gameManager.player.name || "Player"
-        const level = this.gameManager.player.level || 1
-        const exp = this.gameManager.player.experience || 0
-        const money = this.gameManager.player.money || 0
-        const screenW = love.graphics.getWidth()
-        const panelW = 200
-        const panelX = screenW - panelW - padX
-
-        suit.layout.reset(panelX, padY, 10, 10)
-        suit.Label(name, { align: "center" }, ...suit.layout.row(panelW, 24))
-        suit.Label("Level: " + level, { align: "left" }, ...suit.layout.row(panelW, 22))
-        suit.Label("XP: " + exp, { align: "left" }, ...suit.layout.row(panelW, 22))
-        suit.Label("Money: " + money, { align: "left" }, ...suit.layout.row(panelW, 22))
-    }
-
-    renderPlayerDeckVisualization(): void {
-        const deckSize = this.gameManager.player.deck.length
-        const discardSize = this.gameManager.player.discardPile.length
-
-        // Render discard pile and deck visualization in bottom right corner
-        const screenW = love.graphics.getWidth()
-        const screenH = love.graphics.getHeight()
-        const panelX = screenW - 170 // Same right alignment as selected stats
-        const panelY = screenH - 200 // Higher up to fit on screen
-
-        suit.layout.reset(panelX, panelY, 10, 10)
-        suit.Label("Discard Pile", { align: "center" }, ...suit.layout.row(150, 30))
-        suit.Label("Cards: " + discardSize, { align: "center" }, ...suit.layout.row(150, 30))
-
-        suit.layout.row(0, 10)
-        suit.Label("Player Deck", { align: "center" }, ...suit.layout.row(150, 30))
-        suit.Label("Cards Remaining: " + deckSize, { align: "center" }, ...suit.layout.row(150, 30))
-    }
-
     renderEnemyRow(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void {
         const enemyHand = this.enemy.hand
         suit.layout.reset(startX, startY, padX, padY)
@@ -262,7 +235,7 @@ export default class Board {
         suit.Label("Your hand: " + playerHand.length, { align: "left" }, ...suit.layout.row(contentW, lblH))
         suit.layout.row(0, 0)
         for (const card of playerHand) {
-            Draw.card(this.gameManager,card, btnW, btnH)
+            Draw.card(card, btnW, btnH, { multiSelect: true } )
         }
     }
 
@@ -309,9 +282,9 @@ export default class Board {
         const enemyPower = this.enemy.getCardPower()
 
         if (selectedPower > enemyPower) {
-            this.playerPoints = this.playerPoints + this.getCashout()
+            this.playerPoints = this.playerPoints + this.getPlayerCashout()
         } else {
-            this.enemyPoints = this.enemyPoints + this.enemy.getCardValue()
+            this.enemyPoints = this.enemyPoints + this.getEnemyCashout()
         }
 
         this.gameManager.player.removeSelectedCardsFromHand()

@@ -6,8 +6,11 @@ export default class Card {
     power: number;
     value: number;
     selected: boolean;
+    cost: number;
     constructor(suit: Suits, rank: Ranks);
     isEqual(otherCard: Card): boolean;
     getPower(suit: string, rank: string): number;
     getValue(rank: string): number;
+    getCost(): number;
+    getBaseCost(): number;
 }

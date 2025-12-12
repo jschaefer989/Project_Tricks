@@ -3,8 +3,6 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local __TS__ArrayMap = ____lualib.__TS__ArrayMap
 local ____exports = {}
-local ____Draw = require("Draw")
-local Draw = ____Draw.default
 local ____MapTier = require("MapTier")
 local MapTier = ____MapTier.default
 ____exports.default = __TS__Class()
@@ -14,7 +12,6 @@ function Map.prototype.____constructor(self, gameManager)
     self.gameManager = gameManager
     self.tiers = {}
     self.currentTierIndex = 0
-    self.backgroundImage = Draw:loadImage("assets/map_background.png")
 end
 function Map.prototype.load(self, data)
     self.tiers = __TS__ArrayMap(
@@ -40,7 +37,6 @@ function Map.prototype.drawMap(self)
     self:drawTiers()
 end
 function Map.prototype.drawBackground(self)
-    Draw:drawBackgroundImage(self.backgroundImage)
 end
 function Map.prototype.drawTiers(self)
     do
@@ -63,6 +59,11 @@ function Map.prototype.generateNewMap(self)
             ____self_tiers_0[#____self_tiers_0 + 1] = newTier
             i = i + 1
         end
+    end
+end
+function Map.prototype.advanceToNextTier(self)
+    if self.currentTierIndex < #self.tiers - 1 then
+        self.currentTierIndex = self.currentTierIndex + 1
     end
 end
 return ____exports

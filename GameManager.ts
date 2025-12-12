@@ -15,7 +15,7 @@ import Player from "Player"
 import Map from "Map"
 import Enemy from "Enemy"
 import * as suit from "Libraries.suit-master.suit"
-import Draw from "Draw"
+import Shop from "Shop"
 
 interface GameState {
     update: (dt: number) => void
@@ -33,6 +33,7 @@ export default class GameManager {
     winScreen?: WinScreen
     loseScreen?: LoseScreen
     map: Map
+    shop?: Shop
 
     constructor() {
         this.gameState = GameStates.MAIN_MENU
@@ -45,6 +46,7 @@ export default class GameManager {
         this.winScreen = undefined
         this.loseScreen = undefined
         this.map = new Map(this)
+        this.shop = undefined
     }
 
     getCharacter(characterType: string): Character | undefined {
@@ -78,6 +80,9 @@ export default class GameManager {
                 break
             case GameStates.MAP:
                 this.switchToMap()
+                break
+            case GameStates.SHOP:
+                this.switchToShop()
                 break
             default:
                 exhaustiveGuard(this.gameState)
@@ -229,8 +234,27 @@ export default class GameManager {
         this.loseScreen = undefined
 
         // Set dark text color for labels to be readable on light backgrounds
-        Draw.setThemeColors(0, 0, 0)
+       // Draw.setThemeColors(0, 0, 0)
 
         GameStateManager.setState(mapState)
+    }
+
+    switchToShop(): void {
+        const shopState: GameState = {
+            update: (dt: number) => {
+                this.shop?.drawShop()
+            }
+        }
+
+        this.gameState = GameStates.SHOP
+
+        this.board = undefined
+        this.winScreen = undefined
+        this.loseScreen = undefined
+
+        this.shop = new Shop(this)
+        this.shop.generateCardsForSale()
+
+        GameStateManager.setState(shopState)
     }
 }

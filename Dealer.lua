@@ -69,6 +69,11 @@ function Dealer.dealCards(self, gameManager, characterType)
         end
     end
 end
+function Dealer.getRandomCard(self)
+    local suit = getRandomElementFromEnum(Suits)
+    local rank = getRandomElementFromEnum(Ranks)
+    return __TS__New(Card, suit, rank)
+end
 function Dealer.prototype.initializeEnemyDeck(self)
     if not self.gameManager.board or not self.gameManager.board.enemy then
         return
@@ -76,15 +81,7 @@ function Dealer.prototype.initializeEnemyDeck(self)
     do
         local i = 0
         while i < self.gameManager.board.enemy.numberOfCardsInDeck do
-            do
-                local suit = getRandomElementFromEnum(Suits)
-                local rank = getRandomElementFromEnum(Ranks)
-                if isEmpty(suit) or isEmpty(rank) then
-                    goto __continue22
-                end
-                self.gameManager.board.enemy:addToDeck(__TS__New(Card, suit, rank))
-            end
-            ::__continue22::
+            self.gameManager.board.enemy:addToDeck(____exports.default:getRandomCard())
             i = i + 1
         end
     end

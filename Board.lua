@@ -80,8 +80,8 @@ function Board.prototype.drawBoard(self)
         padY
     )
     self:renderPlayerSelectedStatsPanel()
-    self:renderPlayerInfoPanel(padX, padY)
-    self:renderPlayerDeckVisualization()
+    Draw:playerInfoPanel(self.gameManager.player)
+    Draw:playerDeckVisualization(self.gameManager.player)
     self:renderDiscardCounter()
 end
 function Board.prototype.getStartingCoordinates(self, contentW, btnH, groupH, padY)
@@ -108,10 +108,19 @@ function Board.prototype.getContentWidth(self)
         300
     )
 end
-function Board.prototype.getCashout(self)
+function Board.prototype.getPlayerCashout(self)
     local selectedValue = self.gameManager.player:getCardValue()
     local enemyValue = self.enemy:getCardValue()
     local cashout = selectedValue - enemyValue
+    if cashout < 0 then
+        cashout = 0
+    end
+    return cashout
+end
+function Board.prototype.getEnemyCashout(self)
+    local selectedValue = self.gameManager.player:getCardValue()
+    local enemyValue = self.enemy:getCardValue()
+    local cashout = enemyValue - selectedValue
     if cashout < 0 then
         cashout = 0
     end
@@ -140,7 +149,7 @@ function Board.prototype.renderWinStatus(self)
             suit.layout:row(150, 40)
         )
         suit.Label(
-            "Your cashout: " .. tostring(self:getCashout()),
+            "Your cashout: " .. tostring(self:getPlayerCashout()),
             {align = "left"},
             suit.layout:row(150, 30)
         )
@@ -226,66 +235,6 @@ function Board.prototype.renderPlayerSelectedStatsPanel(self)
         suit.layout:row(panelW, 30)
     )
 end
-function Board.prototype.renderPlayerInfoPanel(self, padX, padY)
-    local name = self.gameManager.player.name or "Player"
-    local level = self.gameManager.player.level or 1
-    local exp = self.gameManager.player.experience or 0
-    local money = self.gameManager.player.money or 0
-    local screenW = love.graphics.getWidth()
-    local panelW = 200
-    local panelX = screenW - panelW - padX
-    suit.layout:reset(panelX, padY, 10, 10)
-    suit.Label(
-        name,
-        {align = "center"},
-        suit.layout:row(panelW, 24)
-    )
-    suit.Label(
-        "Level: " .. tostring(level),
-        {align = "left"},
-        suit.layout:row(panelW, 22)
-    )
-    suit.Label(
-        "XP: " .. tostring(exp),
-        {align = "left"},
-        suit.layout:row(panelW, 22)
-    )
-    suit.Label(
-        "Money: " .. tostring(money),
-        {align = "left"},
-        suit.layout:row(panelW, 22)
-    )
-end
-function Board.prototype.renderPlayerDeckVisualization(self)
-    local deckSize = #self.gameManager.player.deck
-    local discardSize = #self.gameManager.player.discardPile
-    local screenW = love.graphics.getWidth()
-    local screenH = love.graphics.getHeight()
-    local panelX = screenW - 170
-    local panelY = screenH - 200
-    suit.layout:reset(panelX, panelY, 10, 10)
-    suit.Label(
-        "Discard Pile",
-        {align = "center"},
-        suit.layout:row(150, 30)
-    )
-    suit.Label(
-        "Cards: " .. tostring(discardSize),
-        {align = "center"},
-        suit.layout:row(150, 30)
-    )
-    suit.layout:row(0, 10)
-    suit.Label(
-        "Player Deck",
-        {align = "center"},
-        suit.layout:row(150, 30)
-    )
-    suit.Label(
-        "Cards Remaining: " .. tostring(deckSize),
-        {align = "center"},
-        suit.layout:row(150, 30)
-    )
-end
 function Board.prototype.renderEnemyRow(self, startX, startY, contentW, btnW, btnH, lblH, padX, padY)
     local enemyHand = self.enemy.hand
     suit.layout:reset(startX, startY, padX, padY)
@@ -314,7 +263,7 @@ function Board.prototype.renderPlayerRow(self, startX, startY, contentW, btnW, b
     )
     suit.layout:row(0, 0)
     for ____, card in ipairs(playerHand) do
-        Draw:card(self.gameManager, card, btnW, btnH)
+        Draw:card(card, btnW, btnH, {multiSelect = true})
     end
 end
 function Board.prototype.renderPlayButton(self, startY, btnW, btnH, padX, padY)
@@ -368,9 +317,9 @@ function Board.prototype.handlePlay(self)
     local selectedPower = self.gameManager.player:getCardPower()
     local enemyPower = self.enemy:getCardPower()
     if selectedPower > enemyPower then
-        self.playerPoints = self.playerPoints + self:getCashout()
+        self.playerPoints = self.playerPoints + self:getPlayerCashout()
     else
-        self.enemyPoints = self.enemyPoints + self.enemy:getCardValue()
+        self.enemyPoints = self.enemyPoints + self:getEnemyCashout()
     end
     self.gameManager.player:removeSelectedCardsFromHand()
     Dealer:dealCards(self.gameManager, CharacterTypes.PLAYER)

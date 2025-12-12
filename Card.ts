@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { exhaustiveGuard } from "Helpers"
 import { Ranks, Suits } from "./Enums"
 
 export default class Card {
@@ -8,6 +9,7 @@ export default class Card {
     power: number
     value: number
     selected: boolean
+    cost: number
 
     constructor(suit: Suits, rank: Ranks) {
         this.suit = suit
@@ -15,6 +17,7 @@ export default class Card {
         this.power = this.getPower(suit, rank)
         this.value = this.getValue(rank)
         this.selected = false
+        this.cost = this.getCost()
     }
 
     isEqual(otherCard: Card): boolean {
@@ -25,17 +28,17 @@ export default class Card {
         // Handle trump cards
         if (rank === Ranks.QUEEN || rank === Ranks.JACK || suit === Suits.DIAMONDS) {
             if (rank === Ranks.QUEEN) {
-                switch (suit) {
-                    case Suits.HEARTS: return 19
+                switch (suit) {                 
+                    case Suits.CLUBS: return 19   
                     case Suits.SPADES: return 18
-                    case Suits.CLUBS: return 17
+                    case Suits.HEARTS: return 17
                     case Suits.DIAMONDS: return 16
                 }
             } else if (rank === Ranks.JACK) {
                 switch (suit) {
-                    case Suits.HEARTS: return 15
+                    case Suits.CLUBS: return 15                    
                     case Suits.SPADES: return 14
-                    case Suits.CLUBS: return 13
+                    case Suits.HEARTS: return 13
                     case Suits.DIAMONDS: return 12
                 }
             } else if (suit === Suits.DIAMONDS) {
@@ -69,5 +72,57 @@ export default class Card {
             case Ranks.JACK: return 2
             default: return 0
         }
+    }
+
+    getCost(): number {
+        let cost = 0
+        cost += this.getBaseCost()
+        return cost
+    }
+
+    getBaseCost(): number {
+        let cost = 10
+        switch (this.rank) {
+            case Ranks.SEVEN: 
+                cost *= 1
+                break
+            case Ranks.EIGHT: 
+                cost *= 1
+                break
+            case Ranks.NINE: 
+                cost *= 1 
+                break
+            case Ranks.KING: cost += 2 
+                cost *= 2 
+                break
+            case Ranks.TEN: 
+                cost *= 3
+                break
+            case Ranks.JACK: 
+                cost *= 3
+                break
+            case Ranks.QUEEN: 
+                cost *= 4
+                break
+            case Ranks.ACE: 
+                cost *= 4
+                break
+            default: exhaustiveGuard(this.rank)
+        }
+        switch (this.suit) {
+            case Suits.DIAMONDS:
+                cost *= 2
+                break
+            case Suits.CLUBS:
+                cost *= 1
+                break
+            case Suits.HEARTS:
+                cost *= 1
+                break
+            case Suits.SPADES:
+                cost *= 1
+                break
+        }   
+        return cost
     }
 }

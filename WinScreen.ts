@@ -3,6 +3,7 @@ import Draw from "./Draw"
 import { isEmpty } from "Helpers"
 import * as suit from "Libraries.suit-master.suit"
 import GameManager from "./GameManager"
+import Card from "Card"
 
 /**
  * WinScreen class handles the display of the victory screen
@@ -28,9 +29,6 @@ export default class WinScreen {
 
         const lootStartY = panelY + panelH + 10
         const lootH = this.renderLootCards(panelX, lootStartY, panelW)
-
-        const continueBtnY = lootStartY + lootH + 10
-        this.renderContinueButton(panelX, continueBtnY, panelW)
     }
 
     renderVictoryLabel(): void {
@@ -77,34 +75,36 @@ export default class WinScreen {
             const card = lootCards[i]
             const x = panelX + i * (btnW + padding)
             suit.layout.reset(x, cardsY)
-            Draw.card(this.gameManager, card, btnW, btnH, true)
+            Draw.card(card, btnW, btnH, { onClick: () => this.handleLootCardSelection(card) } )
         }
 
         const totalHeight = labelH + 8 + btnH
         return totalHeight
     }
 
-    renderContinueButton(panelX: number, panelY: number, panelW: number): void {
-        const btnW = 200
-        const btnH = 50
-        suit.layout.reset(panelX + (panelW - btnW) / 2, panelY)
-        const continueResult = suit.Button("Continue", {}, ...suit.layout.row(btnW, btnH))
-        if (continueResult && continueResult.hit) {
-            this.gameManager.player.addDiscardsToDeck && this.gameManager.player.addDiscardsToDeck()
-            if (!isEmpty(this.gameManager.board?.dealer)) {
-                 this.gameManager.board.dealer.addLootCardsToPlayer()
-            }
-            this.gameManager.board = undefined
-            this.gameManager.switchToBoard && this.gameManager.switchToBoard()
-        }
+    handleLootCardSelection(card: Card): void {
+        // TODO: handle perk to pick multiple cards
+        // if (hasPerk)
+        // {
+        // this.gameManager.board?.dealer.addLootCardsToPlayer()
+        // }
+        //else {
+        this.gameManager.player.addDiscardsToDeck()
+        this.gameManager.player.addToDeck(card)
+        this.gameManager.board = undefined
+        this.gameManager.map?.advanceToNextTier()
+        this.gameManager.switchToMap()
     }
 
     addLootCardsToPlayer(): void {
-        const lootCards = (this.gameManager.board && this.gameManager.board.dealer && this.gameManager.board.dealer.lootCards) || []
-        for (let i = 0; i < lootCards.length; i++) {
-            const card = lootCards[i]
+        const lootCards = this.gameManager.board?.dealer.lootCards
+        if (isEmpty(lootCards)) {
+            return
+        }
+
+        for (const card of lootCards) {
             if (card.selected) {
-                this.gameManager.player.addToHand && this.gameManager.player.addToHand(card)
+                this.gameManager.player.addToDeck(card)
             }
         }
     }

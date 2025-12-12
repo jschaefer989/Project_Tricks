@@ -140,7 +140,7 @@ function MapNode.prototype.drawInteractiveShopNode(self, x, y)
         suit.layout:row(imageW, imageH)
     )
     if result.hit then
-        print("Shop clicked!")
+        self.gameManager:switchToShop()
     end
 end
 function MapNode.prototype.drawMapNode(self, x, y)

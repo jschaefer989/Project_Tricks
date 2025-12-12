@@ -23,8 +23,6 @@ function WinScreen.prototype.drawScreen(self)
     local panelH = self:renderPlayerInfoPanel(panelX, panelY, panelW)
     local lootStartY = panelY + panelH + 10
     local lootH = self:renderLootCards(panelX, lootStartY, panelW)
-    local continueBtnY = lootStartY + lootH + 10
-    self:renderContinueButton(panelX, continueBtnY, panelW)
 end
 function WinScreen.prototype.renderVictoryLabel(self)
     suit.layout:reset(
@@ -92,11 +90,10 @@ function WinScreen.prototype.renderLootCards(self, panelX, startY, panelW)
             local x = panelX + i * (btnW + padding)
             suit.layout:reset(x, cardsY)
             Draw:card(
-                self.gameManager,
                 card,
                 btnW,
                 btnH,
-                true
+                {onClick = function() return self:handleLootCardSelection(card) end}
             )
             i = i + 1
         end
@@ -104,36 +101,25 @@ function WinScreen.prototype.renderLootCards(self, panelX, startY, panelW)
     local totalHeight = labelH + 8 + btnH
     return totalHeight
 end
-function WinScreen.prototype.renderContinueButton(self, panelX, panelY, panelW)
-    local btnW = 200
-    local btnH = 50
-    suit.layout:reset(panelX + (panelW - btnW) / 2, panelY)
-    local continueResult = suit.Button(
-        "Continue",
-        {},
-        suit.layout:row(btnW, btnH)
-    )
-    if continueResult and continueResult.hit then
-        local ____ = self.gameManager.player.addDiscardsToDeck and self.gameManager.player:addDiscardsToDeck()
-        local ____isEmpty_2 = isEmpty
-        local ____opt_0 = self.gameManager.board
-        if not ____isEmpty_2(____opt_0 and ____opt_0.dealer) then
-            self.gameManager.board.dealer:addLootCardsToPlayer()
-        end
-        self.gameManager.board = nil
-        local ____ = self.gameManager.switchToBoard and self.gameManager:switchToBoard()
+function WinScreen.prototype.handleLootCardSelection(self, card)
+    self.gameManager.player:addDiscardsToDeck()
+    self.gameManager.player:addToDeck(card)
+    self.gameManager.board = nil
+    local ____opt_0 = self.gameManager.map
+    if ____opt_0 ~= nil then
+        ____opt_0:advanceToNextTier()
     end
+    self.gameManager:switchToMap()
 end
 function WinScreen.prototype.addLootCardsToPlayer(self)
-    local lootCards = self.gameManager.board and self.gameManager.board.dealer and self.gameManager.board.dealer.lootCards or ({})
-    do
-        local i = 0
-        while i < #lootCards do
-            local card = lootCards[i + 1]
-            if card.selected then
-                local ____ = self.gameManager.player.addToHand and self.gameManager.player:addToHand(card)
-            end
-            i = i + 1
+    local ____opt_2 = self.gameManager.board
+    local lootCards = ____opt_2 and ____opt_2.dealer.lootCards
+    if isEmpty(lootCards) then
+        return
+    end
+    for ____, card in ipairs(lootCards) do
+        if card.selected then
+            self.gameManager.player:addToDeck(card)
         end
     end
 end

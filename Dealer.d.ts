@@ -9,6 +9,7 @@ export default class Dealer {
     static initializePlayerDeck(gameManager: GameManager): void;
     static shuffle(gameManager: GameManager, characterType: string): void;
     static dealCards(gameManager: GameManager, characterType: string): void;
+    static getRandomCard(): Card;
     initializeEnemyDeck(): void;
     getLootCards(): Card[];
     addLootCard(card: Card): void;

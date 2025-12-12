@@ -117,8 +117,7 @@ export default class MapNode {
         const result = suit.ImageButton(this.marketImage, {}, ...suit.layout.row(imageW, imageH))
         
         if (result.hit) {
-            // TODO: Implement shop functionality
-            print("Shop clicked!")
+            this.gameManager.switchToShop()
         }
     }
 

@@ -30,8 +30,8 @@ local Map = ____Map.default
 local ____Enemy = require("Enemy")
 local Enemy = ____Enemy.default
 local suit = require("Libraries.suit-master.suit")
-local ____Draw = require("Draw")
-local Draw = ____Draw.default
+local ____Shop = require("Shop")
+local Shop = ____Shop.default
 ____exports.default = __TS__Class()
 local GameManager = ____exports.default
 GameManager.name = "GameManager"
@@ -46,6 +46,7 @@ function GameManager.prototype.____constructor(self)
     self.winScreen = nil
     self.loseScreen = nil
     self.map = __TS__New(Map, self)
+    self.shop = nil
 end
 function GameManager.prototype.getCharacter(self, characterType)
     repeat
@@ -99,6 +100,11 @@ function GameManager.prototype.switchBasedOnGameState(self)
         ____cond6 = ____cond6 or ____switch6 == GameStates.MAP
         if ____cond6 then
             self:switchToMap()
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == GameStates.SHOP
+        if ____cond6 then
+            self:switchToShop()
             break
         end
         do
@@ -219,7 +225,21 @@ function GameManager.prototype.switchToMap(self)
     self.board = nil
     self.winScreen = nil
     self.loseScreen = nil
-    Draw:setThemeColors(0, 0, 0)
     GameStateManager:setState(mapState)
+end
+function GameManager.prototype.switchToShop(self)
+    local shopState = {update = function(____, dt)
+        local ____opt_19 = self.shop
+        if ____opt_19 ~= nil then
+            ____opt_19:drawShop()
+        end
+    end}
+    self.gameState = GameStates.SHOP
+    self.board = nil
+    self.winScreen = nil
+    self.loseScreen = nil
+    self.shop = __TS__New(Shop, self)
+    self.shop:generateCardsForSale()
+    GameStateManager:setState(shopState)
 end
 return ____exports

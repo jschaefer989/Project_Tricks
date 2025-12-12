@@ -5,7 +5,8 @@ export declare enum GameStates {
     PAUSE_MENU = "PAUSE_MENU",
     WIN_SCREEN = "WIN_SCREEN",
     LOSE_SCREEN = "LOSE_SCREEN",
-    MAP = "MAP"
+    MAP = "MAP",
+    SHOP = "SHOP"
 }
 export declare enum Suits {
     HEARTS = "HEARTS",

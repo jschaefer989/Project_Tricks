@@ -11,6 +11,7 @@ import Character from "Character";
 import Player from "Player";
 import Map from "Map";
 import Enemy from "Enemy";
+import Shop from "Shop";
 export default class GameManager {
     gameState: GameStates;
     player: Player;
@@ -22,6 +23,7 @@ export default class GameManager {
     winScreen?: WinScreen;
     loseScreen?: LoseScreen;
     map: Map;
+    shop?: Shop;
     constructor();
     getCharacter(characterType: string): Character | undefined;
     switchBasedOnGameState(): void;
@@ -32,4 +34,5 @@ export default class GameManager {
     switchToWinScreen(): void;
     switchToLoseScreen(): void;
     switchToMap(): void;
+    switchToShop(): void;
 }

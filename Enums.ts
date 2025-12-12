@@ -6,6 +6,7 @@ export enum GameStates {
     WIN_SCREEN = "WIN_SCREEN",
     LOSE_SCREEN = "LOSE_SCREEN",
     MAP = "MAP",
+    SHOP = "SHOP",
 }
 export enum Suits {
     HEARTS = "HEARTS",

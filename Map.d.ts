@@ -17,5 +17,6 @@ export default class Map {
     drawBackground(): void;
     drawTiers(): void;
     generateNewMap(): void;
+    advanceToNextTier(): void;
 }
 export {};

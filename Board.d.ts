@@ -25,14 +25,13 @@ export default class Board {
         startY: number;
     };
     getContentWidth(): number;
-    getCashout(): number;
+    getPlayerCashout(): number;
+    getEnemyCashout(): number;
     renderWinStatus(): void;
     renderPointsDisplay(): void;
     renderEnemyStatsPanel(padX: number, padY: number): void;
     renderEnemyDeckVisualization(): void;
     renderPlayerSelectedStatsPanel(): void;
-    renderPlayerInfoPanel(padX: number, padY: number): void;
-    renderPlayerDeckVisualization(): void;
     renderEnemyRow(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void;
     renderPlayerRow(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void;
     renderPlayButton(startY: number, btnW: number, btnH: number, padX: number, padY: number): void;

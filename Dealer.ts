@@ -64,18 +64,19 @@ export default class Dealer {
         }
     }
 
+    static getRandomCard(): Card {
+            const suit = getRandomElementFromEnum(Suits)
+            const rank = getRandomElementFromEnum(Ranks)
+            return new Card(suit, rank)
+    }
+
     initializeEnemyDeck(): void {
         if (!this.gameManager.board || !this.gameManager.board.enemy) {
             return
         }
 
         for (let i = 0; i < this.gameManager.board.enemy.numberOfCardsInDeck; i++) {
-            const suit = getRandomElementFromEnum(Suits)
-            const rank = getRandomElementFromEnum(Ranks)
-            if (isEmpty(suit) || isEmpty(rank)) {
-                continue
-            }
-            this.gameManager.board.enemy.addToDeck(new Card(suit, rank))
+            this.gameManager.board.enemy.addToDeck(Dealer.getRandomCard())
         }
         Dealer.shuffle(this.gameManager, CharacterTypes.ENEMY)
     }

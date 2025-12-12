@@ -8,6 +8,7 @@ ____exports.GameStates.PAUSE_MENU = "PAUSE_MENU"
 ____exports.GameStates.WIN_SCREEN = "WIN_SCREEN"
 ____exports.GameStates.LOSE_SCREEN = "LOSE_SCREEN"
 ____exports.GameStates.MAP = "MAP"
+____exports.GameStates.SHOP = "SHOP"
 ____exports.Suits = Suits or ({})
 ____exports.Suits.HEARTS = "HEARTS"
 ____exports.Suits.DIAMONDS = "DIAMONDS"

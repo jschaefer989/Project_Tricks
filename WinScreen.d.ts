@@ -1,4 +1,5 @@
 import GameManager from "./GameManager";
+import Card from "Card";
 /**
  * WinScreen class handles the display of the victory screen
  */
@@ -16,6 +17,6 @@ export default class WinScreen {
      */
     renderPlayerInfoPanel(x: number, y: number, panelW: number): number;
     renderLootCards(panelX: number, startY: number, panelW: number): number;
-    renderContinueButton(panelX: number, panelY: number, panelW: number): void;
+    handleLootCardSelection(card: Card): void;
     addLootCardsToPlayer(): void;
 }
