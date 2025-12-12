@@ -6,7 +6,8 @@ export declare enum GameStates {
     WIN_SCREEN = "WIN_SCREEN",
     LOSE_SCREEN = "LOSE_SCREEN",
     MAP = "MAP",
-    SHOP = "SHOP"
+    SHOP = "SHOP",
+    LEVEL_UP = "LEVEL_UP"
 }
 export declare enum Suits {
     HEARTS = "HEARTS",
@@ -37,4 +38,9 @@ export declare enum EnemyTypes {
     ORC = "ORC",
     TROLL = "TROLL",
     DRAGON = "DRAGON"
+}
+export declare enum Perks {
+    EXTRA_CARD = "EXTRA_CARD",
+    EXTRA_DISCARD = "EXTRA_DISCARD",
+    INCREASED_LOOT = "INCREASED_LOOT"
 }

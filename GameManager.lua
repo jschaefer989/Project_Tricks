@@ -32,12 +32,16 @@ local Enemy = ____Enemy.default
 local suit = require("Libraries.suit-master.suit")
 local ____Shop = require("Shop")
 local Shop = ____Shop.default
+local ____LevelUpScreen = require("LevelUpScreen")
+local LevelUpScreen = ____LevelUpScreen.default
+local ____PerkScreen = require("PerkScreen")
+local PerkScreen = ____PerkScreen.default
 ____exports.default = __TS__Class()
 local GameManager = ____exports.default
 GameManager.name = "GameManager"
 function GameManager.prototype.____constructor(self)
     self.gameState = GameStates.MAIN_MENU
-    self.player = __TS__New(Player)
+    self.player = __TS__New(Player, self)
     self.settings = __TS__New(Settings)
     self.mainMenu = nil
     self.newGameMenu = nil
@@ -47,6 +51,8 @@ function GameManager.prototype.____constructor(self)
     self.loseScreen = nil
     self.map = __TS__New(Map, self)
     self.shop = nil
+    self.levelUpScreen = nil
+    self.perkScreen = nil
 end
 function GameManager.prototype.getCharacter(self, characterType)
     repeat
@@ -107,6 +113,11 @@ function GameManager.prototype.switchBasedOnGameState(self)
             self:switchToShop()
             break
         end
+        ____cond6 = ____cond6 or ____switch6 == GameStates.LEVEL_UP
+        if ____cond6 then
+            self:switchToLevelUpScreen()
+            break
+        end
         do
             exhaustiveGuard(self.gameState)
         end
@@ -123,6 +134,8 @@ function GameManager.prototype.switchToMainMenu(self)
     self.board = nil
     self.winScreen = nil
     self.loseScreen = nil
+    self.shop = nil
+    self.levelUpScreen = nil
     suit.theme.color.normal.fg = {1, 1, 1}
     if isEmpty(self.mainMenu) then
         self.mainMenu = __TS__New(MainMenu, self)
@@ -166,6 +179,8 @@ function GameManager.prototype.switchToBoard(self, enemy)
     self.gameState = GameStates.PLAYING
     self.winScreen = nil
     self.loseScreen = nil
+    self.shop = nil
+    self.levelUpScreen = nil
     suit.theme.color.normal.fg = {1, 1, 1}
     if isEmpty(self.board) then
         self.board = __TS__New(
@@ -186,26 +201,26 @@ function GameManager.prototype.switchToWinScreen(self)
     end}
     self.gameState = GameStates.WIN_SCREEN
     self.loseScreen = nil
+    self.shop = nil
+    self.levelUpScreen = nil
     suit.theme.color.normal.fg = {1, 1, 1}
     if isEmpty(self.winScreen) then
         self.winScreen = __TS__New(WinScreen, self)
-    end
-    local ____opt_15 = self.board
-    if ____opt_15 ~= nil then
-        ____opt_15.dealer:getLootCards()
     end
     GameStateManager:setState(winState)
 end
 function GameManager.prototype.switchToLoseScreen(self)
     local loseState = {update = function(____, dt)
-        local ____opt_17 = self.loseScreen
-        if ____opt_17 ~= nil then
-            ____opt_17:drawScreen()
+        local ____opt_15 = self.loseScreen
+        if ____opt_15 ~= nil then
+            ____opt_15:drawScreen()
         end
     end}
     self.gameState = GameStates.LOSE_SCREEN
     self.board = nil
     self.winScreen = nil
+    self.shop = nil
+    self.levelUpScreen = nil
     suit.theme.color.normal.fg = {1, 1, 1}
     if isEmpty(self.loseScreen) then
         self.loseScreen = __TS__New(LoseScreen)
@@ -225,21 +240,56 @@ function GameManager.prototype.switchToMap(self)
     self.board = nil
     self.winScreen = nil
     self.loseScreen = nil
+    self.shop = nil
+    self.levelUpScreen = nil
     GameStateManager:setState(mapState)
 end
 function GameManager.prototype.switchToShop(self)
     local shopState = {update = function(____, dt)
-        local ____opt_19 = self.shop
-        if ____opt_19 ~= nil then
-            ____opt_19:drawShop()
+        local ____opt_17 = self.shop
+        if ____opt_17 ~= nil then
+            ____opt_17:drawShop()
         end
     end}
     self.gameState = GameStates.SHOP
     self.board = nil
     self.winScreen = nil
     self.loseScreen = nil
-    self.shop = __TS__New(Shop, self)
-    self.shop:generateCardsForSale()
+    self.levelUpScreen = nil
+    if isEmpty(self.shop) then
+        self.shop = __TS__New(Shop, self)
+        self.shop:setup()
+    end
     GameStateManager:setState(shopState)
+end
+function GameManager.prototype.switchToLevelUpScreen(self)
+    local levelUpState = {update = function(____, dt)
+        local ____opt_19 = self.levelUpScreen
+        if ____opt_19 ~= nil then
+            ____opt_19:drawScreen()
+        end
+    end}
+    self.gameState = GameStates.LEVEL_UP
+    self.board = nil
+    self.winScreen = nil
+    self.loseScreen = nil
+    self.shop = nil
+    if isEmpty(self.levelUpScreen) then
+        self.levelUpScreen = __TS__New(LevelUpScreen, self)
+        self.levelUpScreen:setup()
+    end
+    GameStateManager:setState(levelUpState)
+end
+function GameManager.prototype.switchToPerkScreen(self)
+    local perkState = {update = function(____, dt)
+        local ____opt_21 = self.perkScreen
+        if ____opt_21 ~= nil then
+            ____opt_21:drawScreen()
+        end
+    end}
+    if isEmpty(self.perkScreen) then
+        self.perkScreen = __TS__New(PerkScreen, self)
+    end
+    GameStateManager:setState(perkState)
 end
 return ____exports

@@ -11,6 +11,7 @@ export default class Shop {
     load(data: ShopData): void;
     save(): ShopData;
     drawShop(): void;
+    setup(): void;
     generateCardsForSale(): void;
     canAfford(card: Card): boolean;
     buyCard(card: Card): void;

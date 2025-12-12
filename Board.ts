@@ -87,10 +87,10 @@ export default class Board {
         this.renderPlayerSelectedStatsPanel()
 
         // Player info (upper-right)
-        Draw.playerInfoPanel(this.gameManager.player)
+        Draw.playerInfo(this.gameManager.player, this.gameManager)
 
         // Player deck visualization (bottom right)
-        Draw.playerDeckVisualization(this.gameManager.player)
+        Draw.playerDeck(this.gameManager.player, { showDiscards: true })
 
         // Discard counter (bottom center)
         this.renderDiscardCounter()
@@ -242,7 +242,7 @@ export default class Board {
     renderPlayButton(startY: number, btnW: number, btnH: number, padX: number, padY: number): void {
         // Center the buttons horizontally
         const gap = 20
-        const totalW = btnW * 2 + gap
+        const totalW = btnW * 3 + gap * 2
 
         suit.layout.reset(love.graphics.getWidth() / 2 - totalW / 2, startY, padX, padY)
 
@@ -253,11 +253,16 @@ export default class Board {
         const discardLabel = discardEnabled ? "Discard" : "Discard (used)"
         const discardHit = suit.Button(discardLabel, {}, ...suit.layout.col(btnW, btnH)).hit
 
+        const deselectHit = suit.Button("Deselect All", {}, ...suit.layout.col(btnW, btnH)).hit
+
         if (playHit) {
             this.handlePlay()
         }
         if (discardHit && discardEnabled) {
             this.handleDiscard()
+        }
+        if (deselectHit) {
+            this.gameManager.player.deselectAllCards()
         }
     }
 
@@ -318,7 +323,9 @@ export default class Board {
         const winner = this.getWinner()
         if (winner === CharacterTypes.PLAYER) {
             this.enemy.removeAllCardsFromHand()
+            this.gameManager.player.addDiscardsToDeck()
             this.gameManager.player.cashout(this.playerPoints)
+            this.dealer.getLootCards()
             this.gameManager.switchToWinScreen()
         } else if (winner === CharacterTypes.ENEMY) {
             this.gameManager.switchToLoseScreen()

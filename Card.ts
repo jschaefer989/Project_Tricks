@@ -29,36 +29,39 @@ export default class Card {
         if (rank === Ranks.QUEEN || rank === Ranks.JACK || suit === Suits.DIAMONDS) {
             if (rank === Ranks.QUEEN) {
                 switch (suit) {                 
-                    case Suits.CLUBS: return 19   
-                    case Suits.SPADES: return 18
-                    case Suits.HEARTS: return 17
-                    case Suits.DIAMONDS: return 16
+                    case Suits.CLUBS: return 22  
+                    case Suits.SPADES: return 21
+                    case Suits.HEARTS: return 20
+                    case Suits.DIAMONDS: return 19
                 }
             } else if (rank === Ranks.JACK) {
                 switch (suit) {
-                    case Suits.CLUBS: return 15                    
-                    case Suits.SPADES: return 14
-                    case Suits.HEARTS: return 13
-                    case Suits.DIAMONDS: return 12
+                    case Suits.CLUBS: return 18                   
+                    case Suits.SPADES: return 17
+                    case Suits.HEARTS: return 16
+                    case Suits.DIAMONDS: return 15
                 }
             } else if (suit === Suits.DIAMONDS) {
                 switch (rank) {
-                    case Ranks.ACE: return 11
-                    case Ranks.TEN: return 10
-                    case Ranks.KING: return 9
-                    case Ranks.NINE: return 8
-                    case Ranks.EIGHT: return 7
-                    case Ranks.SEVEN: return 6
+                    case Ranks.ACE: return 14
+                    case Ranks.TEN: return 13
+                    case Ranks.KING: return 12
+                    case Ranks.NINE: return 11
+                    case Ranks.EIGHT: return 10
+                    case Ranks.SEVEN: return 9
                 }
             }
         }
         // Other cards have the same power regardless of suit
         switch (rank) {
-            case Ranks.ACE: return 5
-            case Ranks.TEN: return 4
-            case Ranks.KING: return 3
-            case Ranks.QUEEN: return 2
-            case Ranks.JACK: return 1
+            case Ranks.ACE: return 8
+            case Ranks.TEN: return 7
+            case Ranks.KING: return 6
+            case Ranks.QUEEN: return 5
+            case Ranks.JACK: return 4
+            case Ranks.NINE: return 3
+            case Ranks.EIGHT: return 2
+            case Ranks.SEVEN: return 1
             default: return 0
         }
     }

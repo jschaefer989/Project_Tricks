@@ -16,6 +16,8 @@ import Map from "Map"
 import Enemy from "Enemy"
 import * as suit from "Libraries.suit-master.suit"
 import Shop from "Shop"
+import LevelUpScreen from "LevelUpScreen"
+import PerkScreen from "PerkScreen"
 
 interface GameState {
     update: (dt: number) => void
@@ -34,10 +36,12 @@ export default class GameManager {
     loseScreen?: LoseScreen
     map: Map
     shop?: Shop
+    levelUpScreen?: LevelUpScreen
+    perkScreen?: PerkScreen
 
     constructor() {
         this.gameState = GameStates.MAIN_MENU
-        this.player = new Player()
+        this.player = new Player(this)
         this.settings = new Settings()
         this.mainMenu = undefined
         this.newGameMenu = undefined
@@ -47,6 +51,8 @@ export default class GameManager {
         this.loseScreen = undefined
         this.map = new Map(this)
         this.shop = undefined
+        this.levelUpScreen = undefined
+        this.perkScreen = undefined
     }
 
     getCharacter(characterType: string): Character | undefined {
@@ -84,6 +90,9 @@ export default class GameManager {
             case GameStates.SHOP:
                 this.switchToShop()
                 break
+            case GameStates.LEVEL_UP:
+                this.switchToLevelUpScreen()
+                break
             default:
                 exhaustiveGuard(this.gameState)
         }
@@ -100,6 +109,8 @@ export default class GameManager {
         this.board = undefined
         this.winScreen = undefined
         this.loseScreen = undefined
+        this.shop = undefined
+        this.levelUpScreen = undefined
 
         // Reset to white text for dark backgrounds
         suit.theme.color.normal.fg = [1, 1, 1]
@@ -160,6 +171,8 @@ export default class GameManager {
         this.gameState = GameStates.PLAYING
         this.winScreen = undefined
         this.loseScreen = undefined
+        this.shop = undefined
+        this.levelUpScreen = undefined
 
         // Reset to white text for dark backgrounds
         suit.theme.color.normal.fg = [1, 1, 1]
@@ -183,6 +196,8 @@ export default class GameManager {
         // We need some data from the board to show stats and loot cards, so we keep it
         // this.board = {}
         this.loseScreen = undefined
+        this.shop = undefined
+        this.levelUpScreen = undefined
 
         // Reset to white text for dark backgrounds
         suit.theme.color.normal.fg = [1, 1, 1]
@@ -190,8 +205,6 @@ export default class GameManager {
         if (isEmpty(this.winScreen)) {
             this.winScreen = new WinScreen(this)
         }
-
-        this.board?.dealer.getLootCards()
 
         GameStateManager.setState(winState)
     }
@@ -206,6 +219,8 @@ export default class GameManager {
         this.gameState = GameStates.LOSE_SCREEN
         this.board = undefined
         this.winScreen = undefined
+        this.shop = undefined
+        this.levelUpScreen = undefined
 
         // Reset to white text for dark backgrounds
         suit.theme.color.normal.fg = [1, 1, 1]
@@ -232,6 +247,8 @@ export default class GameManager {
         this.board = undefined
         this.winScreen = undefined
         this.loseScreen = undefined
+        this.shop = undefined
+        this.levelUpScreen = undefined
 
         // Set dark text color for labels to be readable on light backgrounds
        // Draw.setThemeColors(0, 0, 0)
@@ -251,10 +268,49 @@ export default class GameManager {
         this.board = undefined
         this.winScreen = undefined
         this.loseScreen = undefined
+        this.levelUpScreen = undefined
 
-        this.shop = new Shop(this)
-        this.shop.generateCardsForSale()
+        if (isEmpty(this.shop)) {
+            this.shop = new Shop(this)
+            this.shop.setup()
+        }
 
         GameStateManager.setState(shopState)
+    }
+
+    switchToLevelUpScreen(): void {
+        const levelUpState: GameState = {
+            update: (dt: number) => {
+                this.levelUpScreen?.drawScreen()
+            }
+        }
+
+        this.gameState = GameStates.LEVEL_UP
+
+        this.board = undefined
+        this.winScreen = undefined
+        this.loseScreen = undefined
+        this.shop = undefined
+
+        if (isEmpty(this.levelUpScreen)) {
+            this.levelUpScreen = new LevelUpScreen(this)
+            this.levelUpScreen.setup()
+        }
+
+        GameStateManager.setState(levelUpState)
+    }
+
+    switchToPerkScreen(): void {
+        const perkState: GameState = {
+            update: (dt: number) => {
+                this.perkScreen?.drawScreen()
+            }
+        }
+
+        if (isEmpty(this.perkScreen)) {
+            this.perkScreen = new PerkScreen(this)
+        }
+
+        GameStateManager.setState(perkState)
     }
 }

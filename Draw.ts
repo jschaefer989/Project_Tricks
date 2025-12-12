@@ -1,14 +1,18 @@
 import Card from "Card"
 import * as suit from "Libraries.suit-master.suit"
-import GameManager from "./GameManager"
 import { Image } from "love.graphics"
 import { isEmpty } from "Helpers"
 import Player from "Player"
+import GameManager from "GameManager"
 
 interface CardOptions {
     multiSelect?: boolean
     onClick?: (card: Card) => void
     displayCost?: boolean
+}
+
+interface PlayerDeckOptions {
+    showDiscards?: boolean
 }
 
 export default class Draw {
@@ -55,7 +59,7 @@ export default class Draw {
         suit.theme.color.normal.fg = [r, g, b]
     }
 
-    static playerInfoPanel(player: Player): void {
+    static playerInfo(player: Player, gameManager: GameManager): void {
         const padX = 20
         const padY = 20
         const name = player.name
@@ -68,12 +72,20 @@ export default class Draw {
 
         suit.layout.reset(panelX, padY, 10, 10)
         suit.Label(name, { align: "center" }, ...suit.layout.row(panelW, 24))
-        suit.Label("Level: " + level, { align: "left" }, ...suit.layout.row(panelW, 22))
+        suit.Label("Level: " + level + " (Next: " + player.getNextLevelExperience() + " XP)", { align: "left" }, ...suit.layout.row(panelW, 22))
         suit.Label("XP: " + exp, { align: "left" }, ...suit.layout.row(panelW, 22))
         suit.Label("Money: " + money, { align: "left" }, ...suit.layout.row(panelW, 22))
+        
+        if (gameManager) {
+            const btnH = 30
+            const perkResult = suit.Button("Perks", {}, ...suit.layout.row(panelW, btnH))
+            if (perkResult.hit) {
+                gameManager.switchToPerkScreen()
+            }
+        }
     }
 
-    static playerDeckVisualization(player: Player): void {
+    static playerDeck(player: Player, options?: PlayerDeckOptions): void {
         const deckSize = player.deck.length
         const discardSize = player.discardPile.length
 
@@ -83,9 +95,11 @@ export default class Draw {
         const panelX = screenW - 170 // Same right alignment as selected stats
         const panelY = screenH - 200 // Higher up to fit on screen
 
-        suit.layout.reset(panelX, panelY, 10, 10)
-        suit.Label("Discard Pile", { align: "center" }, ...suit.layout.row(150, 30))
-        suit.Label("Cards: " + discardSize, { align: "center" }, ...suit.layout.row(150, 30))
+        if (options?.showDiscards) {
+            suit.layout.reset(panelX, panelY, 10, 10)
+            suit.Label("Discard Pile", { align: "center" }, ...suit.layout.row(150, 30))
+            suit.Label("Cards: " + discardSize, { align: "center" }, ...suit.layout.row(150, 30))
+        }
 
         suit.layout.row(0, 10)
         suit.Label("Player Deck", { align: "center" }, ...suit.layout.row(150, 30))

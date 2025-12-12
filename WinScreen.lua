@@ -19,10 +19,10 @@ function WinScreen.prototype.drawScreen(self)
     local panelX = (screenW - panelW) / 2
     local labelHeight = 36
     self:renderVictoryLabel()
-    local panelY = labelY + labelHeight
-    local panelH = self:renderPlayerInfoPanel(panelX, panelY, panelW)
-    local lootStartY = panelY + panelH + 10
-    local lootH = self:renderLootCards(panelX, lootStartY, panelW)
+    local lootStartY = labelY + labelHeight + 10
+    self:renderLootCards(panelX, lootStartY, panelW)
+    Draw:playerInfo(self.gameManager.player, self.gameManager)
+    Draw:playerDeck(self.gameManager.player)
 end
 function WinScreen.prototype.renderVictoryLabel(self)
     suit.layout:reset(
@@ -34,35 +34,6 @@ function WinScreen.prototype.renderVictoryLabel(self)
         {align = "center"},
         suit.layout:row(240, 36)
     )
-end
-function WinScreen.prototype.renderPlayerInfoPanel(self, x, y, panelW)
-    local name = self.gameManager.player.name or "Player"
-    local level = self.gameManager.player.level or 1
-    local exp = self.gameManager.player.experience or 0
-    local money = self.gameManager.player.money or 0
-    suit.layout:reset(x, y)
-    suit.Label(
-        name,
-        {align = "center"},
-        suit.layout:row(panelW, 24)
-    )
-    suit.Label(
-        "Level: " .. tostring(level),
-        {align = "left"},
-        suit.layout:row(panelW, 22)
-    )
-    suit.Label(
-        "XP: " .. tostring(exp),
-        {align = "left"},
-        suit.layout:row(panelW, 22)
-    )
-    suit.Label(
-        "Money: " .. tostring(money),
-        {align = "left"},
-        suit.layout:row(panelW, 22)
-    )
-    local totalHeight = 24 + 22 * 3
-    return totalHeight
 end
 function WinScreen.prototype.renderLootCards(self, panelX, startY, panelW)
     local labelH = 24
@@ -102,18 +73,25 @@ function WinScreen.prototype.renderLootCards(self, panelX, startY, panelW)
     return totalHeight
 end
 function WinScreen.prototype.handleLootCardSelection(self, card)
-    self.gameManager.player:addDiscardsToDeck()
+    local ____self_2 = self.gameManager.player
+    local ____self_2_gatherExperience_3 = ____self_2.gatherExperience
+    local ____opt_0 = self.gameManager.board
+    local levelUp = ____self_2_gatherExperience_3(____self_2, ____opt_0 and ____opt_0.enemy.experience or 0)
     self.gameManager.player:addToDeck(card)
     self.gameManager.board = nil
-    local ____opt_0 = self.gameManager.map
-    if ____opt_0 ~= nil then
-        ____opt_0:advanceToNextTier()
+    if levelUp then
+        self.gameManager:switchToLevelUpScreen()
+        return
+    end
+    local ____opt_4 = self.gameManager.map
+    if ____opt_4 ~= nil then
+        ____opt_4:advanceToNextTier()
     end
     self.gameManager:switchToMap()
 end
 function WinScreen.prototype.addLootCardsToPlayer(self)
-    local ____opt_2 = self.gameManager.board
-    local lootCards = ____opt_2 and ____opt_2.dealer.lootCards
+    local ____opt_6 = self.gameManager.board
+    local lootCards = ____opt_6 and ____opt_6.dealer.lootCards
     if isEmpty(lootCards) then
         return
     end

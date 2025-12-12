@@ -18,6 +18,7 @@ export default class Dealer {
         if (this.gameManager.player.deck.length === 0) {
             Dealer.initializePlayerDeck(this.gameManager)
         }
+        this.gameManager.player.deselectAllCards()
         this.initializeEnemyDeck()
         Dealer.dealCards(this.gameManager, CharacterTypes.PLAYER)
         Dealer.dealCards(this.gameManager, CharacterTypes.ENEMY)
@@ -111,7 +112,7 @@ export default class Dealer {
         return false
     }
 
-    deselectAllCards(): void {
+    deselectLootCards(): void {
         for (const card of this.lootCards) {
             card.selected = false
         }

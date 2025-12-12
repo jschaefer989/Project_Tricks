@@ -37,4 +37,9 @@ function Character.prototype.addDiscardsToDeck(self)
     end
     self.discardPile = {}
 end
+function Character.prototype.deselectAllCards(self)
+    for ____, card in ipairs(self.hand) do
+        card.selected = false
+    end
+end
 return ____exports

@@ -12,4 +12,5 @@ export default class Character {
     addToDiscards(card: Card): void;
     getCardFromDiscards(position: number): Card | undefined;
     addDiscardsToDeck(): void;
+    deselectAllCards(): void;
 }

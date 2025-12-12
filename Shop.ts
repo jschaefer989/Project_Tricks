@@ -66,11 +66,15 @@ export default class Shop {
         }
 
         // Player info (upper-right)
-        Draw.playerInfoPanel(this.gameManager.player)
+        Draw.playerInfo(this.gameManager.player, this.gameManager)
 
         // Player deck visualization (bottom right)
-        Draw.playerDeckVisualization(this.gameManager.player)
+        Draw.playerDeck(this.gameManager.player)
         
+    }
+
+    setup(): void {
+        this.generateCardsForSale()
     }
 
     generateCardsForSale(): void {

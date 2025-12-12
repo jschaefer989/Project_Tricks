@@ -43,4 +43,10 @@ export default class Character {
         }
         this.discardPile = []
     }
+
+    deselectAllCards(): void {
+        for (const card of this.hand) {
+            card.selected = false
+        }
+    }
 }

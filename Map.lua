@@ -3,6 +3,8 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local __TS__ArrayMap = ____lualib.__TS__ArrayMap
 local ____exports = {}
+local ____Draw = require("Draw")
+local Draw = ____Draw.default
 local ____MapTier = require("MapTier")
 local MapTier = ____MapTier.default
 ____exports.default = __TS__Class()
@@ -35,6 +37,8 @@ function Map.prototype.save(self)
 end
 function Map.prototype.drawMap(self)
     self:drawTiers()
+    Draw:playerInfo(self.gameManager.player, self.gameManager)
+    Draw:playerDeck(self.gameManager.player)
 end
 function Map.prototype.drawBackground(self)
 end

@@ -65,8 +65,11 @@ function Shop.prototype.drawShop(self)
         end
         self.gameManager:switchToMap()
     end
-    Draw:playerInfoPanel(self.gameManager.player)
-    Draw:playerDeckVisualization(self.gameManager.player)
+    Draw:playerInfo(self.gameManager.player, self.gameManager)
+    Draw:playerDeck(self.gameManager.player)
+end
+function Shop.prototype.setup(self)
+    self:generateCardsForSale()
 end
 function Shop.prototype.generateCardsForSale(self)
     self.cardsForSale = {}

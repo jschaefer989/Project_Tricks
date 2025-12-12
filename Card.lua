@@ -27,19 +27,19 @@ function Card.prototype.getPower(self, suit, rank)
                 local ____switch7 = suit
                 local ____cond7 = ____switch7 == Suits.CLUBS
                 if ____cond7 then
-                    return 19
+                    return 22
                 end
                 ____cond7 = ____cond7 or ____switch7 == Suits.SPADES
                 if ____cond7 then
-                    return 18
+                    return 21
                 end
                 ____cond7 = ____cond7 or ____switch7 == Suits.HEARTS
                 if ____cond7 then
-                    return 17
+                    return 20
                 end
                 ____cond7 = ____cond7 or ____switch7 == Suits.DIAMONDS
                 if ____cond7 then
-                    return 16
+                    return 19
                 end
             until true
         elseif rank == Ranks.JACK then
@@ -47,19 +47,19 @@ function Card.prototype.getPower(self, suit, rank)
                 local ____switch9 = suit
                 local ____cond9 = ____switch9 == Suits.CLUBS
                 if ____cond9 then
-                    return 15
+                    return 18
                 end
                 ____cond9 = ____cond9 or ____switch9 == Suits.SPADES
                 if ____cond9 then
-                    return 14
+                    return 17
                 end
                 ____cond9 = ____cond9 or ____switch9 == Suits.HEARTS
                 if ____cond9 then
-                    return 13
+                    return 16
                 end
                 ____cond9 = ____cond9 or ____switch9 == Suits.DIAMONDS
                 if ____cond9 then
-                    return 12
+                    return 15
                 end
             until true
         elseif suit == Suits.DIAMONDS then
@@ -67,27 +67,27 @@ function Card.prototype.getPower(self, suit, rank)
                 local ____switch11 = rank
                 local ____cond11 = ____switch11 == Ranks.ACE
                 if ____cond11 then
-                    return 11
+                    return 14
                 end
                 ____cond11 = ____cond11 or ____switch11 == Ranks.TEN
                 if ____cond11 then
-                    return 10
+                    return 13
                 end
                 ____cond11 = ____cond11 or ____switch11 == Ranks.KING
                 if ____cond11 then
-                    return 9
+                    return 12
                 end
                 ____cond11 = ____cond11 or ____switch11 == Ranks.NINE
                 if ____cond11 then
-                    return 8
+                    return 11
                 end
                 ____cond11 = ____cond11 or ____switch11 == Ranks.EIGHT
                 if ____cond11 then
-                    return 7
+                    return 10
                 end
                 ____cond11 = ____cond11 or ____switch11 == Ranks.SEVEN
                 if ____cond11 then
-                    return 6
+                    return 9
                 end
             until true
         end
@@ -96,21 +96,33 @@ function Card.prototype.getPower(self, suit, rank)
         local ____switch12 = rank
         local ____cond12 = ____switch12 == Ranks.ACE
         if ____cond12 then
-            return 5
+            return 8
         end
         ____cond12 = ____cond12 or ____switch12 == Ranks.TEN
         if ____cond12 then
-            return 4
+            return 7
         end
         ____cond12 = ____cond12 or ____switch12 == Ranks.KING
         if ____cond12 then
-            return 3
+            return 6
         end
         ____cond12 = ____cond12 or ____switch12 == Ranks.QUEEN
         if ____cond12 then
-            return 2
+            return 5
         end
         ____cond12 = ____cond12 or ____switch12 == Ranks.JACK
+        if ____cond12 then
+            return 4
+        end
+        ____cond12 = ____cond12 or ____switch12 == Ranks.NINE
+        if ____cond12 then
+            return 3
+        end
+        ____cond12 = ____cond12 or ____switch12 == Ranks.EIGHT
+        if ____cond12 then
+            return 2
+        end
+        ____cond12 = ____cond12 or ____switch12 == Ranks.SEVEN
         if ____cond12 then
             return 1
         end

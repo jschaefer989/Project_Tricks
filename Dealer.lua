@@ -24,6 +24,7 @@ function Dealer.prototype.setup(self)
     if #self.gameManager.player.deck == 0 then
         ____exports.default:initializePlayerDeck(self.gameManager)
     end
+    self.gameManager.player:deselectAllCards()
     self:initializeEnemyDeck()
     ____exports.default:dealCards(self.gameManager, CharacterTypes.PLAYER)
     ____exports.default:dealCards(self.gameManager, CharacterTypes.ENEMY)
@@ -118,7 +119,7 @@ function Dealer.prototype.hasLootCard(self, card)
     end
     return false
 end
-function Dealer.prototype.deselectAllCards(self)
+function Dealer.prototype.deselectLootCards(self)
     for ____, card in ipairs(self.lootCards) do
         card.selected = false
     end

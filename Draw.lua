@@ -55,7 +55,7 @@ end
 function Draw.setThemeColors(self, r, g, b)
     suit.theme.color.normal.fg = {r, g, b}
 end
-function Draw.playerInfoPanel(self, player)
+function Draw.playerInfo(self, player, gameManager)
     local padX = 20
     local padY = 20
     local name = player.name
@@ -72,7 +72,7 @@ function Draw.playerInfoPanel(self, player)
         suit.layout:row(panelW, 24)
     )
     suit.Label(
-        "Level: " .. tostring(level),
+        ((("Level: " .. tostring(level)) .. " (Next: ") .. tostring(player:getNextLevelExperience())) .. " XP)",
         {align = "left"},
         suit.layout:row(panelW, 22)
     )
@@ -86,25 +86,38 @@ function Draw.playerInfoPanel(self, player)
         {align = "left"},
         suit.layout:row(panelW, 22)
     )
+    if gameManager then
+        local btnH = 30
+        local perkResult = suit.Button(
+            "Perks",
+            {},
+            suit.layout:row(panelW, btnH)
+        )
+        if perkResult.hit then
+            gameManager:switchToPerkScreen()
+        end
+    end
 end
-function Draw.playerDeckVisualization(self, player)
+function Draw.playerDeck(self, player, options)
     local deckSize = #player.deck
     local discardSize = #player.discardPile
     local screenW = love.graphics.getWidth()
     local screenH = love.graphics.getHeight()
     local panelX = screenW - 170
     local panelY = screenH - 200
-    suit.layout:reset(panelX, panelY, 10, 10)
-    suit.Label(
-        "Discard Pile",
-        {align = "center"},
-        suit.layout:row(150, 30)
-    )
-    suit.Label(
-        "Cards: " .. tostring(discardSize),
-        {align = "center"},
-        suit.layout:row(150, 30)
-    )
+    if options and options.showDiscards then
+        suit.layout:reset(panelX, panelY, 10, 10)
+        suit.Label(
+            "Discard Pile",
+            {align = "center"},
+            suit.layout:row(150, 30)
+        )
+        suit.Label(
+            "Cards: " .. tostring(discardSize),
+            {align = "center"},
+            suit.layout:row(150, 30)
+        )
+    end
     suit.layout:row(0, 10)
     suit.Label(
         "Player Deck",

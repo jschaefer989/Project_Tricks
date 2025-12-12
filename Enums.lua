@@ -9,6 +9,7 @@ ____exports.GameStates.WIN_SCREEN = "WIN_SCREEN"
 ____exports.GameStates.LOSE_SCREEN = "LOSE_SCREEN"
 ____exports.GameStates.MAP = "MAP"
 ____exports.GameStates.SHOP = "SHOP"
+____exports.GameStates.LEVEL_UP = "LEVEL_UP"
 ____exports.Suits = Suits or ({})
 ____exports.Suits.HEARTS = "HEARTS"
 ____exports.Suits.DIAMONDS = "DIAMONDS"
@@ -34,4 +35,8 @@ ____exports.EnemyTypes.GOBLIN = "GOBLIN"
 ____exports.EnemyTypes.ORC = "ORC"
 ____exports.EnemyTypes.TROLL = "TROLL"
 ____exports.EnemyTypes.DRAGON = "DRAGON"
+____exports.Perks = Perks or ({})
+____exports.Perks.EXTRA_CARD = "EXTRA_CARD"
+____exports.Perks.EXTRA_DISCARD = "EXTRA_DISCARD"
+____exports.Perks.INCREASED_LOOT = "INCREASED_LOOT"
 return ____exports

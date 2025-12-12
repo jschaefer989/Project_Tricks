@@ -39,8 +39,11 @@ export default class Map {
         }
     }
 
-    drawMap(): void {        
+    drawMap(): void {
         this.drawTiers()
+        
+        Draw.playerInfo(this.gameManager.player, this.gameManager)
+        Draw.playerDeck(this.gameManager.player)
     }
 
     drawBackground(): void {

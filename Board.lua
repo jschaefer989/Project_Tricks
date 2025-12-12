@@ -80,8 +80,8 @@ function Board.prototype.drawBoard(self)
         padY
     )
     self:renderPlayerSelectedStatsPanel()
-    Draw:playerInfoPanel(self.gameManager.player)
-    Draw:playerDeckVisualization(self.gameManager.player)
+    Draw:playerInfo(self.gameManager.player, self.gameManager)
+    Draw:playerDeck(self.gameManager.player, {showDiscards = true})
     self:renderDiscardCounter()
 end
 function Board.prototype.getStartingCoordinates(self, contentW, btnH, groupH, padY)
@@ -268,7 +268,7 @@ function Board.prototype.renderPlayerRow(self, startX, startY, contentW, btnW, b
 end
 function Board.prototype.renderPlayButton(self, startY, btnW, btnH, padX, padY)
     local gap = 20
-    local totalW = btnW * 2 + gap
+    local totalW = btnW * 3 + gap * 2
     suit.layout:reset(
         love.graphics.getWidth() / 2 - totalW / 2,
         startY,
@@ -287,11 +287,19 @@ function Board.prototype.renderPlayButton(self, startY, btnW, btnH, padX, padY)
         {},
         suit.layout:col(btnW, btnH)
     ).hit
+    local deselectHit = suit.Button(
+        "Deselect All",
+        {},
+        suit.layout:col(btnW, btnH)
+    ).hit
     if playHit then
         self:handlePlay()
     end
     if discardHit and discardEnabled then
         self:handleDiscard()
+    end
+    if deselectHit then
+        self.gameManager.player:deselectAllCards()
     end
 end
 function Board.prototype.renderDiscardCounter(self)
@@ -346,7 +354,9 @@ function Board.prototype.endFight(self)
     local winner = self:getWinner()
     if winner == CharacterTypes.PLAYER then
         self.enemy:removeAllCardsFromHand()
+        self.gameManager.player:addDiscardsToDeck()
         self.gameManager.player:cashout(self.playerPoints)
+        self.dealer:getLootCards()
         self.gameManager:switchToWinScreen()
     elseif winner == CharacterTypes.ENEMY then
         self.gameManager:switchToLoseScreen()

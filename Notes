@@ -37,3 +37,8 @@ Bosses?
 Enemies have more higher-level cards the further you progress - maybe separated by regions?
 
 What happens when we cashout a negative value?
+
+TODO:
+Display enemy information on board
+Adjust deck display on map
+Give unique IDs to all cards, since sometimes there will be duplicates

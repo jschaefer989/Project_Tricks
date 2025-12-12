@@ -88,5 +88,6 @@ function NewGameMenu.prototype.handleStartGame(self)
         self.gameManager.map:generateNewMap()
         self.gameManager:switchToMap()
     end
+    self.gameManager.player:setup()
 end
 return ____exports

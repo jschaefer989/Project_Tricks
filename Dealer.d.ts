@@ -14,6 +14,6 @@ export default class Dealer {
     getLootCards(): Card[];
     addLootCard(card: Card): void;
     hasLootCard(card: Card): boolean;
-    deselectAllCards(): void;
+    deselectLootCards(): void;
     addLootCardsToPlayer(): void;
 }

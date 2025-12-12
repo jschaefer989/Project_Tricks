@@ -24,38 +24,17 @@ export default class WinScreen {
         const labelHeight = 36
         this.renderVictoryLabel()
 
-        const panelY = labelY + labelHeight
-        const panelH = this.renderPlayerInfoPanel(panelX, panelY, panelW)
+        const lootStartY = labelY + labelHeight + 10
+        this.renderLootCards(panelX, lootStartY, panelW)
 
-        const lootStartY = panelY + panelH + 10
-        const lootH = this.renderLootCards(panelX, lootStartY, panelW)
+        Draw.playerInfo(this.gameManager.player, this.gameManager)
+
+        Draw.playerDeck(this.gameManager.player)
     }
 
     renderVictoryLabel(): void {
         suit.layout.reset((love.graphics.getWidth() - 240) / 2, 50)
         suit.Label("Victory!", { align: "center" }, ...suit.layout.row(240, 36))
-    }
-
-    /**
-     * 
-     * @param x 
-     * @param y 
-     * @param panelW 
-     * @returns 
-     */
-    renderPlayerInfoPanel(x: number, y: number, panelW: number): number {
-        const name = this.gameManager.player.name ?? "Player"
-        const level = this.gameManager.player.level ?? 1
-        const exp = this.gameManager.player.experience ?? 0
-        const money = this.gameManager.player.money ?? 0
-        suit.layout.reset(x, y)
-        suit.Label(name, { align: "center" }, ...suit.layout.row(panelW, 24))
-        suit.Label("Level: " + level, { align: "left" }, ...suit.layout.row(panelW, 22))
-        suit.Label("XP: " + exp, { align: "left" }, ...suit.layout.row(panelW, 22))
-        suit.Label("Money: " + money, { align: "left" }, ...suit.layout.row(panelW, 22))
-
-        const totalHeight = 24 + 22 * 3
-        return totalHeight
     }
 
     renderLootCards(panelX: number, startY: number, panelW: number): number {
@@ -83,15 +62,19 @@ export default class WinScreen {
     }
 
     handleLootCardSelection(card: Card): void {
+        const levelUp = this.gameManager.player.gatherExperience(this.gameManager.board?.enemy.experience ?? 0)
         // TODO: handle perk to pick multiple cards
         // if (hasPerk)
         // {
         // this.gameManager.board?.dealer.addLootCardsToPlayer()
         // }
         //else {
-        this.gameManager.player.addDiscardsToDeck()
         this.gameManager.player.addToDeck(card)
         this.gameManager.board = undefined
+        if (levelUp) {
+            this.gameManager.switchToLevelUpScreen()
+            return
+        }
         this.gameManager.map?.advanceToNextTier()
         this.gameManager.switchToMap()
     }

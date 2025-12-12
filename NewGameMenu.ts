@@ -89,5 +89,6 @@ export default class NewGameMenu {
             this.gameManager.map.generateNewMap()
             this.gameManager.switchToMap()
         }
+        this.gameManager.player.setup()
     }
 }

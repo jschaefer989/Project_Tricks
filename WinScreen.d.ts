@@ -8,14 +8,6 @@ export default class WinScreen {
     constructor(gameManager: GameManager);
     drawScreen(): void;
     renderVictoryLabel(): void;
-    /**
-     *
-     * @param x
-     * @param y
-     * @param panelW
-     * @returns
-     */
-    renderPlayerInfoPanel(x: number, y: number, panelW: number): number;
     renderLootCards(panelX: number, startY: number, panelW: number): number;
     handleLootCardSelection(card: Card): void;
     addLootCardsToPlayer(): void;
