@@ -1,4 +1,4 @@
-import Card from "Card";
+import Card from "Cards/Card";
 import { Image } from "love.graphics";
 import Player from "Player";
 import GameManager from "GameManager";

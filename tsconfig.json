@@ -26,7 +26,7 @@
   "include": [
     "*.ts",
     "TSTL/Declarations/**/*.d.ts"
-],
+, "Cards/Card.ts", "Cards/Card.d.ts", "Enemies/Enemy.ts", "Enemies/Enemy.d.ts", "Screens/Board.ts", "Screens/Board.d.ts", "Screens/LevelUpScreen.ts", "Screens/LevelUpScreen.d.ts", "Screens/LoseScreen.ts", "Screens/LoseScreen.d.ts", "Screens/MainMenu.ts", "Screens/MainMenu.d.ts", "Screens/Map/Map.ts", "Screens/Map/Map.d.ts", "Screens/Map/MapNode.ts", "Screens/Map/MapNode.d.ts", "Screens/Map/MapTier.ts", "Screens/Map/MapTier.d.ts", "Screens/NewGameMenu.ts", "Screens/NewGameMenu.d.ts", "Screens/PauseMenu.ts", "Screens/PauseMenu.d.ts", "Screens/PerkScreen.ts", "Screens/PerkScreen.d.ts", "Screens/Shop.ts", "Screens/Shop.d.ts", "Screens/WinScreen.ts", "Screens/WinScreen.d.ts"],
   "exclude": [
     "node_modules"
   ]

@@ -2,7 +2,7 @@
 
 import { Suits, Ranks, CharacterTypes } from "./Enums"
 import { getRandomElementFromArray, getRandomElementFromEnum, isEmpty } from "./Helpers"
-import Card from "./Card"
+import Card from "Cards/Card"
 import GameManager from "./GameManager"
 
 export default class Dealer {
