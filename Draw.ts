@@ -1,4 +1,4 @@
-import Card from "Card"
+import Card from "Cards/Card"
 import * as suit from "Libraries.suit-master.suit"
 import { Image } from "love.graphics"
 import { isEmpty } from "Helpers"
@@ -76,12 +76,10 @@ export default class Draw {
         suit.Label("XP: " + exp, { align: "left" }, ...suit.layout.row(panelW, 22))
         suit.Label("Money: " + money, { align: "left" }, ...suit.layout.row(panelW, 22))
         
-        if (gameManager) {
-            const btnH = 30
-            const perkResult = suit.Button("Perks", {}, ...suit.layout.row(panelW, btnH))
-            if (perkResult.hit) {
-                gameManager.switchToPerkScreen()
-            }
+        const btnH = 30
+        const perkResult = suit.Button("Perks", {}, ...suit.layout.row(panelW, btnH))
+        if (perkResult.hit) {
+            gameManager.switchToPerkScreen()
         }
     }
 

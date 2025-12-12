@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import Board from "Board"
+import Board from "Screens/Board"
 import { GameStates } from "Enums"
 import { isEmpty } from "Helpers"
 import * as lovelyToasts from "Libraries.Lovely-Toasts-main.lovelyToasts"

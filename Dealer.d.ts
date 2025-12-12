@@ -1,5 +1,5 @@
 /** @noSelfInFile */
-import Card from "./Card";
+import Card from "Cards/Card";
 import GameManager from "./GameManager";
 export default class Dealer {
     gameManager: GameManager;

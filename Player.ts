@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
 import Perk from "Perk"
-import Card from "./Card"
+import Card from "Cards/Card"
 import Character from "./Character"
 import { Perks } from "Enums"
 import Dealer from "Dealer"

@@ -86,16 +86,14 @@ function Draw.playerInfo(self, player, gameManager)
         {align = "left"},
         suit.layout:row(panelW, 22)
     )
-    if gameManager then
-        local btnH = 30
-        local perkResult = suit.Button(
-            "Perks",
-            {},
-            suit.layout:row(panelW, btnH)
-        )
-        if perkResult.hit then
-            gameManager:switchToPerkScreen()
-        end
+    local btnH = 30
+    local perkResult = suit.Button(
+        "Perks",
+        {},
+        suit.layout:row(panelW, btnH)
+    )
+    if perkResult.hit then
+        gameManager:switchToPerkScreen()
     end
 end
 function Draw.playerDeck(self, player, options)

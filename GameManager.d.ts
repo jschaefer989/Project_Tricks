@@ -1,19 +1,19 @@
 /** @noSelfInFile */
 import { GameStates } from "./Enums";
-import MainMenu from "MainMenu";
-import NewGameMenu from "NewGameMenu";
-import PauseMenu from "PauseMenu";
-import Board from "Board";
-import WinScreen from "WinScreen";
-import LoseScreen from "LoseScreen";
+import MainMenu from "Screens/MainMenu";
+import NewGameMenu from "Screens/NewGameMenu";
+import PauseMenu from "Screens/PauseMenu";
+import Board from "Screens/Board";
+import WinScreen from "Screens/WinScreen";
+import LoseScreen from "Screens/LoseScreen";
 import Settings from "Settings";
 import Character from "Character";
 import Player from "Player";
-import Map from "Map";
-import Enemy from "Enemy";
-import Shop from "Shop";
-import LevelUpScreen from "LevelUpScreen";
-import PerkScreen from "PerkScreen";
+import Map from "Screens/Map/Map";
+import Enemy from "Enemies/Enemy";
+import Shop from "Screens/Shop";
+import LevelUpScreen from "Screens/LevelUpScreen";
+import PerkScreen from "Screens/PerkScreen";
 export default class GameManager {
     gameState: GameStates;
     player: Player;
