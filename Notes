@@ -1,38 +1,5 @@
-Suit
-Diamond -> 
-Heart ->
-Spade -> 
-Club
+Based on Karnoffel, a German card game
 
-Rank
-Queen ->
-Jack ->
-Ace ->
-Ten -> 
-King -> 
-Nine ->
-Eight ->
-Seven ->
-
-
-Enemy hand is laid out
-Player must pick cards that both beat the enemy's hand in power and score a lot of points
-If the player's power is not greater than the enemy's power, no points are scored
-Points scored are the players total - the enemy's total
-Player is dealt X amount of cards at the start of a blind - that's all the cards they'll get
-The player has to go through one or more rounds with the enemy, where the enemy plays some subset of their total cards per round
-The player knows all of the enemy's cards, but doesn't know which ones they'll specifically play in a given round
-Discarding can swap cards out in the player's hand with new ones in the deck
-
-States
-Start menu
-Pause menu
-Playing cards
-Shop
-Selecting next blind
-
-
-Navigate map, loot one card from slain enemy, can choose to go to shop or level up or just fight again between fights
 Bosses?
 Enemies have more higher-level cards the further you progress - maybe separated by regions?
 
