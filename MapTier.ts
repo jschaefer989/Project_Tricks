@@ -15,15 +15,18 @@ const spacing = labelHeight + gapBetweenLabelAndImage + imageHeight + padding
 
 export interface MapTierData {
     nodes: MapNodeData[]
+    level: number
 }
 
 export default class MapTier {
     gameManager: GameManager
     nodes: MapNode[]
+    level: number
 
-    constructor(gameManager: GameManager) {
+    constructor(gameManager: GameManager, level?: number) {
         this.gameManager = gameManager
         this.nodes = []
+        this.level = level ?? 1
     }
 
     load(data: MapTierData): void {
@@ -32,21 +35,37 @@ export default class MapTier {
             node.load(nodeData)
             return node
         })
+        this.level = data.level
     }
 
     save(): MapTierData {
         return {
-            nodes: this.nodes.map(node => node.save())
+            nodes: this.nodes.map(node => node.save()),
+            level: this.level
         }
     }
 
     generateNodes(numberOfNodes: number): void {
         for (let i = 0; i < numberOfNodes; i++) {
             const newNode = new MapNode(this.gameManager)
+            if (this.level === 1 && this.shouldBeExcludedFromFirstTier(newNode.type)) {
+                continue
+            }
             if (this.shouldBeUniqueNodeType(newNode.type) && !this.isUniqueNodeType(newNode.type)) {
                 continue
             }
             this.nodes.push(newNode)
+        }
+    }
+
+    shouldBeExcludedFromFirstTier(nodeType: MapNodeTypes): boolean {
+        switch (nodeType) {
+            case MapNodeTypes.SHOP:
+                return true
+            case MapNodeTypes.BATTLE:
+                return false
+            default:
+                exhaustiveGuard(nodeType)
         }
     }
 

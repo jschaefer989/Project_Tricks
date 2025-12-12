@@ -19,9 +19,10 @@ local spacing = labelHeight + gapBetweenLabelAndImage + imageHeight + padding
 ____exports.default = __TS__Class()
 local MapTier = ____exports.default
 MapTier.name = "MapTier"
-function MapTier.prototype.____constructor(self, gameManager)
+function MapTier.prototype.____constructor(self, gameManager, level)
     self.gameManager = gameManager
     self.nodes = {}
+    self.level = level or 1
 end
 function MapTier.prototype.load(self, data)
     self.nodes = __TS__ArrayMap(
@@ -32,12 +33,16 @@ function MapTier.prototype.load(self, data)
             return node
         end
     )
+    self.level = data.level
 end
 function MapTier.prototype.save(self)
-    return {nodes = __TS__ArrayMap(
-        self.nodes,
-        function(____, node) return node:save() end
-    )}
+    return {
+        nodes = __TS__ArrayMap(
+            self.nodes,
+            function(____, node) return node:save() end
+        ),
+        level = self.level
+    }
 end
 function MapTier.prototype.generateNodes(self, numberOfNodes)
     do
@@ -45,6 +50,9 @@ function MapTier.prototype.generateNodes(self, numberOfNodes)
         while i < numberOfNodes do
             do
                 local newNode = __TS__New(MapNode, self.gameManager)
+                if self.level == 1 and self:shouldBeExcludedFromFirstTier(newNode.type) then
+                    goto __continue9
+                end
                 if self:shouldBeUniqueNodeType(newNode.type) and not self:isUniqueNodeType(newNode.type) then
                     goto __continue9
                 end
@@ -56,15 +64,31 @@ function MapTier.prototype.generateNodes(self, numberOfNodes)
         end
     end
 end
-function MapTier.prototype.shouldBeUniqueNodeType(self, nodeType)
+function MapTier.prototype.shouldBeExcludedFromFirstTier(self, nodeType)
     repeat
-        local ____switch12 = nodeType
-        local ____cond12 = ____switch12 == MapNodeTypes.SHOP
-        if ____cond12 then
+        local ____switch13 = nodeType
+        local ____cond13 = ____switch13 == MapNodeTypes.SHOP
+        if ____cond13 then
             return true
         end
-        ____cond12 = ____cond12 or ____switch12 == MapNodeTypes.BATTLE
-        if ____cond12 then
+        ____cond13 = ____cond13 or ____switch13 == MapNodeTypes.BATTLE
+        if ____cond13 then
+            return false
+        end
+        do
+            exhaustiveGuard(nodeType)
+        end
+    until true
+end
+function MapTier.prototype.shouldBeUniqueNodeType(self, nodeType)
+    repeat
+        local ____switch15 = nodeType
+        local ____cond15 = ____switch15 == MapNodeTypes.SHOP
+        if ____cond15 then
+            return true
+        end
+        ____cond15 = ____cond15 or ____switch15 == MapNodeTypes.BATTLE
+        if ____cond15 then
             return false
         end
         do

@@ -51,13 +51,13 @@ function Map.prototype.drawTiers(self)
 end
 function Map.prototype.generateNewMap(self)
     do
-        local i = 0
-        while i < 5 do
-            local newTier = __TS__New(MapTier, self.gameManager)
+        local index = 0
+        while index < 5 do
+            local newTier = __TS__New(MapTier, self.gameManager, index + 1)
             newTier:generateNodes(3)
             local ____self_tiers_0 = self.tiers
             ____self_tiers_0[#____self_tiers_0 + 1] = newTier
-            i = i + 1
+            index = index + 1
         end
     end
 end

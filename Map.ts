@@ -57,8 +57,8 @@ export default class Map {
 
     generateNewMap(): void {
         // TODO: hardcoded to 5 tiers for now
-        for (let i = 0; i < 5; i++) {
-            const newTier = new MapTier(this.gameManager)
+        for (let index = 0; index < 5; index++) {
+            const newTier = new MapTier(this.gameManager, index + 1)
             newTier.generateNodes(3) // Hardcoded to 3 nodes per tier for now
             this.tiers.push(newTier)
         }
