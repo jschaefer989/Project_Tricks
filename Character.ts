@@ -46,7 +46,47 @@ export default class Character {
 
     deselectAllCards(): void {
         for (const card of this.hand) {
-            card.selected = false
+            card.isSelected = false
         }
+    }
+
+    getCardPower(): number {
+        let power = 0
+        for (const card of this.hand) {
+            power += card.power
+        }
+        return power
+    }
+
+    getCardValue(): number {
+        let value = 0
+        for (const card of this.hand) {
+            value += card.value
+        }
+        return value
+    }
+
+    removeAllCardsFromHand(): void {
+        for (let i = this.hand.length - 1; i >= 0; i--) {
+            const card = this.hand[i]
+            this.addToDiscards(card)
+            this.hand.splice(i, 1)
+        }
+    }
+
+    removeFromDeck(card: Card): void {      
+        for (let index = 0; index < this.deck.length; index++) {
+            const otherCard = this.deck[index]
+            if (card.isEqual(otherCard)) {
+                this.deck.splice(index, 1)
+            }
+        }
+    }
+
+    putHandBackInDeck(): void {
+        for (const card of this.hand) {
+            this.addToDeck(card)
+        }
+        this.hand = []
     }
 }

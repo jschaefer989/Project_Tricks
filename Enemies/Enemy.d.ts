@@ -21,9 +21,6 @@ export default class Enemy extends Character {
     constructor(numberOfHeldCards?: number, numberOfCardsInDeck?: number, level?: number, enemyType?: EnemyTypes, experience?: number);
     load(data?: EnemyData): void;
     save(): EnemyData;
-    getCardPower(): number;
-    getCardValue(): number;
-    removeAllCardsFromHand(): void;
     getEnemyName(): string;
     getExpeierenceReward(): number;
 }

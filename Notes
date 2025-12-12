@@ -1,4 +1,7 @@
 Based on Karnoffel, a German card game
+Power comes from Karnoffel
+Value loosely comes from Sheepshead
+
 
 Bosses?
 Enemies have more higher-level cards the further you progress - maybe separated by regions?
@@ -10,4 +13,14 @@ Display enemy information on board
 Adjust deck display on map
 Give unique IDs to all cards, since sometimes there will be duplicates
 
+Enemies will be from Germanic folklore
 Add bidding??
+Add weapons??
+Add special one-time use cards?? -> e.g. change the value of a card, or swap two cards, or change trump, or swap two cards for free
+Add option to store stuff for the next run??
+
+Ideas for other map events:
+You find a hidden treasure chest with a random card
+You can trade with a fellow traveler, card for a card
+You get a quest from a local villager to beat a certain number of Enemies
+You find an ancient statue that grants experience

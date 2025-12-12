@@ -56,30 +56,6 @@ export default class Enemy extends Character {
       }
     }
 
-    getCardPower(): number {
-        let power = 0
-        for (const card of this.hand) {
-            power += card.power
-        }
-        return power
-    }
-
-    getCardValue(): number {
-        let value = 0
-        for (const card of this.hand) {
-            value += card.value
-        }
-        return value
-    }
-
-    removeAllCardsFromHand(): void {
-        for (let i = this.hand.length - 1; i >= 0; i--) {
-            const card = this.hand[i]
-            this.addToDiscards(card)
-            this.hand.splice(i, 1)
-        }
-    }
-
     getEnemyName(): string {
         switch (this.enemyType) {
             case EnemyTypes.GOBLIN:

@@ -53,31 +53,13 @@ function Player.prototype.setup(self)
         Dealer:initializePlayerDeck(self.gameManager)
     end
 end
-function Player.prototype.getCardPower(self)
-    local power = 0
-    for ____, card in ipairs(self.hand) do
-        if card.selected then
-            power = power + card.power
-        end
-    end
-    return power
-end
-function Player.prototype.getCardValue(self)
-    local value = 0
-    for ____, card in ipairs(self.hand) do
-        if card.selected then
-            value = value + card.value
-        end
-    end
-    return value
-end
 function Player.prototype.removeSelectedCardsFromHand(self)
     do
         local i = #self.hand - 1
         while i >= 0 do
             local card = self.hand[i + 1]
-            if card.selected then
-                card.selected = false
+            if card.isSelected then
+                card.isSelected = false
                 self:addToDiscards(card)
                 __TS__ArraySplice(self.hand, i, 1)
             end
@@ -88,8 +70,8 @@ end
 function Player.prototype.discard(self)
     local newHand = {}
     for ____, card in ipairs(self.hand) do
-        if card.selected then
-            card.selected = false
+        if card.isSelected then
+            card.isSelected = false
             local ____self_discardPile_0 = self.discardPile
             ____self_discardPile_0[#____self_discardPile_0 + 1] = card
         else
@@ -100,7 +82,7 @@ function Player.prototype.discard(self)
 end
 function Player.prototype.anySelectedCards(self)
     for ____, card in ipairs(self.hand) do
-        if card.selected then
+        if card.isSelected then
             return true
         end
     end
@@ -114,7 +96,7 @@ function Player.prototype.cashout(self, points)
 end
 function Player.prototype.deselectAllCards(self)
     for ____, card in ipairs(self.hand) do
-        card.selected = false
+        card.isSelected = false
     end
 end
 function Player.prototype.hasPerk(self, perkType)
@@ -139,21 +121,21 @@ function Player.prototype.gatherExperience(self, exp)
 end
 function Player.prototype.getNextLevelExperience(self)
     repeat
-        local ____switch41 = self.level
-        local ____cond41 = ____switch41 == 1
-        if ____cond41 then
+        local ____switch33 = self.level
+        local ____cond33 = ____switch33 == 1
+        if ____cond33 then
             return 100
         end
-        ____cond41 = ____cond41 or ____switch41 == 2
-        if ____cond41 then
+        ____cond33 = ____cond33 or ____switch33 == 2
+        if ____cond33 then
             return 150
         end
-        ____cond41 = ____cond41 or ____switch41 == 3
-        if ____cond41 then
+        ____cond33 = ____cond33 or ____switch33 == 3
+        if ____cond33 then
             return 250
         end
-        ____cond41 = ____cond41 or ____switch41 == 4
-        if ____cond41 then
+        ____cond33 = ____cond33 or ____switch33 == 4
+        if ____cond33 then
             return 500
         end
         do

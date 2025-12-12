@@ -29,8 +29,6 @@ export default class Player extends Character {
     load(data: PlayerData): void;
     save(): PlayerData;
     setup(): void;
-    getCardPower(): number;
-    getCardValue(): number;
     removeSelectedCardsFromHand(): void;
     discard(): void;
     anySelectedCards(): boolean;

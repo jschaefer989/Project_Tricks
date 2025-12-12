@@ -11,20 +11,32 @@ export enum GameStates {
 }
 export enum Suits {
     HEARTS = "HEARTS",
-    DIAMONDS = "DIAMONDS",
-    CLUBS = "CLUBS",
-    SPADES = "SPADES",
+    BELLS = "BELLS",
+    ACORNS = "ACORNS",
+    LEAVES = "SPADES",
 }
 
 export enum Ranks {
-    SEVEN = "SEVEN",
-    EIGHT = "EIGHT",
-    NINE = "NINE",
-    TEN = "TEN",
-    JACK = "JACK",
-    QUEEN = "QUEEN",
     KING = "KING",
-    ACE = "ACE",
+    OVERLORD = "OVERLORD",
+    SERGEANT = "SERGEANT",
+    BANNER = "BANNER",
+    THIEF = "THIEF",
+    PRIEST = "PRIEST",
+    SOLDIER = "SOLDIER",
+    BARON = "BARON",
+    JESTER = "JESTER",
+    DEUCE = "DEUCE"
+}
+
+export enum TrumpRanks {
+    TRICK = "TRICK",
+    DEVIL = "DEVIL",
+    POPE = "POPE",
+    EMPEROR = "EMPEROR",
+    BARD = "BARD",
+    DUKE = "DUKE",
+    KNIGHT = "KNIGHT",
 }
 
 export enum CharacterTypes {

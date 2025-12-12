@@ -13,4 +13,9 @@ export default class Character {
     getCardFromDiscards(position: number): Card | undefined;
     addDiscardsToDeck(): void;
     deselectAllCards(): void;
+    getCardPower(): number;
+    getCardValue(): number;
+    removeAllCardsFromHand(): void;
+    removeFromDeck(card: Card): void;
+    putHandBackInDeck(): void;
 }

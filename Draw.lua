@@ -10,7 +10,7 @@ Draw.name = "Draw"
 function Draw.prototype.____constructor(self)
 end
 function Draw.card(self, card, btnW, btnH, options)
-    local isSelected = card.selected
+    local isSelected = card.isSelected
     local btnText = ((((((card.rank .. " ") .. card.suit) .. " (Val: ") .. tostring(card.value)) .. ", Pow: ") .. tostring(card.power)) .. ")"
     if options and options.multiSelect then
         if isSelected then
@@ -30,8 +30,14 @@ function Draw.card(self, card, btnW, btnH, options)
     if btnHit then
         if not isEmpty(options and options.onClick) then
             options:onClick(card)
+        else
+            card.isSelected = not card.isSelected
+            if card.isSelected then
+                card:onSelect()
+            else
+                card:onUnselect()
+            end
         end
-        card.selected = not card.selected
     end
 end
 function Draw.loadImage(self, path)

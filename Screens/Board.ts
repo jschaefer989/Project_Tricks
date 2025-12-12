@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { CharacterTypes } from "../Enums"
+import { CharacterTypes, Suits } from "../Enums"
 import Dealer from "../Dealer"
 import Draw from "../Draw"
 import Enemy, { EnemyData } from "Enemies/Enemy"
@@ -8,10 +8,15 @@ import * as suit from "Libraries.suit-master.suit"
 import GameManager from "../GameManager"
 
 interface BoardData {
-    discardUsed?: number
-    playerPoints?: number
-    enemyPoints?: number
-    enemy?: EnemyData
+    discardUsed: number
+    playerPoints: number
+    enemyPoints: number
+    enemy: EnemyData
+    trumpSuit: Suits
+    playerPower: number
+    playerValue: number
+    enemyPower: number
+    enemyValue: number
 }
 
 export default class Board {
@@ -21,6 +26,12 @@ export default class Board {
     dealer: Dealer
     playerPoints: number
     enemyPoints: number
+    trumpSuit: Suits
+    playerPower: number
+    playerValue: number
+    enemyPower: number
+    enemyValue: number
+    showingInitialView: boolean
 
     constructor(gameManager: GameManager, enemy?: Enemy) {
         this.gameManager = gameManager
@@ -29,12 +40,23 @@ export default class Board {
         this.dealer = new Dealer(gameManager)
         this.playerPoints = 0
         this.enemyPoints = 0
+        this.trumpSuit = Suits.ACORNS
+        this.playerPower = 0
+        this.playerValue = 0
+        this.enemyPower = 0
+        this.enemyValue = 0
+        this.showingInitialView = true
     }
 
     load(data: BoardData): void {
-        this.discardUsed = data.discardUsed ?? 0
-        this.playerPoints = data.playerPoints ?? 0
-        this.enemyPoints = data.enemyPoints ?? 0
+        this.discardUsed = data.discardUsed
+        this.playerPoints = data.playerPoints
+        this.enemyPoints = data.enemyPoints
+        this.trumpSuit = data.trumpSuit
+        this.playerPower = data.playerPower
+        this.playerValue = data.playerValue
+        this.enemyPower = data.enemyPower
+        this.enemyValue = data.enemyValue
 
         this.enemy = new Enemy()
         this.enemy.load(data.enemy)
@@ -45,11 +67,65 @@ export default class Board {
             discardUsed: this.discardUsed,
             playerPoints: this.playerPoints,
             enemyPoints: this.enemyPoints,
-            enemy: this.enemy.save()
+            enemy: this.enemy.save(),
+            trumpSuit: this.trumpSuit,
+            playerPower: this.playerPower,
+            playerValue: this.playerValue,
+            enemyPower: this.enemyPower,
+            enemyValue: this.enemyValue
         }
     }
 
     drawBoard(): void {
+        if (this.showingInitialView) {
+            this.drawInitialView()
+        } else {
+            this.drawNormalView()
+        }
+    }
+
+    drawInitialView(): void {
+        const btnW = 140
+        const btnH = 70
+        const lblH = 30
+        const padX = 20
+        const padY = 20
+
+        const contentW = this.getContentWidth()
+        const coords = this.getStartingCoordinates(contentW, btnH, lblH, padY)
+        const startX = coords.startX
+        let startY = coords.startY
+
+        // Trump suit label at the top
+        this.renderTrumpSuitLabel()
+
+        // Points display (top center)
+        this.renderPointsDisplay()
+
+        // Enemy stats panel (left side)
+        this.renderEnemyStatsPanel(padX, padY)
+
+        // Enemy deck visualization (left side, below enemy stats)
+        this.renderEnemyDeckVisualization()
+
+        // Enemy row
+        this.renderEnemyRow(startX, startY, contentW, btnW, btnH, lblH, padX, padY)
+
+        // Player row (below enemy) with buttons instead of selectable cards
+        startY = startY + lblH + padY + btnH + 200
+        this.renderPlayerRowInitial(startX, startY, contentW, btnW, btnH, lblH, padX, padY)
+
+        // Let's Fight button
+        this.renderLetsFightButton(startY + lblH + btnH + padY + 50, btnW, btnH)
+
+        // Player info (upper-right)
+        Draw.playerInfo(this.gameManager.player, this.gameManager)
+
+        // Player deck visualization (bottom right)
+        Draw.playerDeck(this.gameManager.player, { showDiscards: true })
+    }
+
+    drawNormalView(): void {
         const btnW = 140
         const btnH = 70
         const lblH = 30
@@ -120,28 +196,19 @@ export default class Board {
     }
 
     getPlayerCashout(): number {
-        const selectedValue = this.gameManager.player.getCardValue()
-        const enemyValue = this.enemy.getCardValue()
-        let cashout = selectedValue - enemyValue
+        let cashout = this.playerValue - this.enemyValue
         if (cashout < 0) cashout = 0
         return cashout
     }
 
     getEnemyCashout(): number {
-        const selectedValue = this.gameManager.player.getCardValue()
-        const enemyValue = this.enemy.getCardValue()
-        let cashout = enemyValue - selectedValue
+        let cashout = this.enemyValue - this.playerValue
         if (cashout < 0) cashout = 0
         return cashout
     }
 
     renderWinStatus(): void {
-        const selectedPower = this.gameManager.player.getCardPower()
-        const enemyPower = this.enemy.getCardPower()
-
-        // Display "Winning!" to the right of the selected-stats panel when visible,
-        // otherwise center it at the bottom.
-        if (selectedPower > enemyPower) {
+        if (this.playerPower > this.enemyPower) {
             const screenW = love.graphics.getWidth()
             const screenH = love.graphics.getHeight()
             const bottomY = screenH - 150
@@ -162,6 +229,16 @@ export default class Board {
         }
     }
 
+    renderTrumpSuitLabel(): void {
+        const screenW = love.graphics.getWidth()
+        const centerX = screenW / 2
+        const panelW = 300
+        const panelX = Math.floor(centerX - panelW / 2)
+
+        suit.layout.reset(panelX, 20, 10, 10)
+        suit.Label("Trump Suit: " + this.trumpSuit, { align: "center" }, ...suit.layout.row(panelW, 40))
+    }
+
     renderPointsDisplay(): void {
         const screenW = love.graphics.getWidth()
         const centerX = screenW / 2
@@ -173,13 +250,10 @@ export default class Board {
     }
 
     renderEnemyStatsPanel(padX: number, padY: number): void {
-        const enemyValue = this.enemy.getCardValue()
-        const enemyPower = this.enemy.getCardPower()
-
         suit.layout.reset(padX, padY, 10, 10)
         suit.Label("Enemy Stats", { align: "center" }, ...suit.layout.row(150, 30))
-        suit.Label("Value: " + enemyValue, { align: "center" }, ...suit.layout.row(150, 30))
-        suit.Label("Power: " + enemyPower, { align: "center" }, ...suit.layout.row(150, 30))
+        suit.Label("Value: " + this.enemyValue, { align: "center" }, ...suit.layout.row(150, 30))
+        suit.Label("Power: " + this.enemyPower, { align: "center" }, ...suit.layout.row(150, 30))
     }
 
     renderEnemyDeckVisualization(): void {
@@ -202,9 +276,6 @@ export default class Board {
         // Only show when the player has at least one selected card
         if (!this.gameManager.player.anySelectedCards()) return
 
-        const selectedValue = this.gameManager.player.getCardValue()
-        const selectedPower = this.gameManager.player.getCardPower()
-
         // Center the panel at the bottom-middle of the screen
         const screenW = love.graphics.getWidth()
         const screenH = love.graphics.getHeight()
@@ -214,8 +285,8 @@ export default class Board {
 
         suit.layout.reset(panelX, bottomY, 10, 10)
         suit.Label("Selected Stats", { align: "center" }, ...suit.layout.row(panelW, 30))
-        suit.Label("Value: " + selectedValue, { align: "center" }, ...suit.layout.row(panelW, 30))
-        suit.Label("Power: " + selectedPower, { align: "center" }, ...suit.layout.row(panelW, 30))
+        suit.Label("Value: " + this.playerValue, { align: "center" }, ...suit.layout.row(panelW, 30))
+        suit.Label("Power: " + this.playerPower, { align: "center" }, ...suit.layout.row(panelW, 30))
     }
 
     renderEnemyRow(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void {
@@ -229,6 +300,17 @@ export default class Board {
         }
     }
 
+    renderPlayerRowInitial(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void {
+        const playerHand = this.gameManager.player.hand
+        suit.layout.reset(startX, startY, padX, padY)
+        suit.Label("Your hand: " + playerHand.length, { align: "left" }, ...suit.layout.row(contentW, lblH))
+        suit.layout.row(0, 0)
+        for (const card of playerHand) {
+            const cardText = card.rank + " " + card.suit + " (Val: " + card.value + ", Pow: " + card.power + ")"
+            suit.Button(cardText, {}, ...suit.layout.col(btnW, btnH))
+        }
+    }
+
     renderPlayerRow(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void {
         const playerHand = this.gameManager.player.hand
         suit.layout.reset(startX, startY, padX, padY)
@@ -236,6 +318,20 @@ export default class Board {
         suit.layout.row(0, 0)
         for (const card of playerHand) {
             Draw.card(card, btnW, btnH, { multiSelect: true } )
+        }
+    }
+
+    renderLetsFightButton(startY: number, btnW: number, btnH: number): void {
+        const screenW = love.graphics.getWidth()
+        const buttonW = 200
+        const buttonX = Math.floor(screenW / 2 - buttonW / 2)
+
+        suit.layout.reset(buttonX, startY, 20, 20)
+        const hit = suit.Button("Let's Fight!", {}, ...suit.layout.row(buttonW, btnH)).hit
+
+        if (hit) {
+            this.showingInitialView = false
+            this.dealer.startGame()
         }
     }
 
@@ -283,20 +379,17 @@ export default class Board {
             return
         }
 
-        const selectedPower = this.gameManager.player.getCardPower()
-        const enemyPower = this.enemy.getCardPower()
-
-        if (selectedPower > enemyPower) {
+        if (this.playerPower > this.enemyPower) {
             this.playerPoints = this.playerPoints + this.getPlayerCashout()
         } else {
             this.enemyPoints = this.enemyPoints + this.getEnemyCashout()
         }
 
         this.gameManager.player.removeSelectedCardsFromHand()
-        Dealer.dealCards(this.gameManager, CharacterTypes.PLAYER)
+        this.gameManager.board?.dealer.dealCards(CharacterTypes.PLAYER)
 
         this.enemy.removeAllCardsFromHand()
-        Dealer.dealCards(this.gameManager,CharacterTypes.ENEMY)
+        this.gameManager.board?.dealer.dealCards(CharacterTypes.ENEMY)
     }
 
     handleDiscard(): void {
@@ -307,7 +400,7 @@ export default class Board {
         this.discardUsed = this.discardUsed + 1
 
         // Refill the player's hand after discarding
-        Dealer.dealCards(this.gameManager,CharacterTypes.PLAYER)
+        this.gameManager.board?.dealer.dealCards(CharacterTypes.PLAYER)
     }
 
     getWinner(): CharacterTypes {

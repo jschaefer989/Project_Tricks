@@ -86,7 +86,7 @@ export default class WinScreen {
         }
 
         for (const card of lootCards) {
-            if (card.selected) {
+            if (card.isSelected) {
                 this.gameManager.player.addToDeck(card)
             }
         }

@@ -1,16 +1,20 @@
 /** @noSelfInFile */
-import { Ranks, Suits } from "../Enums";
+import GameManager from "GameManager";
+import { Ranks, Suits, TrumpRanks } from "../Enums";
 export default class Card {
+    gameManager: GameManager;
     suit: Suits;
-    rank: Ranks;
+    rank: Ranks | TrumpRanks;
     power: number;
     value: number;
-    selected: boolean;
+    isSelected: boolean;
     cost: number;
-    constructor(suit: Suits, rank: Ranks);
+    isTrump: boolean;
+    name: string;
+    constructor(gameManager: GameManager, suit: Suits, rank: Ranks | TrumpRanks, power: number, value: number, name: string, isTrump?: boolean);
     isEqual(otherCard: Card): boolean;
-    getPower(suit: string, rank: string): number;
-    getValue(rank: string): number;
     getCost(): number;
     getBaseCost(): number;
+    onSelect(): void;
+    onUnselect(): void;
 }

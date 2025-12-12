@@ -82,7 +82,7 @@ export default class Shop {
         this.cardsForSale = []
         // TODO: hardcoded to 3 cards for now
         for (let i = 0; i < 3; i++) {
-            this.cardsForSale.push(Dealer.getRandomCard())
+            this.cardsForSale.push(Dealer.getRandomCard(this.gameManager))
         }
     }
 

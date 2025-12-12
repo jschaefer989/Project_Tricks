@@ -1,5 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 ____exports.default = __TS__Class()
 local Character = ____exports.default
@@ -39,7 +40,50 @@ function Character.prototype.addDiscardsToDeck(self)
 end
 function Character.prototype.deselectAllCards(self)
     for ____, card in ipairs(self.hand) do
-        card.selected = false
+        card.isSelected = false
     end
+end
+function Character.prototype.getCardPower(self)
+    local power = 0
+    for ____, card in ipairs(self.hand) do
+        power = power + card.power
+    end
+    return power
+end
+function Character.prototype.getCardValue(self)
+    local value = 0
+    for ____, card in ipairs(self.hand) do
+        value = value + card.value
+    end
+    return value
+end
+function Character.prototype.removeAllCardsFromHand(self)
+    do
+        local i = #self.hand - 1
+        while i >= 0 do
+            local card = self.hand[i + 1]
+            self:addToDiscards(card)
+            __TS__ArraySplice(self.hand, i, 1)
+            i = i - 1
+        end
+    end
+end
+function Character.prototype.removeFromDeck(self, card)
+    do
+        local index = 0
+        while index < #self.deck do
+            local otherCard = self.deck[index + 1]
+            if card:isEqual(otherCard) then
+                __TS__ArraySplice(self.deck, index, 1)
+            end
+            index = index + 1
+        end
+    end
+end
+function Character.prototype.putHandBackInDeck(self)
+    for ____, card in ipairs(self.hand) do
+        self:addToDeck(card)
+    end
+    self.hand = {}
 end
 return ____exports

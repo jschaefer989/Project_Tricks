@@ -96,7 +96,7 @@ function WinScreen.prototype.addLootCardsToPlayer(self)
         return
     end
     for ____, card in ipairs(lootCards) do
-        if card.selected then
+        if card.isSelected then
             self.gameManager.player:addToDeck(card)
         end
     end

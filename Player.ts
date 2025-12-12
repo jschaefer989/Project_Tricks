@@ -76,31 +76,11 @@ export default class Player extends Character {
         }
     }
 
-    getCardPower(): number {
-        let power = 0
-        for (const card of this.hand) {
-            if (card.selected) {
-                power += card.power
-            }
-        }
-        return power
-    }
-
-    getCardValue(): number {
-        let value = 0
-        for (const card of this.hand) {
-            if (card.selected) {
-                value += card.value
-            }
-        }
-        return value
-    }
-
     removeSelectedCardsFromHand(): void {
         for (let i = this.hand.length - 1; i >= 0; i--) {
             const card = this.hand[i]
-            if (card.selected) {
-                card.selected = false
+            if (card.isSelected) {
+                card.isSelected = false
                 this.addToDiscards(card)
                 this.hand.splice(i, 1)
             }
@@ -111,8 +91,8 @@ export default class Player extends Character {
         const newHand: Card[] = []
 
         for (const card of this.hand) {
-            if (card.selected) {
-                card.selected = false
+            if (card.isSelected) {
+                card.isSelected = false
                 this.discardPile.push(card)
             } else {
                 newHand.push(card)
@@ -124,7 +104,7 @@ export default class Player extends Character {
 
     anySelectedCards(): boolean {
         for (const card of this.hand) {
-            if (card.selected) {
+            if (card.isSelected) {
                 return true
             }
         }
@@ -138,7 +118,7 @@ export default class Player extends Character {
 
     deselectAllCards(): void {
         for (const card of this.hand) {
-            card.selected = false
+            card.isSelected = false
         }
     }
 

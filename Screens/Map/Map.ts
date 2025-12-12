@@ -62,7 +62,9 @@ export default class Map {
         // TODO: hardcoded to 5 tiers for now
         for (let index = 0; index < 5; index++) {
             const newTier = new MapTier(this.gameManager, index + 1)
-            newTier.generateNodes(3) // Hardcoded to 3 nodes per tier for now
+            do {
+                newTier.generateNodes(3) // Hardcoded to 3 nodes per tier for now
+            } while (newTier.nodes.length === 0)
             this.tiers.push(newTier)
         }
     }

@@ -58,7 +58,11 @@ function Map.prototype.generateNewMap(self)
         local index = 0
         while index < 5 do
             local newTier = __TS__New(MapTier, self.gameManager, index + 1)
-            newTier:generateNodes(3)
+            repeat
+                do
+                    newTier:generateNodes(3)
+                end
+            until not (#newTier.nodes == 0)
             local ____self_tiers_0 = self.tiers
             ____self_tiers_0[#____self_tiers_0 + 1] = newTier
             index = index + 1

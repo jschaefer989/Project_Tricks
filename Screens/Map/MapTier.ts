@@ -48,7 +48,7 @@ export default class MapTier {
     generateNodes(numberOfNodes: number): void {
         for (let i = 0; i < numberOfNodes; i++) {
             const newNode = new MapNode(this.gameManager)
-            if (this.level === 1 && this.shouldBeExcludedFromFirstTier(newNode.type)) {
+            if (this.level === 1 && this.shouldBeExcludedFromFirstTier(newNode.type)) {                
                 continue
             }
             if (this.shouldBeUniqueNodeType(newNode.type) && !this.isUniqueNodeType(newNode.type)) {

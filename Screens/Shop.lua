@@ -77,7 +77,7 @@ function Shop.prototype.generateCardsForSale(self)
         local i = 0
         while i < 3 do
             local ____self_cardsForSale_2 = self.cardsForSale
-            ____self_cardsForSale_2[#____self_cardsForSale_2 + 1] = Dealer:getRandomCard()
+            ____self_cardsForSale_2[#____self_cardsForSale_2 + 1] = Dealer:getRandomCard(self.gameManager)
             i = i + 1
         end
     end

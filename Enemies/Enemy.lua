@@ -1,7 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
-local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local ____Character = require("Character")
 local Character = ____Character.default
@@ -43,48 +42,23 @@ function Enemy.prototype.save(self)
         experience = self.experience
     }
 end
-function Enemy.prototype.getCardPower(self)
-    local power = 0
-    for ____, card in ipairs(self.hand) do
-        power = power + card.power
-    end
-    return power
-end
-function Enemy.prototype.getCardValue(self)
-    local value = 0
-    for ____, card in ipairs(self.hand) do
-        value = value + card.value
-    end
-    return value
-end
-function Enemy.prototype.removeAllCardsFromHand(self)
-    do
-        local i = #self.hand - 1
-        while i >= 0 do
-            local card = self.hand[i + 1]
-            self:addToDiscards(card)
-            __TS__ArraySplice(self.hand, i, 1)
-            i = i - 1
-        end
-    end
-end
 function Enemy.prototype.getEnemyName(self)
     repeat
-        local ____switch15 = self.enemyType
-        local ____cond15 = ____switch15 == EnemyTypes.GOBLIN
-        if ____cond15 then
+        local ____switch6 = self.enemyType
+        local ____cond6 = ____switch6 == EnemyTypes.GOBLIN
+        if ____cond6 then
             return "Goblin"
         end
-        ____cond15 = ____cond15 or ____switch15 == EnemyTypes.ORC
-        if ____cond15 then
+        ____cond6 = ____cond6 or ____switch6 == EnemyTypes.ORC
+        if ____cond6 then
             return "Orc"
         end
-        ____cond15 = ____cond15 or ____switch15 == EnemyTypes.TROLL
-        if ____cond15 then
+        ____cond6 = ____cond6 or ____switch6 == EnemyTypes.TROLL
+        if ____cond6 then
             return "Troll"
         end
-        ____cond15 = ____cond15 or ____switch15 == EnemyTypes.DRAGON
-        if ____cond15 then
+        ____cond6 = ____cond6 or ____switch6 == EnemyTypes.DRAGON
+        if ____cond6 then
             return "Dragon"
         end
         do
@@ -94,21 +68,21 @@ function Enemy.prototype.getEnemyName(self)
 end
 function Enemy.prototype.getExpeierenceReward(self)
     repeat
-        local ____switch17 = self.enemyType
-        local ____cond17 = ____switch17 == EnemyTypes.GOBLIN
-        if ____cond17 then
+        local ____switch8 = self.enemyType
+        local ____cond8 = ____switch8 == EnemyTypes.GOBLIN
+        if ____cond8 then
             return 10 * self.level
         end
-        ____cond17 = ____cond17 or ____switch17 == EnemyTypes.ORC
-        if ____cond17 then
+        ____cond8 = ____cond8 or ____switch8 == EnemyTypes.ORC
+        if ____cond8 then
             return 20 * self.level
         end
-        ____cond17 = ____cond17 or ____switch17 == EnemyTypes.TROLL
-        if ____cond17 then
+        ____cond8 = ____cond8 or ____switch8 == EnemyTypes.TROLL
+        if ____cond8 then
             return 30 * self.level
         end
-        ____cond17 = ____cond17 or ____switch17 == EnemyTypes.DRAGON
-        if ____cond17 then
+        ____cond8 = ____cond8 or ____switch8 == EnemyTypes.DRAGON
+        if ____cond8 then
             return 50 * self.level
         end
         do

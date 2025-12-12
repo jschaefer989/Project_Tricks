@@ -4,6 +4,11 @@ import Player from "Player";
 import GameManager from "GameManager";
 interface CardOptions {
     multiSelect?: boolean;
+    /**
+     * Overrides the onSelect/onUnselect behavior for the card, which generally assumes that the card is rendered on the board
+     * @param card
+     * @returns
+     */
     onClick?: (card: Card) => void;
     displayCost?: boolean;
 }
