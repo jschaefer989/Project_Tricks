@@ -106,7 +106,7 @@ export default class Board {
         this.renderEnemyStatsPanel(padX, padY)
 
         // Enemy deck visualization (left side, below enemy stats)
-        this.renderEnemyDeckVisualization()
+        this.renderEnemyDeck()
 
         // Enemy row
         this.renderEnemyRow(startX, startY, contentW, btnW, btnH, lblH, padX, padY)
@@ -147,7 +147,7 @@ export default class Board {
         this.renderEnemyStatsPanel(padX, padY)
 
         // Enemy deck visualization (left side, below enemy stats)
-        this.renderEnemyDeckVisualization()
+        this.renderEnemyDeck()
 
         // Enemy row
         this.renderEnemyRow(startX, startY, contentW, btnW, btnH, lblH, padX, padY)
@@ -256,7 +256,7 @@ export default class Board {
         suit.Label("Power: " + this.enemyPower, { align: "center" }, ...suit.layout.row(150, 30))
     }
 
-    renderEnemyDeckVisualization(): void {
+    renderEnemyDeck(): void {
         const enemyDeck = this.enemy.deck
         const padX = 20
         const panelY = 170 // Position below enemy stats panel
@@ -342,7 +342,7 @@ export default class Board {
 
         suit.layout.reset(love.graphics.getWidth() / 2 - totalW / 2, startY, padX, padY)
 
-        const playHit = suit.Button("Play", {}, ...suit.layout.col(btnW, btnH)).hit
+        const attackHit = suit.Button("Attack", {}, ...suit.layout.col(btnW, btnH)).hit
 
         // Check if discard button should be enabled
         const discardEnabled = this.discardUsed < this.gameManager.player.discards
@@ -351,8 +351,8 @@ export default class Board {
 
         const deselectHit = suit.Button("Deselect All", {}, ...suit.layout.col(btnW, btnH)).hit
 
-        if (playHit) {
-            this.handlePlay()
+        if (attackHit) {
+            this.handleAttack()
         }
         if (discardHit && discardEnabled) {
             this.handleDiscard()
@@ -372,7 +372,7 @@ export default class Board {
         suit.Label("Discards Remaining: " + (this.gameManager.player.discards - this.discardUsed) + "/" + this.gameManager.player.discards, { align: "center" }, ...suit.layout.row(150, 30))
     }
 
-    handlePlay(): void {
+    handleAttack(): void {
         if (!this.gameManager.player.anySelectedCards()) return
         if (this.enemy.deck.length === 0) {
             this.endFight()

@@ -6,6 +6,7 @@ import { isEmpty } from "Helpers"
 
 export default class Card {
     gameManager: GameManager
+    id: string
     suit: Suits
     rank: Ranks | TrumpRanks
     power: number
@@ -25,10 +26,11 @@ export default class Card {
         this.isSelected = false
         this.isTrump = isTrump
         this.name = name
+        this.id = `${this.suit}-${this.rank}`
     }
 
     isEqual(otherCard: Card): boolean {
-        return this.suit === otherCard.suit && this.rank === otherCard.rank
+        return this.id === otherCard.id
     }
 
     getCost(): number {

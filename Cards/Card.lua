@@ -19,9 +19,10 @@ function Card.prototype.____constructor(self, gameManager, suit, rank, power, va
     self.isSelected = false
     self.isTrump = isTrump
     self.name = name
+    self.id = (self.suit .. "-") .. self.rank
 end
 function Card.prototype.isEqual(self, otherCard)
-    return self.suit == otherCard.suit and self.rank == otherCard.rank
+    return self.id == otherCard.id
 end
 function Card.prototype.getCost(self)
     local cost = 0

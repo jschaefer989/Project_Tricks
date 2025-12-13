@@ -37,7 +37,7 @@ export default class Draw {
             btnText += " Cost: " + card.cost
         }
 
-        const btnHit = suit.Button(btnText, {}, ...suit.layout.col(btnW, btnH)).hit
+        const btnHit = suit.Button(btnText, { id: card.id }, ...suit.layout.col(btnW, btnH)).hit
 
         if (btnHit) {
             if (!isEmpty(options?.onClick)) {

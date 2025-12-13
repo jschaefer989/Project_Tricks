@@ -74,7 +74,7 @@ function Board.prototype.drawInitialView(self)
     self:renderTrumpSuitLabel()
     self:renderPointsDisplay()
     self:renderEnemyStatsPanel(padX, padY)
-    self:renderEnemyDeckVisualization()
+    self:renderEnemyDeck()
     self:renderEnemyRow(
         startX,
         startY,
@@ -113,7 +113,7 @@ function Board.prototype.drawNormalView(self)
     self:renderWinStatus()
     self:renderPointsDisplay()
     self:renderEnemyStatsPanel(padX, padY)
-    self:renderEnemyDeckVisualization()
+    self:renderEnemyDeck()
     self:renderEnemyRow(
         startX,
         startY,
@@ -254,7 +254,7 @@ function Board.prototype.renderEnemyStatsPanel(self, padX, padY)
         suit.layout:row(150, 30)
     )
 end
-function Board.prototype.renderEnemyDeckVisualization(self)
+function Board.prototype.renderEnemyDeck(self)
     local enemyDeck = self.enemy.deck
     local padX = 20
     local panelY = 170
@@ -373,8 +373,8 @@ function Board.prototype.renderPlayButton(self, startY, btnW, btnH, padX, padY)
         padX,
         padY
     )
-    local playHit = suit.Button(
-        "Play",
+    local attackHit = suit.Button(
+        "Attack",
         {},
         suit.layout:col(btnW, btnH)
     ).hit
@@ -390,8 +390,8 @@ function Board.prototype.renderPlayButton(self, startY, btnW, btnH, padX, padY)
         {},
         suit.layout:col(btnW, btnH)
     ).hit
-    if playHit then
-        self:handlePlay()
+    if attackHit then
+        self:handleAttack()
     end
     if discardHit and discardEnabled then
         self:handleDiscard()
@@ -412,7 +412,7 @@ function Board.prototype.renderDiscardCounter(self)
         suit.layout:row(150, 30)
     )
 end
-function Board.prototype.handlePlay(self)
+function Board.prototype.handleAttack(self)
     if not self.gameManager.player:anySelectedCards() then
         return
     end

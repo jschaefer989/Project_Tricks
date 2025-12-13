@@ -221,18 +221,23 @@ function Dealer.prototype.determineTrumpSuit(self)
         return
     end
     local player = self.gameManager.player
-    local cardsToDeal = player.numberOfHeldCards - #player.hand
     local trumpSuit = Suits.HEARTS
     local lowestPower = 100
     do
         local index = 0
-        while index < cardsToDeal do
-            local card = player.deck[index + 1]
+        while index < #player.hand do
+            local card = player.hand[index + 1]
             if index == 0 or card.power < lowestPower then
                 lowestPower = card.power
                 trumpSuit = card.suit
             end
             index = index + 1
+        end
+    end
+    for ____, card in ipairs(self.gameManager.board.enemy.hand) do
+        if card.power < lowestPower then
+            lowestPower = card.power
+            trumpSuit = card.suit
         end
     end
     self.gameManager.board.trumpSuit = trumpSuit
@@ -245,33 +250,33 @@ function Dealer.prototype.convertToTrumpSuit(self, card)
         return card
     end
     repeat
-        local ____switch36 = card.rank
-        local ____cond36 = ____switch36 == Ranks.SOLDIER
-        if ____cond36 then
+        local ____switch39 = card.rank
+        local ____cond39 = ____switch39 == Ranks.SOLDIER
+        if ____cond39 then
             return __TS__New(Knight, self.gameManager, self.gameManager.board.trumpSuit)
         end
-        ____cond36 = ____cond36 or ____switch36 == Ranks.BARON
-        if ____cond36 then
+        ____cond39 = ____cond39 or ____switch39 == Ranks.BARON
+        if ____cond39 then
             return __TS__New(Duke, self.gameManager, self.gameManager.board.trumpSuit)
         end
-        ____cond36 = ____cond36 or ____switch36 == Ranks.JESTER
-        if ____cond36 then
+        ____cond39 = ____cond39 or ____switch39 == Ranks.JESTER
+        if ____cond39 then
             return __TS__New(Bard, self.gameManager, self.gameManager.board.trumpSuit)
         end
-        ____cond36 = ____cond36 or ____switch36 == Ranks.DEUCE
-        if ____cond36 then
+        ____cond39 = ____cond39 or ____switch39 == Ranks.DEUCE
+        if ____cond39 then
             return __TS__New(Emperor, self.gameManager, self.gameManager.board.trumpSuit)
         end
-        ____cond36 = ____cond36 or ____switch36 == Ranks.PRIEST
-        if ____cond36 then
+        ____cond39 = ____cond39 or ____switch39 == Ranks.PRIEST
+        if ____cond39 then
             return __TS__New(Pope, self.gameManager, self.gameManager.board.trumpSuit)
         end
-        ____cond36 = ____cond36 or ____switch36 == Ranks.THIEF
-        if ____cond36 then
+        ____cond39 = ____cond39 or ____switch39 == Ranks.THIEF
+        if ____cond39 then
             return __TS__New(Devil, self.gameManager, self.gameManager.board.trumpSuit)
         end
-        ____cond36 = ____cond36 or ____switch36 == Ranks.SERGEANT
-        if ____cond36 then
+        ____cond39 = ____cond39 or ____switch39 == Ranks.SERGEANT
+        if ____cond39 then
             return __TS__New(Trick, self.gameManager, self.gameManager.board.trumpSuit)
         end
         do
@@ -287,7 +292,7 @@ function Dealer.prototype.convertToTrumpSuitForCharacter(self, characterType)
     for ____, card in ipairs(character.deck) do
         do
             if card.suit ~= self.gameManager.board.trumpSuit then
-                goto __continue39
+                goto __continue42
             end
             local trumpCard = self:convertToTrumpSuit(card)
             if trumpCard ~= card then
@@ -295,7 +300,7 @@ function Dealer.prototype.convertToTrumpSuitForCharacter(self, characterType)
                 character:addToDeck(trumpCard)
             end
         end
-        ::__continue39::
+        ::__continue42::
     end
 end
 function Dealer.prototype.convertBackToOriginalSuit(self, card)
@@ -306,33 +311,33 @@ function Dealer.prototype.convertBackToOriginalSuit(self, card)
         return card
     end
     repeat
-        local ____switch46 = card.rank
-        local ____cond46 = ____switch46 == TrumpRanks.KNIGHT
-        if ____cond46 then
+        local ____switch49 = card.rank
+        local ____cond49 = ____switch49 == TrumpRanks.KNIGHT
+        if ____cond49 then
             return __TS__New(Soldier, self.gameManager, self.gameManager.board.trumpSuit)
         end
-        ____cond46 = ____cond46 or ____switch46 == TrumpRanks.DUKE
-        if ____cond46 then
+        ____cond49 = ____cond49 or ____switch49 == TrumpRanks.DUKE
+        if ____cond49 then
             return __TS__New(Baron, self.gameManager, self.gameManager.board.trumpSuit)
         end
-        ____cond46 = ____cond46 or ____switch46 == TrumpRanks.BARD
-        if ____cond46 then
+        ____cond49 = ____cond49 or ____switch49 == TrumpRanks.BARD
+        if ____cond49 then
             return __TS__New(Jester, self.gameManager, self.gameManager.board.trumpSuit)
         end
-        ____cond46 = ____cond46 or ____switch46 == TrumpRanks.EMPEROR
-        if ____cond46 then
+        ____cond49 = ____cond49 or ____switch49 == TrumpRanks.EMPEROR
+        if ____cond49 then
             return __TS__New(Deuce, self.gameManager, self.gameManager.board.trumpSuit)
         end
-        ____cond46 = ____cond46 or ____switch46 == TrumpRanks.POPE
-        if ____cond46 then
+        ____cond49 = ____cond49 or ____switch49 == TrumpRanks.POPE
+        if ____cond49 then
             return __TS__New(Priest, self.gameManager, self.gameManager.board.trumpSuit)
         end
-        ____cond46 = ____cond46 or ____switch46 == TrumpRanks.DEVIL
-        if ____cond46 then
+        ____cond49 = ____cond49 or ____switch49 == TrumpRanks.DEVIL
+        if ____cond49 then
             return __TS__New(Thief, self.gameManager, self.gameManager.board.trumpSuit)
         end
-        ____cond46 = ____cond46 or ____switch46 == TrumpRanks.TRICK
-        if ____cond46 then
+        ____cond49 = ____cond49 or ____switch49 == TrumpRanks.TRICK
+        if ____cond49 then
             return __TS__New(Sergeant, self.gameManager, self.gameManager.board.trumpSuit)
         end
         do
@@ -348,7 +353,7 @@ function Dealer.prototype.convertBackToOriginalSuitForCharacter(self, characterT
     for ____, trumpCard in ipairs(character.deck) do
         do
             if trumpCard.suit ~= self.gameManager.board.trumpSuit then
-                goto __continue49
+                goto __continue52
             end
             local originalCard = self:convertBackToOriginalSuit(trumpCard)
             if originalCard ~= trumpCard then
@@ -356,7 +361,7 @@ function Dealer.prototype.convertBackToOriginalSuitForCharacter(self, characterT
                 character:addToDeck(originalCard)
             end
         end
-        ::__continue49::
+        ::__continue52::
     end
 end
 function Dealer.prototype.getLootCards(self)

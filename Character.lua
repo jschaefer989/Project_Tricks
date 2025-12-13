@@ -19,6 +19,7 @@ function Character.prototype.getCardFromHand(self, position)
     return self.hand[position + 1]
 end
 function Character.prototype.addToDeck(self, card)
+    card.id = (((card.suit .. "-") .. card.rank) .. "-") .. tostring(#self.deck)
     local ____self_deck_1 = self.deck
     ____self_deck_1[#____self_deck_1 + 1] = card
 end

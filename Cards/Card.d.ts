@@ -3,6 +3,7 @@ import GameManager from "GameManager";
 import { Ranks, Suits, TrumpRanks } from "../Enums";
 export default class Card {
     gameManager: GameManager;
+    id: string;
     suit: Suits;
     rank: Ranks | TrumpRanks;
     power: number;

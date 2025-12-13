@@ -163,13 +163,19 @@ export default class Dealer {
             return
         }
 
-        const player = this.gameManager.player
-        const cardsToDeal = player.numberOfHeldCards - player.hand.length
+        const player = this.gameManager.player 
         let trumpSuit: Suits = Suits.HEARTS
         let lowestPower: number = 100
-        for (let index = 0; index < cardsToDeal; index++) {
-            const card = player.deck[index]
+        for (let index = 0; index < player.hand.length; index++) {
+            const card = player.hand[index]
             if (index === 0 || card.power < lowestPower) {
+                lowestPower = card.power
+                trumpSuit = card.suit
+            }
+        }
+
+        for (const card of this.gameManager.board.enemy.hand) {
+            if (card.power < lowestPower) {
                 lowestPower = card.power
                 trumpSuit = card.suit
             }

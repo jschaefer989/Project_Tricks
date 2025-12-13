@@ -44,7 +44,7 @@ export default class Board {
     renderTrumpSuitLabel(): void;
     renderPointsDisplay(): void;
     renderEnemyStatsPanel(padX: number, padY: number): void;
-    renderEnemyDeckVisualization(): void;
+    renderEnemyDeck(): void;
     renderPlayerSelectedStatsPanel(): void;
     renderEnemyRow(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void;
     renderPlayerRowInitial(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void;
@@ -52,7 +52,7 @@ export default class Board {
     renderLetsFightButton(startY: number, btnW: number, btnH: number): void;
     renderPlayButton(startY: number, btnW: number, btnH: number, padX: number, padY: number): void;
     renderDiscardCounter(): void;
-    handlePlay(): void;
+    handleAttack(): void;
     handleDiscard(): void;
     getWinner(): CharacterTypes;
     endFight(): void;

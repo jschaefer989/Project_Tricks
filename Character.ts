@@ -22,6 +22,7 @@ export default class Character {
     }
 
     addToDeck(card: Card): void {
+        card.id = `${card.suit}-${card.rank}-${this.deck.length}`
         this.deck.push(card)
     }
 

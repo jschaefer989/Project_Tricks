@@ -24,7 +24,7 @@ function Draw.card(self, card, btnW, btnH, options)
     end
     local btnHit = suit.Button(
         btnText,
-        {},
+        {id = card.id},
         suit.layout:col(btnW, btnH)
     ).hit
     if btnHit then
