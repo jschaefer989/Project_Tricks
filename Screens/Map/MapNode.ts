@@ -6,6 +6,10 @@ import { EnemyTypes, MapNodeTypes } from "Enums"
 import GameManager from "GameManager"
 import { exhaustiveGuard, getRandomElementFromEnum } from "Helpers"
 import * as suit from "Libraries.suit-master.suit"
+import Kobold from "Enemies/Kobold"
+import Nixie from "Enemies/Nixie"
+import Ogre from "Enemies/Ogre"
+import Tatzelwurm from "Enemies/Tatzelwurm"
 
 export interface MapNodeData {
     type: MapNodeTypes,
@@ -35,7 +39,7 @@ export default class MapNode {
         this.type = data.type ?? this.getRandomNodeType()
         if (data.enemy) {
             this.enemy = new Enemy()
-            this.enemy.load(data.enemy)
+            this.enemy.load(this.gameManager, data.enemy)
         }
     }
 
@@ -72,7 +76,7 @@ export default class MapNode {
         const labelHeight = 25
 
         // Draw label above the image button
-        const buttonText = `${this.enemy.getEnemyName()} (Lv. ${this.enemy.level})`
+        const buttonText = `${this.enemy.name} (Lv. ${this.enemy.level})`
         suit.layout.reset(x, y)
         suit.Label(buttonText, { align: "center" }, ...suit.layout.row(imageW, labelHeight))
         
@@ -143,7 +147,7 @@ export default class MapNode {
         const labelHeight = 25
 
         // Draw label above the image button
-        const buttonText = `${this.enemy.getEnemyName()} (Lv. ${this.enemy.level})`
+        const buttonText = `${this.enemy.name} (Lv. ${this.enemy.level})`
         suit.layout.reset(x, y)
         suit.Label(buttonText, { align: "center" }, ...suit.layout.row(imageW, labelHeight))
         
@@ -198,9 +202,25 @@ export default class MapNode {
     }
 
     initializeBattleNode(): void {
-        // TODO: All of this stuff should be weighted based on player level and strength and generated at some point
+        const enemyType = getRandomElementFromEnum(EnemyTypes)
+        this.enemy = this.getEnemyFromType(enemyType)
+    }
+
+    getEnemyFromType(enemyType: EnemyTypes): Enemy {
+        // TODO: Levels, cards in hand, etc. should be weighted based on player level and strength and generated at some point
         // const lootDie = loadedDice.new_die([50, 30, 30, 10, 7, 2])
         // const result = lootDie.random()
-        this.enemy = new Enemy(undefined, undefined, undefined, getRandomElementFromEnum(EnemyTypes))
+        switch (enemyType) {
+            case EnemyTypes.KOBOLD:
+                return new Kobold(1)
+            case EnemyTypes.NIXIE:
+                return new Nixie(1)
+            case EnemyTypes.OGRE:
+                return new Ogre(1)
+            case EnemyTypes.TATZELWURM:
+                return new Tatzelwurm(1)
+            default:
+                exhaustiveGuard(enemyType)
+        }
     }
 }

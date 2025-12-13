@@ -38,7 +38,7 @@ end
 function Map.prototype.drawMap(self)
     self:drawTiers()
     Draw:playerInfo(self.gameManager.player, self.gameManager)
-    Draw:playerDeck(self.gameManager.player)
+    Draw:playerDeck(self.gameManager.player, {position = "bottom-right"})
 end
 function Map.prototype.drawBackground(self)
 end

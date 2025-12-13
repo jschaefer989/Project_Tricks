@@ -45,10 +45,10 @@ export declare enum MapNodeTypes {
     SHOP = "SHOP"
 }
 export declare enum EnemyTypes {
-    GOBLIN = "GOBLIN",
-    ORC = "ORC",
-    TROLL = "TROLL",
-    DRAGON = "DRAGON"
+    KOBOLD = "KOBOLD",
+    NIXIE = "NIXIE",
+    OGRE = "OGRE",
+    TATZELWURM = "TATZELWURM"
 }
 export declare enum Perks {
     EXTRA_CARD = "EXTRA_CARD",

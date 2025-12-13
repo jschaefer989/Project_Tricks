@@ -4,6 +4,10 @@ import { Perks } from "Enums"
 import GameManager from "GameManager"
 import { exhaustiveGuard } from "Helpers"
 
+export interface PerkData {
+    perkType: Perks
+}
+
 export default class Perk {
     gameManager: GameManager
     perkType: Perks
@@ -11,6 +15,16 @@ export default class Perk {
     constructor(gameManager: GameManager, perkType: Perks) {
         this.gameManager = gameManager
         this.perkType = perkType
+    }
+
+    save(): PerkData {
+        return {
+            perkType: this.perkType
+        }
+    }
+
+    static load(gameManager: GameManager, data: PerkData): Perk {
+        return new Perk(gameManager, data.perkType)
     }
 
     getPerkName(): string {

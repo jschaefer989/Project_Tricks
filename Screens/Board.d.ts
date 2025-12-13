@@ -13,6 +13,7 @@ interface BoardData {
     playerValue: number;
     enemyPower: number;
     enemyValue: number;
+    showingInitialView: boolean;
 }
 export default class Board {
     gameManager: GameManager;
@@ -40,21 +41,22 @@ export default class Board {
     getContentWidth(): number;
     getPlayerCashout(): number;
     getEnemyCashout(): number;
-    renderWinStatus(): void;
+    renderWinStatus(startX: number, startY: number): void;
     renderTrumpSuitLabel(): void;
     renderPointsDisplay(): void;
-    renderEnemyStatsPanel(padX: number, padY: number): void;
+    renderEnemyStats(startX: number, startY: number): void;
     renderEnemyDeck(): void;
-    renderPlayerSelectedStatsPanel(): void;
+    renderPlayerSelectedStats(startX: number, startY: number, contentW: number, btnW: number): void;
     renderEnemyRow(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void;
     renderPlayerRowInitial(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void;
     renderPlayerRow(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void;
     renderLetsFightButton(startY: number, btnW: number, btnH: number): void;
-    renderPlayButton(startY: number, btnW: number, btnH: number, padX: number, padY: number): void;
+    renderAttackButton(startY: number, btnW: number, btnH: number, padX: number, padY: number): void;
     renderDiscardCounter(): void;
     handleAttack(): void;
     handleDiscard(): void;
     getWinner(): CharacterTypes;
     endFight(): void;
+    clearStats(): void;
 }
 export {};

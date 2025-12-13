@@ -14,6 +14,7 @@ interface CardOptions {
 }
 interface PlayerDeckOptions {
     showDiscards?: boolean;
+    position?: "bottom-right" | "default";
 }
 export default class Draw {
     static card(card: Card, btnW: number, btnH: number, options?: CardOptions): void;

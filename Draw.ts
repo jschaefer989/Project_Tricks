@@ -18,6 +18,7 @@ interface CardOptions {
 
 interface PlayerDeckOptions {
     showDiscards?: boolean
+    position?: "bottom-right" | "default"
 }
 
 export default class Draw {
@@ -101,16 +102,28 @@ export default class Draw {
         // Render discard pile and deck visualization in bottom right corner
         const screenW = love.graphics.getWidth()
         const screenH = love.graphics.getHeight()
-        const panelX = screenW - 170 // Same right alignment as selected stats
-        const panelY = screenH - 200 // Higher up to fit on screen
-
-        if (options?.showDiscards) {
-            suit.layout.reset(panelX, panelY, 10, 10)
-            suit.Label("Discard Pile", { align: "center" }, ...suit.layout.row(150, 30))
-            suit.Label("Cards: " + discardSize, { align: "center" }, ...suit.layout.row(150, 30))
+        
+        let panelX: number
+        let panelY: number
+        
+        if (options?.position === "bottom-right") {
+            // Bottom right corner with padding
+            const panelW = 150
+            panelX = screenW - panelW - 10
+            panelY = screenH - (options?.showDiscards ? 150 : 80) - 10
+        } else {
+            // Default positioning
+            panelX = screenW - 170
+            panelY = screenH - 200
         }
 
-        suit.layout.row(0, 10)
+        suit.layout.reset(panelX, panelY, 10, 10)
+        
+        if (options?.showDiscards) {
+            suit.Label("Discard Pile", { align: "center" }, ...suit.layout.row(150, 30))
+            suit.Label("Cards: " + discardSize, { align: "center" }, ...suit.layout.row(150, 30))
+            suit.layout.row(0, 10)
+        }
         suit.Label("Player Deck", { align: "center" }, ...suit.layout.row(150, 30))
         suit.Label("Cards Remaining: " + deckSize, { align: "center" }, ...suit.layout.row(150, 30))
     }

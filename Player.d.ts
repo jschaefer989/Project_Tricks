@@ -1,9 +1,19 @@
 /** @noSelfInFile */
-import Perk from "Perk";
-import Card from "Cards/Card";
+import Perk, { PerkData } from "Perk";
 import Character from "./Character";
 import { Perks } from "Enums";
 import GameManager from "GameManager";
+interface CardData {
+    id: string;
+    suit: any;
+    rank: any;
+    power: number;
+    value: number;
+    isSelected: boolean;
+    cost: number;
+    isTrump: boolean;
+    name: string;
+}
 interface PlayerData {
     name: string;
     money: number;
@@ -11,10 +21,10 @@ interface PlayerData {
     level: number;
     discards: number;
     numberOfLootCards: number;
-    hand: Card[];
-    deck: Card[];
-    discardPile: Card[];
-    perks: Perk[];
+    hand: CardData[];
+    deck: CardData[];
+    discardPile: CardData[];
+    perks: PerkData[];
 }
 export default class Player extends Character {
     gameManager: GameManager;
@@ -33,11 +43,11 @@ export default class Player extends Character {
     discard(): void;
     anySelectedCards(): boolean;
     cashout(points: number): void;
-    deselectAllCards(): void;
     hasPerk(perkType: Perks): boolean;
     addPerk(perk: Perk): void;
     gatherExperience(exp: number): boolean;
     getNextLevelExperience(): number;
     levelUp(): void;
+    unselectCards(): void;
 }
 export {};

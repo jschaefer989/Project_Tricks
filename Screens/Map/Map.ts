@@ -43,7 +43,7 @@ export default class Map {
         this.drawTiers()
         
         Draw.playerInfo(this.gameManager.player, this.gameManager)
-        Draw.playerDeck(this.gameManager.player)
+        Draw.playerDeck(this.gameManager.player, { position: "bottom-right" })
     }
 
     drawBackground(): void {

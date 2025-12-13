@@ -17,6 +17,7 @@ interface BoardData {
     playerValue: number
     enemyPower: number
     enemyValue: number
+    showingInitialView: boolean
 }
 
 export default class Board {
@@ -57,9 +58,10 @@ export default class Board {
         this.playerValue = data.playerValue
         this.enemyPower = data.enemyPower
         this.enemyValue = data.enemyValue
+        this.showingInitialView = data.showingInitialView ?? true
 
         this.enemy = new Enemy()
-        this.enemy.load(data.enemy)
+        this.enemy.load(this.gameManager, data.enemy)
     }
 
     save(): BoardData {
@@ -72,7 +74,8 @@ export default class Board {
             playerPower: this.playerPower,
             playerValue: this.playerValue,
             enemyPower: this.enemyPower,
-            enemyValue: this.enemyValue
+            enemyValue: this.enemyValue,
+            showingInitialView: this.showingInitialView
         }
     }
 
@@ -99,13 +102,7 @@ export default class Board {
         // Trump suit label at the top
         this.renderTrumpSuitLabel()
 
-        // Points display (top center)
-        this.renderPointsDisplay()
-
-        // Enemy stats panel (left side)
-        this.renderEnemyStatsPanel(padX, padY)
-
-        // Enemy deck visualization (left side, below enemy stats)
+        // Enemy deck visualization (left side)
         this.renderEnemyDeck()
 
         // Enemy row
@@ -137,17 +134,14 @@ export default class Board {
         const startX = coords.startX
         let startY = coords.startY
 
-        // Win status display at top
-        this.renderWinStatus()
-
         // Points display (top center)
         this.renderPointsDisplay()
 
-        // Enemy stats panel (left side)
-        this.renderEnemyStatsPanel(padX, padY)
-
-        // Enemy deck visualization (left side, below enemy stats)
+        // Enemy deck visualization (left side)
         this.renderEnemyDeck()
+
+        // Enemy stats panel (left of enemy row)
+        this.renderEnemyStats(startX, startY)
 
         // Enemy row
         this.renderEnemyRow(startX, startY, contentW, btnW, btnH, lblH, padX, padY)
@@ -157,10 +151,13 @@ export default class Board {
         this.renderPlayerRow(startX, startY, contentW, btnW, btnH, lblH, padX, padY)
 
         // Submit button centered below
-        this.renderPlayButton(startY + lblH + btnH + padY + 50, btnW, btnH, padX, padY)
+        this.renderAttackButton(startY + lblH + btnH + padY + 50, btnW, btnH, padX, padY)
 
-        // Player selected stats panel (right side)
-        this.renderPlayerSelectedStatsPanel()
+        // Player selected stats panel (right of player row)
+        this.renderPlayerSelectedStats(startX, startY, contentW, btnW)
+
+        // Win status display (right of player row)
+        this.renderWinStatus(startX, startY)
 
         // Player info (upper-right)
         Draw.playerInfo(this.gameManager.player, this.gameManager)
@@ -207,25 +204,17 @@ export default class Board {
         return cashout
     }
 
-    renderWinStatus(): void {
+    renderWinStatus(startX: number, startY: number): void {
         if (this.playerPower > this.enemyPower) {
-            const screenW = love.graphics.getWidth()
-            const screenH = love.graphics.getHeight()
-            const bottomY = screenH - 150
-            const selectedPanelW = 200
-            const gap = 20
-            let x: number
+            const gap = 30
+            const panelW = 180
+            const selectedStatsW = this.gameManager.player.anySelectedCards() ? 180 : 0
+            const selectedStatsGap = this.gameManager.player.anySelectedCards() ? gap : 0
+            const x = startX - panelW - gap - selectedStatsW - selectedStatsGap
 
-            if (this.gameManager.player.anySelectedCards()) {
-                const selectedPanelX = Math.floor(screenW / 2 - selectedPanelW / 2)
-                x = selectedPanelX + selectedPanelW + gap
-            } else {
-                x = Math.floor(screenW / 2 - 75)
-            }
-
-            suit.layout.reset(x, bottomY, 10, 10)
-            suit.Label("You will slay your foe!", { align: "left" }, ...suit.layout.row(150, 40))
-            suit.Label("Your cashout: " + this.getPlayerCashout(), { align: "left" }, ...suit.layout.row(150, 30))
+            suit.layout.reset(x, startY, 10, 10)
+            suit.Label("You will slay your foe!", { align: "left" }, ...suit.layout.row(panelW, 40))
+            suit.Label("Your cashout: " + this.getPlayerCashout(), { align: "left" }, ...suit.layout.row(panelW, 30))
         }
     }
 
@@ -246,23 +235,25 @@ export default class Board {
         const panelX = Math.floor(centerX - panelW / 2)
 
         suit.layout.reset(panelX, 70, 10, 10)
-        suit.Label("Enemy: " + this.enemyPoints + " | Player: " + this.playerPoints, { align: "center" }, ...suit.layout.row(panelW, 30))
+        suit.Label(`${this.enemy.name}: ${this.enemyPoints} | Player: ${this.playerPoints}`, { align: "center" }, ...suit.layout.row(panelW, 30))
     }
 
-    renderEnemyStatsPanel(padX: number, padY: number): void {
-        suit.layout.reset(padX, padY, 10, 10)
-        suit.Label("Enemy Stats", { align: "center" }, ...suit.layout.row(150, 30))
-        suit.Label("Value: " + this.enemyValue, { align: "center" }, ...suit.layout.row(150, 30))
-        suit.Label("Power: " + this.enemyPower, { align: "center" }, ...suit.layout.row(150, 30))
+    renderEnemyStats(startX: number, startY: number): void {
+        const gap = 30
+        const panelW = 150
+        const x = startX - panelW - gap
+
+        suit.layout.reset(x, startY, 10, 10)
+        suit.Label(`${this.enemy.name} Hand`, { align: "center" }, ...suit.layout.row(panelW, 30))
+        suit.Label("Value: " + this.enemyValue, { align: "center" }, ...suit.layout.row(panelW, 30))
+        suit.Label("Power: " + this.enemyPower, { align: "center" }, ...suit.layout.row(panelW, 30))
     }
 
     renderEnemyDeck(): void {
         const enemyDeck = this.enemy.deck
-        const padX = 20
-        const panelY = 170 // Position below enemy stats panel
 
-        suit.layout.reset(padX, panelY, 10, 10)
-        suit.Label("Enemy Deck (" + enemyDeck.length + " cards)", { align: "left" }, ...suit.layout.row(150, 30))
+        suit.layout.reset(10, 10, 10, 10)
+        suit.Label(`${this.enemy.name} Deck (${enemyDeck.length} cards)`, { align: "left" }, ...suit.layout.row(150, 30))
         suit.layout.row(0, 5)
 
         // Display each card in the enemy's deck
@@ -272,19 +263,16 @@ export default class Board {
         }
     }
 
-    renderPlayerSelectedStatsPanel(): void {
+    renderPlayerSelectedStats(startX: number, startY: number, contentW: number, btnW: number): void {
         // Only show when the player has at least one selected card
         if (!this.gameManager.player.anySelectedCards()) return
 
-        // Center the panel at the bottom-middle of the screen
-        const screenW = love.graphics.getWidth()
-        const screenH = love.graphics.getHeight()
-        const panelW = 200
-        const panelX = Math.floor(screenW / 2 - panelW / 2)
-        const bottomY = screenH - 150
+        const gap = 30
+        const panelW = 180
+        const x = startX - panelW - gap
 
-        suit.layout.reset(panelX, bottomY, 10, 10)
-        suit.Label("Selected Stats", { align: "center" }, ...suit.layout.row(panelW, 30))
+        suit.layout.reset(x, startY, 10, 10)
+        suit.Label("Selected Hand", { align: "center" }, ...suit.layout.row(panelW, 30))
         suit.Label("Value: " + this.playerValue, { align: "center" }, ...suit.layout.row(panelW, 30))
         suit.Label("Power: " + this.playerPower, { align: "center" }, ...suit.layout.row(panelW, 30))
     }
@@ -335,7 +323,7 @@ export default class Board {
         }
     }
 
-    renderPlayButton(startY: number, btnW: number, btnH: number, padX: number, padY: number): void {
+    renderAttackButton(startY: number, btnW: number, btnH: number, padX: number, padY: number): void {
         // Center the buttons horizontally
         const gap = 20
         const totalW = btnW * 3 + gap * 2
@@ -358,7 +346,7 @@ export default class Board {
             this.handleDiscard()
         }
         if (deselectHit) {
-            this.gameManager.player.deselectAllCards()
+            this.gameManager.player.unselectCards()
         }
     }
 
@@ -384,6 +372,8 @@ export default class Board {
         } else {
             this.enemyPoints = this.enemyPoints + this.getEnemyCashout()
         }
+
+        this.clearStats()
 
         this.gameManager.player.removeSelectedCardsFromHand()
         this.gameManager.board?.dealer.dealCards(CharacterTypes.PLAYER)
@@ -412,6 +402,7 @@ export default class Board {
     }
 
     endFight(): void {
+        this.clearStats()
         this.gameManager.player.deselectAllCards()
         const winner = this.getWinner()
         if (winner === CharacterTypes.PLAYER) {
@@ -423,5 +414,12 @@ export default class Board {
         } else if (winner === CharacterTypes.ENEMY) {
             this.gameManager.switchToLoseScreen()
         }
+    }
+
+    clearStats(): void {
+        this.playerPower = 0
+        this.playerValue = 0
+        this.enemyPower = 0
+        this.enemyValue = 0
     }
 }

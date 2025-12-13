@@ -3,12 +3,24 @@
 import Card from "Cards/Card"
 import Character from "../Character"
 import { EnemyTypes } from "Enums"
-import { exhaustiveGuard } from "Helpers"
+import GameManager from "GameManager"
+
+interface CardData {
+    id: string
+    suit: any
+    rank: any
+    power: number
+    value: number
+    isSelected: boolean
+    cost: number
+    isTrump: boolean
+    name: string
+}
 
 export interface EnemyData {
-    hand: Card[]
-    deck: Card[]
-    discardPile: Card[]
+    hand: CardData[]
+    deck: CardData[]
+    discardPile: CardData[]
     level: number
     numberOfHeldCards: number
     numberOfCardsInDeck: number
@@ -17,72 +29,46 @@ export interface EnemyData {
 }
 
 export default class Enemy extends Character {
+    gameManager?: GameManager
     numberOfHeldCards: number
     numberOfCardsInDeck: number
     level: number
     enemyType: EnemyTypes
     experience: number
+    name: string
 
-    constructor(numberOfHeldCards?: number, numberOfCardsInDeck?: number, level?: number, enemyType?: EnemyTypes, experience?: number) {
+    constructor(level?: number, enemyType?: EnemyTypes, experience?: number, name?: string, numberOfHeldCards?: number, numberOfCardsInDeck?: number) {
         super()
         this.numberOfHeldCards = numberOfHeldCards ?? 3
         this.numberOfCardsInDeck = numberOfCardsInDeck ?? 9
         this.level = level ?? 1
-        this.enemyType = enemyType ?? EnemyTypes.GOBLIN
-        this.experience = experience ?? this.getExpeierenceReward()
+        this.enemyType = enemyType ?? EnemyTypes.KOBOLD
+        this.experience = experience ?? 0
+        this.name = name ?? "Enemy"
     }
 
-    load(data?: EnemyData): void {
-        this.hand = data?.hand ?? []
-        this.deck = data?.deck ?? []
-        this.discardPile = data?.discardPile ?? []
+    load(gameManager: GameManager, data?: EnemyData): void {
+        this.gameManager = gameManager
+        this.hand = data?.hand ? data.hand.map(cardData => Card.load(gameManager, cardData)) : []
+        this.deck = data?.deck ? data.deck.map(cardData => Card.load(gameManager, cardData)) : []
+        this.discardPile = data?.discardPile ? data.discardPile.map(cardData => Card.load(gameManager, cardData)) : []
         this.level = data?.level ?? 1
         this.numberOfHeldCards = data?.numberOfHeldCards ?? 3
         this.numberOfCardsInDeck = data?.numberOfCardsInDeck ?? 9
-        this.enemyType = data?.enemyType ?? EnemyTypes.GOBLIN
-        this.experience = data?.experience ?? this.getExpeierenceReward()
+        this.enemyType = data?.enemyType ?? EnemyTypes.KOBOLD
+        this.experience = data?.experience ?? 0
     }
 
     save(): EnemyData {
       return {  
-        hand: this.hand,
-        deck: this.deck,
-        discardPile: this.discardPile,
+        hand: this.hand.map(card => card.save()),
+        deck: this.deck.map(card => card.save()),
+        discardPile: this.discardPile.map(card => card.save()),
         level: this.level,
         numberOfHeldCards: this.numberOfHeldCards,
         numberOfCardsInDeck: this.numberOfCardsInDeck,
         enemyType: this.enemyType,
         experience: this.experience
       }
-    }
-
-    getEnemyName(): string {
-        switch (this.enemyType) {
-            case EnemyTypes.GOBLIN:
-                return "Goblin"
-            case EnemyTypes.ORC:
-                return "Orc"
-            case EnemyTypes.TROLL:
-                return "Troll"
-            case EnemyTypes.DRAGON:
-                return "Dragon"
-            default:
-                exhaustiveGuard(this.enemyType)
-        }
-    }
-
-    getExpeierenceReward(): number {
-        switch (this.enemyType) {
-            case EnemyTypes.GOBLIN:
-                return 10 * this.level
-            case EnemyTypes.ORC:
-                return 20 * this.level
-            case EnemyTypes.TROLL:
-                return 30 * this.level
-            case EnemyTypes.DRAGON:
-                return 50 * this.level
-            default:
-                exhaustiveGuard(this.enemyType)
-        }
     }
 }

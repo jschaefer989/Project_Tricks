@@ -47,13 +47,20 @@ export enum CharacterTypes {
 export enum MapNodeTypes {
     BATTLE = "BATTLE",
     SHOP = "SHOP",
+    // Belsnickel
+    // Bergmonch
+    // Feldgeister
 }
 
 export enum EnemyTypes {
-    GOBLIN = "GOBLIN",
-    ORC = "ORC",
-    TROLL = "TROLL",
-    DRAGON = "DRAGON",
+    KOBOLD = "KOBOLD",
+    NIXIE = "NIXIE",
+    OGRE = "OGRE",
+    TATZELWURM = "TATZELWURM",
+    // Alp
+    // Lindworm
+    // Night raven
+
 }
 
 export enum Perks {

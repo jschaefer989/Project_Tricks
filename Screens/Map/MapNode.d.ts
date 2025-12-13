@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 import Enemy, { EnemyData } from "Enemies/Enemy";
-import { MapNodeTypes } from "Enums";
+import { EnemyTypes, MapNodeTypes } from "Enums";
 import GameManager from "GameManager";
 export interface MapNodeData {
     type: MapNodeTypes;
@@ -24,4 +24,5 @@ export default class MapNode {
     drawShopNode(x: number, y: number): void;
     handleNodeInitialization(): void;
     initializeBattleNode(): void;
+    getEnemyFromType(enemyType: EnemyTypes): Enemy;
 }

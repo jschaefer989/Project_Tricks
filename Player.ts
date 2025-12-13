@@ -1,11 +1,23 @@
 /** @noSelfInFile */
 
-import Perk from "Perk"
+import Perk, { PerkData } from "Perk"
 import Card from "Cards/Card"
 import Character from "./Character"
 import { Perks } from "Enums"
 import Dealer from "Dealer"
 import GameManager from "GameManager"
+
+interface CardData {
+    id: string
+    suit: any
+    rank: any
+    power: number
+    value: number
+    isSelected: boolean
+    cost: number
+    isTrump: boolean
+    name: string
+}
 
 interface PlayerData {
     name: string
@@ -14,10 +26,10 @@ interface PlayerData {
     level: number
     discards: number
     numberOfLootCards: number
-    hand: Card[]
-    deck: Card[]
-    discardPile: Card[]
-   perks: Perk[] 
+    hand: CardData[]
+    deck: CardData[]
+    discardPile: CardData[]
+   perks: PerkData[] 
 }
 
 export default class Player extends Character {
@@ -49,10 +61,10 @@ export default class Player extends Character {
         this.level = data.level
         this.discards = data.discards
         this.numberOfLootCards = data.numberOfLootCards
-        this.hand = data.hand
-        this.deck = data.deck
-        this.discardPile = data.discardPile
-        this.perks = data.perks
+        this.hand = data.hand.map(cardData => Card.load(this.gameManager, cardData))
+        this.deck = data.deck.map(cardData => Card.load(this.gameManager, cardData))
+        this.discardPile = data.discardPile.map(cardData => Card.load(this.gameManager, cardData))
+        this.perks = data.perks.map(perkData => Perk.load(this.gameManager, perkData))
     }
 
     save(): PlayerData {
@@ -63,10 +75,10 @@ export default class Player extends Character {
             level: this.level,
             discards: this.discards,
             numberOfLootCards: this.numberOfLootCards,
-            hand: this.hand,
-            deck: this.deck,
-            discardPile: this.discardPile,
-            perks: this.perks
+            hand: this.hand.map(card => card.save()),
+            deck: this.deck.map(card => card.save()),
+            discardPile: this.discardPile.map(card => card.save()),
+            perks: this.perks.map(perk => perk.save())
         }
     }
 
@@ -93,6 +105,7 @@ export default class Player extends Character {
         for (const card of this.hand) {
             if (card.isSelected) {
                 card.isSelected = false
+                card.onUnselect()
                 this.discardPile.push(card)
             } else {
                 newHand.push(card)
@@ -114,12 +127,6 @@ export default class Player extends Character {
     cashout(points: number): void {
         if (points < 0) return
         this.money += points
-    }
-
-    deselectAllCards(): void {
-        for (const card of this.hand) {
-            card.isSelected = false
-        }
     }
 
     hasPerk(perkType: Perks): boolean {
@@ -163,5 +170,14 @@ export default class Player extends Character {
     levelUp(): void {
         this.experience = 0
         this.level += 1
+    }
+
+    unselectCards(): void {
+        for (const card of this.hand) {
+            if (card.isSelected) {
+                card.isSelected = false
+                card.onUnselect()
+            }
+        }
     }
 }

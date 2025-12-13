@@ -13,6 +13,14 @@ local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local getRandomElementFromEnum = ____Helpers.getRandomElementFromEnum
 local suit = require("Libraries.suit-master.suit")
+local ____Kobold = require("Enemies.Kobold")
+local Kobold = ____Kobold.default
+local ____Nixie = require("Enemies.Nixie")
+local Nixie = ____Nixie.default
+local ____Ogre = require("Enemies.Ogre")
+local Ogre = ____Ogre.default
+local ____Tatzelwurm = require("Enemies.Tatzelwurm")
+local Tatzelwurm = ____Tatzelwurm.default
 ____exports.default = __TS__Class()
 local MapNode = ____exports.default
 MapNode.name = "MapNode"
@@ -27,7 +35,7 @@ function MapNode.prototype.load(self, data)
     self.type = data.type or self:getRandomNodeType()
     if data.enemy then
         self.enemy = __TS__New(Enemy)
-        self.enemy:load(data.enemy)
+        self.enemy:load(self.gameManager, data.enemy)
     end
 end
 function MapNode.prototype.save(self)
@@ -64,7 +72,7 @@ function MapNode.prototype.drawInteractiveBattleNode(self, x, y)
     local imageW = self.swordImage:getWidth()
     local imageH = self.swordImage:getHeight()
     local labelHeight = 25
-    local buttonText = ((self.enemy:getEnemyName() .. " (Lv. ") .. tostring(self.enemy.level)) .. ")"
+    local buttonText = ((self.enemy.name .. " (Lv. ") .. tostring(self.enemy.level)) .. ")"
     suit.layout:reset(x, y)
     suit.Label(
         buttonText,
@@ -168,7 +176,7 @@ function MapNode.prototype.drawBattleNode(self, x, y)
     local imageW = self.swordImage:getWidth()
     local imageH = self.swordImage:getHeight()
     local labelHeight = 25
-    local buttonText = ((self.enemy:getEnemyName() .. " (Lv. ") .. tostring(self.enemy.level)) .. ")"
+    local buttonText = ((self.enemy.name .. " (Lv. ") .. tostring(self.enemy.level)) .. ")"
     suit.layout:reset(x, y)
     suit.Label(
         buttonText,
@@ -251,12 +259,31 @@ function MapNode.prototype.handleNodeInitialization(self)
     until true
 end
 function MapNode.prototype.initializeBattleNode(self)
-    self.enemy = __TS__New(
-        Enemy,
-        nil,
-        nil,
-        nil,
-        getRandomElementFromEnum(EnemyTypes)
-    )
+    local enemyType = getRandomElementFromEnum(EnemyTypes)
+    self.enemy = self:getEnemyFromType(enemyType)
+end
+function MapNode.prototype.getEnemyFromType(self, enemyType)
+    repeat
+        local ____switch23 = enemyType
+        local ____cond23 = ____switch23 == EnemyTypes.KOBOLD
+        if ____cond23 then
+            return __TS__New(Kobold, 1)
+        end
+        ____cond23 = ____cond23 or ____switch23 == EnemyTypes.NIXIE
+        if ____cond23 then
+            return __TS__New(Nixie, 1)
+        end
+        ____cond23 = ____cond23 or ____switch23 == EnemyTypes.OGRE
+        if ____cond23 then
+            return __TS__New(Ogre, 1)
+        end
+        ____cond23 = ____cond23 or ____switch23 == EnemyTypes.TATZELWURM
+        if ____cond23 then
+            return __TS__New(Tatzelwurm, 1)
+        end
+        do
+            exhaustiveGuard(enemyType)
+        end
+    until true
 end
 return ____exports

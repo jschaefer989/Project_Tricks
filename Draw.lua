@@ -107,10 +107,18 @@ function Draw.playerDeck(self, player, options)
     local discardSize = #player.discardPile
     local screenW = love.graphics.getWidth()
     local screenH = love.graphics.getHeight()
-    local panelX = screenW - 170
-    local panelY = screenH - 200
+    local panelX
+    local panelY
+    if (options and options.position) == "bottom-right" then
+        local panelW = 150
+        panelX = screenW - panelW - 10
+        panelY = screenH - (options and options.showDiscards and 150 or 80) - 10
+    else
+        panelX = screenW - 170
+        panelY = screenH - 200
+    end
+    suit.layout:reset(panelX, panelY, 10, 10)
     if options and options.showDiscards then
-        suit.layout:reset(panelX, panelY, 10, 10)
         suit.Label(
             "Discard Pile",
             {align = "center"},
@@ -121,8 +129,8 @@ function Draw.playerDeck(self, player, options)
             {align = "center"},
             suit.layout:row(150, 30)
         )
+        suit.layout:row(0, 10)
     end
-    suit.layout:row(0, 10)
     suit.Label(
         "Player Deck",
         {align = "center"},

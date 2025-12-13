@@ -1,8 +1,13 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local __TS__ArrayMap = ____lualib.__TS__ArrayMap
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
+local ____Perk = require("Perk")
+local Perk = ____Perk.default
+local ____Card = require("Cards.Card")
+local Card = ____Card.default
 local ____Character = require("Character")
 local Character = ____Character.default
 local ____Dealer = require("Dealer")
@@ -29,10 +34,22 @@ function Player.prototype.load(self, data)
     self.level = data.level
     self.discards = data.discards
     self.numberOfLootCards = data.numberOfLootCards
-    self.hand = data.hand
-    self.deck = data.deck
-    self.discardPile = data.discardPile
-    self.perks = data.perks
+    self.hand = __TS__ArrayMap(
+        data.hand,
+        function(____, cardData) return Card:load(self.gameManager, cardData) end
+    )
+    self.deck = __TS__ArrayMap(
+        data.deck,
+        function(____, cardData) return Card:load(self.gameManager, cardData) end
+    )
+    self.discardPile = __TS__ArrayMap(
+        data.discardPile,
+        function(____, cardData) return Card:load(self.gameManager, cardData) end
+    )
+    self.perks = __TS__ArrayMap(
+        data.perks,
+        function(____, perkData) return Perk:load(self.gameManager, perkData) end
+    )
 end
 function Player.prototype.save(self)
     return {
@@ -42,10 +59,22 @@ function Player.prototype.save(self)
         level = self.level,
         discards = self.discards,
         numberOfLootCards = self.numberOfLootCards,
-        hand = self.hand,
-        deck = self.deck,
-        discardPile = self.discardPile,
-        perks = self.perks
+        hand = __TS__ArrayMap(
+            self.hand,
+            function(____, card) return card:save() end
+        ),
+        deck = __TS__ArrayMap(
+            self.deck,
+            function(____, card) return card:save() end
+        ),
+        discardPile = __TS__ArrayMap(
+            self.discardPile,
+            function(____, card) return card:save() end
+        ),
+        perks = __TS__ArrayMap(
+            self.perks,
+            function(____, perk) return perk:save() end
+        )
     }
 end
 function Player.prototype.setup(self)
@@ -72,6 +101,7 @@ function Player.prototype.discard(self)
     for ____, card in ipairs(self.hand) do
         if card.isSelected then
             card.isSelected = false
+            card:onUnselect()
             local ____self_discardPile_0 = self.discardPile
             ____self_discardPile_0[#____self_discardPile_0 + 1] = card
         else
@@ -93,11 +123,6 @@ function Player.prototype.cashout(self, points)
         return
     end
     self.money = self.money + points
-end
-function Player.prototype.deselectAllCards(self)
-    for ____, card in ipairs(self.hand) do
-        card.isSelected = false
-    end
 end
 function Player.prototype.hasPerk(self, perkType)
     for ____, perk in ipairs(self.perks) do
@@ -121,21 +146,21 @@ function Player.prototype.gatherExperience(self, exp)
 end
 function Player.prototype.getNextLevelExperience(self)
     repeat
-        local ____switch33 = self.level
-        local ____cond33 = ____switch33 == 1
-        if ____cond33 then
+        local ____switch38 = self.level
+        local ____cond38 = ____switch38 == 1
+        if ____cond38 then
             return 100
         end
-        ____cond33 = ____cond33 or ____switch33 == 2
-        if ____cond33 then
+        ____cond38 = ____cond38 or ____switch38 == 2
+        if ____cond38 then
             return 150
         end
-        ____cond33 = ____cond33 or ____switch33 == 3
-        if ____cond33 then
+        ____cond38 = ____cond38 or ____switch38 == 3
+        if ____cond38 then
             return 250
         end
-        ____cond33 = ____cond33 or ____switch33 == 4
-        if ____cond33 then
+        ____cond38 = ____cond38 or ____switch38 == 4
+        if ____cond38 then
             return 500
         end
         do
@@ -146,5 +171,13 @@ end
 function Player.prototype.levelUp(self)
     self.experience = 0
     self.level = self.level + 1
+end
+function Player.prototype.unselectCards(self)
+    for ____, card in ipairs(self.hand) do
+        if card.isSelected then
+            card.isSelected = false
+            card:onUnselect()
+        end
+    end
 end
 return ____exports
