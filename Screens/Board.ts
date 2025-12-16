@@ -1,11 +1,13 @@
 /** @noSelfInFile */
 
-import { CharacterTypes, Suits } from "../Enums"
+import { AssetIds, CharacterTypes, Suits } from "../Enums"
 import Dealer from "../Dealer"
 import Draw from "../Draw"
 import Enemy, { EnemyData } from "Enemies/Enemy"
 import * as suit from "Libraries.suit-master.suit"
 import GameManager from "../GameManager"
+import CardAssets from "Assets/CardAssets"
+import * as push from "Libraries.push"
 
 interface BoardData {
     discardUsed: number
@@ -33,6 +35,7 @@ export default class Board {
     enemyPower: number
     enemyValue: number
     showingInitialView: boolean
+    cardRenderer: CardAssets
 
     constructor(gameManager: GameManager, enemy?: Enemy) {
         this.gameManager = gameManager
@@ -47,6 +50,7 @@ export default class Board {
         this.enemyPower = 0
         this.enemyValue = 0
         this.showingInitialView = true
+        this.cardRenderer = new CardAssets(gameManager)
     }
 
     load(data: BoardData): void {
@@ -108,12 +112,9 @@ export default class Board {
         // Enemy row
         this.renderEnemyRow(startX, startY, contentW, btnW, btnH, lblH, padX, padY)
 
-        // Player row (below enemy) with buttons instead of selectable cards
-        startY = startY + lblH + padY + btnH + 200
-        this.renderPlayerRowInitial(startX, startY, contentW, btnW, btnH, lblH, padX, padY)
-
-        // Let's Fight button
-        this.renderLetsFightButton(startY + lblH + btnH + padY + 50, btnW, btnH)
+        // Player row positioned slightly below center
+        const playerRowY = Math.floor(love.graphics.getHeight() * 0.55)
+        this.renderPlayerRowInitial(startX, playerRowY, contentW, btnW, btnH, lblH, padX, padY)
 
         // Player info (upper-right)
         Draw.playerInfo(this.gameManager.player, this.gameManager)
@@ -288,39 +289,34 @@ export default class Board {
         }
     }
 
+    buildAssets(): void {
+        const playerHand = this.gameManager.player.hand
+        const cardCount = playerHand.length
+        const padding = 20
+        const screenW = push.getWidth()
+        const screenH = push.getHeight()
+        const totalW = cardCount * this.cardRenderer.baseW + Math.max(0, cardCount - 1) * padding
+        const startX = Math.floor((screenW - totalW) / 2)
+        const cardY = (screenH / 2) + (this.cardRenderer.baseH /2) 
+
+        for (let i = 0; i < playerHand.length; i++) {
+            const card = playerHand[i]
+            const x = startX + i * (this.cardRenderer.baseW + padding)
+
+            this.cardRenderer.addAsset(card, x, cardY)
+        }
+    }
+
     renderPlayerRowInitial(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void {
         const playerHand = this.gameManager.player.hand
         suit.layout.reset(startX, startY, padX, padY)
         suit.Label("Your hand: " + playerHand.length, { align: "left" }, ...suit.layout.row(contentW, lblH))
-        suit.layout.row(0, 0)
-        for (const card of playerHand) {
-            const cardText = card.rank + " " + card.suit + " (Val: " + card.value + ", Pow: " + card.power + ")"
-            suit.Button(cardText, {}, ...suit.layout.col(btnW, btnH))
-        }
     }
 
     renderPlayerRow(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void {
         const playerHand = this.gameManager.player.hand
         suit.layout.reset(startX, startY, padX, padY)
         suit.Label("Your hand: " + playerHand.length, { align: "left" }, ...suit.layout.row(contentW, lblH))
-        suit.layout.row(0, 0)
-        for (const card of playerHand) {
-            Draw.card(card, btnW, btnH, { multiSelect: true } )
-        }
-    }
-
-    renderLetsFightButton(startY: number, btnW: number, btnH: number): void {
-        const screenW = love.graphics.getWidth()
-        const buttonW = 200
-        const buttonX = Math.floor(screenW / 2 - buttonW / 2)
-
-        suit.layout.reset(buttonX, startY, 20, 20)
-        const hit = suit.Button("Let's Fight!", {}, ...suit.layout.row(buttonW, btnH)).hit
-
-        if (hit) {
-            this.showingInitialView = false
-            this.dealer.startGame()
-        }
     }
 
     renderAttackButton(startY: number, btnW: number, btnH: number, padX: number, padY: number): void {

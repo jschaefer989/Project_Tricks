@@ -29,10 +29,10 @@ export default class MapNode {
         this.handleNodeInitialization()
 
         // Load sword image if it exists
-        this.swordImage = Draw.loadImage("assets/battle.jpg")
+        this.swordImage = Draw.loadImage("Assets/Images/battle.jpg")
         
         // Load market image if it exists
-        this.marketImage = Draw.loadImage("assets/shop.jpg")
+        this.marketImage = Draw.loadImage("Assets/Images/shop.jpg")
     }
 
     load(data: MapNodeData): void {

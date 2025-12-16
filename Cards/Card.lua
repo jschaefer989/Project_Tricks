@@ -62,6 +62,15 @@ function Card.load(self, gameManager, data)
     card.cost = data.cost
     return card
 end
+function Card.prototype.onClick(self)
+    if self.isSelected then
+        self.isSelected = false
+        self:onUnselect()
+    else
+        self.isSelected = true
+        self:onSelect()
+    end
+end
 function Card.prototype.onSelect(self)
     if isEmpty(self.gameManager.board) then
         return

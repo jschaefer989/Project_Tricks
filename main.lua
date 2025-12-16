@@ -1,17 +1,21 @@
 if pcall(require, "lldebugger") then require("lldebugger").start() end
 if pcall(require, "mobdebug") then require("mobdebug").start() end
-local ____lualib = require("lualib_bundle")
-local __TS__New = ____lualib.__TS__New
+local lualib = require("lualib_bundle")
+local tsNew = lualib.__TS__New
 local suit = require('Libraries.suit-master.suit')
 local GameStateManager = require("Libraries.GameStateManager-main.gamestateManager")
 local lovelyToasts = require("Libraries.Lovely-Toasts-main.lovelyToasts")
+local Text = require("Libraries.SYSL-Text-master.example.library.slog-text")
+_G.SYSLText = Text -- Make it globally available for TypeScript
 local GameManager = require("GameManager").default
-local gameManager = __TS__New(GameManager)
+local gameManager = tsNew(GameManager)
 
 function love.load()    
     love.window.setTitle("Tricks")
     love.keyboard.setKeyRepeat(true)
     math.randomseed(os.time() + os.clock())
+    local mainFont = love.graphics.newFont("Assets/Fonts/BerlinFraktur-24.otf", 24)
+    love.graphics.setFont(mainFont)
 
     -- TODO: load settings properly
     --global.GAME_MANAGER.settings:loadFromTable(saveData.settings or {})
@@ -23,7 +27,7 @@ function love.mousepressed(x, y, button)
     GameStateManager:mousepressed(x, y, button)
 end
 
-function love.draw()
+function love.draw()    
     GameStateManager:draw()
     suit.draw()
     lovelyToasts.draw()
@@ -56,4 +60,12 @@ end
 
 function love.keyreleased(key, scancode)
     GameStateManager:keyreleased(key, scancode)
+end
+
+function love.mousepressed(x, y, button)
+    GameStateManager:mousepressed(x, y, button)
+end
+
+function love.mousereleased(x, y, button)
+    GameStateManager:mousereleased(x, y, button)
 end

@@ -77,6 +77,16 @@ export default class Card {
         return card
     }
 
+    onClick(): void {
+        if (this.isSelected) {
+            this.isSelected = false
+            this.onUnselect()
+        } else {
+            this.isSelected = true
+            this.onSelect()
+        }
+    }
+
     onSelect(): void {
         if (isEmpty(this.gameManager.board)) {
             return  

@@ -43,8 +43,8 @@ local ____Knight = require("Cards.Knight")
 local Knight = ____Knight.default
 local ____Pope = require("Cards.Pope")
 local Pope = ____Pope.default
-local ____Trick = require("Cards.Trick")
-local Trick = ____Trick.default
+local ____Chosen = require("Cards.Chosen")
+local Chosen = ____Chosen.default
 local ____Baron = require("Cards.Baron")
 local Baron = ____Baron.default
 ____exports.default = __TS__Class()
@@ -168,9 +168,9 @@ function Dealer.getNewCard(self, gameManager, rank, suit)
         if ____cond16 then
             return __TS__New(Pope, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == TrumpRanks.TRICK
+        ____cond16 = ____cond16 or ____switch16 == TrumpRanks.CHOSEN
         if ____cond16 then
-            return __TS__New(Trick, gameManager, suit)
+            return __TS__New(Chosen, gameManager, suit)
         end
         do
             exhaustiveGuard(rank)
@@ -277,7 +277,7 @@ function Dealer.prototype.convertToTrumpSuit(self, card)
         end
         ____cond39 = ____cond39 or ____switch39 == Ranks.SERGEANT
         if ____cond39 then
-            return __TS__New(Trick, self.gameManager, self.gameManager.board.trumpSuit)
+            return __TS__New(Chosen, self.gameManager, self.gameManager.board.trumpSuit)
         end
         do
             return card
@@ -336,7 +336,7 @@ function Dealer.prototype.convertBackToOriginalSuit(self, card)
         if ____cond49 then
             return __TS__New(Thief, self.gameManager, self.gameManager.board.trumpSuit)
         end
-        ____cond49 = ____cond49 or ____switch49 == TrumpRanks.TRICK
+        ____cond49 = ____cond49 or ____switch49 == TrumpRanks.CHOSEN
         if ____cond49 then
             return __TS__New(Sergeant, self.gameManager, self.gameManager.board.trumpSuit)
         end

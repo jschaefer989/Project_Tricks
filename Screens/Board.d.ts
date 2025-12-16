@@ -3,6 +3,7 @@ import { CharacterTypes, Suits } from "../Enums";
 import Dealer from "../Dealer";
 import Enemy, { EnemyData } from "Enemies/Enemy";
 import GameManager from "../GameManager";
+import CardAssets from "Assets/CardAssets";
 interface BoardData {
     discardUsed: number;
     playerPoints: number;
@@ -28,6 +29,7 @@ export default class Board {
     enemyPower: number;
     enemyValue: number;
     showingInitialView: boolean;
+    cardRenderer: CardAssets;
     constructor(gameManager: GameManager, enemy?: Enemy);
     load(data: BoardData): void;
     save(): BoardData;
@@ -48,9 +50,9 @@ export default class Board {
     renderEnemyDeck(): void;
     renderPlayerSelectedStats(startX: number, startY: number, contentW: number, btnW: number): void;
     renderEnemyRow(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void;
+    buildAssets(): void;
     renderPlayerRowInitial(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void;
     renderPlayerRow(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void;
-    renderLetsFightButton(startY: number, btnW: number, btnH: number): void;
     renderAttackButton(startY: number, btnW: number, btnH: number, padX: number, padY: number): void;
     renderDiscardCounter(): void;
     handleAttack(): void;

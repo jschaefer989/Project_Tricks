@@ -1,19 +1,20 @@
 export declare enum GameStates {
     MAIN_MENU = "MAIN_MENU",
     NEW_GAME_MENU = "NEW_GAME_MENU",
-    PLAYING = "PLAYING",
+    BOARD = "BOARD",
     PAUSE_MENU = "PAUSE_MENU",
     WIN_SCREEN = "WIN_SCREEN",
     LOSE_SCREEN = "LOSE_SCREEN",
     MAP = "MAP",
     SHOP = "SHOP",
-    LEVEL_UP = "LEVEL_UP"
+    LEVEL_UP = "LEVEL_UP",
+    PERKS = "PERKS"
 }
 export declare enum Suits {
     HEARTS = "HEARTS",
     BELLS = "BELLS",
     ACORNS = "ACORNS",
-    LEAVES = "SPADES"
+    LEAVES = "LEAVES"
 }
 export declare enum Ranks {
     KING = "KING",
@@ -28,7 +29,7 @@ export declare enum Ranks {
     DEUCE = "DEUCE"
 }
 export declare enum TrumpRanks {
-    TRICK = "TRICK",
+    CHOSEN = "CHOSEN",
     DEVIL = "DEVIL",
     POPE = "POPE",
     EMPEROR = "EMPEROR",
@@ -54,4 +55,11 @@ export declare enum Perks {
     EXTRA_CARD = "EXTRA_CARD",
     EXTRA_DISCARD = "EXTRA_DISCARD",
     INCREASED_LOOT = "INCREASED_LOOT"
+}
+export declare enum AssetIds {
+    BASE_CARD_TEMPLATE = "BASE_CARD_TEMPLATE",
+    HEART_SUIT = "HEART_SUIT",
+    BELL_SUIT = "BELL_SUIT",
+    ACORN_SUIT = "ACORN_SUIT",
+    LEAF_SUIT = "LEAF_SUIT"
 }

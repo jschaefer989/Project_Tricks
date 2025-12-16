@@ -28,8 +28,8 @@ function MapNode.prototype.____constructor(self, gameManager)
     self.gameManager = gameManager
     self.type = self:getRandomNodeType()
     self:handleNodeInitialization()
-    self.swordImage = Draw:loadImage("assets/battle.jpg")
-    self.marketImage = Draw:loadImage("assets/shop.jpg")
+    self.swordImage = Draw:loadImage("Assets/Images/battle.jpg")
+    self.marketImage = Draw:loadImage("Assets/Images/shop.jpg")
 end
 function MapNode.prototype.load(self, data)
     self.type = data.type or self:getRandomNodeType()

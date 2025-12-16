@@ -14,6 +14,7 @@ import Enemy from "Enemies/Enemy";
 import Shop from "Screens/Shop";
 import LevelUpScreen from "Screens/LevelUpScreen";
 import PerkScreen from "Screens/PerkScreen";
+import AssetManager from "Assets/AssetManager";
 export default class GameManager {
     gameState: GameStates;
     player: Player;
@@ -28,6 +29,8 @@ export default class GameManager {
     shop?: Shop;
     levelUpScreen?: LevelUpScreen;
     perkScreen?: PerkScreen;
+    assetManager: AssetManager;
+    testTextbox?: any;
     constructor();
     getCharacter(characterType: string): Character | undefined;
     switchBasedOnGameState(): void;

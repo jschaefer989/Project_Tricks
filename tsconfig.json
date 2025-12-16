@@ -20,13 +20,18 @@
       "Libraries.Lovely-Toasts-main.lovelyToasts",
       "Libraries.jsonlua-master",
       "Libraries.push",
-      "Libraries.suit-master.suit"
+      "Libraries.suit-master.suit",
+      "Libraries.SYSL-Text-master.example.main"
     ]
   },
   "include": [
     "*.ts",
-    "TSTL/Declarations/**/*.d.ts"
-, "Cards/Card.ts", "Cards/Card.d.ts", "Enemies/Enemy.ts", "Enemies/Enemy.d.ts", "Screens/Board.ts", "Screens/Board.d.ts", "Screens/LevelUpScreen.ts", "Screens/LevelUpScreen.d.ts", "Screens/LoseScreen.ts", "Screens/LoseScreen.d.ts", "Screens/MainMenu.ts", "Screens/MainMenu.d.ts", "Screens/Map/Map.ts", "Screens/Map/Map.d.ts", "Screens/Map/MapNode.ts", "Screens/Map/MapNode.d.ts", "Screens/Map/MapTier.ts", "Screens/Map/MapTier.d.ts", "Screens/NewGameMenu.ts", "Screens/NewGameMenu.d.ts", "Screens/PauseMenu.ts", "Screens/PauseMenu.d.ts", "Screens/PerkScreen.ts", "Screens/PerkScreen.d.ts", "Screens/Shop.ts", "Screens/Shop.d.ts", "Screens/WinScreen.ts", "Screens/WinScreen.d.ts"],
+    "TSTL/Declarations/**/*.d.ts",
+    "Cards/**/*.ts",
+    "Enemies/**/*.ts",
+    "Screens/**/*.ts",
+    "Draw/**/*.ts"
+, "Assets/Asset.ts", "Assets/Asset.d.ts", "Assets/AssetManager.ts", "Assets/AssetManager.d.ts", "Assets/CardAssets.ts", "Assets/CardAssets.d.ts"  ],
   "exclude": [
     "node_modules"
   ]

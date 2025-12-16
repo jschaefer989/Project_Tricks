@@ -29,6 +29,7 @@ export default class Card {
     getBaseCost(): number;
     save(): CardData;
     static load(gameManager: GameManager, data: CardData): Card;
+    onClick(): void;
     onSelect(): void;
     onUnselect(): void;
 }

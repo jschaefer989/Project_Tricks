@@ -11,8 +11,8 @@ export default class Settings {
     }
 
     setupWindowedMode(): void {
-        const gameWidth = 1920
-        const gameHeight = 1080 // fixed game resolution
+        const gameWidth = 1280
+        const gameHeight = 720 // fixed game resolution
         let [windowWidth, windowHeight] = love.window.getDesktopDimensions()
         windowWidth = windowWidth - 25
         windowHeight = windowHeight - 60 // make the window a bit smaller than the screen itself

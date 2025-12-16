@@ -11,8 +11,8 @@ function Settings.prototype.defaults(self)
     self:setupWindowedMode()
 end
 function Settings.prototype.setupWindowedMode(self)
-    local gameWidth = 1920
-    local gameHeight = 1080
+    local gameWidth = 1280
+    local gameHeight = 720
     local windowWidth, windowHeight = love.window.getDesktopDimensions()
     windowWidth = windowWidth - 25
     windowHeight = windowHeight - 60

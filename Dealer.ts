@@ -19,7 +19,7 @@ import Duke from "Cards/Duke"
 import Emperor from "Cards/Emperor"
 import Knight from "Cards/Knight"
 import Pope from "Cards/Pope"
-import Trick from "Cards/Trick"
+import Chosen from "Cards/Chosen"
 import Baron from "Cards/Baron"
 
 export default class Dealer {
@@ -114,8 +114,8 @@ export default class Dealer {
                 return new Knight(gameManager, suit)
             case TrumpRanks.POPE:
                 return new Pope(gameManager, suit)
-            case TrumpRanks.TRICK:
-                return new Trick(gameManager, suit)
+            case TrumpRanks.CHOSEN:
+                return new Chosen(gameManager, suit)
             default:
                 exhaustiveGuard(rank)
         }
@@ -206,7 +206,7 @@ export default class Dealer {
             case Ranks.THIEF:
                 return new Devil(this.gameManager, this.gameManager.board.trumpSuit)
             case Ranks.SERGEANT:
-                return new Trick(this.gameManager, this.gameManager.board.trumpSuit)
+                return new Chosen(this.gameManager, this.gameManager.board.trumpSuit)
             default:
                 return card
         }
@@ -253,7 +253,7 @@ export default class Dealer {
                 return new Priest(this.gameManager, this.gameManager.board.trumpSuit)
             case TrumpRanks.DEVIL:
                 return new Thief(this.gameManager, this.gameManager.board.trumpSuit)
-            case TrumpRanks.TRICK:
+            case TrumpRanks.CHOSEN:
                 return new Sergeant(this.gameManager, this.gameManager.board.trumpSuit)
             default:
                 return card

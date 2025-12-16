@@ -12,6 +12,9 @@ local Draw = ____Draw.default
 local ____Enemy = require("Enemies.Enemy")
 local Enemy = ____Enemy.default
 local suit = require("Libraries.suit-master.suit")
+local ____CardAssets = require("Assets.CardAssets")
+local CardAssets = ____CardAssets.default
+local push = require("Libraries.push")
 ____exports.default = __TS__Class()
 local Board = ____exports.default
 Board.name = "Board"
@@ -28,6 +31,7 @@ function Board.prototype.____constructor(self, gameManager, enemy)
     self.enemyPower = 0
     self.enemyValue = 0
     self.showingInitialView = true
+    self.cardRenderer = __TS__New(CardAssets, gameManager)
 end
 function Board.prototype.load(self, data)
     self.discardUsed = data.discardUsed
@@ -89,10 +93,10 @@ function Board.prototype.drawInitialView(self)
         padX,
         padY
     )
-    startY = startY + lblH + padY + btnH + 200
+    local playerRowY = math.floor(love.graphics.getHeight() * 0.55)
     self:renderPlayerRowInitial(
         startX,
-        startY,
+        playerRowY,
         contentW,
         btnW,
         btnH,
@@ -100,7 +104,6 @@ function Board.prototype.drawInitialView(self)
         padX,
         padY
     )
-    self:renderLetsFightButton(startY + lblH + btnH + padY + 50, btnW, btnH)
     Draw:playerInfo(self.gameManager.player, self.gameManager)
     Draw:playerDeck(self.gameManager.player, {showDiscards = true})
 end
@@ -314,6 +317,25 @@ function Board.prototype.renderEnemyRow(self, startX, startY, contentW, btnW, bt
         )
     end
 end
+function Board.prototype.buildAssets(self)
+    local playerHand = self.gameManager.player.hand
+    local cardCount = #playerHand
+    local padding = 20
+    local screenW = push:getWidth()
+    local screenH = push:getHeight()
+    local totalW = cardCount * self.cardRenderer.baseW + math.max(0, cardCount - 1) * padding
+    local startX = math.floor((screenW - totalW) / 2)
+    local cardY = screenH / 2 + self.cardRenderer.baseH / 2
+    do
+        local i = 0
+        while i < #playerHand do
+            local card = playerHand[i + 1]
+            local x = startX + i * (self.cardRenderer.baseW + padding)
+            self.cardRenderer:addAsset(card, x, cardY)
+            i = i + 1
+        end
+    end
+end
 function Board.prototype.renderPlayerRowInitial(self, startX, startY, contentW, btnW, btnH, lblH, padX, padY)
     local playerHand = self.gameManager.player.hand
     suit.layout:reset(startX, startY, padX, padY)
@@ -322,15 +344,6 @@ function Board.prototype.renderPlayerRowInitial(self, startX, startY, contentW, 
         {align = "left"},
         suit.layout:row(contentW, lblH)
     )
-    suit.layout:row(0, 0)
-    for ____, card in ipairs(playerHand) do
-        local cardText = ((((((card.rank .. " ") .. card.suit) .. " (Val: ") .. tostring(card.value)) .. ", Pow: ") .. tostring(card.power)) .. ")"
-        suit.Button(
-            cardText,
-            {},
-            suit.layout:col(btnW, btnH)
-        )
-    end
 end
 function Board.prototype.renderPlayerRow(self, startX, startY, contentW, btnW, btnH, lblH, padX, padY)
     local playerHand = self.gameManager.player.hand
@@ -340,25 +353,6 @@ function Board.prototype.renderPlayerRow(self, startX, startY, contentW, btnW, b
         {align = "left"},
         suit.layout:row(contentW, lblH)
     )
-    suit.layout:row(0, 0)
-    for ____, card in ipairs(playerHand) do
-        Draw:card(card, btnW, btnH, {multiSelect = true})
-    end
-end
-function Board.prototype.renderLetsFightButton(self, startY, btnW, btnH)
-    local screenW = love.graphics.getWidth()
-    local buttonW = 200
-    local buttonX = math.floor(screenW / 2 - buttonW / 2)
-    suit.layout:reset(buttonX, startY, 20, 20)
-    local hit = suit.Button(
-        "Let's Fight!",
-        {},
-        suit.layout:row(buttonW, btnH)
-    ).hit
-    if hit then
-        self.showingInitialView = false
-        self.dealer:startGame()
-    end
 end
 function Board.prototype.renderAttackButton(self, startY, btnW, btnH, padX, padY)
     local gap = 20

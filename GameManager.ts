@@ -18,10 +18,14 @@ import * as suit from "Libraries.suit-master.suit"
 import Shop from "Screens/Shop"
 import LevelUpScreen from "Screens/LevelUpScreen"
 import PerkScreen from "Screens/PerkScreen"
+import * as push from "Libraries.push"
+import AssetManager from "Assets/AssetManager"
 
 interface GameState {
     update: (dt: number) => void
     draw?: () => void
+    mousepressed?: (x: number, y: number, button: number) => void
+    mousereleased?: (x: number, y: number, button: number) => void
 }
 
 export default class GameManager {
@@ -38,6 +42,8 @@ export default class GameManager {
     shop?: Shop
     levelUpScreen?: LevelUpScreen
     perkScreen?: PerkScreen
+    assetManager: AssetManager
+    testTextbox?: any
 
     constructor() {
         this.gameState = GameStates.MAIN_MENU
@@ -53,6 +59,7 @@ export default class GameManager {
         this.shop = undefined
         this.levelUpScreen = undefined
         this.perkScreen = undefined
+        this.assetManager = new AssetManager()
     }
 
     getCharacter(characterType: string): Character | undefined {
@@ -72,7 +79,7 @@ export default class GameManager {
             case GameStates.NEW_GAME_MENU:
                 this.switchToNewGameMenu()
                 break
-            case GameStates.PLAYING:
+            case GameStates.BOARD:
                 this.switchToBoard(this.board?.enemy)
                 break
             case GameStates.PAUSE_MENU:
@@ -92,6 +99,9 @@ export default class GameManager {
                 break
             case GameStates.LEVEL_UP:
                 this.switchToLevelUpScreen()
+                break
+            case GameStates.PERKS:
+                this.switchToPerkScreen()
                 break
             default:
                 exhaustiveGuard(this.gameState)
@@ -119,6 +129,8 @@ export default class GameManager {
             this.mainMenu = new MainMenu(this)
         }
 
+        this.assetManager = new AssetManager()
+
         GameStateManager.setState(mainMenuState)
     }
 
@@ -137,6 +149,8 @@ export default class GameManager {
         if (isEmpty(this.newGameMenu)) {
             this.newGameMenu = new NewGameMenu(this)
         }
+
+        this.assetManager = new AssetManager()
 
         GameStateManager.setState(newGameMenuState)
     }
@@ -158,6 +172,8 @@ export default class GameManager {
             this.pauseMenu = new PauseMenu(this)
         }
 
+        this.assetManager = new AssetManager()
+
         GameStateManager.setState(pauseMenuState)
     }
 
@@ -165,10 +181,23 @@ export default class GameManager {
         const boardState: GameState = {
             update: (dt: number) => {
                 this.board?.drawBoard()
+                this.testTextbox?.update(dt)
+            },
+            draw: () => {
+                push.start()
+                this.assetManager.drawAssets()
+                love.graphics.print("Hello world!", 100, 200)
+                push.finish()
+            },
+            mousepressed: (x: number, y: number, button: number) => {
+                this.assetManager.handleMousePressed(x, y, button)
+            },
+            mousereleased: (x: number, y: number, button: number) => {
+                this.assetManager.handleMouseReleased(x, y, button)
             }
         }
 
-        this.gameState = GameStates.PLAYING
+        this.gameState = GameStates.BOARD
         this.winScreen = undefined
         this.loseScreen = undefined
         this.shop = undefined
@@ -181,6 +210,9 @@ export default class GameManager {
             this.board = new Board(this, enemy ?? new Enemy())
             this.board.dealer.setup()
         }
+
+        this.assetManager = new AssetManager()
+        this.board.buildAssets()
 
         GameStateManager.setState(boardState)
     }
@@ -206,6 +238,8 @@ export default class GameManager {
             this.winScreen = new WinScreen(this)
         }
 
+        this.assetManager = new AssetManager()
+
         GameStateManager.setState(winState)
     }
 
@@ -228,6 +262,8 @@ export default class GameManager {
         if (isEmpty(this.loseScreen)) {
             this.loseScreen = new LoseScreen()
         }
+
+        this.assetManager = new AssetManager()
 
         GameStateManager.setState(loseState)
     }
@@ -253,6 +289,8 @@ export default class GameManager {
         // Set dark text color for labels to be readable on light backgrounds
        // Draw.setThemeColors(0, 0, 0)
 
+        this.assetManager = new AssetManager()
+
         GameStateManager.setState(mapState)
     }
 
@@ -274,6 +312,8 @@ export default class GameManager {
             this.shop = new Shop(this)
             this.shop.setup()
         }
+
+        this.assetManager = new AssetManager()
 
         GameStateManager.setState(shopState)
     }
@@ -297,6 +337,8 @@ export default class GameManager {
             this.levelUpScreen.setup()
         }
 
+        this.assetManager = new AssetManager()
+
         GameStateManager.setState(levelUpState)
     }
 
@@ -310,6 +352,8 @@ export default class GameManager {
         if (isEmpty(this.perkScreen)) {
             this.perkScreen = new PerkScreen(this)
         }
+
+        this.assetManager = new AssetManager()
 
         GameStateManager.setState(perkState)
     }

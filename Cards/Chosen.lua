@@ -7,18 +7,18 @@ local TrumpRanks = ____Enums.TrumpRanks
 local ____Card = require("Cards.Card")
 local Card = ____Card.default
 ____exports.default = __TS__Class()
-local Trick = ____exports.default
-Trick.name = "Trick"
-__TS__ClassExtends(Trick, Card)
-function Trick.prototype.____constructor(self, gameManager, suit)
+local Chosen = ____exports.default
+Chosen.name = "Chosen"
+__TS__ClassExtends(Chosen, Card)
+function Chosen.prototype.____constructor(self, gameManager, suit)
     Card.prototype.____constructor(
         self,
         gameManager,
         suit,
-        TrumpRanks.TRICK,
+        TrumpRanks.CHOSEN,
         16,
         11,
-        "Trick"
+        "The Chosen"
     )
 end
 return ____exports
