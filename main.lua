@@ -14,7 +14,7 @@ function love.load()
     love.window.setTitle("Tricks")
     love.keyboard.setKeyRepeat(true)
     math.randomseed(os.time() + os.clock())
-    local mainFont = love.graphics.newFont("Assets/Fonts/BerlinFraktur-24.otf", 24)
+    local mainFont = love.graphics.newFont("Assets/Fonts/Gothic Pixels.ttf", 24)
     love.graphics.setFont(mainFont)
 
     -- TODO: load settings properly
