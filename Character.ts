@@ -1,12 +1,16 @@
 import Card from "Cards/Card"
+import GameManager from "GameManager"
+import { isEmpty } from "Helpers"
 
 export default class Character {
+    gameManager: GameManager
     deck: Card[]
     hand: Card[]
     discardPile: Card[]
     numberOfHeldCards: number
 
-    constructor() {
+    constructor(gameManager: GameManager) {
+        this.gameManager = gameManager
         this.deck = []
         this.hand = []
         this.discardPile = []
@@ -15,6 +19,11 @@ export default class Character {
 
     addToHand(card: Card): void {
         this.hand.push(card)
+        const board = this.gameManager.board
+        if (!isEmpty(board)) {
+            board.cardAssets.appendAsset(card)
+            board.cardAssets.centerCards()
+        }
     }
 
     getCardFromHand(position: number): Card | undefined {
@@ -32,6 +41,11 @@ export default class Character {
 
     addToDiscards(card: Card): void {
         this.discardPile.push(card)
+        const board = this.gameManager.board
+        if (!isEmpty(board)) {
+            board.cardAssets.hideCardAssets(card)
+            board.cardAssets.centerCards()
+        }
     }
 
     getCardFromDiscards(position: number): Card | undefined {
@@ -88,6 +102,6 @@ export default class Character {
         for (const card of this.hand) {
             this.addToDeck(card)
         }
-        this.hand = []
+        this.removeAllCardsFromHand()
     }
 }

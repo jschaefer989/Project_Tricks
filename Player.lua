@@ -17,8 +17,7 @@ local Player = ____exports.default
 Player.name = "Player"
 __TS__ClassExtends(Player, Character)
 function Player.prototype.____constructor(self, gameManager)
-    Character.prototype.____constructor(self)
-    self.gameManager = gameManager
+    Character.prototype.____constructor(self, gameManager)
     self.name = "Player"
     self.money = 0
     self.experience = 0

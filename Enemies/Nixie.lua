@@ -10,9 +10,10 @@ ____exports.default = __TS__Class()
 local Nixie = ____exports.default
 Nixie.name = "Nixie"
 __TS__ClassExtends(Nixie, Enemy)
-function Nixie.prototype.____constructor(self, level, numberOfHeldCards, numberOfCardsInDeck)
+function Nixie.prototype.____constructor(self, gameManager, level, numberOfHeldCards, numberOfCardsInDeck)
     Enemy.prototype.____constructor(
         self,
+        gameManager,
         level,
         EnemyTypes.NIXIE,
         20 * level,

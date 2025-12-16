@@ -6,7 +6,6 @@ local Asset = ____exports.default
 Asset.name = "Asset"
 function Asset.prototype.____constructor(self, image, x, y, onClick, width, height, orientation, scaleX, scaleY, offsetX, offsetY)
     self.disabled = false
-    self.hidden = false
     self.image = image
     self.x = x
     self.y = y
@@ -43,8 +42,5 @@ function Asset.prototype.updateOffset(self, offsetX, offsetY)
 end
 function Asset.prototype.setDisabled(self, disabled)
     self.disabled = disabled
-end
-function Asset.prototype.setHidden(self, hidden)
-    self.hidden = hidden
 end
 return ____exports

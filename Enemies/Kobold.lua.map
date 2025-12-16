@@ -1,1 +1,1 @@
-{"version":3,"sources":["Kobold.ts"],"names":[],"mappings":";;;;AAAA,kBAAkB;AAAX;AACP,kBAA2B;AAAlB;AAET;MAAqB,qBAArB;AAAA;AAA4B,2BAAQ;AAChC,gDAAY,OAAe,mBAA4B;IACnD;;QAAM;QAAO;QAAmB,KAAK;QAAO;QAAU;QAAmB;;AAD7E","file":"Kobold.lua","sourceRoot":""}
+{"version":3,"sources":["Kobold.ts"],"names":[],"mappings":";;;;AAAA,kBAAkB;AAAX;AACP,kBAA2B;AAAlB;AAGT;MAAqB,qBAArB;AAAA;AAA4B,2BAAQ;AAChC,gDAAY,aAA0B,OAAe,mBAA4B;IAC7E;;QAAM;QAAa;QAAO;QAAmB,KAAK;QAAO;QAAU;QAAmB;;AAD1F","file":"Kobold.lua","sourceRoot":""}

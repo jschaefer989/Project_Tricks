@@ -1,13 +1,16 @@
 /** @noSelfInFile */
 
-import { CharacterTypes, Suits } from "../Enums"
+import { AssetIds, CharacterTypes, Suits } from "../Enums"
 import Dealer from "../Dealer"
 import Draw from "../Draw"
 import Enemy, { EnemyData } from "Enemies/Enemy"
 import * as suit from "Libraries.suit-master.suit"
-import GameManager from "../GameManager"
+import type GameManager from "../GameManager"
 import CardAssets from "Assets/CardAssets"
+import ButtonAssets from "Assets/ButtonAssets"
 import * as push from "Libraries.push"
+
+const padding = 20
 
 interface BoardData {
     discardUsed: number
@@ -35,12 +38,13 @@ export default class Board {
     enemyPower: number
     enemyValue: number
     showingInitialView: boolean
-    cardRenderer: CardAssets
+    cardAssets: CardAssets
+    buttonAssets: ButtonAssets
 
     constructor(gameManager: GameManager, enemy?: Enemy) {
         this.gameManager = gameManager
         this.discardUsed = 0
-        this.enemy = enemy ?? new Enemy()
+        this.enemy = enemy ?? new Enemy(gameManager)
         this.dealer = new Dealer(gameManager)
         this.playerPoints = 0
         this.enemyPoints = 0
@@ -50,7 +54,8 @@ export default class Board {
         this.enemyPower = 0
         this.enemyValue = 0
         this.showingInitialView = true
-        this.cardRenderer = new CardAssets(gameManager)
+        this.cardAssets = new CardAssets(gameManager)
+        this.buttonAssets = new ButtonAssets(gameManager)
     }
 
     load(data: BoardData): void {
@@ -64,7 +69,7 @@ export default class Board {
         this.enemyValue = data.enemyValue
         this.showingInitialView = data.showingInitialView ?? true
 
-        this.enemy = new Enemy()
+        this.enemy = new Enemy(this.gameManager)
         this.enemy.load(this.gameManager, data.enemy)
     }
 
@@ -325,8 +330,7 @@ export default class Board {
         const hit = suit.Button("Let's Fight!", {}, ...suit.layout.row(buttonW, btnH)).hit
 
         if (hit) {
-            this.showingInitialView = false
-            this.dealer.startGame()
+            this.handleStartFight()
         }
     }
 
@@ -365,6 +369,12 @@ export default class Board {
 
         suit.layout.reset(panelX, panelY, 10, 10)
         suit.Label("Discards Remaining: " + (this.gameManager.player.discards - this.discardUsed) + "/" + this.gameManager.player.discards, { align: "center" }, ...suit.layout.row(150, 30))
+    }
+
+    handleStartFight(): void {
+        this.showingInitialView = false
+        this.buttonAssets.hideButton(AssetIds.LETS_FIGHT_BUTTON)
+        this.dealer.startGame()
     }
 
     handleAttack(): void {
@@ -431,20 +441,31 @@ export default class Board {
     }
 
     buildAssets(): void {
+        this.buildCardAssets()
+        this.buildButtonAssets()
+    }
+
+    private buildCardAssets(): void {
         const playerHand = this.gameManager.player.hand
         const cardCount = playerHand.length
-        const padding = 20
         const screenW = push.getWidth()
-        const screenH = push.getHeight()
-        const totalW = cardCount * this.cardRenderer.baseW + Math.max(0, cardCount - 1) * padding
+        const totalW = cardCount * this.cardAssets.baseW + Math.max(0, cardCount - 1) * padding
         const startX = Math.floor((screenW - totalW) / 2)
-        const cardY = (screenH / 2) + (this.cardRenderer.baseH /2) 
+        const cardY = this.cardAssets.getCardPosition()
 
         for (let i = 0; i < playerHand.length; i++) {
             const card = playerHand[i]
-            const x = startX + i * (this.cardRenderer.baseW + padding)
+            const x = startX + i * (this.cardAssets.baseW + padding)
 
-            this.cardRenderer.addAsset(card, x, cardY)
+            this.cardAssets.addAsset(card, x, cardY)
         }
+    }
+
+    private buildButtonAssets(): void {
+        const cardY = this.cardAssets.getCardPosition()
+        const buttonHeight = this.buttonAssets.letsFightButton.getHeight()
+        const buttonWidth = this.buttonAssets.letsFightButton.getWidth()
+        const screenW = push.getWidth()
+        this.buttonAssets.addAsset(Math.floor((screenW - buttonWidth) / 2), cardY - buttonHeight - padding, this.handleStartFight)
     }
 }

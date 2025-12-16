@@ -33,7 +33,6 @@ interface PlayerData {
 }
 
 export default class Player extends Character {
-    gameManager: GameManager
     name: string
     money: number
     experience: number
@@ -43,8 +42,7 @@ export default class Player extends Character {
     perks: Perk[]
 
     constructor(gameManager: GameManager) {
-        super()
-        this.gameManager = gameManager
+        super(gameManager)
         this.name = "Player"
         this.money = 0
         this.experience = 0

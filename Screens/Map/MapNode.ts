@@ -38,7 +38,7 @@ export default class MapNode {
     load(data: MapNodeData): void {
         this.type = data.type ?? this.getRandomNodeType()
         if (data.enemy) {
-            this.enemy = new Enemy()
+            this.enemy = new Enemy(this.gameManager)
             this.enemy.load(this.gameManager, data.enemy)
         }
     }
@@ -212,13 +212,13 @@ export default class MapNode {
         // const result = lootDie.random()
         switch (enemyType) {
             case EnemyTypes.KOBOLD:
-                return new Kobold(1)
+                return new Kobold(this.gameManager, 1)
             case EnemyTypes.NIXIE:
-                return new Nixie(1)
+                return new Nixie(this.gameManager, 1)
             case EnemyTypes.OGRE:
-                return new Ogre(1)
+                return new Ogre(this.gameManager, 1)
             case EnemyTypes.TATZELWURM:
-                return new Tatzelwurm(1)
+                return new Tatzelwurm(this.gameManager, 1)
             default:
                 exhaustiveGuard(enemyType)
         }

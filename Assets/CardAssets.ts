@@ -3,6 +3,9 @@ import Asset from "./Asset"
 import { Suits, AssetIds } from "Enums"
 import { exhaustiveGuard } from "Helpers"
 import GameManager from "GameManager"
+import * as push from "Libraries.push"
+
+const padding = 20
 
 interface CardOptions {
     multiSelect?: boolean
@@ -67,6 +70,53 @@ export default class CardAssets {
             default: 
                 exhaustiveGuard(suit)
         }
+    }    
+
+    hideCardAssets(card: Card): void {
+        this.gameManager.assetManager.assets.delete(`${AssetIds.BASE_CARD_TEMPLATE}-${card.id}`)
+        this.gameManager.assetManager.assets.delete(this.getSuitAssetId(card.suit, card, 0))
+        this.gameManager.assetManager.assets.delete(this.getSuitAssetId(card.suit, card, 1))
     }
 
+    centerCards(): void {
+        const playerHand = this.gameManager.player.hand
+        const cardCount = playerHand.length
+        const screenW = push.getWidth()
+        const totalW = cardCount * this.baseW + Math.max(0, cardCount - 1) * padding
+        const startX = Math.floor((screenW - totalW) / 2)
+        const cardY = this.getCardPosition()
+
+        for (let i = 0; i < playerHand.length; i++) {
+            const card = playerHand[i]
+            const x = startX + i * (this.baseW + padding)
+
+            this.addAsset(card, x, cardY)
+        }
+    }
+
+    updateCardPosition(card: Card, x: number, y: number): void {
+        const assetManager = this.gameManager.assetManager
+        assetManager.getAsset(`${AssetIds.BASE_CARD_TEMPLATE}-${card.id}`)?.updatePosition(x, y)
+        assetManager.getAsset(this.getSuitAssetId(card.suit, card, 0))?.updatePosition(x + 10, y + 10)
+        assetManager.getAsset(this.getSuitAssetId(card.suit, card, 1))?.updatePosition(x + this.baseW - 10, y + this.baseH - 10)
+
+    }
+
+    getCardPosition(): number {
+        const screenH = push.getHeight()
+        return (screenH / 2) + (this.baseH / 2) 
+    }
+
+    // TODO: this logic is duplicated in the baord, so consolidate
+    appendAsset(card: Card): void {
+        const playerHand = this.gameManager.player.hand
+        const cardCount = playerHand.length
+        const screenW = push.getWidth()
+        const totalW = cardCount * this.baseW + Math.max(0, cardCount - 1) * padding
+        const startX = Math.floor((screenW - totalW) / 2)
+        const cardY = this.getCardPosition()
+        const x = startX + (cardCount - 1) * (this.baseW + padding)
+
+        this.addAsset(card, x, cardY)
+    }
 }

@@ -31,6 +31,11 @@ function AssetManager.prototype.drawAssets(self)
     end
 end
 function AssetManager.prototype.handleMousePressed(self, x, y, button)
+    for ____, asset in __TS__Iterator(self.assets:values()) do
+        if x >= asset.x and x <= asset.x + asset.width and y >= asset.y and y <= asset.y + asset.height then
+            asset:onClick()
+        end
+    end
 end
 function AssetManager.prototype.handleMouseReleased(self, x, y, button)
     for ____, asset in __TS__Iterator(self.assets:values()) do

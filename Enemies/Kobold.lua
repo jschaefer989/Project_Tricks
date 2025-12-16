@@ -10,9 +10,10 @@ ____exports.default = __TS__Class()
 local Kobold = ____exports.default
 Kobold.name = "Kobold"
 __TS__ClassExtends(Kobold, Enemy)
-function Kobold.prototype.____constructor(self, level, numberOfHeldCards, numberOfCardsInDeck)
+function Kobold.prototype.____constructor(self, gameManager, level, numberOfHeldCards, numberOfCardsInDeck)
     Enemy.prototype.____constructor(
         self,
+        gameManager,
         level,
         EnemyTypes.KOBOLD,
         10 * level,

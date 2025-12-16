@@ -3,6 +3,7 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____Enums = require("Enums")
+local AssetIds = ____Enums.AssetIds
 local CharacterTypes = ____Enums.CharacterTypes
 local Suits = ____Enums.Suits
 local ____Dealer = require("Dealer")
@@ -14,14 +15,17 @@ local Enemy = ____Enemy.default
 local suit = require("Libraries.suit-master.suit")
 local ____CardAssets = require("Assets.CardAssets")
 local CardAssets = ____CardAssets.default
+local ____ButtonAssets = require("Assets.ButtonAssets")
+local ButtonAssets = ____ButtonAssets.default
 local push = require("Libraries.push")
+local padding = 20
 ____exports.default = __TS__Class()
 local Board = ____exports.default
 Board.name = "Board"
 function Board.prototype.____constructor(self, gameManager, enemy)
     self.gameManager = gameManager
     self.discardUsed = 0
-    self.enemy = enemy or __TS__New(Enemy)
+    self.enemy = enemy or __TS__New(Enemy, gameManager)
     self.dealer = __TS__New(Dealer, gameManager)
     self.playerPoints = 0
     self.enemyPoints = 0
@@ -31,7 +35,8 @@ function Board.prototype.____constructor(self, gameManager, enemy)
     self.enemyPower = 0
     self.enemyValue = 0
     self.showingInitialView = true
-    self.cardRenderer = __TS__New(CardAssets, gameManager)
+    self.cardAssets = __TS__New(CardAssets, gameManager)
+    self.buttonAssets = __TS__New(ButtonAssets, gameManager)
 end
 function Board.prototype.load(self, data)
     self.discardUsed = data.discardUsed
@@ -47,7 +52,7 @@ function Board.prototype.load(self, data)
         ____data_showingInitialView_0 = true
     end
     self.showingInitialView = ____data_showingInitialView_0
-    self.enemy = __TS__New(Enemy)
+    self.enemy = __TS__New(Enemy, self.gameManager)
     self.enemy:load(self.gameManager, data.enemy)
 end
 function Board.prototype.save(self)
@@ -363,8 +368,7 @@ function Board.prototype.renderLetsFightButton(self, startY, btnW, btnH)
         suit.layout:row(buttonW, btnH)
     ).hit
     if hit then
-        self.showingInitialView = false
-        self.dealer:startGame()
+        self:handleStartFight()
     end
 end
 function Board.prototype.renderAttackButton(self, startY, btnW, btnH, padX, padY)
@@ -414,6 +418,11 @@ function Board.prototype.renderDiscardCounter(self)
         {align = "center"},
         suit.layout:row(150, 30)
     )
+end
+function Board.prototype.handleStartFight(self)
+    self.showingInitialView = false
+    self.buttonAssets:hideButton(AssetIds.LETS_FIGHT_BUTTON)
+    self.dealer:startGame()
 end
 function Board.prototype.handleAttack(self)
     if not self.gameManager.player:anySelectedCards() then
@@ -479,22 +488,35 @@ function Board.prototype.clearStats(self)
     self.enemyValue = 0
 end
 function Board.prototype.buildAssets(self)
+    self:buildCardAssets()
+    self:buildButtonAssets()
+end
+function Board.prototype.buildCardAssets(self)
     local playerHand = self.gameManager.player.hand
     local cardCount = #playerHand
-    local padding = 20
     local screenW = push:getWidth()
-    local screenH = push:getHeight()
-    local totalW = cardCount * self.cardRenderer.baseW + math.max(0, cardCount - 1) * padding
+    local totalW = cardCount * self.cardAssets.baseW + math.max(0, cardCount - 1) * padding
     local startX = math.floor((screenW - totalW) / 2)
-    local cardY = screenH / 2 + self.cardRenderer.baseH / 2
+    local cardY = self.cardAssets:getCardPosition()
     do
         local i = 0
         while i < #playerHand do
             local card = playerHand[i + 1]
-            local x = startX + i * (self.cardRenderer.baseW + padding)
-            self.cardRenderer:addAsset(card, x, cardY)
+            local x = startX + i * (self.cardAssets.baseW + padding)
+            self.cardAssets:addAsset(card, x, cardY)
             i = i + 1
         end
     end
+end
+function Board.prototype.buildButtonAssets(self)
+    local cardY = self.cardAssets:getCardPosition()
+    local buttonHeight = self.buttonAssets.letsFightButton:getHeight()
+    local buttonWidth = self.buttonAssets.letsFightButton:getWidth()
+    local screenW = push:getWidth()
+    self.buttonAssets:addAsset(
+        math.floor((screenW - buttonWidth) / 2),
+        cardY - buttonHeight - padding,
+        self.handleStartFight
+    )
 end
 return ____exports

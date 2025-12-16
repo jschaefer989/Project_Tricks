@@ -2,10 +2,13 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
+local ____Helpers = require("Helpers")
+local isEmpty = ____Helpers.isEmpty
 ____exports.default = __TS__Class()
 local Character = ____exports.default
 Character.name = "Character"
-function Character.prototype.____constructor(self)
+function Character.prototype.____constructor(self, gameManager)
+    self.gameManager = gameManager
     self.deck = {}
     self.hand = {}
     self.discardPile = {}
@@ -14,6 +17,11 @@ end
 function Character.prototype.addToHand(self, card)
     local ____self_hand_0 = self.hand
     ____self_hand_0[#____self_hand_0 + 1] = card
+    local board = self.gameManager.board
+    if not isEmpty(board) then
+        board.cardAssets:appendAsset(card)
+        board.cardAssets:centerCards()
+    end
 end
 function Character.prototype.getCardFromHand(self, position)
     return self.hand[position + 1]
@@ -29,6 +37,11 @@ end
 function Character.prototype.addToDiscards(self, card)
     local ____self_discardPile_2 = self.discardPile
     ____self_discardPile_2[#____self_discardPile_2 + 1] = card
+    local board = self.gameManager.board
+    if not isEmpty(board) then
+        board.cardAssets:hideCardAssets(card)
+        board.cardAssets:centerCards()
+    end
 end
 function Character.prototype.getCardFromDiscards(self, position)
     return self.discardPile[position + 1]
@@ -85,6 +98,6 @@ function Character.prototype.putHandBackInDeck(self)
     for ____, card in ipairs(self.hand) do
         self:addToDeck(card)
     end
-    self.hand = {}
+    self:removeAllCardsFromHand()
 end
 return ____exports

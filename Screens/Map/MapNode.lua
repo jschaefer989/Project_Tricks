@@ -34,7 +34,7 @@ end
 function MapNode.prototype.load(self, data)
     self.type = data.type or self:getRandomNodeType()
     if data.enemy then
-        self.enemy = __TS__New(Enemy)
+        self.enemy = __TS__New(Enemy, self.gameManager)
         self.enemy:load(self.gameManager, data.enemy)
     end
 end
@@ -267,19 +267,19 @@ function MapNode.prototype.getEnemyFromType(self, enemyType)
         local ____switch23 = enemyType
         local ____cond23 = ____switch23 == EnemyTypes.KOBOLD
         if ____cond23 then
-            return __TS__New(Kobold, 1)
+            return __TS__New(Kobold, self.gameManager, 1)
         end
         ____cond23 = ____cond23 or ____switch23 == EnemyTypes.NIXIE
         if ____cond23 then
-            return __TS__New(Nixie, 1)
+            return __TS__New(Nixie, self.gameManager, 1)
         end
         ____cond23 = ____cond23 or ____switch23 == EnemyTypes.OGRE
         if ____cond23 then
-            return __TS__New(Ogre, 1)
+            return __TS__New(Ogre, self.gameManager, 1)
         end
         ____cond23 = ____cond23 or ____switch23 == EnemyTypes.TATZELWURM
         if ____cond23 then
-            return __TS__New(Tatzelwurm, 1)
+            return __TS__New(Tatzelwurm, self.gameManager, 1)
         end
         do
             exhaustiveGuard(enemyType)

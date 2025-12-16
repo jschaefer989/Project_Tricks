@@ -1,1 +1,1 @@
-{"version":3,"sources":["Ogre.ts"],"names":[],"mappings":";;;;AAAA,kBAAkB;AAAX;AACP,kBAA2B;AAAlB;AAET;MAAqB,mBAArB;AAAA;AAA0B,yBAAQ;AAC9B,8CAAY,OAAe,mBAA4B;IACnD;;QAAM;QAAO;QAAiB,KAAK;QAAO;QAAQ;QAAmB;;AADzE","file":"Ogre.lua","sourceRoot":""}
+{"version":3,"sources":["Ogre.ts"],"names":[],"mappings":";;;;AAAA,kBAAkB;AAAX;AACP,kBAA2B;AAAlB;AAGT;MAAqB,mBAArB;AAAA;AAA0B,yBAAQ;AAC9B,8CAAY,aAA0B,OAAe,mBAA4B;IAC7E;;QAAM;QAAa;QAAO;QAAiB,KAAK;QAAO;QAAQ;QAAmB;;AADtF","file":"Ogre.lua","sourceRoot":""}

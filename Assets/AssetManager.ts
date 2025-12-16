@@ -22,7 +22,12 @@ export default class AssetManager {
     }
 
     handleMousePressed(x: number, y: number, button: number): void {
-        // Implement mouse pressed handling for assets if needed
+        for (const asset of this.assets.values()) {
+            if (x >= asset.x && x <= asset.x + asset.width &&
+                y >= asset.y && y <= asset.y + asset.height) {
+                asset.onClick()
+            }
+        }
     }
 
     handleMouseReleased(x: number, y: number, button: number): void {

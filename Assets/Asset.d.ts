@@ -12,7 +12,6 @@ export default class Asset {
     offsetX: number;
     offsetY: number;
     disabled: boolean;
-    hidden: boolean;
     constructor(image: Image, x: number, y: number, onClick?: () => void, width?: number, height?: number, orientation?: number, scaleX?: number, scaleY?: number, offsetX?: number, offsetY?: number);
     updatePosition(x: number, y: number): void;
     updateWidth(width: number): void;
@@ -21,5 +20,4 @@ export default class Asset {
     updateScale(scaleX: number, scaleY: number): void;
     updateOffset(offsetX: number, offsetY: number): void;
     setDisabled(disabled: boolean): void;
-    setHidden(hidden: boolean): void;
 }

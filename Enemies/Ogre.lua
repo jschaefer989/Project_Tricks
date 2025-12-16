@@ -10,9 +10,10 @@ ____exports.default = __TS__Class()
 local Ogre = ____exports.default
 Ogre.name = "Ogre"
 __TS__ClassExtends(Ogre, Enemy)
-function Ogre.prototype.____constructor(self, level, numberOfHeldCards, numberOfCardsInDeck)
+function Ogre.prototype.____constructor(self, gameManager, level, numberOfHeldCards, numberOfCardsInDeck)
     Enemy.prototype.____constructor(
         self,
+        gameManager,
         level,
         EnemyTypes.OGRE,
         30 * level,

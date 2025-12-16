@@ -27,7 +27,6 @@ interface PlayerData {
     perks: PerkData[];
 }
 export default class Player extends Character {
-    gameManager: GameManager;
     name: string;
     money: number;
     experience: number;

@@ -13,7 +13,6 @@ export default class Asset {
     offsetX: number
     offsetY: number
     disabled: boolean = false
-    hidden: boolean = false
 
     constructor(image: Image, x: number, y: number, onClick?: () => void, width?: number, height?: number, orientation?: number, scaleX?: number, scaleY?: number, offsetX?: number, offsetY?: number) {
         this.image = image
@@ -58,9 +57,5 @@ export default class Asset {
 
     setDisabled(disabled: boolean): void {
         this.disabled = disabled
-    }
-
-    setHidden(hidden: boolean): void {
-        this.hidden = hidden
     }
 }

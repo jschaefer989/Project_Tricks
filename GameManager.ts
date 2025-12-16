@@ -43,7 +43,7 @@ export default class GameManager {
     levelUpScreen?: LevelUpScreen
     perkScreen?: PerkScreen
     assetManager: AssetManager
-    devMode: boolean = true // Change if you want to test in dev mode
+    devMode: boolean = false // Change if you want to test in dev mode
 
     constructor() {
         this.gameState = GameStates.MAIN_MENU
@@ -212,7 +212,7 @@ export default class GameManager {
         suit.theme.color.normal.fg = [1, 1, 1]
 
         if (isEmpty(this.board)) {
-            this.board = new Board(this, enemy ?? new Enemy())
+            this.board = new Board(this, enemy ?? new Enemy(this))
             this.board.dealer.setup()
         }
 

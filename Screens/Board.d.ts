@@ -2,8 +2,9 @@
 import { CharacterTypes, Suits } from "../Enums";
 import Dealer from "../Dealer";
 import Enemy, { EnemyData } from "Enemies/Enemy";
-import GameManager from "../GameManager";
+import type GameManager from "../GameManager";
 import CardAssets from "Assets/CardAssets";
+import ButtonAssets from "Assets/ButtonAssets";
 interface BoardData {
     discardUsed: number;
     playerPoints: number;
@@ -29,7 +30,8 @@ export default class Board {
     enemyPower: number;
     enemyValue: number;
     showingInitialView: boolean;
-    cardRenderer: CardAssets;
+    cardAssets: CardAssets;
+    buttonAssets: ButtonAssets;
     constructor(gameManager: GameManager, enemy?: Enemy);
     load(data: BoardData): void;
     save(): BoardData;
@@ -55,11 +57,14 @@ export default class Board {
     renderLetsFightButton(startY: number, btnW: number, btnH: number): void;
     renderAttackButton(startY: number, btnW: number, btnH: number, padX: number, padY: number): void;
     renderDiscardCounter(): void;
+    handleStartFight(): void;
     handleAttack(): void;
     handleDiscard(): void;
     getWinner(): CharacterTypes;
     endFight(): void;
     clearStats(): void;
     buildAssets(): void;
+    private buildCardAssets;
+    private buildButtonAssets;
 }
 export {};

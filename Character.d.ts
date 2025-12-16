@@ -1,10 +1,12 @@
 import Card from "Cards/Card";
+import GameManager from "GameManager";
 export default class Character {
+    gameManager: GameManager;
     deck: Card[];
     hand: Card[];
     discardPile: Card[];
     numberOfHeldCards: number;
-    constructor();
+    constructor(gameManager: GameManager);
     addToHand(card: Card): void;
     getCardFromHand(position: number): Card | undefined;
     addToDeck(card: Card): void;

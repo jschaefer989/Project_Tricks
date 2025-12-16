@@ -56,4 +56,5 @@ ____exports.AssetIds.HEART_SUIT = "HEART_SUIT"
 ____exports.AssetIds.BELL_SUIT = "BELL_SUIT"
 ____exports.AssetIds.ACORN_SUIT = "ACORN_SUIT"
 ____exports.AssetIds.LEAF_SUIT = "LEAF_SUIT"
+____exports.AssetIds.LETS_FIGHT_BUTTON = "LETS_FIGHT_BUTTON"
 return ____exports

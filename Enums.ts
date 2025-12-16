@@ -76,4 +76,5 @@ export enum AssetIds {
     BELL_SUIT = "BELL_SUIT",
     ACORN_SUIT = "ACORN_SUIT",
     LEAF_SUIT = "LEAF_SUIT",
+    LETS_FIGHT_BUTTON = "LETS_FIGHT_BUTTON",
 }

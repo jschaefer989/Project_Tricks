@@ -43,7 +43,7 @@ ____exports.default = __TS__Class()
 local GameManager = ____exports.default
 GameManager.name = "GameManager"
 function GameManager.prototype.____constructor(self)
-    self.devMode = true
+    self.devMode = false
     self.gameState = GameStates.MAIN_MENU
     self.player = __TS__New(Player, self)
     self.settings = __TS__New(Settings)
@@ -219,7 +219,7 @@ function GameManager.prototype.switchToBoard(self, enemy)
         self.board = __TS__New(
             Board,
             self,
-            enemy or __TS__New(Enemy)
+            enemy or __TS__New(Enemy, self)
         )
         self.board.dealer:setup()
     end

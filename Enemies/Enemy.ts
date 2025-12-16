@@ -29,7 +29,6 @@ export interface EnemyData {
 }
 
 export default class Enemy extends Character {
-    gameManager?: GameManager
     numberOfHeldCards: number
     numberOfCardsInDeck: number
     level: number
@@ -37,8 +36,8 @@ export default class Enemy extends Character {
     experience: number
     name: string
 
-    constructor(level?: number, enemyType?: EnemyTypes, experience?: number, name?: string, numberOfHeldCards?: number, numberOfCardsInDeck?: number) {
-        super()
+    constructor(gameManager: GameManager, level?: number, enemyType?: EnemyTypes, experience?: number, name?: string, numberOfHeldCards?: number, numberOfCardsInDeck?: number) {
+        super(gameManager)
         this.numberOfHeldCards = numberOfHeldCards ?? 3
         this.numberOfCardsInDeck = numberOfCardsInDeck ?? 9
         this.level = level ?? 1

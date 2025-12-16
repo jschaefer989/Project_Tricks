@@ -21,5 +21,10 @@ export default class CardAssets {
     addSuitAsset(card: Card, x: number, y: number, width: number, height: number): void;
     getSuitAssetPath(suit: Suits): string;
     getSuitAssetId(suit: Suits, card: Card, orientation: number): string;
+    hideCardAssets(card: Card): void;
+    centerCards(): void;
+    updateCardPosition(card: Card, x: number, y: number): void;
+    getCardPosition(): number;
+    appendAsset(card: Card): void;
 }
 export {};
