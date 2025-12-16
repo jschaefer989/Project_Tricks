@@ -30,7 +30,7 @@ export default class GameManager {
     levelUpScreen?: LevelUpScreen;
     perkScreen?: PerkScreen;
     assetManager: AssetManager;
-    testTextbox?: any;
+    devMode: boolean;
     constructor();
     getCharacter(characterType: string): Character | undefined;
     switchBasedOnGameState(): void;

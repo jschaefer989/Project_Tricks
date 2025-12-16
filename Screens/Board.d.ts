@@ -50,9 +50,9 @@ export default class Board {
     renderEnemyDeck(): void;
     renderPlayerSelectedStats(startX: number, startY: number, contentW: number, btnW: number): void;
     renderEnemyRow(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void;
-    buildAssets(): void;
     renderPlayerRowInitial(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void;
     renderPlayerRow(startX: number, startY: number, contentW: number, btnW: number, btnH: number, lblH: number, padX: number, padY: number): void;
+    renderLetsFightButton(startY: number, btnW: number, btnH: number): void;
     renderAttackButton(startY: number, btnW: number, btnH: number, padX: number, padY: number): void;
     renderDiscardCounter(): void;
     handleAttack(): void;
@@ -60,5 +60,6 @@ export default class Board {
     getWinner(): CharacterTypes;
     endFight(): void;
     clearStats(): void;
+    buildAssets(): void;
 }
 export {};

@@ -43,6 +43,7 @@ ____exports.default = __TS__Class()
 local GameManager = ____exports.default
 GameManager.name = "GameManager"
 function GameManager.prototype.____constructor(self)
+    self.devMode = true
     self.gameState = GameStates.MAIN_MENU
     self.player = __TS__New(Player, self)
     self.settings = __TS__New(Settings)
@@ -57,16 +58,20 @@ function GameManager.prototype.____constructor(self)
     self.levelUpScreen = nil
     self.perkScreen = nil
     self.assetManager = __TS__New(AssetManager)
+    if not self.devMode then
+        local mainFont = love.graphics.newFont("Assets/Fonts/Gothic Pixels.ttf", 24)
+        love.graphics.setFont(mainFont)
+    end
 end
 function GameManager.prototype.getCharacter(self, characterType)
     repeat
-        local ____switch4 = characterType
-        local ____cond4 = ____switch4 == CharacterTypes.PLAYER
-        if ____cond4 then
+        local ____switch5 = characterType
+        local ____cond5 = ____switch5 == CharacterTypes.PLAYER
+        if ____cond5 then
             return self.player
         end
-        ____cond4 = ____cond4 or ____switch4 == CharacterTypes.ENEMY
-        if ____cond4 then
+        ____cond5 = ____cond5 or ____switch5 == CharacterTypes.ENEMY
+        if ____cond5 then
             local ____opt_0 = self.board
             return ____opt_0 and ____opt_0.enemy
         end
@@ -74,56 +79,56 @@ function GameManager.prototype.getCharacter(self, characterType)
 end
 function GameManager.prototype.switchBasedOnGameState(self)
     repeat
-        local ____switch6 = self.gameState
-        local ____cond6 = ____switch6 == GameStates.MAIN_MENU
-        if ____cond6 then
+        local ____switch7 = self.gameState
+        local ____cond7 = ____switch7 == GameStates.MAIN_MENU
+        if ____cond7 then
             self:switchToMainMenu()
             break
         end
-        ____cond6 = ____cond6 or ____switch6 == GameStates.NEW_GAME_MENU
-        if ____cond6 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.NEW_GAME_MENU
+        if ____cond7 then
             self:switchToNewGameMenu()
             break
         end
-        ____cond6 = ____cond6 or ____switch6 == GameStates.BOARD
-        if ____cond6 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.BOARD
+        if ____cond7 then
             local ____self_switchToBoard_4 = self.switchToBoard
             local ____opt_2 = self.board
             ____self_switchToBoard_4(self, ____opt_2 and ____opt_2.enemy)
             break
         end
-        ____cond6 = ____cond6 or ____switch6 == GameStates.PAUSE_MENU
-        if ____cond6 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.PAUSE_MENU
+        if ____cond7 then
             self:switchToPauseMenu()
             break
         end
-        ____cond6 = ____cond6 or ____switch6 == GameStates.WIN_SCREEN
-        if ____cond6 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.WIN_SCREEN
+        if ____cond7 then
             self:switchToWinScreen()
             break
         end
-        ____cond6 = ____cond6 or ____switch6 == GameStates.LOSE_SCREEN
-        if ____cond6 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.LOSE_SCREEN
+        if ____cond7 then
             self:switchToLoseScreen()
             break
         end
-        ____cond6 = ____cond6 or ____switch6 == GameStates.MAP
-        if ____cond6 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.MAP
+        if ____cond7 then
             self:switchToMap()
             break
         end
-        ____cond6 = ____cond6 or ____switch6 == GameStates.SHOP
-        if ____cond6 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.SHOP
+        if ____cond7 then
             self:switchToShop()
             break
         end
-        ____cond6 = ____cond6 or ____switch6 == GameStates.LEVEL_UP
-        if ____cond6 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.LEVEL_UP
+        if ____cond7 then
             self:switchToLevelUpScreen()
             break
         end
-        ____cond6 = ____cond6 or ____switch6 == GameStates.PERKS
-        if ____cond6 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.PERKS
+        if ____cond7 then
             self:switchToPerkScreen()
             break
         end
@@ -188,16 +193,14 @@ function GameManager.prototype.switchToBoard(self, enemy)
             if ____opt_11 ~= nil then
                 ____opt_11:drawBoard()
             end
-            local ____opt_13 = self.testTextbox
-            if ____opt_13 ~= nil then
-                ____opt_13:update(dt)
-            end
         end,
         draw = function()
-            push:start()
-            self.assetManager:drawAssets()
-            love.graphics.print("Hello world!", 100, 200)
-            push:finish()
+            if not self.devMode then
+                push:start()
+                self.assetManager:drawAssets()
+                love.graphics.print("Hello world!", 100, 200)
+                push:finish()
+            end
         end,
         mousepressed = function(____, x, y, button)
             self.assetManager:handleMousePressed(x, y, button)
@@ -226,9 +229,9 @@ function GameManager.prototype.switchToBoard(self, enemy)
 end
 function GameManager.prototype.switchToWinScreen(self)
     local winState = {update = function(____, dt)
-        local ____opt_15 = self.winScreen
-        if ____opt_15 ~= nil then
-            ____opt_15:drawScreen()
+        local ____opt_13 = self.winScreen
+        if ____opt_13 ~= nil then
+            ____opt_13:drawScreen()
         end
     end}
     self.gameState = GameStates.WIN_SCREEN
@@ -244,9 +247,9 @@ function GameManager.prototype.switchToWinScreen(self)
 end
 function GameManager.prototype.switchToLoseScreen(self)
     local loseState = {update = function(____, dt)
-        local ____opt_17 = self.loseScreen
-        if ____opt_17 ~= nil then
-            ____opt_17:drawScreen()
+        local ____opt_15 = self.loseScreen
+        if ____opt_15 ~= nil then
+            ____opt_15:drawScreen()
         end
     end}
     self.gameState = GameStates.LOSE_SCREEN
@@ -281,9 +284,9 @@ function GameManager.prototype.switchToMap(self)
 end
 function GameManager.prototype.switchToShop(self)
     local shopState = {update = function(____, dt)
-        local ____opt_19 = self.shop
-        if ____opt_19 ~= nil then
-            ____opt_19:drawShop()
+        local ____opt_17 = self.shop
+        if ____opt_17 ~= nil then
+            ____opt_17:drawShop()
         end
     end}
     self.gameState = GameStates.SHOP
@@ -300,9 +303,9 @@ function GameManager.prototype.switchToShop(self)
 end
 function GameManager.prototype.switchToLevelUpScreen(self)
     local levelUpState = {update = function(____, dt)
-        local ____opt_21 = self.levelUpScreen
-        if ____opt_21 ~= nil then
-            ____opt_21:drawScreen()
+        local ____opt_19 = self.levelUpScreen
+        if ____opt_19 ~= nil then
+            ____opt_19:drawScreen()
         end
     end}
     self.gameState = GameStates.LEVEL_UP
@@ -319,9 +322,9 @@ function GameManager.prototype.switchToLevelUpScreen(self)
 end
 function GameManager.prototype.switchToPerkScreen(self)
     local perkState = {update = function(____, dt)
-        local ____opt_23 = self.perkScreen
-        if ____opt_23 ~= nil then
-            ____opt_23:drawScreen()
+        local ____opt_21 = self.perkScreen
+        if ____opt_21 ~= nil then
+            ____opt_21:drawScreen()
         end
     end}
     if isEmpty(self.perkScreen) then

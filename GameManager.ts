@@ -43,7 +43,7 @@ export default class GameManager {
     levelUpScreen?: LevelUpScreen
     perkScreen?: PerkScreen
     assetManager: AssetManager
-    testTextbox?: any
+    devMode: boolean = true // Change if you want to test in dev mode
 
     constructor() {
         this.gameState = GameStates.MAIN_MENU
@@ -60,6 +60,10 @@ export default class GameManager {
         this.levelUpScreen = undefined
         this.perkScreen = undefined
         this.assetManager = new AssetManager()
+        if (!this.devMode) {
+            const mainFont = love.graphics.newFont("Assets/Fonts/Gothic Pixels.ttf", 24)
+            love.graphics.setFont(mainFont)
+        }
     }
 
     getCharacter(characterType: string): Character | undefined {
@@ -181,13 +185,14 @@ export default class GameManager {
         const boardState: GameState = {
             update: (dt: number) => {
                 this.board?.drawBoard()
-                this.testTextbox?.update(dt)
             },
             draw: () => {
-                push.start()
-                this.assetManager.drawAssets()
-                love.graphics.print("Hello world!", 100, 200)
-                push.finish()
+                if (!this.devMode) {
+                    push.start()
+                    this.assetManager.drawAssets()
+                    love.graphics.print("Hello world!", 100, 200)
+                    push.finish()
+                }
             },
             mousepressed: (x: number, y: number, button: number) => {
                 this.assetManager.handleMousePressed(x, y, button)
