@@ -59,7 +59,7 @@ function GameManager.prototype.____constructor(self)
     self.perkScreen = nil
     self.assetManager = __TS__New(AssetManager)
     if not self.devMode then
-        local mainFont = love.graphics.newFont("Assets/Fonts/Gothic Pixels.ttf", 24)
+        local mainFont = love.graphics.newFont("Assets/Fonts/Gothic Pixels.ttf")
         love.graphics.setFont(mainFont)
     end
 end
@@ -198,7 +198,6 @@ function GameManager.prototype.switchToBoard(self, enemy)
             if not self.devMode then
                 push:start()
                 self.assetManager:drawAssets()
-                love.graphics.print("Hello world!", 100, 200)
                 push:finish()
             end
         end,

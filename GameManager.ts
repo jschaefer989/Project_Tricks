@@ -61,7 +61,7 @@ export default class GameManager {
         this.perkScreen = undefined
         this.assetManager = new AssetManager()
         if (!this.devMode) {
-            const mainFont = love.graphics.newFont("Assets/Fonts/Gothic Pixels.ttf", 24)
+            const mainFont = love.graphics.newFont("Assets/Fonts/Gothic Pixels.ttf")
             love.graphics.setFont(mainFont)
         }
     }
@@ -189,8 +189,7 @@ export default class GameManager {
             draw: () => {
                 if (!this.devMode) {
                     push.start()
-                    this.assetManager.drawAssets()
-                    love.graphics.print("Hello world!", 100, 200)
+                    this.assetManager.drawAssets()                    
                     push.finish()
                 }
             },

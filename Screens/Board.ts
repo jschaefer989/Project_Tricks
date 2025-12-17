@@ -466,6 +466,6 @@ export default class Board {
         const buttonHeight = this.buttonAssets.letsFightButton.getHeight()
         const buttonWidth = this.buttonAssets.letsFightButton.getWidth()
         const screenW = push.getWidth()
-        this.buttonAssets.addAsset(Math.floor((screenW - buttonWidth) / 2), cardY - buttonHeight - padding, this.handleStartFight)
+        this.buttonAssets.addAsset(Math.floor((screenW - buttonWidth) / 2), cardY - buttonHeight - padding, () => this.handleStartFight())
     }
 }

@@ -20,7 +20,7 @@ function Card.prototype.____constructor(self, gameManager, suit, rank, power, va
     self.isSelected = false
     self.isTrump = isTrump
     self.name = name
-    self.id = (self.suit .. "-") .. self.rank
+    self.id = (((self.suit .. "-") .. self.rank) .. "-") .. tostring(love.math.random(1000))
 end
 function Card.prototype.isEqual(self, otherCard)
     return self.id == otherCard.id

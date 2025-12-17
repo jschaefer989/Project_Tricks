@@ -14,7 +14,7 @@ if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
 $include = @('*.lua', 'Libraries')
 
 # Collect only .lua files and Libraries folder
-$luaFiles = Get-ChildItem -Path $PSScriptRoot -Filter "*.lua" -File | Where-Object { $_.Name -ne 'lualib_bundle.lua' }
+$luaFiles = Get-ChildItem -Path $PSScriptRoot -Filter "*.lua" -File
 $libFolder = Get-Item -Path "$PSScriptRoot\Libraries" -ErrorAction SilentlyContinue
 
 $paths = @($luaFiles | ForEach-Object { $_.FullName })

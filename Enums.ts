@@ -72,9 +72,7 @@ export enum Perks {
 
 export enum AssetIds {
     BASE_CARD_TEMPLATE = "BASE_CARD_TEMPLATE",
-    HEART_SUIT = "HEART_SUIT",
-    BELL_SUIT = "BELL_SUIT",
-    ACORN_SUIT = "ACORN_SUIT",
-    LEAF_SUIT = "LEAF_SUIT",
+    SUIT = "SUIT",
     LETS_FIGHT_BUTTON = "LETS_FIGHT_BUTTON",
+    RANK = "RANK"
 }

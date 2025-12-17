@@ -1,5 +1,5 @@
 import Card from "../Cards/Card";
-import { Suits } from "Enums";
+import { Suits, Ranks, TrumpRanks } from "Enums";
 import GameManager from "GameManager";
 interface CardOptions {
     multiSelect?: boolean;
@@ -19,8 +19,11 @@ export default class CardAssets {
     constructor(gameManager: GameManager);
     addAsset(card: Card, cardX: number, cardY: number, options?: CardOptions): void;
     addSuitAsset(card: Card, x: number, y: number, width: number, height: number): void;
+    addRankAsset(card: Card, x: number, y: number, width: number, height: number): void;
     getSuitAssetPath(suit: Suits): string;
-    getSuitAssetId(suit: Suits, card: Card, orientation: number): string;
+    getSuitAssetId(card: Card, orientation: number): string;
+    getRankAssetPath(rank: Ranks | TrumpRanks): string;
+    getRankAssetId(card: Card, orientation: number): string;
     hideCardAssets(card: Card): void;
     centerCards(): void;
     updateCardPosition(card: Card, x: number, y: number): void;

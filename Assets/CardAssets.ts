@@ -1,6 +1,6 @@
 import Card from "../Cards/Card"
 import Asset from "./Asset"
-import { Suits, AssetIds } from "Enums"
+import { Suits, AssetIds, Ranks, TrumpRanks } from "Enums"
 import { exhaustiveGuard } from "Helpers"
 import GameManager from "GameManager"
 import * as push from "Libraries.push"
@@ -32,14 +32,56 @@ export default class CardAssets {
         const assetId = `${AssetIds.BASE_CARD_TEMPLATE}-${card.id}`
         this.gameManager.assetManager.addAsset(assetId, new Asset(this.baseCard, cardX, cardY, card.onClick, this.baseW, this.baseH))
         this.addSuitAsset(card, cardX, cardY, this.baseW, this.baseH)
+        this.addRankAsset(card, cardX, cardY, this.baseW, this.baseH)
     }
 
     addSuitAsset(card: Card, x: number, y: number, width: number, height: number): void {
         const suitImagePath = this.getSuitAssetPath(card.suit)
-        this.gameManager.assetManager.addAsset(this.getSuitAssetId(card.suit, card, 0), new Asset(love.graphics.newImage(suitImagePath), x + 10, y + 10, card.onClick, width, height))
+        this.gameManager.assetManager.addAsset(
+            this.getSuitAssetId(card, 0), 
+            new Asset(
+                love.graphics.newImage(suitImagePath), 
+                x + 10, 
+                y + 10, 
+                card.onClick, 
+                width, 
+                height
+            )
+        )
         const flippedX = x + width - 10
         const flippedY = y + height - 10
-        this.gameManager.assetManager.addAsset(this.getSuitAssetId(card.suit, card, 1), new Asset(love.graphics.newImage(suitImagePath), flippedX, flippedY, card.onClick, width, height, 0, -1, -1))
+        this.gameManager.assetManager.addAsset(
+            this.getSuitAssetId(card, 1),
+            new Asset(
+                love.graphics.newImage(suitImagePath),
+                flippedX, 
+                flippedY, 
+                card.onClick, 
+                width, 
+                height, 
+                0, 
+                -1, 
+                -1
+            )
+        )
+    }
+
+    addRankAsset(card: Card, x: number, y: number, width: number, height: number): void {
+        const rankImagePath = this.getRankAssetPath(card.rank)
+        const rankImage = love.graphics.newImage(rankImagePath)
+        const rankW = rankImage.getWidth()
+        const rankH = rankImage.getHeight()        
+        this.gameManager.assetManager.addAsset(
+            this.getRankAssetId(card, 0), 
+            new Asset(
+                rankImage, 
+                x + (this.baseW / 2) - (rankW / 2),
+                y + (this.baseH / 2) - (rankH / 2), 
+                card.onClick, 
+                width, 
+                height
+            )
+        )
     }
 
     getSuitAssetPath(suit: Suits): string {
@@ -57,25 +99,59 @@ export default class CardAssets {
         }
     }
 
-    getSuitAssetId(suit: Suits, card: Card, orientation: number): string {
-        switch (suit) {
-            case Suits.HEARTS:
-                return  `${AssetIds.HEART_SUIT}-${card.id}-${orientation}`
-            case Suits.BELLS:
-                return  `${AssetIds.BELL_SUIT}-${card.id}-${orientation}`
-            case Suits.ACORNS:
-                return  `${AssetIds.ACORN_SUIT}-${card.id}-${orientation}`
-            case Suits.LEAVES:
-                return  `${AssetIds.LEAF_SUIT}-${card.id}-${orientation}`
-            default: 
-                exhaustiveGuard(suit)
-        }
+    getSuitAssetId(card: Card, orientation: number): string {
+        return  `${AssetIds.SUIT}-${card.id}-${orientation}`
     }    
+
+    getRankAssetPath(rank: Ranks | TrumpRanks): string {
+        switch (rank) {
+            case Ranks.BANNER:
+                return "Assets/Images/BannerRank.png"
+            case Ranks.BARON:
+                return "Assets/Images/BaronRank.png"
+            case Ranks.DEUCE:
+                return "Assets/Images/DeuceRank.png"
+            case Ranks.JESTER:
+                return "Assets/Images/JesterRank.png"
+            case Ranks.KING:
+                return "Assets/Images/KingRank.png"
+            case Ranks.OVERLORD:
+                return "Assets/Images/OverlordRank.png"
+            case Ranks.PRIEST:
+                return "Assets/Images/PriestRank.png"
+            case Ranks.SERGEANT:
+                return "Assets/Images/SergeantRank.png"
+            case Ranks.SOLDIER:
+                return "Assets/Images/SoldierRank.png"
+            case Ranks.THIEF:
+                return "Assets/Images/ThiefRank.png"
+            case TrumpRanks.BARD:
+                return "Assets/Images/BardRank.png"
+            case TrumpRanks.CHOSEN:
+                return "Assets/Images/ChosenRank.png"
+            case TrumpRanks.DEVIL:
+                return "Assets/Images/DevilRank.png"
+            case TrumpRanks.DUKE:
+                return "Assets/Images/DukeRank.png"
+            case TrumpRanks.EMPEROR:
+                return "Assets/Images/EmperorRank.png"
+            case TrumpRanks.POPE:
+                return "Assets/Images/PopeRank.png"
+            case TrumpRanks.KNIGHT:
+                return "Assets/Images/KnightRank.png"
+            default:
+                exhaustiveGuard(rank)      
+        }  
+    }
+
+    getRankAssetId(card: Card, orientation: number): string {
+        return `${AssetIds.RANK}-${card.id}-${orientation}`
+    }
 
     hideCardAssets(card: Card): void {
         this.gameManager.assetManager.assets.delete(`${AssetIds.BASE_CARD_TEMPLATE}-${card.id}`)
-        this.gameManager.assetManager.assets.delete(this.getSuitAssetId(card.suit, card, 0))
-        this.gameManager.assetManager.assets.delete(this.getSuitAssetId(card.suit, card, 1))
+        this.gameManager.assetManager.assets.delete(this.getSuitAssetId(card, 0))
+        this.gameManager.assetManager.assets.delete(this.getSuitAssetId(card, 1))
     }
 
     centerCards(): void {
@@ -90,15 +166,15 @@ export default class CardAssets {
             const card = playerHand[i]
             const x = startX + i * (this.baseW + padding)
 
-            this.addAsset(card, x, cardY)
+            this.updateCardPosition(card, x, cardY)
         }
     }
 
     updateCardPosition(card: Card, x: number, y: number): void {
         const assetManager = this.gameManager.assetManager
         assetManager.getAsset(`${AssetIds.BASE_CARD_TEMPLATE}-${card.id}`)?.updatePosition(x, y)
-        assetManager.getAsset(this.getSuitAssetId(card.suit, card, 0))?.updatePosition(x + 10, y + 10)
-        assetManager.getAsset(this.getSuitAssetId(card.suit, card, 1))?.updatePosition(x + this.baseW - 10, y + this.baseH - 10)
+        assetManager.getAsset(this.getSuitAssetId(card, 0))?.updatePosition(x + 10, y + 10)
+        assetManager.getAsset(this.getSuitAssetId(card, 1))?.updatePosition(x + this.baseW - 10, y + this.baseH - 10)
 
     }
 

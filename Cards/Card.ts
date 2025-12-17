@@ -38,7 +38,7 @@ export default class Card {
         this.isSelected = false
         this.isTrump = isTrump
         this.name = name
-        this.id = `${this.suit}-${this.rank}`
+        this.id = `${this.suit}-${this.rank}-${love.math.random(1000)}`
     }
 
     isEqual(otherCard: Card): boolean {

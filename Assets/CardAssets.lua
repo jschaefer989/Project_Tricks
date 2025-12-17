@@ -7,6 +7,8 @@ local Asset = ____Asset.default
 local ____Enums = require("Enums")
 local Suits = ____Enums.Suits
 local AssetIds = ____Enums.AssetIds
+local Ranks = ____Enums.Ranks
+local TrumpRanks = ____Enums.TrumpRanks
 local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local push = require("Libraries.push")
@@ -41,11 +43,18 @@ function CardAssets.prototype.addAsset(self, card, cardX, cardY, options)
         self.baseW,
         self.baseH
     )
+    self:addRankAsset(
+        card,
+        cardX,
+        cardY,
+        self.baseW,
+        self.baseH
+    )
 end
 function CardAssets.prototype.addSuitAsset(self, card, x, y, width, height)
     local suitImagePath = self:getSuitAssetPath(card.suit)
     self.gameManager.assetManager:addAsset(
-        self:getSuitAssetId(card.suit, card, 0),
+        self:getSuitAssetId(card, 0),
         __TS__New(
             Asset,
             love.graphics.newImage(suitImagePath),
@@ -59,7 +68,7 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, width, height)
     local flippedX = x + width - 10
     local flippedY = y + height - 10
     self.gameManager.assetManager:addAsset(
-        self:getSuitAssetId(card.suit, card, 1),
+        self:getSuitAssetId(card, 1),
         __TS__New(
             Asset,
             love.graphics.newImage(suitImagePath),
@@ -74,23 +83,41 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, width, height)
         )
     )
 end
+function CardAssets.prototype.addRankAsset(self, card, x, y, width, height)
+    local rankImagePath = self:getRankAssetPath(card.rank)
+    local rankImage = love.graphics.newImage(rankImagePath)
+    local rankW = rankImage:getWidth()
+    local rankH = rankImage:getHeight()
+    self.gameManager.assetManager:addAsset(
+        self:getRankAssetId(card, 0),
+        __TS__New(
+            Asset,
+            rankImage,
+            x + self.baseW / 2 - rankW / 2,
+            y + self.baseH / 2 - rankH / 2,
+            card.onClick,
+            width,
+            height
+        )
+    )
+end
 function CardAssets.prototype.getSuitAssetPath(self, suit)
     repeat
-        local ____switch6 = suit
-        local ____cond6 = ____switch6 == Suits.HEARTS
-        if ____cond6 then
+        local ____switch7 = suit
+        local ____cond7 = ____switch7 == Suits.HEARTS
+        if ____cond7 then
             return "Assets/Images/HeartSuit.png"
         end
-        ____cond6 = ____cond6 or ____switch6 == Suits.BELLS
-        if ____cond6 then
+        ____cond7 = ____cond7 or ____switch7 == Suits.BELLS
+        if ____cond7 then
             return "Assets/Images/BellSuit.png"
         end
-        ____cond6 = ____cond6 or ____switch6 == Suits.ACORNS
-        if ____cond6 then
+        ____cond7 = ____cond7 or ____switch7 == Suits.ACORNS
+        if ____cond7 then
             return "Assets/Images/AcornSuit.png"
         end
-        ____cond6 = ____cond6 or ____switch6 == Suits.LEAVES
-        if ____cond6 then
+        ____cond7 = ____cond7 or ____switch7 == Suits.LEAVES
+        if ____cond7 then
             return "Assets/Images/LeafSuit.png"
         end
         do
@@ -98,34 +125,92 @@ function CardAssets.prototype.getSuitAssetPath(self, suit)
         end
     until true
 end
-function CardAssets.prototype.getSuitAssetId(self, suit, card, orientation)
+function CardAssets.prototype.getSuitAssetId(self, card, orientation)
+    return (((AssetIds.SUIT .. "-") .. card.id) .. "-") .. tostring(orientation)
+end
+function CardAssets.prototype.getRankAssetPath(self, rank)
     repeat
-        local ____switch8 = suit
-        local ____cond8 = ____switch8 == Suits.HEARTS
-        if ____cond8 then
-            return (((AssetIds.HEART_SUIT .. "-") .. card.id) .. "-") .. tostring(orientation)
+        local ____switch10 = rank
+        local ____cond10 = ____switch10 == Ranks.BANNER
+        if ____cond10 then
+            return "Assets/Images/BannerRank.png"
         end
-        ____cond8 = ____cond8 or ____switch8 == Suits.BELLS
-        if ____cond8 then
-            return (((AssetIds.BELL_SUIT .. "-") .. card.id) .. "-") .. tostring(orientation)
+        ____cond10 = ____cond10 or ____switch10 == Ranks.BARON
+        if ____cond10 then
+            return "Assets/Images/BaronRank.png"
         end
-        ____cond8 = ____cond8 or ____switch8 == Suits.ACORNS
-        if ____cond8 then
-            return (((AssetIds.ACORN_SUIT .. "-") .. card.id) .. "-") .. tostring(orientation)
+        ____cond10 = ____cond10 or ____switch10 == Ranks.DEUCE
+        if ____cond10 then
+            return "Assets/Images/DeuceRank.png"
         end
-        ____cond8 = ____cond8 or ____switch8 == Suits.LEAVES
-        if ____cond8 then
-            return (((AssetIds.LEAF_SUIT .. "-") .. card.id) .. "-") .. tostring(orientation)
+        ____cond10 = ____cond10 or ____switch10 == Ranks.JESTER
+        if ____cond10 then
+            return "Assets/Images/JesterRank.png"
+        end
+        ____cond10 = ____cond10 or ____switch10 == Ranks.KING
+        if ____cond10 then
+            return "Assets/Images/KingRank.png"
+        end
+        ____cond10 = ____cond10 or ____switch10 == Ranks.OVERLORD
+        if ____cond10 then
+            return "Assets/Images/OverlordRank.png"
+        end
+        ____cond10 = ____cond10 or ____switch10 == Ranks.PRIEST
+        if ____cond10 then
+            return "Assets/Images/PriestRank.png"
+        end
+        ____cond10 = ____cond10 or ____switch10 == Ranks.SERGEANT
+        if ____cond10 then
+            return "Assets/Images/SergeantRank.png"
+        end
+        ____cond10 = ____cond10 or ____switch10 == Ranks.SOLDIER
+        if ____cond10 then
+            return "Assets/Images/SoldierRank.png"
+        end
+        ____cond10 = ____cond10 or ____switch10 == Ranks.THIEF
+        if ____cond10 then
+            return "Assets/Images/ThiefRank.png"
+        end
+        ____cond10 = ____cond10 or ____switch10 == TrumpRanks.BARD
+        if ____cond10 then
+            return "Assets/Images/BardRank.png"
+        end
+        ____cond10 = ____cond10 or ____switch10 == TrumpRanks.CHOSEN
+        if ____cond10 then
+            return "Assets/Images/ChosenRank.png"
+        end
+        ____cond10 = ____cond10 or ____switch10 == TrumpRanks.DEVIL
+        if ____cond10 then
+            return "Assets/Images/DevilRank.png"
+        end
+        ____cond10 = ____cond10 or ____switch10 == TrumpRanks.DUKE
+        if ____cond10 then
+            return "Assets/Images/DukeRank.png"
+        end
+        ____cond10 = ____cond10 or ____switch10 == TrumpRanks.EMPEROR
+        if ____cond10 then
+            return "Assets/Images/EmperorRank.png"
+        end
+        ____cond10 = ____cond10 or ____switch10 == TrumpRanks.POPE
+        if ____cond10 then
+            return "Assets/Images/PopeRank.png"
+        end
+        ____cond10 = ____cond10 or ____switch10 == TrumpRanks.KNIGHT
+        if ____cond10 then
+            return "Assets/Images/KnightRank.png"
         end
         do
-            exhaustiveGuard(suit)
+            exhaustiveGuard(rank)
         end
     until true
 end
+function CardAssets.prototype.getRankAssetId(self, card, orientation)
+    return (((AssetIds.RANK .. "-") .. card.id) .. "-") .. tostring(orientation)
+end
 function CardAssets.prototype.hideCardAssets(self, card)
     self.gameManager.assetManager.assets:delete((AssetIds.BASE_CARD_TEMPLATE .. "-") .. card.id)
-    self.gameManager.assetManager.assets:delete(self:getSuitAssetId(card.suit, card, 0))
-    self.gameManager.assetManager.assets:delete(self:getSuitAssetId(card.suit, card, 1))
+    self.gameManager.assetManager.assets:delete(self:getSuitAssetId(card, 0))
+    self.gameManager.assetManager.assets:delete(self:getSuitAssetId(card, 1))
 end
 function CardAssets.prototype.centerCards(self)
     local playerHand = self.gameManager.player.hand
@@ -139,7 +224,7 @@ function CardAssets.prototype.centerCards(self)
         while i < #playerHand do
             local card = playerHand[i + 1]
             local x = startX + i * (self.baseW + padding)
-            self:addAsset(card, x, cardY)
+            self:updateCardPosition(card, x, cardY)
             i = i + 1
         end
     end
@@ -150,11 +235,11 @@ function CardAssets.prototype.updateCardPosition(self, card, x, y)
     if ____opt_0 ~= nil then
         ____opt_0:updatePosition(x, y)
     end
-    local ____opt_2 = assetManager:getAsset(self:getSuitAssetId(card.suit, card, 0))
+    local ____opt_2 = assetManager:getAsset(self:getSuitAssetId(card, 0))
     if ____opt_2 ~= nil then
         ____opt_2:updatePosition(x + 10, y + 10)
     end
-    local ____opt_4 = assetManager:getAsset(self:getSuitAssetId(card.suit, card, 1))
+    local ____opt_4 = assetManager:getAsset(self:getSuitAssetId(card, 1))
     if ____opt_4 ~= nil then
         ____opt_4:updatePosition(x + self.baseW - 10, y + self.baseH - 10)
     end

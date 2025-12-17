@@ -516,7 +516,7 @@ function Board.prototype.buildButtonAssets(self)
     self.buttonAssets:addAsset(
         math.floor((screenW - buttonWidth) / 2),
         cardY - buttonHeight - padding,
-        self.handleStartFight
+        function() return self:handleStartFight() end
     )
 end
 return ____exports
