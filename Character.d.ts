@@ -1,4 +1,5 @@
 import Card from "Cards/Card";
+import { CharacterTypes } from "Enums";
 import GameManager from "GameManager";
 export default class Character {
     gameManager: GameManager;
@@ -6,7 +7,8 @@ export default class Character {
     hand: Card[];
     discardPile: Card[];
     numberOfHeldCards: number;
-    constructor(gameManager: GameManager);
+    type: CharacterTypes;
+    constructor(gameManager: GameManager, type: CharacterTypes);
     addToHand(card: Card): void;
     getCardFromHand(position: number): Card | undefined;
     addToDeck(card: Card): void;

@@ -125,7 +125,7 @@ export default class Card extends Hoverable {
         }
 
         const screenW = love.graphics.getWidth()
-        const defaultX = asset.x + asset.width + padding
+        const defaultX = asset.x + asset.getWidth() + padding
         const placeRight = defaultX + tooltipMaxWidth <= screenW - padding
         const tooltipX = placeRight
             ? defaultX

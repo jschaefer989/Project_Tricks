@@ -136,7 +136,7 @@ export default class Dealer {
         const cardsToDeal = character.numberOfHeldCards - character.hand.length
         for (let i = 0; i < cardsToDeal; i++) {
             const card = character.deck.pop()
-            if (card) {
+            if (!isEmpty(card)) {
                 character.addToHand(card)
             }
         }

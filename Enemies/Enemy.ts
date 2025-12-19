@@ -2,7 +2,7 @@
 
 import Card from "Cards/Card"
 import Character from "../Character"
-import { EnemyTypes } from "Enums"
+import { CharacterTypes, EnemyTypes } from "Enums"
 import GameManager from "GameManager"
 
 interface CardData {
@@ -37,7 +37,7 @@ export default class Enemy extends Character {
     name: string
 
     constructor(gameManager: GameManager, level?: number, enemyType?: EnemyTypes, experience?: number, name?: string, numberOfHeldCards?: number, numberOfCardsInDeck?: number) {
-        super(gameManager)
+        super(gameManager, CharacterTypes.ENEMY);
         this.numberOfHeldCards = numberOfHeldCards ?? 3
         this.numberOfCardsInDeck = numberOfCardsInDeck ?? 9
         this.level = level ?? 1

@@ -2,13 +2,12 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local ____Helpers = require("Helpers")
-local isEmpty = ____Helpers.isEmpty
 ____exports.default = __TS__Class()
 local Character = ____exports.default
 Character.name = "Character"
-function Character.prototype.____constructor(self, gameManager)
+function Character.prototype.____constructor(self, gameManager, ____type)
     self.gameManager = gameManager
+    self.type = ____type
     self.deck = {}
     self.hand = {}
     self.discardPile = {}
@@ -17,29 +16,31 @@ end
 function Character.prototype.addToHand(self, card)
     local ____self_hand_0 = self.hand
     ____self_hand_0[#____self_hand_0 + 1] = card
-    local board = self.gameManager.board
-    if not isEmpty(board) then
-        board.cardAssets:appendAsset(card)
-        board.cardAssets:centerCards()
+    local ____opt_1 = self.gameManager.board
+    if ____opt_1 ~= nil then
+        ____opt_1.cardAssets:appendAsset(card, self.type)
     end
 end
 function Character.prototype.getCardFromHand(self, position)
     return self.hand[position + 1]
 end
 function Character.prototype.addToDeck(self, card)
-    local ____self_deck_1 = self.deck
-    ____self_deck_1[#____self_deck_1 + 1] = card
+    local ____self_deck_3 = self.deck
+    ____self_deck_3[#____self_deck_3 + 1] = card
+    local ____opt_4 = self.gameManager.board
+    if ____opt_4 ~= nil then
+        ____opt_4.cardAssets:hideCardAssets(card)
+    end
 end
 function Character.prototype.getCardFromDeck(self, position)
     return self.deck[position + 1]
 end
 function Character.prototype.addToDiscards(self, card)
-    local ____self_discardPile_2 = self.discardPile
-    ____self_discardPile_2[#____self_discardPile_2 + 1] = card
-    local board = self.gameManager.board
-    if not isEmpty(board) then
-        board.cardAssets:hideCardAssets(card)
-        board.cardAssets:centerCards()
+    local ____self_discardPile_6 = self.discardPile
+    ____self_discardPile_6[#____self_discardPile_6 + 1] = card
+    local ____opt_7 = self.gameManager.board
+    if ____opt_7 ~= nil then
+        ____opt_7.cardAssets:hideCardAssets(card)
     end
 end
 function Character.prototype.getCardFromDiscards(self, position)
@@ -94,9 +95,14 @@ function Character.prototype.removeFromDeck(self, card)
     end
 end
 function Character.prototype.putHandBackInDeck(self)
+    local board = self.gameManager.board
     for ____, card in ipairs(self.hand) do
-        self:addToDeck(card)
+        local ____self_deck_9 = self.deck
+        ____self_deck_9[#____self_deck_9 + 1] = card
+        if board ~= nil then
+            board.cardAssets:hideCardAssets(card)
+        end
     end
-    self:removeAllCardsFromHand()
+    self.hand = {}
 end
 return ____exports

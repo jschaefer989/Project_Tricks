@@ -55,16 +55,12 @@ function AssetManager.prototype.drawHoverables(self)
     end
 end
 function AssetManager.prototype.handleMousePressed(self, x, y, button)
-    local gameX = (push:toGame(x, y))
-    local gameY = select(
-        2,
-        push:toGame(x, y)
-    )
+    local gameX, gameY = push:toGame(x, y)
     if isEmpty(gameX) or isEmpty(gameY) then
         return
     end
     for ____, asset in __TS__Iterator(self.assets:values()) do
-        if gameX >= asset.x and gameX <= asset.x + asset.width and gameY >= asset.y and gameY <= asset.y + asset.height then
+        if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
             asset:onClick()
         end
     end
@@ -75,7 +71,7 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
         return
     end
     for ____, asset in __TS__Iterator(self.assets:values()) do
-        if gameX >= asset.x and gameX <= asset.x + asset.width and gameY >= asset.y and gameY <= asset.y + asset.height then
+        if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
             asset:onClick()
         end
     end
@@ -92,11 +88,7 @@ function AssetManager.prototype.handleMouseHover(self)
             if isEmpty(asset.hoverable) then
                 goto __continue26
             end
-            local imgWidth = asset.image:getWidth()
-            local imgHeight = asset.image:getHeight()
-            local scaledWidth = imgWidth * math.abs(asset.scaleX)
-            local scaledHeight = imgHeight * math.abs(asset.scaleY)
-            if gameX >= asset.x and gameX <= asset.x + scaledWidth and gameY >= asset.y and gameY <= asset.y + scaledHeight then
+            if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
                 hoveredHoverables:add(asset.hoverable.id)
             end
         end

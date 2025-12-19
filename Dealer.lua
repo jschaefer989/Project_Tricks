@@ -192,7 +192,7 @@ function Dealer.prototype.dealCards(self, characterType)
         local i = 0
         while i < cardsToDeal do
             local card = table.remove(character.deck)
-            if card then
+            if not isEmpty(card) then
                 character:addToHand(card)
             end
             i = i + 1

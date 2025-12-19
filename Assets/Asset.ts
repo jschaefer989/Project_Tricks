@@ -11,8 +11,6 @@ export default class Asset {
     y: number
     onClick: () => void
     onHover?: AssetCallback
-    width: number
-    height: number
     orientation: number
     scaleX: number
     scaleY: number
@@ -28,8 +26,6 @@ export default class Asset {
         this.y = y
         this.onClick = onClick ?? (() => {})
         this.onHover = onHover
-        this.width = width ?? 0
-        this.height = height ?? 0
         this.orientation = orientation ?? 0
         this.scaleX = scaleX ?? 1
         this.scaleY = scaleY ?? 1
@@ -40,14 +36,6 @@ export default class Asset {
     updatePosition(x: number, y: number): void {
         this.x = x
         this.y = y
-    }
-
-    updateWidth(width: number): void {
-        this.width = width
-    }
-
-    updateHeight(height: number): void {
-        this.height = height
     }
 
     updateOrientation(orientation: number): void {
@@ -70,5 +58,15 @@ export default class Asset {
     
     setHoverable(hoverable: Hoverable): void {
         this.hoverable = hoverable
+    }
+
+    getWidth(): number {
+        const imgWidth = this.image.getWidth()
+        return imgWidth * Math.abs(this.scaleX)        
+    }
+
+    getHeight(): number {
+        const imgHeight = this.image.getHeight()
+        return imgHeight * Math.abs(this.scaleY) 
     }
 }

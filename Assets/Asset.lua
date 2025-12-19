@@ -13,8 +13,6 @@ function Asset.prototype.____constructor(self, id, image, x, y, onClick, onHover
     self.onClick = onClick or (function()
     end)
     self.onHover = onHover
-    self.width = width or 0
-    self.height = height or 0
     self.orientation = orientation or 0
     self.scaleX = scaleX or 1
     self.scaleY = scaleY or 1
@@ -24,12 +22,6 @@ end
 function Asset.prototype.updatePosition(self, x, y)
     self.x = x
     self.y = y
-end
-function Asset.prototype.updateWidth(self, width)
-    self.width = width
-end
-function Asset.prototype.updateHeight(self, height)
-    self.height = height
 end
 function Asset.prototype.updateOrientation(self, orientation)
     self.orientation = orientation
@@ -47,5 +39,13 @@ function Asset.prototype.setDisabled(self, disabled)
 end
 function Asset.prototype.setHoverable(self, hoverable)
     self.hoverable = hoverable
+end
+function Asset.prototype.getWidth(self)
+    local imgWidth = self.image:getWidth()
+    return imgWidth * math.abs(self.scaleX)
+end
+function Asset.prototype.getHeight(self)
+    local imgHeight = self.image:getHeight()
+    return imgHeight * math.abs(self.scaleY)
 end
 return ____exports

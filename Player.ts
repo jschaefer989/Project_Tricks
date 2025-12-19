@@ -3,7 +3,7 @@
 import Perk, { PerkData } from "Perk"
 import Card from "Cards/Card"
 import Character from "./Character"
-import { Perks } from "Enums"
+import { CharacterTypes, Perks } from "Enums"
 import Dealer from "Dealer"
 import GameManager from "GameManager"
 
@@ -42,7 +42,7 @@ export default class Player extends Character {
     perks: Perk[]
 
     constructor(gameManager: GameManager) {
-        super(gameManager)
+        super(gameManager, CharacterTypes.PLAYER);
         this.name = "Player"
         this.money = 0
         this.experience = 0

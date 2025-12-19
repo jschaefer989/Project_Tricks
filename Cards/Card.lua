@@ -110,7 +110,7 @@ function Card.onHover(self, gameManager, asset)
         return
     end
     local screenW = love.graphics.getWidth()
-    local defaultX = asset.x + asset.width + padding
+    local defaultX = asset.x + asset:getWidth() + padding
     local placeRight = defaultX + tooltipMaxWidth <= screenW - padding
     local tooltipX = placeRight and defaultX or math.max(padding, asset.x - padding - tooltipMaxWidth)
     local tooltipY = asset.y

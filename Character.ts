@@ -1,6 +1,6 @@
 import Card from "Cards/Card"
+import { CharacterTypes } from "Enums"
 import GameManager from "GameManager"
-import { isEmpty } from "Helpers"
 
 export default class Character {
     gameManager: GameManager
@@ -8,9 +8,11 @@ export default class Character {
     hand: Card[]
     discardPile: Card[]
     numberOfHeldCards: number
+    type: CharacterTypes
 
-    constructor(gameManager: GameManager) {
+    constructor(gameManager: GameManager, type: CharacterTypes) {
         this.gameManager = gameManager
+        this.type = type
         this.deck = []
         this.hand = []
         this.discardPile = []
@@ -19,11 +21,7 @@ export default class Character {
 
     addToHand(card: Card): void {
         this.hand.push(card)
-        const board = this.gameManager.board
-        if (!isEmpty(board)) {
-            board.cardAssets.appendAsset(card)
-            board.cardAssets.centerCards()
-        }
+        this.gameManager.board?.cardAssets.appendAsset(card, this.type)        
     }
 
     getCardFromHand(position: number): Card | undefined {
@@ -32,6 +30,7 @@ export default class Character {
 
     addToDeck(card: Card): void {
         this.deck.push(card)
+        this.gameManager.board?.cardAssets.hideCardAssets(card)
     }
 
     getCardFromDeck(position: number): Card | undefined {
@@ -39,12 +38,8 @@ export default class Character {
     }
 
     addToDiscards(card: Card): void {
-        this.discardPile.push(card)
-        const board = this.gameManager.board
-        if (!isEmpty(board)) {
-            board.cardAssets.hideCardAssets(card)
-            board.cardAssets.centerCards()
-        }
+        this.discardPile.push(card)        
+        this.gameManager.board?.cardAssets.hideCardAssets(card)
     }
 
     getCardFromDiscards(position: number): Card | undefined {
@@ -98,9 +93,14 @@ export default class Character {
     }
 
     putHandBackInDeck(): void {
+        const board = this.gameManager.board
+        
+        // Hide all card assets first without centering
         for (const card of this.hand) {
-            this.addToDeck(card)
+            this.deck.push(card)
+            board?.cardAssets.hideCardAssets(card)
         }
-        this.removeAllCardsFromHand()
+        
+        this.hand = []
     }
 }

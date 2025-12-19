@@ -46,16 +46,15 @@ export default class AssetManager {
     }
 
     handleMousePressed(x: number, y: number, button: number): void {
-        const gameX = push.toGame(x, y)[0]
-        const gameY = push.toGame(x, y)[1]
+        const [gameX, gameY] = push.toGame(x, y)
 
         if (isEmpty(gameX) || isEmpty(gameY)) {
             return
         }
 
         for (const asset of this.assets.values()) {
-            if (gameX >= asset.x && gameX <= asset.x + asset.width &&
-                gameY >= asset.y && gameY <= asset.y + asset.height) {
+            if (gameX >= asset.x && gameX <= asset.x + asset.getWidth() &&
+                gameY >= asset.y && gameY <= asset.y + asset.getHeight()) {
                 asset.onClick()
             }
         }
@@ -69,8 +68,8 @@ export default class AssetManager {
         }
 
         for (const asset of this.assets.values()) {
-            if (gameX >= asset.x && gameX <= asset.x + asset.width &&
-                gameY >= asset.y && gameY <= asset.y + asset.height) {
+            if (gameX >= asset.x && gameX <= asset.x + asset.getWidth() &&
+                gameY >= asset.y && gameY <= asset.y + asset.getHeight()) {
                 asset.onClick()
             }
         }
@@ -92,14 +91,8 @@ export default class AssetManager {
                 continue;
             }
             
-            // Use actual image dimensions for collision detection
-            const imgWidth = asset.image.getWidth()
-            const imgHeight = asset.image.getHeight()
-            const scaledWidth = imgWidth * Math.abs(asset.scaleX)
-            const scaledHeight = imgHeight * Math.abs(asset.scaleY)
-            
-            if (gameX >= asset.x && gameX <= asset.x + scaledWidth &&
-                gameY >= asset.y && gameY <= asset.y + scaledHeight) {
+            if (gameX >= asset.x && gameX <= asset.x + asset.getWidth() &&
+                gameY >= asset.y && gameY <= asset.y + asset.getHeight()) {
                 hoveredHoverables.add(asset.hoverable.id)
             }
         }

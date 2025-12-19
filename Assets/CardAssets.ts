@@ -1,10 +1,13 @@
 import Card from "../Cards/Card";
 import Asset from "./Asset";
-import { Suits, AssetIds, Ranks, TrumpRanks } from "Enums";
-import { exhaustiveGuard } from "Helpers";
+import { Suits, AssetIds, Ranks, TrumpRanks, CharacterTypes } from "Enums";
+import { exhaustiveGuard, isEmpty } from "Helpers";
 import GameManager from "GameManager";
 import * as push from "Libraries.push";
 import Hoverable from "Hoverable"
+import Point from "Point";
+import { Image } from "love.graphics";
+import Character from "Character";
 const padding = 20;
 
 interface CardOptions {
@@ -35,7 +38,6 @@ export default class CardAssets {
     options?: CardOptions
   ): void {
     const assetId = CardAssets.getCardAssetId(card);
-    const hoverable = new Hoverable(card.id);
     const baseCardAsset = new Asset(
       assetId,
       this.baseCard,
@@ -47,10 +49,10 @@ export default class CardAssets {
       this.baseW,
       this.baseH
     );
-    baseCardAsset.setHoverable(hoverable);
+    baseCardAsset.setHoverable(card);
     this.gameManager.assetManager.addAsset(assetId, baseCardAsset);
-    this.addSuitAsset(card, cardX, cardY, this.baseW, this.baseH, hoverable);
-    this.addRankAsset(card, cardX, cardY, this.baseW, this.baseH, hoverable);
+    this.addSuitAsset(card, cardX, cardY, this.baseW, this.baseH, card);
+    this.addRankAsset(card, cardX, cardY, this.baseW, this.baseH, card);
   }
 
   static getCardAssetId(card: Card): string {
@@ -69,11 +71,12 @@ export default class CardAssets {
     const onHoverCallback = (gameManager: GameManager, asset: Asset) =>
       Card.onHover(gameManager, asset);
     const normalAssetId = CardAssets.getSuitAssetId(card, 0);
+    const normalPosition = this.getNormalSuitPosition(x, y);
     const normalAsset = new Asset(
       normalAssetId,
       love.graphics.newImage(suitImagePath),
-      x + 10,
-      y + 10,
+      normalPosition.x,
+      normalPosition.y,
       card.onClick,
       onHoverCallback,
       width,
@@ -81,14 +84,13 @@ export default class CardAssets {
     );
     this.gameManager.assetManager.addAsset(normalAssetId, normalAsset);
     normalAsset.setHoverable(hoverable);
-    const flippedX = x + width - 10;
-    const flippedY = y + height - 10;
+    const flippedPosition = this.getFlippedSuitPosition(x, y);
     const flippedAssetId = CardAssets.getSuitAssetId(card, 1);
     const flippedAsset = new Asset(
       flippedAssetId,
       love.graphics.newImage(suitImagePath),
-      flippedX,
-      flippedY,
+      flippedPosition.x,
+      flippedPosition.y,
       card.onClick,
       onHoverCallback,
       width,
@@ -101,6 +103,14 @@ export default class CardAssets {
     flippedAsset.setHoverable(hoverable);
   }
 
+  getNormalSuitPosition(x: number, y: number): Point {
+    return { x: x + 10, y: y + 10 };
+  }
+
+  getFlippedSuitPosition(x: number, y: number): Point {
+    return { x: x + this.baseW - 10, y: y + this.baseH - 10 };
+  }
+
   addRankAsset(
     card: Card,
     x: number,
@@ -111,14 +121,13 @@ export default class CardAssets {
   ): void {
     const rankImagePath = CardAssets.getRankAssetPath(card.rank);
     const rankImage = love.graphics.newImage(rankImagePath);
-    const rankW = rankImage.getWidth();
-    const rankH = rankImage.getHeight();
     const assetId = CardAssets.getRankAssetId(card, 0);
+    const rankPosition = this.getRankPosition(x, y, rankImage);
     const asset = new Asset(
       assetId,
       rankImage,
-      x + this.baseW / 2 - rankW / 2,
-      y + this.baseH / 2 - rankH / 2,
+      rankPosition.x,
+      rankPosition.y,
       card.onClick,
       (gameManager: GameManager, asset: Asset) =>
         Card.onHover(gameManager, asset),
@@ -127,6 +136,15 @@ export default class CardAssets {
     );
     this.gameManager.assetManager.addAsset(assetId, asset);
     asset.setHoverable(hoverable);
+  }
+
+  getRankPosition(x: number, y: number, rankImage: Image): Point {
+    const rankW = rankImage.getWidth();
+    const rankH = rankImage.getHeight();
+    return { 
+      x: x + this.baseW / 2 - rankW / 2,
+      y: y + this.baseH / 2 - rankH / 2,
+    }
   }
 
   static getSuitAssetPath(suit: Suits): string {
@@ -194,28 +212,28 @@ export default class CardAssets {
   }
 
   hideCardAssets(card: Card): void {
-    this.gameManager.assetManager.assets.delete(
-      CardAssets.getCardAssetId(card)
-    );
-    this.gameManager.assetManager.assets.delete(
-      CardAssets.getSuitAssetId(card, 0)
-    );
-    this.gameManager.assetManager.assets.delete(
-      CardAssets.getSuitAssetId(card, 1)
-    );
+    const assets = this.gameManager.assetManager.assets;
+
+    assets.delete(CardAssets.getCardAssetId(card));
+    assets.delete(CardAssets.getSuitAssetId(card, 0));
+    assets.delete(CardAssets.getSuitAssetId(card, 1));
+    assets.delete(CardAssets.getRankAssetId(card, 0));
   }
 
-  centerCards(): void {
-    const playerHand = this.gameManager.player.hand;
-    const cardCount = playerHand.length;
+  centerCards(characterType: CharacterTypes): void {
+    const character = this.gameManager.getCharacter(characterType)
+    if (isEmpty(character)) {
+      return;
+    }
+    const cardCount = character.hand.length;
     const screenW = push.getWidth();
     const totalW =
       cardCount * this.baseW + Math.max(0, cardCount - 1) * padding;
     const startX = Math.floor((screenW - totalW) / 2);
-    const cardY = this.getCardPosition();
+    const cardY = this.getCardPosition(characterType);
 
-    for (let i = 0; i < playerHand.length; i++) {
-      const card = playerHand[i];
+    for (let i = 0; i < character.hand.length; i++) {
+      const card = character.hand[i];
       const x = startX + i * (this.baseW + padding);
 
       this.updateCardPosition(card, x, cardY);
@@ -233,24 +251,64 @@ export default class CardAssets {
     assetManager
       .getAsset(CardAssets.getSuitAssetId(card, 1))
       ?.updatePosition(x + this.baseW - 10, y + this.baseH - 10);
+
+    const rankAsset = this.getRankAsset(card)
+    if (isEmpty(rankAsset)) {
+      return;
+    }
+    const rankPosition = this.getRankPosition(x, y, rankAsset.image);
+    assetManager
+      .getAsset(CardAssets.getRankAssetId(card, 0))
+      ?.updatePosition(
+        rankPosition.x,
+        rankPosition.y
+      );
   }
 
-  getCardPosition(): number {
+  getRankAsset(card: Card): Asset | undefined {
+    return this.gameManager.assetManager.getAsset(
+      CardAssets.getRankAssetId(card, 0),
+    );
+  }
+
+  getCardPosition(characterType: CharacterTypes): number {
     const screenH = push.getHeight();
-    return screenH / 2 + this.baseH / 2;
+    return screenH / 2 + this.getHeightModifier(characterType);
   }
 
-  // TODO: this logic is duplicated in the baord, so consolidate
-  appendAsset(card: Card): void {
-    const playerHand = this.gameManager.player.hand;
-    const cardCount = playerHand.length;
+  getHeightModifier(characterType: CharacterTypes): number {
+    switch (characterType) {
+      case CharacterTypes.PLAYER:
+        return this.baseH / 2
+      case CharacterTypes.ENEMY:
+        return -(this.baseH * 1.5)
+      default:
+        exhaustiveGuard(characterType);
+    }
+  }
+
+  determineCardStartingPosition(characterType: CharacterTypes): Point {
+    const character = this.gameManager.getCharacter(characterType)
+    if (isEmpty(character)) {
+      return { x: 0, y: 0 };
+    }
+    const cardCount = character.hand.length;
     const screenW = push.getWidth();
     const totalW =
       cardCount * this.baseW + Math.max(0, cardCount - 1) * padding;
-    const startX = Math.floor((screenW - totalW) / 2);
-    const cardY = this.getCardPosition();
-    const x = startX + (cardCount - 1) * (this.baseW + padding);
+    return { 
+      x: Math.floor((screenW - totalW) / 2),
+      y: this.getCardPosition(characterType),
+    }
+  }
 
-    this.addAsset(card, x, cardY);
+  appendAsset(card: Card, characterType: CharacterTypes): void {
+    const character = this.gameManager.getCharacter(characterType)
+    if (isEmpty(character)) {
+      return;
+    }
+    const cardPosition = this.determineCardStartingPosition(characterType);
+    const x = cardPosition.x + (character.hand.length - 1) * (this.baseW + padding);
+    this.addAsset(card, x, cardPosition.y);
   }
 }

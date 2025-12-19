@@ -423,6 +423,8 @@ function Board.prototype.handleStartFight(self)
     self.showingInitialView = false
     self.buttonAssets:hideButton(AssetIds.LETS_FIGHT_BUTTON)
     self.dealer:startGame()
+    self.cardAssets:centerCards(CharacterTypes.PLAYER)
+    self.cardAssets:centerCards(CharacterTypes.ENEMY)
 end
 function Board.prototype.handleAttack(self)
     if not self.gameManager.player:anySelectedCards() then
@@ -492,24 +494,29 @@ function Board.prototype.buildAssets(self)
     self:buildButtonAssets()
 end
 function Board.prototype.buildCardAssets(self)
-    local playerHand = self.gameManager.player.hand
-    local cardCount = #playerHand
-    local screenW = push:getWidth()
-    local totalW = cardCount * self.cardAssets.baseW + math.max(0, cardCount - 1) * padding
-    local startX = math.floor((screenW - totalW) / 2)
-    local cardY = self.cardAssets:getCardPosition()
+    local playerCardPosition = self.cardAssets:determineCardStartingPosition(CharacterTypes.PLAYER)
     do
         local i = 0
-        while i < #playerHand do
-            local card = playerHand[i + 1]
-            local x = startX + i * (self.cardAssets.baseW + padding)
-            self.cardAssets:addAsset(card, x, cardY)
+        while i < #self.gameManager.player.hand do
+            local card = self.gameManager.player.hand[i + 1]
+            local x = playerCardPosition.x + i * (self.cardAssets.baseW + padding)
+            self.cardAssets:addAsset(card, x, playerCardPosition.y)
+            i = i + 1
+        end
+    end
+    local enemyCardPosition = self.cardAssets:determineCardStartingPosition(CharacterTypes.ENEMY)
+    do
+        local i = 0
+        while i < #self.enemy.hand do
+            local card = self.enemy.hand[i + 1]
+            local x = enemyCardPosition.x + i * (self.cardAssets.baseW + padding)
+            self.cardAssets:addAsset(card, x, enemyCardPosition.y)
             i = i + 1
         end
     end
 end
 function Board.prototype.buildButtonAssets(self)
-    local cardY = self.cardAssets:getCardPosition()
+    local cardY = self.cardAssets:getCardPosition(CharacterTypes.PLAYER)
     local buttonHeight = self.buttonAssets.letsFightButton:getHeight()
     local buttonWidth = self.buttonAssets.letsFightButton:getWidth()
     local screenW = push:getWidth()

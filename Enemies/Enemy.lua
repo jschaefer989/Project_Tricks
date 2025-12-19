@@ -8,13 +8,14 @@ local Card = ____Card.default
 local ____Character = require("Character")
 local Character = ____Character.default
 local ____Enums = require("Enums")
+local CharacterTypes = ____Enums.CharacterTypes
 local EnemyTypes = ____Enums.EnemyTypes
 ____exports.default = __TS__Class()
 local Enemy = ____exports.default
 Enemy.name = "Enemy"
 __TS__ClassExtends(Enemy, Character)
 function Enemy.prototype.____constructor(self, gameManager, level, enemyType, experience, name, numberOfHeldCards, numberOfCardsInDeck)
-    Character.prototype.____constructor(self, gameManager)
+    Character.prototype.____constructor(self, gameManager, CharacterTypes.ENEMY)
     self.numberOfHeldCards = numberOfHeldCards or 3
     self.numberOfCardsInDeck = numberOfCardsInDeck or 9
     self.level = level or 1

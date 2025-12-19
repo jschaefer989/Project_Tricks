@@ -10,6 +10,8 @@ local ____Card = require("Cards.Card")
 local Card = ____Card.default
 local ____Character = require("Character")
 local Character = ____Character.default
+local ____Enums = require("Enums")
+local CharacterTypes = ____Enums.CharacterTypes
 local ____Dealer = require("Dealer")
 local Dealer = ____Dealer.default
 ____exports.default = __TS__Class()
@@ -17,7 +19,7 @@ local Player = ____exports.default
 Player.name = "Player"
 __TS__ClassExtends(Player, Character)
 function Player.prototype.____constructor(self, gameManager)
-    Character.prototype.____constructor(self, gameManager)
+    Character.prototype.____constructor(self, gameManager, CharacterTypes.PLAYER)
     self.name = "Player"
     self.money = 0
     self.experience = 0

@@ -9,8 +9,6 @@ export default class Asset {
     y: number;
     onClick: () => void;
     onHover?: AssetCallback;
-    width: number;
-    height: number;
     orientation: number;
     scaleX: number;
     scaleY: number;
@@ -20,11 +18,11 @@ export default class Asset {
     hoverable?: Hoverable;
     constructor(id: string, image: Image, x: number, y: number, onClick?: () => void, onHover?: AssetCallback, width?: number, height?: number, orientation?: number, scaleX?: number, scaleY?: number, offsetX?: number, offsetY?: number);
     updatePosition(x: number, y: number): void;
-    updateWidth(width: number): void;
-    updateHeight(height: number): void;
     updateOrientation(orientation: number): void;
     updateScale(scaleX: number, scaleY: number): void;
     updateOffset(offsetX: number, offsetY: number): void;
     setDisabled(disabled: boolean): void;
     setHoverable(hoverable: Hoverable): void;
+    getWidth(): number;
+    getHeight(): number;
 }

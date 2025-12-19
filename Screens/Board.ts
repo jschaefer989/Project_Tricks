@@ -374,7 +374,10 @@ export default class Board {
     handleStartFight(): void {
         this.showingInitialView = false
         this.buttonAssets.hideButton(AssetIds.LETS_FIGHT_BUTTON)
+        
         this.dealer.startGame()
+        this.cardAssets.centerCards(CharacterTypes.PLAYER)
+        this.cardAssets.centerCards(CharacterTypes.ENEMY)
     }
 
     handleAttack(): void {
@@ -446,23 +449,24 @@ export default class Board {
     }
 
     private buildCardAssets(): void {
-        const playerHand = this.gameManager.player.hand
-        const cardCount = playerHand.length
-        const screenW = push.getWidth()
-        const totalW = cardCount * this.cardAssets.baseW + Math.max(0, cardCount - 1) * padding
-        const startX = Math.floor((screenW - totalW) / 2)
-        const cardY = this.cardAssets.getCardPosition()
+        const playerCardPosition = this.cardAssets.determineCardStartingPosition(CharacterTypes.PLAYER)
 
-        for (let i = 0; i < playerHand.length; i++) {
-            const card = playerHand[i]
-            const x = startX + i * (this.cardAssets.baseW + padding)
+        for (let i = 0; i < this.gameManager.player.hand.length; i++) {
+            const card = this.gameManager.player.hand[i]
+            const x = playerCardPosition.x + i * (this.cardAssets.baseW + padding)
+            this.cardAssets.addAsset(card, x, playerCardPosition.y)
+        }
 
-            this.cardAssets.addAsset(card, x, cardY)
+        const enemyCardPosition = this.cardAssets.determineCardStartingPosition(CharacterTypes.ENEMY);
+        for (let i = 0; i < this.enemy.hand.length; i++) {
+            const card = this.enemy.hand[i]
+            const x = enemyCardPosition.x + i * (this.cardAssets.baseW + padding)
+            this.cardAssets.addAsset(card, x, enemyCardPosition.y)
         }
     }
 
     private buildButtonAssets(): void {
-        const cardY = this.cardAssets.getCardPosition()
+        const cardY = this.cardAssets.getCardPosition(CharacterTypes.PLAYER)
         const buttonHeight = this.buttonAssets.letsFightButton.getHeight()
         const buttonWidth = this.buttonAssets.letsFightButton.getWidth()
         const screenW = push.getWidth()

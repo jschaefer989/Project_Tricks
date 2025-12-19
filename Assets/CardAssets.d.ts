@@ -1,7 +1,10 @@
 import Card from "../Cards/Card";
-import { Suits, Ranks, TrumpRanks } from "Enums";
+import Asset from "./Asset";
+import { Suits, Ranks, TrumpRanks, CharacterTypes } from "Enums";
 import GameManager from "GameManager";
 import Hoverable from "Hoverable";
+import Point from "Point";
+import { Image } from "love.graphics";
 interface CardOptions {
     multiSelect?: boolean;
     /**
@@ -14,22 +17,28 @@ interface CardOptions {
 }
 export default class CardAssets {
     gameManager: GameManager;
-    baseCard: import("love.graphics").Image;
+    baseCard: Image;
     baseW: number;
     baseH: number;
     constructor(gameManager: GameManager);
     addAsset(card: Card, cardX: number, cardY: number, options?: CardOptions): void;
     static getCardAssetId(card: Card): string;
     addSuitAsset(card: Card, x: number, y: number, width: number, height: number, hoverable: Hoverable): void;
+    getNormalSuitPosition(x: number, y: number): Point;
+    getFlippedSuitPosition(x: number, y: number): Point;
     addRankAsset(card: Card, x: number, y: number, width: number, height: number, hoverable: Hoverable): void;
+    getRankPosition(x: number, y: number, rankImage: Image): Point;
     static getSuitAssetPath(suit: Suits): string;
     static getSuitAssetId(card: Card, orientation: number): string;
     static getRankAssetPath(rank: Ranks | TrumpRanks): string;
     static getRankAssetId(card: Card, orientation: number): string;
     hideCardAssets(card: Card): void;
-    centerCards(): void;
+    centerCards(characterType: CharacterTypes): void;
     updateCardPosition(card: Card, x: number, y: number): void;
-    getCardPosition(): number;
-    appendAsset(card: Card): void;
+    getRankAsset(card: Card): Asset | undefined;
+    getCardPosition(characterType: CharacterTypes): number;
+    getHeightModifier(characterType: CharacterTypes): number;
+    determineCardStartingPosition(characterType: CharacterTypes): Point;
+    appendAsset(card: Card, characterType: CharacterTypes): void;
 }
 export {};
