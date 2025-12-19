@@ -15,16 +15,18 @@ function ButtonAssets.prototype.____constructor(self, gameManager)
     self.baseH = self.letsFightButton:getHeight()
     self.gameManager = gameManager
 end
-function ButtonAssets.prototype.addAsset(self, buttonX, buttonY, onClick)
+function ButtonAssets.prototype.addAsset(self, buttonX, buttonY, onClick, options)
     local assetId = AssetIds.LETS_FIGHT_BUTTON
     self.gameManager.assetManager:addAsset(
         assetId,
         __TS__New(
             Asset,
+            assetId,
             self.letsFightButton,
             buttonX,
             buttonY,
             onClick,
+            options and options.onHover,
             self.baseW,
             self.baseH
         )

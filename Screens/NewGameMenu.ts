@@ -40,6 +40,9 @@ export default class NewGameMenu {
 
         // Back button
         this.renderBackButton(panelX, startBtnY)
+
+        // The random seed
+        this.renderRandomSeed()
     }
 
     renderDisplayTitle(panelX: number): void {
@@ -80,6 +83,12 @@ export default class NewGameMenu {
         if (backResult.hit) {
             this.gameManager.switchToMainMenu()
         }
+    }
+
+    renderRandomSeed(): void {  
+        const seed = love.math.getRandomSeed()
+        suit.layout.reset(20, love.graphics.getHeight() - 40)
+        suit.Label("Random Seed: " + seed[0] + seed[1], { align: "left" }, ...suit.layout.row(300, 30))
     }
 
     handleStartGame(): void { 

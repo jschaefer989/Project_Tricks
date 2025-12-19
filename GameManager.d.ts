@@ -15,6 +15,7 @@ import Shop from "Screens/Shop";
 import LevelUpScreen from "Screens/LevelUpScreen";
 import PerkScreen from "Screens/PerkScreen";
 import AssetManager from "Assets/AssetManager";
+import Card from "Cards/Card";
 export default class GameManager {
     gameState: GameStates;
     player: Player;
@@ -44,4 +45,5 @@ export default class GameManager {
     switchToShop(): void;
     switchToLevelUpScreen(): void;
     switchToPerkScreen(): void;
+    getCard(id: string): Card | undefined;
 }

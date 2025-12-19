@@ -74,5 +74,5 @@ export enum AssetIds {
     BASE_CARD_TEMPLATE = "BASE_CARD_TEMPLATE",
     SUIT = "SUIT",
     LETS_FIGHT_BUTTON = "LETS_FIGHT_BUTTON",
-    RANK = "RANK"
+    RANK = "RANK",
 }

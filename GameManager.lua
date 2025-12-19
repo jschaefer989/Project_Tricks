@@ -57,7 +57,7 @@ function GameManager.prototype.____constructor(self)
     self.shop = nil
     self.levelUpScreen = nil
     self.perkScreen = nil
-    self.assetManager = __TS__New(AssetManager)
+    self.assetManager = __TS__New(AssetManager, self)
     if not self.devMode then
         local mainFont = love.graphics.newFont("Assets/Fonts/Gothic Pixels.ttf")
         love.graphics.setFont(mainFont)
@@ -154,7 +154,7 @@ function GameManager.prototype.switchToMainMenu(self)
     if isEmpty(self.mainMenu) then
         self.mainMenu = __TS__New(MainMenu, self)
     end
-    self.assetManager = __TS__New(AssetManager)
+    self.assetManager = __TS__New(AssetManager, self)
     GameStateManager:setState(mainMenuState)
 end
 function GameManager.prototype.switchToNewGameMenu(self)
@@ -169,7 +169,7 @@ function GameManager.prototype.switchToNewGameMenu(self)
     if isEmpty(self.newGameMenu) then
         self.newGameMenu = __TS__New(NewGameMenu, self)
     end
-    self.assetManager = __TS__New(AssetManager)
+    self.assetManager = __TS__New(AssetManager, self)
     GameStateManager:setState(newGameMenuState)
 end
 function GameManager.prototype.switchToPauseMenu(self)
@@ -183,7 +183,7 @@ function GameManager.prototype.switchToPauseMenu(self)
     if isEmpty(self.pauseMenu) then
         self.pauseMenu = __TS__New(PauseMenu, self)
     end
-    self.assetManager = __TS__New(AssetManager)
+    self.assetManager = __TS__New(AssetManager, self)
     GameStateManager:setState(pauseMenuState)
 end
 function GameManager.prototype.switchToBoard(self, enemy)
@@ -193,6 +193,7 @@ function GameManager.prototype.switchToBoard(self, enemy)
             if ____opt_11 ~= nil then
                 ____opt_11:drawBoard()
             end
+            self.assetManager:handleMouseHover()
         end,
         draw = function()
             if not self.devMode then
@@ -222,7 +223,7 @@ function GameManager.prototype.switchToBoard(self, enemy)
         )
         self.board.dealer:setup()
     end
-    self.assetManager = __TS__New(AssetManager)
+    self.assetManager = __TS__New(AssetManager, self)
     self.board:buildAssets()
     GameStateManager:setState(boardState)
 end
@@ -241,7 +242,7 @@ function GameManager.prototype.switchToWinScreen(self)
     if isEmpty(self.winScreen) then
         self.winScreen = __TS__New(WinScreen, self)
     end
-    self.assetManager = __TS__New(AssetManager)
+    self.assetManager = __TS__New(AssetManager, self)
     GameStateManager:setState(winState)
 end
 function GameManager.prototype.switchToLoseScreen(self)
@@ -260,7 +261,7 @@ function GameManager.prototype.switchToLoseScreen(self)
     if isEmpty(self.loseScreen) then
         self.loseScreen = __TS__New(LoseScreen)
     end
-    self.assetManager = __TS__New(AssetManager)
+    self.assetManager = __TS__New(AssetManager, self)
     GameStateManager:setState(loseState)
 end
 function GameManager.prototype.switchToMap(self)
@@ -278,7 +279,7 @@ function GameManager.prototype.switchToMap(self)
     self.loseScreen = nil
     self.shop = nil
     self.levelUpScreen = nil
-    self.assetManager = __TS__New(AssetManager)
+    self.assetManager = __TS__New(AssetManager, self)
     GameStateManager:setState(mapState)
 end
 function GameManager.prototype.switchToShop(self)
@@ -297,7 +298,7 @@ function GameManager.prototype.switchToShop(self)
         self.shop = __TS__New(Shop, self)
         self.shop:setup()
     end
-    self.assetManager = __TS__New(AssetManager)
+    self.assetManager = __TS__New(AssetManager, self)
     GameStateManager:setState(shopState)
 end
 function GameManager.prototype.switchToLevelUpScreen(self)
@@ -316,7 +317,7 @@ function GameManager.prototype.switchToLevelUpScreen(self)
         self.levelUpScreen = __TS__New(LevelUpScreen, self)
         self.levelUpScreen:setup()
     end
-    self.assetManager = __TS__New(AssetManager)
+    self.assetManager = __TS__New(AssetManager, self)
     GameStateManager:setState(levelUpState)
 end
 function GameManager.prototype.switchToPerkScreen(self)
@@ -329,7 +330,44 @@ function GameManager.prototype.switchToPerkScreen(self)
     if isEmpty(self.perkScreen) then
         self.perkScreen = __TS__New(PerkScreen, self)
     end
-    self.assetManager = __TS__New(AssetManager)
+    self.assetManager = __TS__New(AssetManager, self)
     GameStateManager:setState(perkState)
+end
+function GameManager.prototype.getCard(self, id)
+    for ____, card in ipairs(self.player.hand) do
+        if card.id == id then
+            return card
+        end
+    end
+    for ____, card in ipairs(self.player.deck) do
+        if card.id == id then
+            return card
+        end
+    end
+    for ____, card in ipairs(self.player.discardPile) do
+        if card.id == id then
+            return card
+        end
+    end
+    local ____opt_23 = self.board
+    local enemy = ____opt_23 and ____opt_23.enemy
+    if isEmpty(enemy) then
+        return
+    end
+    for ____, card in ipairs(enemy.hand) do
+        if card.id == id then
+            return card
+        end
+    end
+    for ____, card in ipairs(enemy.deck) do
+        if card.id == id then
+            return card
+        end
+    end
+    for ____, card in ipairs(enemy.discardPile) do
+        if card.id == id then
+            return card
+        end
+    end
 end
 return ____exports

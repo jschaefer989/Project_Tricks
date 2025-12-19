@@ -13,5 +13,6 @@ export default class NewGameMenu {
     renderPlayerNameField(panelX: number, inputY: number): void;
     renderStartButton(panelX: number, inputY: number): number;
     renderBackButton(panelX: number, startBtnY: number): void;
+    renderRandomSeed(): void;
     handleStartGame(): void;
 }

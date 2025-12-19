@@ -4,13 +4,15 @@ local ____exports = {}
 ____exports.default = __TS__Class()
 local Asset = ____exports.default
 Asset.name = "Asset"
-function Asset.prototype.____constructor(self, image, x, y, onClick, width, height, orientation, scaleX, scaleY, offsetX, offsetY)
-    self.disabled = false
+function Asset.prototype.____constructor(self, id, image, x, y, onClick, onHover, width, height, orientation, scaleX, scaleY, offsetX, offsetY)
+    self.isDisabled = false
+    self.id = id
     self.image = image
     self.x = x
     self.y = y
     self.onClick = onClick or (function()
     end)
+    self.onHover = onHover
     self.width = width or 0
     self.height = height or 0
     self.orientation = orientation or 0
@@ -41,6 +43,9 @@ function Asset.prototype.updateOffset(self, offsetX, offsetY)
     self.offsetY = offsetY
 end
 function Asset.prototype.setDisabled(self, disabled)
-    self.disabled = disabled
+    self.isDisabled = disabled
+end
+function Asset.prototype.setHoverable(self, hoverable)
+    self.hoverable = hoverable
 end
 return ____exports

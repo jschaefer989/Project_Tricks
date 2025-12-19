@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 import GameManager from "GameManager";
 import { Ranks, Suits, TrumpRanks } from "../Enums";
+import Asset from "Assets/Asset";
+import Hoverable from "Hoverable";
 interface CardData {
     id: string;
     suit: Suits;
@@ -12,7 +14,7 @@ interface CardData {
     isTrump: boolean;
     name: string;
 }
-export default class Card {
+export default class Card extends Hoverable {
     gameManager: GameManager;
     id: string;
     suit: Suits;
@@ -23,6 +25,7 @@ export default class Card {
     cost: number;
     isTrump: boolean;
     name: string;
+    isHovered: boolean;
     constructor(gameManager: GameManager, suit: Suits, rank: Ranks | TrumpRanks, power: number, value: number, name: string, isTrump?: boolean);
     isEqual(otherCard: Card): boolean;
     getCost(): number;
@@ -32,5 +35,6 @@ export default class Card {
     onClick(): void;
     onSelect(): void;
     onUnselect(): void;
+    static onHover(gameManager: GameManager, asset: Asset): void;
 }
 export {};

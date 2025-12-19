@@ -20,6 +20,7 @@ import LevelUpScreen from "Screens/LevelUpScreen"
 import PerkScreen from "Screens/PerkScreen"
 import * as push from "Libraries.push"
 import AssetManager from "Assets/AssetManager"
+import Card from "Cards/Card"
 
 interface GameState {
     update: (dt: number) => void
@@ -59,7 +60,7 @@ export default class GameManager {
         this.shop = undefined
         this.levelUpScreen = undefined
         this.perkScreen = undefined
-        this.assetManager = new AssetManager()
+        this.assetManager = new AssetManager(this)
         if (!this.devMode) {
             const mainFont = love.graphics.newFont("Assets/Fonts/Gothic Pixels.ttf")
             love.graphics.setFont(mainFont)
@@ -133,7 +134,7 @@ export default class GameManager {
             this.mainMenu = new MainMenu(this)
         }
 
-        this.assetManager = new AssetManager()
+        this.assetManager = new AssetManager(this)
 
         GameStateManager.setState(mainMenuState)
     }
@@ -154,7 +155,7 @@ export default class GameManager {
             this.newGameMenu = new NewGameMenu(this)
         }
 
-        this.assetManager = new AssetManager()
+        this.assetManager = new AssetManager(this)
 
         GameStateManager.setState(newGameMenuState)
     }
@@ -176,7 +177,7 @@ export default class GameManager {
             this.pauseMenu = new PauseMenu(this)
         }
 
-        this.assetManager = new AssetManager()
+        this.assetManager = new AssetManager(this)
 
         GameStateManager.setState(pauseMenuState)
     }
@@ -185,6 +186,7 @@ export default class GameManager {
         const boardState: GameState = {
             update: (dt: number) => {
                 this.board?.drawBoard()
+                this.assetManager.handleMouseHover()
             },
             draw: () => {
                 if (!this.devMode) {
@@ -215,7 +217,7 @@ export default class GameManager {
             this.board.dealer.setup()
         }
 
-        this.assetManager = new AssetManager()
+        this.assetManager = new AssetManager(this)
         this.board.buildAssets()
 
         GameStateManager.setState(boardState)
@@ -242,7 +244,7 @@ export default class GameManager {
             this.winScreen = new WinScreen(this)
         }
 
-        this.assetManager = new AssetManager()
+        this.assetManager = new AssetManager(this)
 
         GameStateManager.setState(winState)
     }
@@ -267,7 +269,7 @@ export default class GameManager {
             this.loseScreen = new LoseScreen()
         }
 
-        this.assetManager = new AssetManager()
+        this.assetManager = new AssetManager(this)
 
         GameStateManager.setState(loseState)
     }
@@ -293,7 +295,7 @@ export default class GameManager {
         // Set dark text color for labels to be readable on light backgrounds
        // Draw.setThemeColors(0, 0, 0)
 
-        this.assetManager = new AssetManager()
+        this.assetManager = new AssetManager(this)
 
         GameStateManager.setState(mapState)
     }
@@ -317,7 +319,7 @@ export default class GameManager {
             this.shop.setup()
         }
 
-        this.assetManager = new AssetManager()
+        this.assetManager = new AssetManager(this)
 
         GameStateManager.setState(shopState)
     }
@@ -341,7 +343,7 @@ export default class GameManager {
             this.levelUpScreen.setup()
         }
 
-        this.assetManager = new AssetManager()
+        this.assetManager = new AssetManager(this)
 
         GameStateManager.setState(levelUpState)
     }
@@ -357,8 +359,52 @@ export default class GameManager {
             this.perkScreen = new PerkScreen(this)
         }
 
-        this.assetManager = new AssetManager()
+        this.assetManager = new AssetManager(this)
 
         GameStateManager.setState(perkState)
+    }
+
+    // TODO: this is, of course, an extended search that we could optimize if necessary
+    getCard(id: string): Card | undefined {
+        for (const card of this.player.hand) {
+            if (card.id === id) {
+                return card
+            }
+        }
+
+        for (const card of this.player.deck) {
+            if (card.id === id) {
+                return card
+            }
+        }
+
+        for (const card of this.player.discardPile) {
+            if (card.id === id) {
+                return card
+            }
+        }
+
+        const enemy = this.board?.enemy
+        if (isEmpty(enemy)) {
+            return;
+        }
+
+        for (const card of enemy.hand) {
+            if (card.id === id) {
+                return card
+            }
+        }
+
+        for (const card of enemy.deck) {
+            if (card.id === id) {
+                return card
+            }
+        }
+
+        for (const card of enemy.discardPile) {
+            if (card.id === id) {
+                return card
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 import Card from "../Cards/Card";
 import { Suits, Ranks, TrumpRanks } from "Enums";
 import GameManager from "GameManager";
+import Hoverable from "Hoverable";
 interface CardOptions {
     multiSelect?: boolean;
     /**
@@ -18,12 +19,13 @@ export default class CardAssets {
     baseH: number;
     constructor(gameManager: GameManager);
     addAsset(card: Card, cardX: number, cardY: number, options?: CardOptions): void;
-    addSuitAsset(card: Card, x: number, y: number, width: number, height: number): void;
-    addRankAsset(card: Card, x: number, y: number, width: number, height: number): void;
-    getSuitAssetPath(suit: Suits): string;
-    getSuitAssetId(card: Card, orientation: number): string;
-    getRankAssetPath(rank: Ranks | TrumpRanks): string;
-    getRankAssetId(card: Card, orientation: number): string;
+    static getCardAssetId(card: Card): string;
+    addSuitAsset(card: Card, x: number, y: number, width: number, height: number, hoverable: Hoverable): void;
+    addRankAsset(card: Card, x: number, y: number, width: number, height: number, hoverable: Hoverable): void;
+    static getSuitAssetPath(suit: Suits): string;
+    static getSuitAssetId(card: Card, orientation: number): string;
+    static getRankAssetPath(rank: Ranks | TrumpRanks): string;
+    static getRankAssetId(card: Card, orientation: number): string;
     hideCardAssets(card: Card): void;
     centerCards(): void;
     updateCardPosition(card: Card, x: number, y: number): void;

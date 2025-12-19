@@ -26,6 +26,7 @@ function NewGameMenu.prototype.drawScreen(self)
     self:renderPlayerNameField(panelX, inputY)
     local startBtnY = self:renderStartButton(panelX, inputY)
     self:renderBackButton(panelX, startBtnY)
+    self:renderRandomSeed()
 end
 function NewGameMenu.prototype.renderDisplayTitle(self, panelX)
     suit.layout:reset(panelX, titleY)
@@ -80,6 +81,18 @@ function NewGameMenu.prototype.renderBackButton(self, panelX, startBtnY)
     if backResult.hit then
         self.gameManager:switchToMainMenu()
     end
+end
+function NewGameMenu.prototype.renderRandomSeed(self)
+    local seed = {love.math.getRandomSeed()}
+    suit.layout:reset(
+        20,
+        love.graphics.getHeight() - 40
+    )
+    suit.Label(
+        ("Random Seed: " .. tostring(seed[1])) .. tostring(seed[2]),
+        {align = "left"},
+        suit.layout:row(300, 30)
+    )
 end
 function NewGameMenu.prototype.handleStartGame(self)
     local playerName = __TS__StringTrim(self.nameInput.text)
