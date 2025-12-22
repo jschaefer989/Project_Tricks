@@ -4,7 +4,6 @@ import Dealer from "../Dealer";
 import Enemy, { EnemyData } from "Enemies/Enemy";
 import type GameManager from "../GameManager";
 import CardAssets from "Assets/CardAssets";
-import ButtonAssets from "Assets/ButtonAssets";
 interface BoardData {
     discardUsed: number;
     playerPoints: number;
@@ -31,7 +30,8 @@ export default class Board {
     enemyValue: number;
     showingInitialView: boolean;
     cardAssets: CardAssets;
-    buttonAssets: ButtonAssets;
+    letsFightButton: import("love.graphics").Image;
+    attackButton: import("love.graphics").Image;
     constructor(gameManager: GameManager, enemy?: Enemy);
     load(data: BoardData): void;
     save(): BoardData;
@@ -66,5 +66,7 @@ export default class Board {
     buildAssets(): void;
     private buildCardAssets;
     private buildButtonAssets;
+    private buildLetsFightButton;
+    private buildAttackButton;
 }
 export {};

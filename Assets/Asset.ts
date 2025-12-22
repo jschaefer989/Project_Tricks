@@ -19,7 +19,7 @@ export default class Asset {
     isDisabled: boolean = false
     hoverable?: Hoverable
 
-    constructor(id: string, image: Image, x: number, y: number, onClick?: () => void, onHover?: AssetCallback, width?: number, height?: number, orientation?: number, scaleX?: number, scaleY?: number, offsetX?: number, offsetY?: number) {
+    constructor(id: string, image: Image, x: number, y: number, onClick?: () => void, onHover?: AssetCallback, orientation?: number, scaleX?: number, scaleY?: number, offsetX?: number, offsetY?: number) {
         this.id = id
         this.image = image
         this.x = x

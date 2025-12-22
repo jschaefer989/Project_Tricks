@@ -1,7 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
-local Map = ____lualib.Map
 local ____exports = {}
 local ____Card = require("Cards.Card")
 local Card = ____Card.default
@@ -36,33 +35,17 @@ function CardAssets.prototype.addAsset(self, card, cardX, cardY, options)
         cardX,
         cardY,
         card.onClick,
-        function(____, gameManager, asset) return Card:onHover(gameManager, asset) end,
-        self.baseW,
-        self.baseH
+        function(____, gameManager, asset) return Card:onHover(gameManager, asset) end
     )
     baseCardAsset:setHoverable(card)
     self.gameManager.assetManager:addAsset(assetId, baseCardAsset)
-    self:addSuitAsset(
-        card,
-        cardX,
-        cardY,
-        self.baseW,
-        self.baseH,
-        card
-    )
-    self:addRankAsset(
-        card,
-        cardX,
-        cardY,
-        self.baseW,
-        self.baseH,
-        card
-    )
+    self:addSuitAsset(card, cardX, cardY, card)
+    self:addRankAsset(card, cardX, cardY, card)
 end
 function CardAssets.getCardAssetId(self, card)
     return (AssetIds.BASE_CARD_TEMPLATE .. "-") .. card.id
 end
-function CardAssets.prototype.addSuitAsset(self, card, x, y, width, height, hoverable)
+function CardAssets.prototype.addSuitAsset(self, card, x, y, hoverable)
     local suitImagePath = ____exports.default:getSuitAssetPath(card.suit)
     local function onHoverCallback(____, gameManager, asset)
         return Card:onHover(gameManager, asset)
@@ -76,9 +59,7 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, width, height, hove
         normalPosition.x,
         normalPosition.y,
         card.onClick,
-        onHoverCallback,
-        width,
-        height
+        onHoverCallback
     )
     self.gameManager.assetManager:addAsset(normalAssetId, normalAsset)
     normalAsset:setHoverable(hoverable)
@@ -92,8 +73,6 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, width, height, hove
         flippedPosition.y,
         card.onClick,
         onHoverCallback,
-        width,
-        height,
         0,
         -1,
         -1
@@ -107,7 +86,7 @@ end
 function CardAssets.prototype.getFlippedSuitPosition(self, x, y)
     return {x = x + self.baseW - 10, y = y + self.baseH - 10}
 end
-function CardAssets.prototype.addRankAsset(self, card, x, y, width, height, hoverable)
+function CardAssets.prototype.addRankAsset(self, card, x, y, hoverable)
     local rankImagePath = ____exports.default:getRankAssetPath(card.rank)
     local rankImage = love.graphics.newImage(rankImagePath)
     local assetId = ____exports.default:getRankAssetId(card, 0)
@@ -119,9 +98,7 @@ function CardAssets.prototype.addRankAsset(self, card, x, y, width, height, hove
         rankPosition.x,
         rankPosition.y,
         card.onClick,
-        function(____, gameManager, asset) return Card:onHover(gameManager, asset) end,
-        width,
-        height
+        function(____, gameManager, asset) return Card:onHover(gameManager, asset) end
     )
     self.gameManager.assetManager:addAsset(assetId, asset)
     asset:setHoverable(hoverable)
@@ -238,13 +215,16 @@ function CardAssets.getRankAssetId(self, card, orientation)
     return (((AssetIds.RANK .. "-") .. card.id) .. "-") .. tostring(orientation)
 end
 function CardAssets.prototype.hideCardAssets(self, card)
-    local assets = self.gameManager.assetManager.assets
-    assets:delete(____exports.default:getCardAssetId(card))
-    assets:delete(____exports.default:getSuitAssetId(card, 0))
-    assets:delete(____exports.default:getSuitAssetId(card, 1))
-    assets:delete(____exports.default:getRankAssetId(card, 0))
+    local assetManager = self.gameManager.assetManager
+    assetManager:hideAsset(____exports.default:getCardAssetId(card))
+    assetManager:hideAsset(____exports.default:getSuitAssetId(card, 0))
+    assetManager:hideAsset(____exports.default:getSuitAssetId(card, 1))
+    assetManager:hideAsset(____exports.default:getRankAssetId(card, 0))
 end
-function CardAssets.prototype.centerCards(self, characterType)
+function CardAssets.prototype.centerCards(self, characterType, shiftUp)
+    if shiftUp == nil then
+        shiftUp = false
+    end
     local character = self.gameManager:getCharacter(characterType)
     if isEmpty(character) then
         return
@@ -253,7 +233,7 @@ function CardAssets.prototype.centerCards(self, characterType)
     local screenW = push:getWidth()
     local totalW = cardCount * self.baseW + math.max(0, cardCount - 1) * padding
     local startX = math.floor((screenW - totalW) / 2)
-    local cardY = self:getCardPosition(characterType)
+    local cardY = self:getCardPosition(characterType, shiftUp)
     do
         local i = 0
         while i < #character.hand do
@@ -291,16 +271,22 @@ end
 function CardAssets.prototype.getRankAsset(self, card)
     return self.gameManager.assetManager:getAsset(____exports.default:getRankAssetId(card, 0))
 end
-function CardAssets.prototype.getCardPosition(self, characterType)
+function CardAssets.prototype.getCardPosition(self, characterType, shiftUp)
+    if shiftUp == nil then
+        shiftUp = false
+    end
     local screenH = push:getHeight()
-    return screenH / 2 + self:getHeightModifier(characterType)
+    return screenH / 2 + self:getHeightModifier(characterType, shiftUp)
 end
-function CardAssets.prototype.getHeightModifier(self, characterType)
+function CardAssets.prototype.getHeightModifier(self, characterType, shiftUp)
+    if shiftUp == nil then
+        shiftUp = false
+    end
     repeat
         local ____switch29 = characterType
         local ____cond29 = ____switch29 == CharacterTypes.PLAYER
         if ____cond29 then
-            return self.baseH / 2
+            return shiftUp and -(self.baseH * 0.25) or self.baseH / 2
         end
         ____cond29 = ____cond29 or ____switch29 == CharacterTypes.ENEMY
         if ____cond29 then

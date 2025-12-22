@@ -15,14 +15,18 @@ local Enemy = ____Enemy.default
 local suit = require("Libraries.suit-master.suit")
 local ____CardAssets = require("Assets.CardAssets")
 local CardAssets = ____CardAssets.default
-local ____ButtonAssets = require("Assets.ButtonAssets")
-local ButtonAssets = ____ButtonAssets.default
 local push = require("Libraries.push")
+local ____Asset = require("Assets.Asset")
+local Asset = ____Asset.default
+local ____Helpers = require("Helpers")
+local isEmpty = ____Helpers.isEmpty
 local padding = 20
 ____exports.default = __TS__Class()
 local Board = ____exports.default
 Board.name = "Board"
 function Board.prototype.____constructor(self, gameManager, enemy)
+    self.letsFightButton = love.graphics.newImage("Assets/Images/LetsFightButton.png")
+    self.attackButton = love.graphics.newImage("Assets/Images/AttackButton.png")
     self.gameManager = gameManager
     self.discardUsed = 0
     self.enemy = enemy or __TS__New(Enemy, gameManager)
@@ -36,7 +40,6 @@ function Board.prototype.____constructor(self, gameManager, enemy)
     self.enemyValue = 0
     self.showingInitialView = true
     self.cardAssets = __TS__New(CardAssets, gameManager)
-    self.buttonAssets = __TS__New(ButtonAssets, gameManager)
 end
 function Board.prototype.load(self, data)
     self.discardUsed = data.discardUsed
@@ -421,10 +424,11 @@ function Board.prototype.renderDiscardCounter(self)
 end
 function Board.prototype.handleStartFight(self)
     self.showingInitialView = false
-    self.buttonAssets:hideButton(AssetIds.LETS_FIGHT_BUTTON)
+    self.gameManager.assetManager:hideAsset(AssetIds.LETS_FIGHT_BUTTON)
     self.dealer:startGame()
-    self.cardAssets:centerCards(CharacterTypes.PLAYER)
+    self.cardAssets:centerCards(CharacterTypes.PLAYER, true)
     self.cardAssets:centerCards(CharacterTypes.ENEMY)
+    self:buildAttackButton()
 end
 function Board.prototype.handleAttack(self)
     if not self.gameManager.player:anySelectedCards() then
@@ -516,14 +520,59 @@ function Board.prototype.buildCardAssets(self)
     end
 end
 function Board.prototype.buildButtonAssets(self)
+    self:buildLetsFightButton()
+end
+function Board.prototype.buildLetsFightButton(self)
+    local assetId = AssetIds.LETS_FIGHT_BUTTON
     local cardY = self.cardAssets:getCardPosition(CharacterTypes.PLAYER)
-    local buttonHeight = self.buttonAssets.letsFightButton:getHeight()
-    local buttonWidth = self.buttonAssets.letsFightButton:getWidth()
+    local buttonHeight = self.letsFightButton:getHeight()
+    local buttonWidth = self.letsFightButton:getWidth()
     local screenW = push:getWidth()
-    self.buttonAssets:addAsset(
-        math.floor((screenW - buttonWidth) / 2),
-        cardY - buttonHeight - padding,
-        function() return self:handleStartFight() end
+    local buttonX = math.floor((screenW - buttonWidth) / 2)
+    local buttonY = cardY - buttonHeight - padding
+    self.gameManager.assetManager:addAsset(
+        assetId,
+        __TS__New(
+            Asset,
+            assetId,
+            self.letsFightButton,
+            buttonX,
+            buttonY,
+            function() return self:handleStartFight() end
+        )
     )
+end
+function Board.prototype.buildAttackButton(self)
+    local gap = 20
+    local btnW = self.attackButton:getWidth()
+    local totalW = btnW * 3 + gap * 2
+    local buttonY = self.cardAssets:getCardPosition(CharacterTypes.PLAYER, true) + self.cardAssets.baseH + padding
+    local buttonX = math.floor((push:getWidth() - totalW) / 2)
+    self.gameManager.assetManager:addAsset(
+        AssetIds.ATTACK_BUTTON,
+        __TS__New(
+            Asset,
+            AssetIds.ATTACK_BUTTON,
+            self.attackButton,
+            buttonX,
+            buttonY,
+            function() return self:handleAttack() end
+        )
+    )
+    local font = love.graphics.getFont()
+    if not isEmpty(font) then
+        local text = "Attack"
+        local textW = font:getWidth(text)
+        local textH = font:getHeight()
+        local centerX = buttonX + btnW / 2
+        local centerY = buttonY + self.attackButton:getHeight() / 2
+        love.graphics.setColor(0, 0, 0, 1)
+        love.graphics.print(
+            text,
+            math.floor(centerX - textW / 2),
+            math.floor(centerY - textH / 2)
+        )
+        love.graphics.setColor(1, 1, 1, 1)
+    end
 end
 return ____exports

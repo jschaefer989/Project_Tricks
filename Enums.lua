@@ -55,4 +55,7 @@ ____exports.AssetIds.BASE_CARD_TEMPLATE = "BASE_CARD_TEMPLATE"
 ____exports.AssetIds.SUIT = "SUIT"
 ____exports.AssetIds.LETS_FIGHT_BUTTON = "LETS_FIGHT_BUTTON"
 ____exports.AssetIds.RANK = "RANK"
+____exports.AssetIds.ATTACK_BUTTON = "ATTACK_BUTTON"
+____exports.AssetIds.DISCARD_BUTTON = "DISCARD_BUTTON"
+____exports.AssetIds.DESELECT_BUTTON = "DESELECT_BUTTON"
 return ____exports

@@ -203,10 +203,14 @@ function GameManager.prototype.switchToBoard(self, enemy)
             end
         end,
         mousepressed = function(____, x, y, button)
-            self.assetManager:handleMousePressed(x, y, button)
+            if not self.devMode then
+                self.assetManager:handleMousePressed(x, y, button)
+            end
         end,
         mousereleased = function(____, x, y, button)
-            self.assetManager:handleMouseReleased(x, y, button)
+            if not self.devMode then
+                self.assetManager:handleMouseReleased(x, y, button)
+            end
         end
     }
     self.gameState = GameStates.BOARD

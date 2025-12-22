@@ -196,10 +196,14 @@ export default class GameManager {
                 }
             },
             mousepressed: (x: number, y: number, button: number) => {
-                this.assetManager.handleMousePressed(x, y, button)
+                if (!this.devMode) {
+                    this.assetManager.handleMousePressed(x, y, button)
+                }
             },
             mousereleased: (x: number, y: number, button: number) => {
-                this.assetManager.handleMouseReleased(x, y, button)
+                if (!this.devMode) {
+                    this.assetManager.handleMouseReleased(x, y, button)
+                }
             }
         }
 

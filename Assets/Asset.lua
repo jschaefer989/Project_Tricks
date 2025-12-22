@@ -4,7 +4,7 @@ local ____exports = {}
 ____exports.default = __TS__Class()
 local Asset = ____exports.default
 Asset.name = "Asset"
-function Asset.prototype.____constructor(self, id, image, x, y, onClick, onHover, width, height, orientation, scaleX, scaleY, offsetX, offsetY)
+function Asset.prototype.____constructor(self, id, image, x, y, onClick, onHover, orientation, scaleX, scaleY, offsetX, offsetY)
     self.isDisabled = false
     self.id = id
     self.image = image

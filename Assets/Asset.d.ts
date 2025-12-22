@@ -16,7 +16,7 @@ export default class Asset {
     offsetY: number;
     isDisabled: boolean;
     hoverable?: Hoverable;
-    constructor(id: string, image: Image, x: number, y: number, onClick?: () => void, onHover?: AssetCallback, width?: number, height?: number, orientation?: number, scaleX?: number, scaleY?: number, offsetX?: number, offsetY?: number);
+    constructor(id: string, image: Image, x: number, y: number, onClick?: () => void, onHover?: AssetCallback, orientation?: number, scaleX?: number, scaleY?: number, offsetX?: number, offsetY?: number);
     updatePosition(x: number, y: number): void;
     updateOrientation(orientation: number): void;
     updateScale(scaleX: number, scaleY: number): void;

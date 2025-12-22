@@ -7,8 +7,9 @@ import Enemy, { EnemyData } from "Enemies/Enemy"
 import * as suit from "Libraries.suit-master.suit"
 import type GameManager from "../GameManager"
 import CardAssets from "Assets/CardAssets"
-import ButtonAssets from "Assets/ButtonAssets"
 import * as push from "Libraries.push"
+import Asset from "Assets/Asset"
+import { isEmpty } from "Helpers"
 
 const padding = 20
 
@@ -39,7 +40,10 @@ export default class Board {
     enemyValue: number
     showingInitialView: boolean
     cardAssets: CardAssets
-    buttonAssets: ButtonAssets
+    letsFightButton = love.graphics.newImage("Assets/Images/LetsFightButton.png")
+    attackButton = love.graphics.newImage("Assets/Images/AttackButton.png")
+    // discardButton = love.graphics.newImage("Assets/Images/DiscardButton.png")
+    // deselectButton = love.graphics.newImage("Assets/Images/DeselectButton.png")
 
     constructor(gameManager: GameManager, enemy?: Enemy) {
         this.gameManager = gameManager
@@ -55,7 +59,6 @@ export default class Board {
         this.enemyValue = 0
         this.showingInitialView = true
         this.cardAssets = new CardAssets(gameManager)
-        this.buttonAssets = new ButtonAssets(gameManager)
     }
 
     load(data: BoardData): void {
@@ -373,11 +376,12 @@ export default class Board {
 
     handleStartFight(): void {
         this.showingInitialView = false
-        this.buttonAssets.hideButton(AssetIds.LETS_FIGHT_BUTTON)
+        this.gameManager.assetManager.hideAsset(AssetIds.LETS_FIGHT_BUTTON)
         
         this.dealer.startGame()
-        this.cardAssets.centerCards(CharacterTypes.PLAYER)
+        this.cardAssets.centerCards(CharacterTypes.PLAYER, true)
         this.cardAssets.centerCards(CharacterTypes.ENEMY)
+        this.buildAttackButton()    
     }
 
     handleAttack(): void {
@@ -465,11 +469,76 @@ export default class Board {
         }
     }
 
-    private buildButtonAssets(): void {
+    private buildButtonAssets(): void {  
+        this.buildLetsFightButton()
+    }
+
+    private buildLetsFightButton(): void {
+        const assetId = `${AssetIds.LETS_FIGHT_BUTTON}`
         const cardY = this.cardAssets.getCardPosition(CharacterTypes.PLAYER)
-        const buttonHeight = this.buttonAssets.letsFightButton.getHeight()
-        const buttonWidth = this.buttonAssets.letsFightButton.getWidth()
+        const buttonHeight = this.letsFightButton.getHeight()
+        const buttonWidth = this.letsFightButton.getWidth()
         const screenW = push.getWidth()
-        this.buttonAssets.addAsset(Math.floor((screenW - buttonWidth) / 2), cardY - buttonHeight - padding, () => this.handleStartFight())
+        const buttonX = Math.floor((screenW - buttonWidth) / 2)
+        const buttonY = cardY - buttonHeight - padding
+        this.gameManager.assetManager.addAsset(assetId, new Asset(assetId, this.letsFightButton , buttonX, buttonY,  () => this.handleStartFight()))
+    }
+
+    private buildAttackButton(): void {
+        const gap = 20
+        const btnW = this.attackButton.getWidth()
+        const totalW = btnW * 3 + gap * 2
+        const buttonY = this.cardAssets.getCardPosition(CharacterTypes.PLAYER, true) + this.cardAssets.baseH + padding
+        const buttonX = Math.floor((push.getWidth() - totalW) / 2)
+
+        // Attack Button
+        this.gameManager.assetManager.addAsset(
+            AssetIds.ATTACK_BUTTON,
+            new Asset(
+                AssetIds.ATTACK_BUTTON,
+                this.attackButton,
+                buttonX,
+                buttonY,
+                () => this.handleAttack()
+            )
+        )
+
+        const font = love.graphics.getFont()
+        if (!isEmpty(font)) {
+            const text = "Attack"
+            const textW = font.getWidth(text)
+            const textH = font.getHeight()
+            const centerX = buttonX + btnW / 2
+            const centerY = buttonY + this.attackButton.getHeight() / 2
+            love.graphics.setColor(0, 0, 0, 1)
+            love.graphics.print(text, Math.floor(centerX - textW / 2), Math.floor(centerY - textH / 2))
+            love.graphics.setColor(1, 1, 1, 1)
+        }
+
+        // Discard Button
+        // const discardX = buttonX + btnW + gap
+        // this.gameManager.assetManager.addAsset(
+        //     AssetIds.DISCARD_BUTTON,
+        //     new Asset(
+        //         AssetIds.DISCARD_BUTTON,
+        //         this.discardButton,
+        //         discardX,
+        //         buttonY,
+        //         () => this.handleDiscard()
+        //     )
+        // )
+
+        // // Deselect Button
+        // const deselectX = discardX + btnW + gap
+        // this.gameManager.assetManager.addAsset(
+        //     AssetIds.DESELECT_BUTTON,
+        //     new Asset(
+        //         AssetIds.DESELECT_BUTTON,
+        //         this.deselectButton,
+        //         deselectX,
+        //         buttonY,
+        //         () => this.gameManager.player.unselectCards()
+        //     )
+        // )
     }
 }

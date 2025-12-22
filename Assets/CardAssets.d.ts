@@ -23,21 +23,21 @@ export default class CardAssets {
     constructor(gameManager: GameManager);
     addAsset(card: Card, cardX: number, cardY: number, options?: CardOptions): void;
     static getCardAssetId(card: Card): string;
-    addSuitAsset(card: Card, x: number, y: number, width: number, height: number, hoverable: Hoverable): void;
+    addSuitAsset(card: Card, x: number, y: number, hoverable: Hoverable): void;
     getNormalSuitPosition(x: number, y: number): Point;
     getFlippedSuitPosition(x: number, y: number): Point;
-    addRankAsset(card: Card, x: number, y: number, width: number, height: number, hoverable: Hoverable): void;
+    addRankAsset(card: Card, x: number, y: number, hoverable: Hoverable): void;
     getRankPosition(x: number, y: number, rankImage: Image): Point;
     static getSuitAssetPath(suit: Suits): string;
     static getSuitAssetId(card: Card, orientation: number): string;
     static getRankAssetPath(rank: Ranks | TrumpRanks): string;
     static getRankAssetId(card: Card, orientation: number): string;
     hideCardAssets(card: Card): void;
-    centerCards(characterType: CharacterTypes): void;
+    centerCards(characterType: CharacterTypes, shiftUp?: boolean): void;
     updateCardPosition(card: Card, x: number, y: number): void;
     getRankAsset(card: Card): Asset | undefined;
-    getCardPosition(characterType: CharacterTypes): number;
-    getHeightModifier(characterType: CharacterTypes): number;
+    getCardPosition(characterType: CharacterTypes, shiftUp?: boolean): number;
+    getHeightModifier(characterType: CharacterTypes, shiftUp?: boolean): number;
     determineCardStartingPosition(characterType: CharacterTypes): Point;
     appendAsset(card: Card, characterType: CharacterTypes): void;
 }

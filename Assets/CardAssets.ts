@@ -7,7 +7,6 @@ import * as push from "Libraries.push";
 import Hoverable from "Hoverable"
 import Point from "Point";
 import { Image } from "love.graphics";
-import Character from "Character";
 const padding = 20;
 
 interface CardOptions {
@@ -45,14 +44,12 @@ export default class CardAssets {
       cardY,
       card.onClick,
       (gameManager: GameManager, asset: Asset) =>
-        Card.onHover(gameManager, asset),
-      this.baseW,
-      this.baseH
+        Card.onHover(gameManager, asset)
     );
     baseCardAsset.setHoverable(card);
     this.gameManager.assetManager.addAsset(assetId, baseCardAsset);
-    this.addSuitAsset(card, cardX, cardY, this.baseW, this.baseH, card);
-    this.addRankAsset(card, cardX, cardY, this.baseW, this.baseH, card);
+    this.addSuitAsset(card, cardX, cardY, card);
+    this.addRankAsset(card, cardX, cardY, card);
   }
 
   static getCardAssetId(card: Card): string {
@@ -63,8 +60,6 @@ export default class CardAssets {
     card: Card,
     x: number,
     y: number,
-    width: number,
-    height: number,
     hoverable: Hoverable
   ): void {
     const suitImagePath = CardAssets.getSuitAssetPath(card.suit);
@@ -78,9 +73,7 @@ export default class CardAssets {
       normalPosition.x,
       normalPosition.y,
       card.onClick,
-      onHoverCallback,
-      width,
-      height
+      onHoverCallback
     );
     this.gameManager.assetManager.addAsset(normalAssetId, normalAsset);
     normalAsset.setHoverable(hoverable);
@@ -93,8 +86,6 @@ export default class CardAssets {
       flippedPosition.y,
       card.onClick,
       onHoverCallback,
-      width,
-      height,
       0,
       -1,
       -1
@@ -115,8 +106,6 @@ export default class CardAssets {
     card: Card,
     x: number,
     y: number,
-    width: number,
-    height: number,
     hoverable: Hoverable
   ): void {
     const rankImagePath = CardAssets.getRankAssetPath(card.rank);
@@ -130,9 +119,7 @@ export default class CardAssets {
       rankPosition.y,
       card.onClick,
       (gameManager: GameManager, asset: Asset) =>
-        Card.onHover(gameManager, asset),
-      width,
-      height
+        Card.onHover(gameManager, asset)
     );
     this.gameManager.assetManager.addAsset(assetId, asset);
     asset.setHoverable(hoverable);
@@ -212,15 +199,15 @@ export default class CardAssets {
   }
 
   hideCardAssets(card: Card): void {
-    const assets = this.gameManager.assetManager.assets;
+    const assetManager = this.gameManager.assetManager;
 
-    assets.delete(CardAssets.getCardAssetId(card));
-    assets.delete(CardAssets.getSuitAssetId(card, 0));
-    assets.delete(CardAssets.getSuitAssetId(card, 1));
-    assets.delete(CardAssets.getRankAssetId(card, 0));
+    assetManager.hideAsset(CardAssets.getCardAssetId(card));
+    assetManager.hideAsset(CardAssets.getSuitAssetId(card, 0));
+    assetManager.hideAsset(CardAssets.getSuitAssetId(card, 1));
+    assetManager.hideAsset(CardAssets.getRankAssetId(card, 0));
   }
 
-  centerCards(characterType: CharacterTypes): void {
+  centerCards(characterType: CharacterTypes, shiftUp: boolean = false): void {
     const character = this.gameManager.getCharacter(characterType)
     if (isEmpty(character)) {
       return;
@@ -230,7 +217,7 @@ export default class CardAssets {
     const totalW =
       cardCount * this.baseW + Math.max(0, cardCount - 1) * padding;
     const startX = Math.floor((screenW - totalW) / 2);
-    const cardY = this.getCardPosition(characterType);
+    const cardY = this.getCardPosition(characterType, shiftUp);
 
     for (let i = 0; i < character.hand.length; i++) {
       const card = character.hand[i];
@@ -271,15 +258,15 @@ export default class CardAssets {
     );
   }
 
-  getCardPosition(characterType: CharacterTypes): number {
+  getCardPosition(characterType: CharacterTypes, shiftUp: boolean = false): number {
     const screenH = push.getHeight();
-    return screenH / 2 + this.getHeightModifier(characterType);
+    return screenH / 2 + this.getHeightModifier(characterType, shiftUp);
   }
 
-  getHeightModifier(characterType: CharacterTypes): number {
+  getHeightModifier(characterType: CharacterTypes, shiftUp: boolean = false): number {
     switch (characterType) {
       case CharacterTypes.PLAYER:
-        return this.baseH / 2
+        return shiftUp ? -(this.baseH * 0.25) : this.baseH / 2
       case CharacterTypes.ENEMY:
         return -(this.baseH * 1.5)
       default:

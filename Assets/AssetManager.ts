@@ -2,15 +2,17 @@ import * as push from "Libraries.push";
 import Asset from "./Asset";
 import { isEmpty } from "Helpers";
 import GameManager from "GameManager";
-import Hoverable from "Hoverable";
+import FontManager from "Assets/FontManager";
 
 export default class AssetManager {
     gameManager: GameManager
     assets: Map<string, Asset>
+    fontManager: FontManager
 
     constructor(gameManager: GameManager) {
         this.gameManager = gameManager
         this.assets = new Map<string, Asset>()
+        this.fontManager = new FontManager()
     }
 
     addAsset(id: string, asset: Asset): void {
@@ -21,18 +23,23 @@ export default class AssetManager {
         return this.assets.get(id)
     }
 
-    drawAssets(): void {
-        this.drawCards()
-        this.drawHoverables()
+    hideAsset(id: string): void {
+        this.assets.delete(id)
     }
 
-    drawCards(): void {
+    drawAssets(): void {
+        // Draw all assets
         for (const asset of this.assets.values()) {
             love.graphics.draw(asset.image, asset.x, asset.y, asset.orientation, asset.scaleX, asset.scaleY, asset.offsetX, asset.offsetY)
         }
+
+        this.fontManager.drawText()
+
+        // Draw hover content above assets
+        this.drawHoverables()
     }
 
-    drawHoverables(): void {
+    private drawHoverables(): void {
         const drawnHoverables = new Set<string>()
         for (const asset of this.assets.values()) {
             if (!isEmpty(asset.hoverable) && asset.hoverable.isHovered) {
@@ -46,18 +53,18 @@ export default class AssetManager {
     }
 
     handleMousePressed(x: number, y: number, button: number): void {
-        const [gameX, gameY] = push.toGame(x, y)
+        // const [gameX, gameY] = push.toGame(x, y)
 
-        if (isEmpty(gameX) || isEmpty(gameY)) {
-            return
-        }
+        // if (isEmpty(gameX) || isEmpty(gameY)) {
+        //     return
+        // }
 
-        for (const asset of this.assets.values()) {
-            if (gameX >= asset.x && gameX <= asset.x + asset.getWidth() &&
-                gameY >= asset.y && gameY <= asset.y + asset.getHeight()) {
-                asset.onClick()
-            }
-        }
+        // for (const asset of this.assets.values()) {
+        //     if (gameX >= asset.x && gameX <= asset.x + asset.getWidth() &&
+        //         gameY >= asset.y && gameY <= asset.y + asset.getHeight()) {
+        //         asset.onClick()
+        //     }
+        // }
     }
 
     handleMouseReleased(x: number, y: number, button: number): void {
