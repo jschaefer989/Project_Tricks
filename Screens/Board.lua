@@ -5,6 +5,7 @@ local ____exports = {}
 local ____Enums = require("Enums")
 local AssetIds = ____Enums.AssetIds
 local CharacterTypes = ____Enums.CharacterTypes
+local FontIds = ____Enums.FontIds
 local Suits = ____Enums.Suits
 local ____Dealer = require("Dealer")
 local Dealer = ____Dealer.default
@@ -18,8 +19,8 @@ local CardAssets = ____CardAssets.default
 local push = require("Libraries.push")
 local ____Asset = require("Assets.Asset")
 local Asset = ____Asset.default
-local ____Helpers = require("Helpers")
-local isEmpty = ____Helpers.isEmpty
+local ____FontWithPosition = require("Assets.FontWithPosition")
+local FontWithPosition = ____FontWithPosition.default
 local padding = 20
 ____exports.default = __TS__Class()
 local Board = ____exports.default
@@ -559,20 +560,17 @@ function Board.prototype.buildAttackButton(self)
             function() return self:handleAttack() end
         )
     )
-    local font = love.graphics.getFont()
-    if not isEmpty(font) then
-        local text = "Attack"
-        local textW = font:getWidth(text)
-        local textH = font:getHeight()
-        local centerX = buttonX + btnW / 2
-        local centerY = buttonY + self.attackButton:getHeight() / 2
-        love.graphics.setColor(0, 0, 0, 1)
-        love.graphics.print(
-            text,
-            math.floor(centerX - textW / 2),
-            math.floor(centerY - textH / 2)
+    local centerX = buttonX + btnW / 2
+    local centerY = buttonY + self.attackButton:getHeight() / 2
+    self.gameManager.assetManager.fontManager:addText(
+        FontIds.ATTACK_BUTTON_CAPTION,
+        __TS__New(
+            FontWithPosition,
+            centerX,
+            centerY,
+            "Attack",
+            {size = 28}
         )
-        love.graphics.setColor(1, 1, 1, 1)
-    end
+    )
 end
 return ____exports

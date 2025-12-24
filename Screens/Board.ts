@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { AssetIds, CharacterTypes, Suits } from "../Enums"
+import { AssetIds, CharacterTypes, FontIds, Suits } from "../Enums"
 import Dealer from "../Dealer"
 import Draw from "../Draw"
 import Enemy, { EnemyData } from "Enemies/Enemy"
@@ -10,6 +10,7 @@ import CardAssets from "Assets/CardAssets"
 import * as push from "Libraries.push"
 import Asset from "Assets/Asset"
 import { isEmpty } from "Helpers"
+import FontWithPosition from "Assets/FontWithPosition"
 
 const padding = 20
 
@@ -503,17 +504,9 @@ export default class Board {
             )
         )
 
-        const font = love.graphics.getFont()
-        if (!isEmpty(font)) {
-            const text = "Attack"
-            const textW = font.getWidth(text)
-            const textH = font.getHeight()
-            const centerX = buttonX + btnW / 2
-            const centerY = buttonY + this.attackButton.getHeight() / 2
-            love.graphics.setColor(0, 0, 0, 1)
-            love.graphics.print(text, Math.floor(centerX - textW / 2), Math.floor(centerY - textH / 2))
-            love.graphics.setColor(1, 1, 1, 1)
-        }
+        const centerX = buttonX + btnW / 2
+        const centerY = buttonY + this.attackButton.getHeight() / 2
+        this.gameManager.assetManager.fontManager.addText(FontIds.ATTACK_BUTTON_CAPTION, new FontWithPosition(centerX, centerY, "Attack", { size: 28 }))
 
         // Discard Button
         // const discardX = buttonX + btnW + gap

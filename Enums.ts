@@ -79,3 +79,7 @@ export enum AssetIds {
     DISCARD_BUTTON = "DISCARD_BUTTON",
     DESELECT_BUTTON = "DESELECT_BUTTON",
 }
+
+export enum FontIds {
+    ATTACK_BUTTON_CAPTION = "ATTACK_BUTTON_CAPTION"
+}

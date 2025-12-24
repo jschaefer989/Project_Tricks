@@ -58,4 +58,6 @@ ____exports.AssetIds.RANK = "RANK"
 ____exports.AssetIds.ATTACK_BUTTON = "ATTACK_BUTTON"
 ____exports.AssetIds.DISCARD_BUTTON = "DISCARD_BUTTON"
 ____exports.AssetIds.DESELECT_BUTTON = "DESELECT_BUTTON"
+____exports.FontIds = FontIds or ({})
+____exports.FontIds.ATTACK_BUTTON_CAPTION = "ATTACK_BUTTON_CAPTION"
 return ____exports

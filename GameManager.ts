@@ -21,6 +21,7 @@ import PerkScreen from "Screens/PerkScreen"
 import * as push from "Libraries.push"
 import AssetManager from "Assets/AssetManager"
 import Card from "Cards/Card"
+import FontManager from "Assets/TextManager"
 
 interface GameState {
     update: (dt: number) => void
@@ -62,8 +63,7 @@ export default class GameManager {
         this.perkScreen = undefined
         this.assetManager = new AssetManager(this)
         if (!this.devMode) {
-            const mainFont = love.graphics.newFont("Assets/Fonts/Gothic Pixels.ttf")
-            love.graphics.setFont(mainFont)
+            FontManager.setDefaultFont()
         }
     }
 

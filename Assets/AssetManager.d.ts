@@ -1,6 +1,6 @@
 import Asset from "./Asset";
 import GameManager from "GameManager";
-import FontManager from "Assets/FontManager";
+import FontManager from "Assets/TextManager";
 export default class AssetManager {
     gameManager: GameManager;
     assets: Map<string, Asset>;

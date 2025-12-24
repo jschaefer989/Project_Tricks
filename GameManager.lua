@@ -39,6 +39,8 @@ local PerkScreen = ____PerkScreen.default
 local push = require("Libraries.push")
 local ____AssetManager = require("Assets.AssetManager")
 local AssetManager = ____AssetManager.default
+local ____TextManager = require("Assets.TextManager")
+local FontManager = ____TextManager.default
 ____exports.default = __TS__Class()
 local GameManager = ____exports.default
 GameManager.name = "GameManager"
@@ -59,8 +61,7 @@ function GameManager.prototype.____constructor(self)
     self.perkScreen = nil
     self.assetManager = __TS__New(AssetManager, self)
     if not self.devMode then
-        local mainFont = love.graphics.newFont("Assets/Fonts/Gothic Pixels.ttf")
-        love.graphics.setFont(mainFont)
+        FontManager:setDefaultFont()
     end
 end
 function GameManager.prototype.getCharacter(self, characterType)

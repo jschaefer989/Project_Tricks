@@ -2,7 +2,7 @@ import * as push from "Libraries.push";
 import Asset from "./Asset";
 import { isEmpty } from "Helpers";
 import GameManager from "GameManager";
-import FontManager from "Assets/FontManager";
+import FontManager from "Assets/TextManager";
 
 export default class AssetManager {
     gameManager: GameManager
@@ -33,9 +33,10 @@ export default class AssetManager {
             love.graphics.draw(asset.image, asset.x, asset.y, asset.orientation, asset.scaleX, asset.scaleY, asset.offsetX, asset.offsetY)
         }
 
+        // Draw text above assets
         this.fontManager.drawText()
 
-        // Draw hover content above assets
+        // Draw hover content above assets and text
         this.drawHoverables()
     }
 
