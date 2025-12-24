@@ -4,7 +4,6 @@ import { Suits, AssetIds, Ranks, TrumpRanks, CharacterTypes } from "Enums";
 import { exhaustiveGuard, isEmpty } from "Helpers";
 import GameManager from "GameManager";
 import * as push from "Libraries.push";
-import Hoverable from "Hoverable"
 import Point from "Point";
 import { Image } from "love.graphics";
 const padding = 20;
@@ -18,6 +17,12 @@ interface CardOptions {
    */
   onClick?: (card: Card) => void;
   displayCost?: boolean;
+}
+
+interface AssetsForCard {
+  baseAsset: Asset;
+  suitAssets: Asset[];
+  rankAsset: Asset;
 }
 
 export default class CardAssets {
@@ -36,23 +41,22 @@ export default class CardAssets {
     cardY: number,
     options?: CardOptions
   ): void {
-    const assetId = CardAssets.getCardAssetId(card);
+    const assetId = CardAssets.getBaseAssetId(card);
     const baseCardAsset = new Asset(
       assetId,
       this.baseCard,
       cardX,
       cardY,
-      card.onClick,
+      () => card.onClick(),
       (gameManager: GameManager, asset: Asset) =>
         Card.onHover(gameManager, asset)
     );
-    baseCardAsset.setHoverable(card);
     this.gameManager.assetManager.addAsset(assetId, baseCardAsset);
-    this.addSuitAsset(card, cardX, cardY, card);
-    this.addRankAsset(card, cardX, cardY, card);
+    this.addSuitAsset(card, cardX, cardY);
+    this.addRankAsset(card, cardX, cardY);
   }
 
-  static getCardAssetId(card: Card): string {
+  static getBaseAssetId(card: Card): string {
     return `${AssetIds.BASE_CARD_TEMPLATE}-${card.id}`;
   }
 
@@ -60,7 +64,6 @@ export default class CardAssets {
     card: Card,
     x: number,
     y: number,
-    hoverable: Hoverable
   ): void {
     const suitImagePath = CardAssets.getSuitAssetPath(card.suit);
     const onHoverCallback = (gameManager: GameManager, asset: Asset) =>
@@ -72,11 +75,10 @@ export default class CardAssets {
       love.graphics.newImage(suitImagePath),
       normalPosition.x,
       normalPosition.y,
-      card.onClick,
+      () => card.onClick(),
       onHoverCallback
     );
-    this.gameManager.assetManager.addAsset(normalAssetId, normalAsset);
-    normalAsset.setHoverable(hoverable);
+    this.gameManager.assetManager.addAsset(CardAssets.getBaseAssetId(card), normalAsset);
     const flippedPosition = this.getFlippedSuitPosition(x, y);
     const flippedAssetId = CardAssets.getSuitAssetId(card, 1);
     const flippedAsset = new Asset(
@@ -84,14 +86,13 @@ export default class CardAssets {
       love.graphics.newImage(suitImagePath),
       flippedPosition.x,
       flippedPosition.y,
-      card.onClick,
+      () => card.onClick(),
       onHoverCallback,
       0,
       -1,
       -1
     );
-    this.gameManager.assetManager.addAsset(flippedAssetId, flippedAsset);
-    flippedAsset.setHoverable(hoverable);
+    this.gameManager.assetManager.addAsset(CardAssets.getBaseAssetId(card), flippedAsset);
   }
 
   getNormalSuitPosition(x: number, y: number): Point {
@@ -106,7 +107,6 @@ export default class CardAssets {
     card: Card,
     x: number,
     y: number,
-    hoverable: Hoverable
   ): void {
     const rankImagePath = CardAssets.getRankAssetPath(card.rank);
     const rankImage = love.graphics.newImage(rankImagePath);
@@ -117,12 +117,11 @@ export default class CardAssets {
       rankImage,
       rankPosition.x,
       rankPosition.y,
-      card.onClick,
+      () => card.onClick(),
       (gameManager: GameManager, asset: Asset) =>
         Card.onHover(gameManager, asset)
     );
-    this.gameManager.assetManager.addAsset(assetId, asset);
-    asset.setHoverable(hoverable);
+    this.gameManager.assetManager.addAsset(CardAssets.getBaseAssetId(card), asset);
   }
 
   getRankPosition(x: number, y: number, rankImage: Image): Point {
@@ -201,7 +200,7 @@ export default class CardAssets {
   hideCardAssets(card: Card): void {
     const assetManager = this.gameManager.assetManager;
 
-    assetManager.hideAsset(CardAssets.getCardAssetId(card));
+    assetManager.hideAsset(CardAssets.getBaseAssetId(card));
     assetManager.hideAsset(CardAssets.getSuitAssetId(card, 0));
     assetManager.hideAsset(CardAssets.getSuitAssetId(card, 1));
     assetManager.hideAsset(CardAssets.getRankAssetId(card, 0));
@@ -229,14 +228,15 @@ export default class CardAssets {
 
   updateCardPosition(card: Card, x: number, y: number): void {
     const assetManager = this.gameManager.assetManager;
+    const baseAssetId = CardAssets.getBaseAssetId(card);
     assetManager
-      .getAsset(CardAssets.getCardAssetId(card))
+      .getAsset(baseAssetId, baseAssetId)
       ?.updatePosition(x, y);
     assetManager
-      .getAsset(CardAssets.getSuitAssetId(card, 0))
+      .getAsset(baseAssetId, CardAssets.getSuitAssetId(card, 0))
       ?.updatePosition(x + 10, y + 10);
     assetManager
-      .getAsset(CardAssets.getSuitAssetId(card, 1))
+      .getAsset(baseAssetId, CardAssets.getSuitAssetId(card, 1))
       ?.updatePosition(x + this.baseW - 10, y + this.baseH - 10);
 
     const rankAsset = this.getRankAsset(card)
@@ -245,7 +245,7 @@ export default class CardAssets {
     }
     const rankPosition = this.getRankPosition(x, y, rankAsset.image);
     assetManager
-      .getAsset(CardAssets.getRankAssetId(card, 0))
+      .getAsset(baseAssetId, CardAssets.getRankAssetId(card, 0))
       ?.updatePosition(
         rankPosition.x,
         rankPosition.y
@@ -254,6 +254,7 @@ export default class CardAssets {
 
   getRankAsset(card: Card): Asset | undefined {
     return this.gameManager.assetManager.getAsset(
+      CardAssets.getBaseAssetId(card),
       CardAssets.getRankAssetId(card, 0),
     );
   }
@@ -297,5 +298,27 @@ export default class CardAssets {
     const cardPosition = this.determineCardStartingPosition(characterType);
     const x = cardPosition.x + (character.hand.length - 1) * (this.baseW + padding);
     this.addAsset(card, x, cardPosition.y);
+  }
+
+  getCardAssets(card: Card): AssetsForCard {
+        const baseAssetId = CardAssets.getBaseAssetId(card)
+        const suitAssetId0 = CardAssets.getSuitAssetId(card, 0)
+        const suitAssetId1 = CardAssets.getSuitAssetId(card, 1)
+        const rankAssetId = CardAssets.getRankAssetId(card, 0)
+        
+        const baseAsset = this.gameManager.assetManager.getAsset(baseAssetId, baseAssetId)
+        const suitAsset0 = this.gameManager.assetManager.getAsset(baseAssetId, suitAssetId0)
+        const suitAsset1 = this.gameManager.assetManager.getAsset(baseAssetId, suitAssetId1)
+        const rankAsset = this.gameManager.assetManager.getAsset(baseAssetId, rankAssetId)
+
+        if (isEmpty(baseAsset) || isEmpty(suitAsset0) || isEmpty(suitAsset1) || isEmpty(rankAsset)) {
+            throw new Error(`One or more assets for card ${card.id} are missing.`)
+        }
+
+        return {
+            baseAsset: baseAsset,
+            suitAssets: [suitAsset0, suitAsset1],
+            rankAsset: rankAsset,
+        }
   }
 }

@@ -195,6 +195,14 @@ function GameManager.prototype.switchToBoard(self, enemy)
                 ____opt_11:drawBoard()
             end
             self.assetManager:handleMouseHover()
+            if not isEmpty(self.board) then
+                for ____, card in ipairs(self.player.hand) do
+                    card:updateAnimation(dt)
+                end
+                for ____, card in ipairs(self.board.enemy.hand) do
+                    card:updateAnimation(dt)
+                end
+            end
         end,
         draw = function()
             if not self.devMode then

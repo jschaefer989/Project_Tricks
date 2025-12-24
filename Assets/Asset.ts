@@ -1,5 +1,4 @@
 import GameManager from "GameManager"
-import Hoverable from "Hoverable"
 import { Image } from "love.graphics"
 
 export type AssetCallback = (gameManager: GameManager, asset: Asset) => void
@@ -17,7 +16,7 @@ export default class Asset {
     offsetX: number
     offsetY: number
     isDisabled: boolean = false
-    hoverable?: Hoverable
+    isHovered: boolean = false
 
     constructor(id: string, image: Image, x: number, y: number, onClick?: () => void, onHover?: AssetCallback, orientation?: number, scaleX?: number, scaleY?: number, offsetX?: number, offsetY?: number) {
         this.id = id
@@ -55,9 +54,9 @@ export default class Asset {
     setDisabled(disabled: boolean): void {
         this.isDisabled = disabled
     }
-    
-    setHoverable(hoverable: Hoverable): void {
-        this.hoverable = hoverable
+
+    setHovered(hovered: boolean): void {
+        this.isHovered = hovered
     }
 
     getWidth(): number {

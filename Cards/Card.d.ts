@@ -2,7 +2,6 @@
 import GameManager from "GameManager";
 import { Ranks, Suits, TrumpRanks } from "../Enums";
 import Asset from "Assets/Asset";
-import Hoverable from "Hoverable";
 interface CardData {
     id: string;
     suit: Suits;
@@ -14,7 +13,7 @@ interface CardData {
     isTrump: boolean;
     name: string;
 }
-export default class Card extends Hoverable {
+export default class Card {
     gameManager: GameManager;
     id: string;
     suit: Suits;
@@ -25,7 +24,15 @@ export default class Card extends Hoverable {
     cost: number;
     isTrump: boolean;
     name: string;
-    isHovered: boolean;
+    animDuration: number;
+    animElapsed: number;
+    animOffsetY: number;
+    animTargetOffsetY: number;
+    isAnimating: boolean;
+    originalBaseY: number;
+    originalSuitY0: number;
+    originalSuitY1: number;
+    originalRankY: number;
     constructor(gameManager: GameManager, suit: Suits, rank: Ranks | TrumpRanks, power: number, value: number, name: string, isTrump?: boolean);
     isEqual(otherCard: Card): boolean;
     getCost(): number;
@@ -35,6 +42,8 @@ export default class Card extends Hoverable {
     onClick(): void;
     onSelect(): void;
     onUnselect(): void;
+    startAnimation(offsetY: number): void;
+    updateAnimation(deltaTime: number): void;
     static onHover(gameManager: GameManager, asset: Asset): void;
 }
 export {};

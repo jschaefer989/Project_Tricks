@@ -1,23 +1,26 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__ClassExtends = ____lualib.__TS__ClassExtends
 local __TS__New = ____lualib.__TS__New
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local ____exports = {}
 local ____Helpers = require("Helpers")
 local isEmpty = ____Helpers.isEmpty
-local ____Hoverable = require("Hoverable")
-local Hoverable = ____Hoverable.default
 ____exports.default = __TS__Class()
 local Card = ____exports.default
 Card.name = "Card"
-__TS__ClassExtends(Card, Hoverable)
 function Card.prototype.____constructor(self, gameManager, suit, rank, power, value, name, isTrump)
-    local id = (((suit .. "_") .. rank) .. "_") .. tostring(love.math.random(1000))
-    Hoverable.prototype.____constructor(self, id)
     self.isSelected = false
     self.isTrump = false
-    self.isHovered = false
+    self.animDuration = 0.15
+    self.animElapsed = 0
+    self.animOffsetY = 0
+    self.animTargetOffsetY = 0
+    self.isAnimating = false
+    self.originalBaseY = 0
+    self.originalSuitY0 = 0
+    self.originalSuitY1 = 0
+    self.originalRankY = 0
+    local id = (((suit .. "_") .. rank) .. "_") .. tostring(love.math.random(1000))
     self.gameManager = gameManager
     self.suit = suit
     self.rank = rank
@@ -89,6 +92,7 @@ function Card.prototype.onSelect(self)
     ____self_gameManager_board_1[____playerPower_2] = ____self_gameManager_board_1[____playerPower_2] + self.power
     local ____self_gameManager_board_3, ____playerValue_4 = self.gameManager.board, "playerValue"
     ____self_gameManager_board_3[____playerValue_4] = ____self_gameManager_board_3[____playerValue_4] + self.value
+    self:startAnimation(-20)
 end
 function Card.prototype.onUnselect(self)
     if isEmpty(self.gameManager.board) then
@@ -98,6 +102,65 @@ function Card.prototype.onUnselect(self)
     ____self_gameManager_board_5[____playerPower_6] = ____self_gameManager_board_5[____playerPower_6] - self.power
     local ____self_gameManager_board_7, ____playerValue_8 = self.gameManager.board, "playerValue"
     ____self_gameManager_board_7[____playerValue_8] = ____self_gameManager_board_7[____playerValue_8] - self.value
+    self:startAnimation(20)
+end
+function Card.prototype.startAnimation(self, offsetY)
+    if isEmpty(self.gameManager.board) then
+        return
+    end
+    local ____temp_9 = self.gameManager.board.cardAssets:getCardAssets(self)
+    local baseAsset = ____temp_9.baseAsset
+    local suitAssets = ____temp_9.suitAssets
+    local rankAsset = ____temp_9.rankAsset
+    local suitAsset0 = suitAssets[1]
+    local suitAsset1 = suitAssets[2]
+    if not self.isAnimating then
+        if not isEmpty(baseAsset) then
+            self.originalBaseY = baseAsset.y
+        end
+        if not isEmpty(suitAsset0) then
+            self.originalSuitY0 = suitAsset0.y
+        end
+        if not isEmpty(suitAsset1) then
+            self.originalSuitY1 = suitAsset1.y
+        end
+        if not isEmpty(rankAsset) then
+            self.originalRankY = rankAsset.y
+        end
+    end
+    self.animTargetOffsetY = offsetY
+    self.animElapsed = 0
+    self.isAnimating = true
+end
+function Card.prototype.updateAnimation(self, deltaTime)
+    if not self.isAnimating or isEmpty(self.gameManager.board) then
+        return
+    end
+    self.animElapsed = self.animElapsed + deltaTime
+    if self.animElapsed >= self.animDuration then
+        self.animElapsed = self.animDuration
+        self.isAnimating = false
+    end
+    local progress = self.animElapsed / self.animDuration
+    self.animOffsetY = self.animTargetOffsetY * progress
+    local ____temp_10 = self.gameManager.board.cardAssets:getCardAssets(self)
+    local baseAsset = ____temp_10.baseAsset
+    local suitAssets = ____temp_10.suitAssets
+    local rankAsset = ____temp_10.rankAsset
+    local suitAsset0 = suitAssets[1]
+    local suitAsset1 = suitAssets[2]
+    if not isEmpty(baseAsset) then
+        baseAsset.y = self.originalBaseY + self.animOffsetY
+    end
+    if not isEmpty(suitAsset0) then
+        suitAsset0.y = self.originalSuitY0 + self.animOffsetY
+    end
+    if not isEmpty(suitAsset1) then
+        suitAsset1.y = self.originalSuitY1 + self.animOffsetY
+    end
+    if not isEmpty(rankAsset) then
+        rankAsset.y = self.originalRankY + self.animOffsetY
+    end
 end
 function Card.onHover(self, gameManager, asset)
     local tooltipMaxWidth = 200

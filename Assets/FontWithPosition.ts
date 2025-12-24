@@ -1,6 +1,5 @@
 /** @noSelfInFile */
 
-import { Font } from "love.graphics"
 import TextManager from "./TextManager"
 import { isEmpty } from "Helpers"
 

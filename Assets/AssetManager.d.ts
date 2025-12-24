@@ -3,11 +3,12 @@ import GameManager from "GameManager";
 import FontManager from "Assets/TextManager";
 export default class AssetManager {
     gameManager: GameManager;
-    assets: Map<string, Asset>;
+    assets: Map<string, Asset[]>;
     fontManager: FontManager;
     constructor(gameManager: GameManager);
     addAsset(id: string, asset: Asset): void;
-    getAsset(id: string): Asset | undefined;
+    getAssets(baseId: string): Asset[] | undefined;
+    getAsset(baseId: string, assetId: string): Asset | undefined;
     hideAsset(id: string): void;
     drawAssets(): void;
     private drawHoverables;

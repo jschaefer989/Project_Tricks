@@ -187,6 +187,16 @@ export default class GameManager {
             update: (dt: number) => {
                 this.board?.drawBoard()
                 this.assetManager.handleMouseHover()
+                
+                // Update card animations
+                if (!isEmpty(this.board)) {
+                    for (const card of this.player.hand) {
+                        card.updateAnimation(dt)
+                    }
+                    for (const card of this.board.enemy.hand) {
+                        card.updateAnimation(dt)
+                    }
+                }
             },
             draw: () => {
                 if (!this.devMode) {

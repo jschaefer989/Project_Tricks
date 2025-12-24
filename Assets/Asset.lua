@@ -6,6 +6,7 @@ local Asset = ____exports.default
 Asset.name = "Asset"
 function Asset.prototype.____constructor(self, id, image, x, y, onClick, onHover, orientation, scaleX, scaleY, offsetX, offsetY)
     self.isDisabled = false
+    self.isHovered = false
     self.id = id
     self.image = image
     self.x = x
@@ -37,8 +38,8 @@ end
 function Asset.prototype.setDisabled(self, disabled)
     self.isDisabled = disabled
 end
-function Asset.prototype.setHoverable(self, hoverable)
-    self.hoverable = hoverable
+function Asset.prototype.setHovered(self, hovered)
+    self.isHovered = hovered
 end
 function Asset.prototype.getWidth(self)
     local imgWidth = self.image:getWidth()

@@ -6,21 +6,30 @@ import FontManager from "Assets/TextManager";
 
 export default class AssetManager {
     gameManager: GameManager
-    assets: Map<string, Asset>
+    assets: Map<string, Asset[]>
     fontManager: FontManager
 
     constructor(gameManager: GameManager) {
         this.gameManager = gameManager
-        this.assets = new Map<string, Asset>()
+        this.assets = new Map<string, Asset[]>()
         this.fontManager = new FontManager()
     }
 
     addAsset(id: string, asset: Asset): void {
-        this.assets.set(id, asset)
+        if (this.assets.has(id)) {
+            const assets = this.assets.get(id)
+            assets?.push(asset)
+            return
+        }
+        this.assets.set(id, [asset])
     }
 
-    getAsset(id: string): Asset | undefined {
-        return this.assets.get(id)
+    getAssets(baseId: string): Asset[] | undefined {
+        return this.assets.get(baseId)
+    }
+
+    getAsset(baseId: string, assetId: string): Asset | undefined {
+         return this.getAssets(baseId)?.find(asset => asset.id === assetId)
     }
 
     hideAsset(id: string): void {
@@ -29,8 +38,10 @@ export default class AssetManager {
 
     drawAssets(): void {
         // Draw all assets
-        for (const asset of this.assets.values()) {
-            love.graphics.draw(asset.image, asset.x, asset.y, asset.orientation, asset.scaleX, asset.scaleY, asset.offsetX, asset.offsetY)
+        for (const assets of this.assets.values()) {
+            for (const asset of assets) {
+                love.graphics.draw(asset.image, asset.x, asset.y, asset.orientation, asset.scaleX, asset.scaleY, asset.offsetX, asset.offsetY)
+            }
         }
 
         // Draw text above assets
@@ -41,14 +52,10 @@ export default class AssetManager {
     }
 
     private drawHoverables(): void {
-        const drawnHoverables = new Set<string>()
-        for (const asset of this.assets.values()) {
-            if (!isEmpty(asset.hoverable) && asset.hoverable.isHovered) {
-                const hoverableId = asset.hoverable.id
-                if (!drawnHoverables.has(hoverableId)) {
-                    drawnHoverables.add(hoverableId)
-                    asset.onHover?.(this.gameManager, asset)
-                }
+        for (const assets of this.assets.values()) {
+            const asset = assets[0]  // Assume hoverable is the same for all assets with the same ID
+            if (asset.isHovered) {
+                asset.onHover?.(this.gameManager, asset)
             }
         }
     }
@@ -75,7 +82,8 @@ export default class AssetManager {
             return
         }
 
-        for (const asset of this.assets.values()) {
+        for (const assets of this.assets.values()) {
+            const asset = assets[0]  // Assume click area is the same for all assets with the same ID
             if (gameX >= asset.x && gameX <= asset.x + asset.getWidth() &&
                 gameY >= asset.y && gameY <= asset.y + asset.getHeight()) {
                 asset.onClick()
@@ -90,25 +98,15 @@ export default class AssetManager {
         if (isEmpty(gameX) || isEmpty(gameY)) {
             return
         }
-
-        // Track which hoverables are being hovered
-        const hoveredHoverables = new Set<string>()
         
-        for (const asset of this.assets.values()) {
-            if (isEmpty(asset.hoverable)) {
-                continue;
-            }
+        for (const assets of this.assets.values()) {
+            const asset = assets[0]  // Assume hoverable is the same for all assets with the same ID
             
             if (gameX >= asset.x && gameX <= asset.x + asset.getWidth() &&
                 gameY >= asset.y && gameY <= asset.y + asset.getHeight()) {
-                hoveredHoverables.add(asset.hoverable.id)
-            }
-        }
-        
-        // Set isHovered based on whether the hoverable was hit by any asset
-        for (const asset of this.assets.values()) {
-            if (!isEmpty(asset.hoverable)) {
-                asset.hoverable.isHovered = hoveredHoverables.has(asset.hoverable.id)
+                asset.setHovered(true)
+            } else {
+                asset.setHovered(false)
             }
         }
     }

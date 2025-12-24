@@ -2,7 +2,6 @@ import Card from "../Cards/Card";
 import Asset from "./Asset";
 import { Suits, Ranks, TrumpRanks, CharacterTypes } from "Enums";
 import GameManager from "GameManager";
-import Hoverable from "Hoverable";
 import Point from "Point";
 import { Image } from "love.graphics";
 interface CardOptions {
@@ -15,6 +14,11 @@ interface CardOptions {
     onClick?: (card: Card) => void;
     displayCost?: boolean;
 }
+interface AssetsForCard {
+    baseAsset: Asset;
+    suitAssets: Asset[];
+    rankAsset: Asset;
+}
 export default class CardAssets {
     gameManager: GameManager;
     baseCard: Image;
@@ -22,11 +26,11 @@ export default class CardAssets {
     baseH: number;
     constructor(gameManager: GameManager);
     addAsset(card: Card, cardX: number, cardY: number, options?: CardOptions): void;
-    static getCardAssetId(card: Card): string;
-    addSuitAsset(card: Card, x: number, y: number, hoverable: Hoverable): void;
+    static getBaseAssetId(card: Card): string;
+    addSuitAsset(card: Card, x: number, y: number): void;
     getNormalSuitPosition(x: number, y: number): Point;
     getFlippedSuitPosition(x: number, y: number): Point;
-    addRankAsset(card: Card, x: number, y: number, hoverable: Hoverable): void;
+    addRankAsset(card: Card, x: number, y: number): void;
     getRankPosition(x: number, y: number, rankImage: Image): Point;
     static getSuitAssetPath(suit: Suits): string;
     static getSuitAssetId(card: Card, orientation: number): string;
@@ -40,5 +44,6 @@ export default class CardAssets {
     getHeightModifier(characterType: CharacterTypes, shiftUp?: boolean): number;
     determineCardStartingPosition(characterType: CharacterTypes): Point;
     appendAsset(card: Card, characterType: CharacterTypes): void;
+    getCardAssets(card: Card): AssetsForCard;
 }
 export {};
