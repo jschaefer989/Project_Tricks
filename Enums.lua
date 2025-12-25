@@ -60,4 +60,13 @@ ____exports.AssetIds.DISCARD_BUTTON = "DISCARD_BUTTON"
 ____exports.AssetIds.DESELECT_BUTTON = "DESELECT_BUTTON"
 ____exports.FontIds = FontIds or ({})
 ____exports.FontIds.ATTACK_BUTTON_CAPTION = "ATTACK_BUTTON_CAPTION"
+____exports.AnimationIds = AnimationIds or ({})
+____exports.AnimationIds.CARD_BASE_SELECT = "CARD_BASE_SELECT"
+____exports.AnimationIds.CARD_BASE_UNSELECT = "CARD_BASE_UNSELECT"
+____exports.AnimationIds.CARD_SUIT_NORMAL_SELECT = "CARD_SUIT_NORMAL_SELECT"
+____exports.AnimationIds.CARD_SUIT_NORMAL_UNSELECT = "CARD_SUIT_NORMAL_UNSELECT"
+____exports.AnimationIds.CARD_SUIT_FLIPPED_SELECT = "CARD_SUIT_FLIPPED_SELECT"
+____exports.AnimationIds.CARD_SUIT_FLIPPED_UNSELECT = "CARD_SUIT_FLIPPED_UNSELECT"
+____exports.AnimationIds.CARD_RANK_SELECT = "CARD_RANK_NORMAL_SELECT"
+____exports.AnimationIds.CARD_RANK_UNSELECT = "CARD_RANK_NORMAL_UNSELECT"
 return ____exports

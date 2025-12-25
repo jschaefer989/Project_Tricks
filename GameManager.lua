@@ -41,6 +41,8 @@ local ____AssetManager = require("Assets.AssetManager")
 local AssetManager = ____AssetManager.default
 local ____TextManager = require("Assets.TextManager")
 local FontManager = ____TextManager.default
+local ____AnimationManager = require("Assets.AnimationManager")
+local AnimationManager = ____AnimationManager.default
 ____exports.default = __TS__Class()
 local GameManager = ____exports.default
 GameManager.name = "GameManager"
@@ -60,6 +62,7 @@ function GameManager.prototype.____constructor(self)
     self.levelUpScreen = nil
     self.perkScreen = nil
     self.assetManager = __TS__New(AssetManager, self)
+    self.animationManager = __TS__New(AnimationManager)
     if not self.devMode then
         FontManager:setDefaultFont()
     end
@@ -195,14 +198,7 @@ function GameManager.prototype.switchToBoard(self, enemy)
                 ____opt_11:drawBoard()
             end
             self.assetManager:handleMouseHover()
-            if not isEmpty(self.board) then
-                for ____, card in ipairs(self.player.hand) do
-                    card:updateAnimation(dt)
-                end
-                for ____, card in ipairs(self.board.enemy.hand) do
-                    card:updateAnimation(dt)
-                end
-            end
+            self.animationManager:updateAnimations(dt)
         end,
         draw = function()
             if not self.devMode then

@@ -1,10 +1,10 @@
 /** @noSelfInFile */
 
 import GameManager from "GameManager"
-import { Ranks, Suits, TrumpRanks, AssetIds } from "../Enums"
+import { AnimationIds, Ranks, Suits, TrumpRanks } from "../Enums"
 import { isEmpty } from "Helpers"
 import Asset from "Assets/Asset"
-import CardAssets from "Assets/CardAssets"
+import Animation from "Assets/Animation"
 
 interface CardData {
     id: string
@@ -29,20 +29,6 @@ export default class Card {
     cost: number
     isTrump: boolean = false
     name: string
-
-    // TODO: I want to make this into a more generic animation handler
-    // Animation state for selected card movement
-    animDuration: number = 0.15  // seconds
-    animElapsed: number = 0
-    animOffsetY: number = 0  // Current animation offset
-    animTargetOffsetY: number = 0  // Target animation offset (e.g., -20 for up)
-    isAnimating: boolean = false
-    
-    // Store original Y positions for all assets
-    originalBaseY: number = 0
-    originalSuitY0: number = 0
-    originalSuitY1: number = 0
-    originalRankY: number = 0
 
     constructor(gameManager: GameManager, suit: Suits, rank: Ranks | TrumpRanks, power: number, value: number, name: string, isTrump?: boolean) {
         const id = `${suit}_${rank}_${love.math.random(1000)}`
@@ -111,8 +97,30 @@ export default class Card {
         this.gameManager.board.playerPower += this.power
         this.gameManager.board.playerValue += this.value
         
-        // Trigger animation: move card up by 20 pixels
-        this.startAnimation(-20)
+        const { baseAsset, suitAssets, rankAsset } = this.gameManager.board.cardAssets.getCardAssets(this)
+        const suitAssetNormal = suitAssets[0]
+        const suitAssetFlipped = suitAssets[1]
+
+        const baseId = AnimationIds.CARD_BASE_SELECT + this.id
+        if (!isEmpty(baseAsset) && !this.gameManager.animationManager.animations.has(baseId)) {
+
+            this.gameManager.animationManager.animations.set(baseId, new Animation(0, -20, baseAsset))
+        }
+        const suitNormalId = AnimationIds.CARD_SUIT_NORMAL_SELECT + this.id
+        if (!isEmpty(suitAssetNormal) && !this.gameManager.animationManager.animations.has(suitNormalId)) {
+
+            this.gameManager.animationManager.animations.set(suitNormalId, new Animation(0, -20, suitAssetNormal))
+        }
+        const suitFlippedId = AnimationIds.CARD_SUIT_FLIPPED_SELECT + this.id
+        if (!isEmpty(suitAssetFlipped) && !this.gameManager.animationManager.animations.has(suitFlippedId)) {
+
+            this.gameManager.animationManager.animations.set(suitFlippedId, new Animation(0, -20, suitAssetFlipped))
+        }
+        const rankAssetId = AnimationIds.CARD_RANK_SELECT + this.id
+        if (!isEmpty(rankAsset) && !this.gameManager.animationManager.animations.has(rankAssetId)) {
+
+            this.gameManager.animationManager.animations.set(rankAssetId, new Animation(0, -20, rankAsset))
+        }
     }
 
     onUnselect(): void {
@@ -123,67 +131,29 @@ export default class Card {
         this.gameManager.board.playerPower -= this.power
         this.gameManager.board.playerValue -= this.value
         
-        // Trigger animation: move card back to original position
-        this.startAnimation(20)
-    }
-
-    // TODO: I want to make this into a more generic animation handler
-    startAnimation(offsetY: number): void {
-        if (isEmpty(this.gameManager.board)) {
-            return  
-        }
-
-        // Store original positions of all assets
         const { baseAsset, suitAssets, rankAsset } = this.gameManager.board.cardAssets.getCardAssets(this)
-        const suitAsset0 = suitAssets[0]
-        const suitAsset1 = suitAssets[1]
-        
-        // Only initialize original positions on first animation call or when not animating
-        if (!this.isAnimating) {
-            if (!isEmpty(baseAsset)) this.originalBaseY = baseAsset.y
-            if (!isEmpty(suitAsset0)) this.originalSuitY0 = suitAsset0.y
-            if (!isEmpty(suitAsset1)) this.originalSuitY1 = suitAsset1.y
-            if (!isEmpty(rankAsset)) this.originalRankY = rankAsset.y
-        }
-        
-        this.animTargetOffsetY = offsetY
-        this.animElapsed = 0
-        this.isAnimating = true
-    }
+        const suitAssetNormal = suitAssets[0]
+        const suitAssetFlipped = suitAssets[1]
 
-    updateAnimation(deltaTime: number): void {
-        if (!this.isAnimating || isEmpty(this.gameManager.board)) {
-            return
-        }
+        const baseId = AnimationIds.CARD_BASE_SELECT + this.id
+        if (!isEmpty(baseAsset) && !this.gameManager.animationManager.animations.has(baseId)) {
 
-        this.animElapsed += deltaTime
-        
-        if (this.animElapsed >= this.animDuration) {
-            // Animation complete
-            this.animElapsed = this.animDuration
-            this.isAnimating = false
+            this.gameManager.animationManager.animations.set(baseId, new Animation(0, 20, baseAsset))
         }
+        const suitNormalId = AnimationIds.CARD_SUIT_NORMAL_SELECT + this.id
+        if (!isEmpty(suitAssetNormal) && !this.gameManager.animationManager.animations.has(suitNormalId)) {
 
-        // Interpolate animation offset
-        const progress = this.animElapsed / this.animDuration
-        this.animOffsetY = this.animTargetOffsetY * progress
-        
-        // Update all card assets' Y positions by adding offset to their original positions
-        const { baseAsset, suitAssets, rankAsset } = this.gameManager.board.cardAssets.getCardAssets(this)
-        const suitAsset0 = suitAssets[0]
-        const suitAsset1 = suitAssets[1]
-        
-        if (!isEmpty(baseAsset)) {
-            baseAsset.y = this.originalBaseY + this.animOffsetY
+            this.gameManager.animationManager.animations.set(suitNormalId, new Animation(0, 20, suitAssetNormal))
         }
-        if (!isEmpty(suitAsset0)) {
-            suitAsset0.y = this.originalSuitY0 + this.animOffsetY
+        const suitFlippedId = AnimationIds.CARD_SUIT_FLIPPED_SELECT + this.id
+        if (!isEmpty(suitAssetFlipped) && !this.gameManager.animationManager.animations.has(suitFlippedId)) {
+
+            this.gameManager.animationManager.animations.set(suitFlippedId, new Animation(0, 20, suitAssetFlipped))
         }
-        if (!isEmpty(suitAsset1)) {
-            suitAsset1.y = this.originalSuitY1 + this.animOffsetY
-        }
-        if (!isEmpty(rankAsset)) {
-            rankAsset.y = this.originalRankY + this.animOffsetY
+        const rankAssetId = AnimationIds.CARD_RANK_SELECT + this.id
+        if (!isEmpty(rankAsset) && !this.gameManager.animationManager.animations.has(rankAssetId)) {
+
+            this.gameManager.animationManager.animations.set(rankAssetId, new Animation(0, 20, rankAsset))
         }
     }
 

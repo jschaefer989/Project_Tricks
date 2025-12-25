@@ -3,23 +3,18 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local ____exports = {}
+local ____Enums = require("Enums")
+local AnimationIds = ____Enums.AnimationIds
 local ____Helpers = require("Helpers")
 local isEmpty = ____Helpers.isEmpty
+local ____Animation = require("Assets.Animation")
+local Animation = ____Animation.default
 ____exports.default = __TS__Class()
 local Card = ____exports.default
 Card.name = "Card"
 function Card.prototype.____constructor(self, gameManager, suit, rank, power, value, name, isTrump)
     self.isSelected = false
     self.isTrump = false
-    self.animDuration = 0.15
-    self.animElapsed = 0
-    self.animOffsetY = 0
-    self.animTargetOffsetY = 0
-    self.isAnimating = false
-    self.originalBaseY = 0
-    self.originalSuitY0 = 0
-    self.originalSuitY1 = 0
-    self.originalRankY = 0
     local id = (((suit .. "_") .. rank) .. "_") .. tostring(love.math.random(1000))
     self.gameManager = gameManager
     self.suit = suit
@@ -92,74 +87,82 @@ function Card.prototype.onSelect(self)
     ____self_gameManager_board_1[____playerPower_2] = ____self_gameManager_board_1[____playerPower_2] + self.power
     local ____self_gameManager_board_3, ____playerValue_4 = self.gameManager.board, "playerValue"
     ____self_gameManager_board_3[____playerValue_4] = ____self_gameManager_board_3[____playerValue_4] + self.value
-    self:startAnimation(-20)
+    local ____temp_5 = self.gameManager.board.cardAssets:getCardAssets(self)
+    local baseAsset = ____temp_5.baseAsset
+    local suitAssets = ____temp_5.suitAssets
+    local rankAsset = ____temp_5.rankAsset
+    local suitAssetNormal = suitAssets[1]
+    local suitAssetFlipped = suitAssets[2]
+    local baseId = AnimationIds.CARD_BASE_SELECT .. self.id
+    if not isEmpty(baseAsset) and not self.gameManager.animationManager.animations:has(baseId) then
+        self.gameManager.animationManager.animations:set(
+            baseId,
+            __TS__New(Animation, 0, -20, baseAsset)
+        )
+    end
+    local suitNormalId = AnimationIds.CARD_SUIT_NORMAL_SELECT .. self.id
+    if not isEmpty(suitAssetNormal) and not self.gameManager.animationManager.animations:has(suitNormalId) then
+        self.gameManager.animationManager.animations:set(
+            suitNormalId,
+            __TS__New(Animation, 0, -20, suitAssetNormal)
+        )
+    end
+    local suitFlippedId = AnimationIds.CARD_SUIT_FLIPPED_SELECT .. self.id
+    if not isEmpty(suitAssetFlipped) and not self.gameManager.animationManager.animations:has(suitFlippedId) then
+        self.gameManager.animationManager.animations:set(
+            suitFlippedId,
+            __TS__New(Animation, 0, -20, suitAssetFlipped)
+        )
+    end
+    local rankAssetId = AnimationIds.CARD_RANK_SELECT .. self.id
+    if not isEmpty(rankAsset) and not self.gameManager.animationManager.animations:has(rankAssetId) then
+        self.gameManager.animationManager.animations:set(
+            rankAssetId,
+            __TS__New(Animation, 0, -20, rankAsset)
+        )
+    end
 end
 function Card.prototype.onUnselect(self)
     if isEmpty(self.gameManager.board) then
         return
     end
-    local ____self_gameManager_board_5, ____playerPower_6 = self.gameManager.board, "playerPower"
-    ____self_gameManager_board_5[____playerPower_6] = ____self_gameManager_board_5[____playerPower_6] - self.power
-    local ____self_gameManager_board_7, ____playerValue_8 = self.gameManager.board, "playerValue"
-    ____self_gameManager_board_7[____playerValue_8] = ____self_gameManager_board_7[____playerValue_8] - self.value
-    self:startAnimation(20)
-end
-function Card.prototype.startAnimation(self, offsetY)
-    if isEmpty(self.gameManager.board) then
-        return
-    end
-    local ____temp_9 = self.gameManager.board.cardAssets:getCardAssets(self)
-    local baseAsset = ____temp_9.baseAsset
-    local suitAssets = ____temp_9.suitAssets
-    local rankAsset = ____temp_9.rankAsset
-    local suitAsset0 = suitAssets[1]
-    local suitAsset1 = suitAssets[2]
-    if not self.isAnimating then
-        if not isEmpty(baseAsset) then
-            self.originalBaseY = baseAsset.y
-        end
-        if not isEmpty(suitAsset0) then
-            self.originalSuitY0 = suitAsset0.y
-        end
-        if not isEmpty(suitAsset1) then
-            self.originalSuitY1 = suitAsset1.y
-        end
-        if not isEmpty(rankAsset) then
-            self.originalRankY = rankAsset.y
-        end
-    end
-    self.animTargetOffsetY = offsetY
-    self.animElapsed = 0
-    self.isAnimating = true
-end
-function Card.prototype.updateAnimation(self, deltaTime)
-    if not self.isAnimating or isEmpty(self.gameManager.board) then
-        return
-    end
-    self.animElapsed = self.animElapsed + deltaTime
-    if self.animElapsed >= self.animDuration then
-        self.animElapsed = self.animDuration
-        self.isAnimating = false
-    end
-    local progress = self.animElapsed / self.animDuration
-    self.animOffsetY = self.animTargetOffsetY * progress
+    local ____self_gameManager_board_6, ____playerPower_7 = self.gameManager.board, "playerPower"
+    ____self_gameManager_board_6[____playerPower_7] = ____self_gameManager_board_6[____playerPower_7] - self.power
+    local ____self_gameManager_board_8, ____playerValue_9 = self.gameManager.board, "playerValue"
+    ____self_gameManager_board_8[____playerValue_9] = ____self_gameManager_board_8[____playerValue_9] - self.value
     local ____temp_10 = self.gameManager.board.cardAssets:getCardAssets(self)
     local baseAsset = ____temp_10.baseAsset
     local suitAssets = ____temp_10.suitAssets
     local rankAsset = ____temp_10.rankAsset
-    local suitAsset0 = suitAssets[1]
-    local suitAsset1 = suitAssets[2]
-    if not isEmpty(baseAsset) then
-        baseAsset.y = self.originalBaseY + self.animOffsetY
+    local suitAssetNormal = suitAssets[1]
+    local suitAssetFlipped = suitAssets[2]
+    local baseId = AnimationIds.CARD_BASE_SELECT .. self.id
+    if not isEmpty(baseAsset) and not self.gameManager.animationManager.animations:has(baseId) then
+        self.gameManager.animationManager.animations:set(
+            baseId,
+            __TS__New(Animation, 0, 20, baseAsset)
+        )
     end
-    if not isEmpty(suitAsset0) then
-        suitAsset0.y = self.originalSuitY0 + self.animOffsetY
+    local suitNormalId = AnimationIds.CARD_SUIT_NORMAL_SELECT .. self.id
+    if not isEmpty(suitAssetNormal) and not self.gameManager.animationManager.animations:has(suitNormalId) then
+        self.gameManager.animationManager.animations:set(
+            suitNormalId,
+            __TS__New(Animation, 0, 20, suitAssetNormal)
+        )
     end
-    if not isEmpty(suitAsset1) then
-        suitAsset1.y = self.originalSuitY1 + self.animOffsetY
+    local suitFlippedId = AnimationIds.CARD_SUIT_FLIPPED_SELECT .. self.id
+    if not isEmpty(suitAssetFlipped) and not self.gameManager.animationManager.animations:has(suitFlippedId) then
+        self.gameManager.animationManager.animations:set(
+            suitFlippedId,
+            __TS__New(Animation, 0, 20, suitAssetFlipped)
+        )
     end
-    if not isEmpty(rankAsset) then
-        rankAsset.y = self.originalRankY + self.animOffsetY
+    local rankAssetId = AnimationIds.CARD_RANK_SELECT .. self.id
+    if not isEmpty(rankAsset) and not self.gameManager.animationManager.animations:has(rankAssetId) then
+        self.gameManager.animationManager.animations:set(
+            rankAssetId,
+            __TS__New(Animation, 0, 20, rankAsset)
+        )
     end
 end
 function Card.onHover(self, gameManager, asset)

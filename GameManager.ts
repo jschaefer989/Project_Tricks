@@ -22,6 +22,7 @@ import * as push from "Libraries.push"
 import AssetManager from "Assets/AssetManager"
 import Card from "Cards/Card"
 import FontManager from "Assets/TextManager"
+import AnimationManager from "Assets/AnimationManager"
 
 interface GameState {
     update: (dt: number) => void
@@ -45,6 +46,7 @@ export default class GameManager {
     levelUpScreen?: LevelUpScreen
     perkScreen?: PerkScreen
     assetManager: AssetManager
+    animationManager: AnimationManager
     devMode: boolean = false // Change if you want to test in dev mode
 
     constructor() {
@@ -62,6 +64,7 @@ export default class GameManager {
         this.levelUpScreen = undefined
         this.perkScreen = undefined
         this.assetManager = new AssetManager(this)
+        this.animationManager = new AnimationManager()
         if (!this.devMode) {
             FontManager.setDefaultFont()
         }
@@ -187,16 +190,7 @@ export default class GameManager {
             update: (dt: number) => {
                 this.board?.drawBoard()
                 this.assetManager.handleMouseHover()
-                
-                // Update card animations
-                if (!isEmpty(this.board)) {
-                    for (const card of this.player.hand) {
-                        card.updateAnimation(dt)
-                    }
-                    for (const card of this.board.enemy.hand) {
-                        card.updateAnimation(dt)
-                    }
-                }
+                this.animationManager.updateAnimations(dt)
             },
             draw: () => {
                 if (!this.devMode) {

@@ -16,6 +16,7 @@ import LevelUpScreen from "Screens/LevelUpScreen";
 import PerkScreen from "Screens/PerkScreen";
 import AssetManager from "Assets/AssetManager";
 import Card from "Cards/Card";
+import AnimationManager from "Assets/AnimationManager";
 export default class GameManager {
     gameState: GameStates;
     player: Player;
@@ -31,6 +32,7 @@ export default class GameManager {
     levelUpScreen?: LevelUpScreen;
     perkScreen?: PerkScreen;
     assetManager: AssetManager;
+    animationManager: AnimationManager;
     devMode: boolean;
     constructor();
     getCharacter(characterType: string): Character | undefined;

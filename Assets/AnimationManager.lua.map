@@ -1,0 +1,1 @@
+{"version":3,"sources":["AnimationManager.ts"],"names":["this"],"mappings":";;;;;;AAEA;MAAqB,+BAArB;AAAA;AAGI;AAFA,sBAAqC,UAAI;AAEzC;AAIA,yDAAe,IAAY;IACvB,AAAAA,gBAAgB,IAAI,IAAI;AAD5B;AAIA,2DAAiB;AACb,2BAA8B,eAAAA;cAAlB;cAAI;QACZ,UAAU,gBAAgB;WACtB;YACA,AAAAA,gBAAgB,OAAO;;;AAJnC","file":"AnimationManager.lua","sourceRoot":""}
