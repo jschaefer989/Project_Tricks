@@ -232,10 +232,7 @@ function CardAssets.prototype.hideCardAssets(self, card)
     assetManager:hideAsset(____exports.default:getSuitAssetId(card, 1))
     assetManager:hideAsset(____exports.default:getRankAssetId(card, 0))
 end
-function CardAssets.prototype.centerCards(self, characterType, shiftUp)
-    if shiftUp == nil then
-        shiftUp = false
-    end
+function CardAssets.prototype.centerCards(self, characterType)
     local character = self.gameManager:getCharacter(characterType)
     if isEmpty(character) then
         return
@@ -244,7 +241,7 @@ function CardAssets.prototype.centerCards(self, characterType, shiftUp)
     local screenW = push:getWidth()
     local totalW = cardCount * self.baseW + math.max(0, cardCount - 1) * padding
     local startX = math.floor((screenW - totalW) / 2)
-    local cardY = self:getCardPosition(characterType, shiftUp)
+    local cardY = self:getCardPosition(characterType)
     do
         local i = 0
         while i < #character.hand do
@@ -295,22 +292,17 @@ function CardAssets.prototype.getRankAsset(self, card)
         ____exports.default:getRankAssetId(card, 0)
     )
 end
-function CardAssets.prototype.getCardPosition(self, characterType, shiftUp)
-    if shiftUp == nil then
-        shiftUp = false
-    end
+function CardAssets.prototype.getCardPosition(self, characterType)
     local screenH = push:getHeight()
-    return screenH / 2 + self:getHeightModifier(characterType, shiftUp)
+    return screenH / 2 + self:getHeightModifier(characterType)
 end
-function CardAssets.prototype.getHeightModifier(self, characterType, shiftUp)
-    if shiftUp == nil then
-        shiftUp = false
-    end
+function CardAssets.prototype.getHeightModifier(self, characterType)
     repeat
         local ____switch33 = characterType
         local ____cond33 = ____switch33 == CharacterTypes.PLAYER
         if ____cond33 then
-            return shiftUp and -(self.baseH * 0.25) or self.baseH / 2
+            local ____opt_8 = self.gameManager.board
+            return not (____opt_8 and ____opt_8.showingInitialView) and -(self.baseH * 0.25) or self.baseH / 2
         end
         ____cond33 = ____cond33 or ____switch33 == CharacterTypes.ENEMY
         if ____cond33 then

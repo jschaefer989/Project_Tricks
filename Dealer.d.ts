@@ -1,5 +1,5 @@
 /** @noSelfInFile */
-import { Suits, Ranks, TrumpRanks } from "./Enums";
+import { Suits, Ranks, CharacterTypes, TrumpRanks } from "./Enums";
 import Card from "Cards/Card";
 import GameManager from "./GameManager";
 export default class Dealer {
@@ -12,7 +12,7 @@ export default class Dealer {
     static shuffle(gameManager: GameManager, characterType: string): void;
     static getNewCard(gameManager: GameManager, rank: Ranks | TrumpRanks, suit: Suits): Card;
     static getRandomCard(gameManager: GameManager): Card;
-    dealCards(characterType: string): void;
+    dealCards(characterType: CharacterTypes): void;
     initializeEnemyDeck(): void;
     determineTrumpSuit(): void;
     convertToTrumpSuit(card: Card): Card;

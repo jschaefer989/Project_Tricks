@@ -37,11 +37,11 @@ export default class CardAssets {
     static getRankAssetPath(rank: Ranks | TrumpRanks): string;
     static getRankAssetId(card: Card, orientation: number): string;
     hideCardAssets(card: Card): void;
-    centerCards(characterType: CharacterTypes, shiftUp?: boolean): void;
+    centerCards(characterType: CharacterTypes): void;
     updateCardPosition(card: Card, x: number, y: number): void;
     getRankAsset(card: Card): Asset | undefined;
-    getCardPosition(characterType: CharacterTypes, shiftUp?: boolean): number;
-    getHeightModifier(characterType: CharacterTypes, shiftUp?: boolean): number;
+    getCardPosition(characterType: CharacterTypes): number;
+    getHeightModifier(characterType: CharacterTypes): number;
     determineCardStartingPosition(characterType: CharacterTypes): Point;
     appendAsset(card: Card, characterType: CharacterTypes): void;
     getCardAssets(card: Card): AssetsForCard;

@@ -127,7 +127,7 @@ export default class Dealer {
         return Dealer.getNewCard(gameManager, rank, suit)
     }
 
-    dealCards(characterType: string): void {
+    dealCards(characterType: CharacterTypes): void {
         const character = this.gameManager.getCharacter(characterType)
         if (isEmpty(character)) {   
             return
@@ -140,6 +140,8 @@ export default class Dealer {
                 character.addToHand(card)
             }
         }
+
+        this.gameManager.board?.cardAssets.centerCards(characterType);
 
         if (characterType === CharacterTypes.ENEMY && !isEmpty(this.gameManager.board)) {
             this.gameManager.board.enemyPower = this.gameManager.board.enemy.getCardPower()

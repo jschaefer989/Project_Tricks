@@ -198,6 +198,10 @@ function Dealer.prototype.dealCards(self, characterType)
             i = i + 1
         end
     end
+    local ____opt_2 = self.gameManager.board
+    if ____opt_2 ~= nil then
+        ____opt_2.cardAssets:centerCards(characterType)
+    end
     if characterType == CharacterTypes.ENEMY and not isEmpty(self.gameManager.board) then
         self.gameManager.board.enemyPower = self.gameManager.board.enemy:getCardPower()
         self.gameManager.board.enemyValue = self.gameManager.board.enemy:getCardValue()
@@ -384,8 +388,8 @@ function Dealer.prototype.getLootCards(self)
     return self.lootCards
 end
 function Dealer.prototype.addLootCard(self, card)
-    local ____self_lootCards_2 = self.lootCards
-    ____self_lootCards_2[#____self_lootCards_2 + 1] = card
+    local ____self_lootCards_4 = self.lootCards
+    ____self_lootCards_4[#____self_lootCards_4 + 1] = card
 end
 function Dealer.prototype.hasLootCard(self, card)
     for ____, lootCard in ipairs(self.lootCards) do

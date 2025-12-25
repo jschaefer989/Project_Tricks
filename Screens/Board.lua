@@ -427,8 +427,6 @@ function Board.prototype.handleStartFight(self)
     self.showingInitialView = false
     self.gameManager.assetManager:hideAsset(AssetIds.LETS_FIGHT_BUTTON)
     self.dealer:startGame()
-    self.cardAssets:centerCards(CharacterTypes.PLAYER, true)
-    self.cardAssets:centerCards(CharacterTypes.ENEMY)
     self:buildAttackButton()
 end
 function Board.prototype.handleAttack(self)
@@ -547,7 +545,7 @@ function Board.prototype.buildAttackButton(self)
     local gap = 20
     local btnW = self.attackButton:getWidth()
     local totalW = btnW * 3 + gap * 2
-    local buttonY = self.cardAssets:getCardPosition(CharacterTypes.PLAYER, true) + self.cardAssets.baseH + padding
+    local buttonY = self.cardAssets:getCardPosition(CharacterTypes.PLAYER) + self.cardAssets.baseH + padding
     local buttonX = math.floor((push:getWidth() - totalW) / 2)
     self.gameManager.assetManager:addAsset(
         AssetIds.ATTACK_BUTTON,

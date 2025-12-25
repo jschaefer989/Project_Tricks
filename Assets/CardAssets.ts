@@ -206,7 +206,7 @@ export default class CardAssets {
     assetManager.hideAsset(CardAssets.getRankAssetId(card, 0));
   }
 
-  centerCards(characterType: CharacterTypes, shiftUp: boolean = false): void {
+  centerCards(characterType: CharacterTypes): void {
     const character = this.gameManager.getCharacter(characterType)
     if (isEmpty(character)) {
       return;
@@ -216,7 +216,7 @@ export default class CardAssets {
     const totalW =
       cardCount * this.baseW + Math.max(0, cardCount - 1) * padding;
     const startX = Math.floor((screenW - totalW) / 2);
-    const cardY = this.getCardPosition(characterType, shiftUp);
+    const cardY = this.getCardPosition(characterType);
 
     for (let i = 0; i < character.hand.length; i++) {
       const card = character.hand[i];
@@ -259,15 +259,15 @@ export default class CardAssets {
     );
   }
 
-  getCardPosition(characterType: CharacterTypes, shiftUp: boolean = false): number {
+  getCardPosition(characterType: CharacterTypes): number {
     const screenH = push.getHeight();
-    return screenH / 2 + this.getHeightModifier(characterType, shiftUp);
+    return screenH / 2 + this.getHeightModifier(characterType);
   }
 
-  getHeightModifier(characterType: CharacterTypes, shiftUp: boolean = false): number {
+  getHeightModifier(characterType: CharacterTypes): number {
     switch (characterType) {
       case CharacterTypes.PLAYER:
-        return shiftUp ? -(this.baseH * 0.25) : this.baseH / 2
+        return !this.gameManager.board?.showingInitialView ? -(this.baseH * 0.25) : this.baseH / 2
       case CharacterTypes.ENEMY:
         return -(this.baseH * 1.5)
       default:
