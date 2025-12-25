@@ -28,6 +28,8 @@ Board.name = "Board"
 function Board.prototype.____constructor(self, gameManager, enemy)
     self.letsFightButton = love.graphics.newImage("Assets/Images/LetsFightButton.png")
     self.attackButton = love.graphics.newImage("Assets/Images/AttackButton.png")
+    self.discardButton = love.graphics.newImage("Assets/Images/DiscardButton.png")
+    self.deselectButton = love.graphics.newImage("Assets/Images/DeselectButton.png")
     self.gameManager = gameManager
     self.discardUsed = 0
     self.enemy = enemy or __TS__New(Enemy, gameManager)
@@ -427,7 +429,7 @@ function Board.prototype.handleStartFight(self)
     self.showingInitialView = false
     self.gameManager.assetManager:hideAsset(AssetIds.LETS_FIGHT_BUTTON)
     self.dealer:startGame()
-    self:buildAttackButton()
+    self:buildPrimaryButtons()
 end
 function Board.prototype.handleAttack(self)
     if not self.gameManager.player:anySelectedCards() then
@@ -541,12 +543,17 @@ function Board.prototype.buildLetsFightButton(self)
         )
     )
 end
-function Board.prototype.buildAttackButton(self)
+function Board.prototype.buildPrimaryButtons(self)
     local gap = 20
     local btnW = self.attackButton:getWidth()
     local totalW = btnW * 3 + gap * 2
     local buttonY = self.cardAssets:getCardPosition(CharacterTypes.PLAYER) + self.cardAssets.baseH + padding
     local buttonX = math.floor((push:getWidth() - totalW) / 2)
+    self:buildAttackButton(buttonX, buttonY, btnW)
+    local discardX = self:buildDiscardButton(buttonX, buttonY, btnW, gap)
+    self:buildDeselectButton(discardX, buttonY, btnW, gap)
+end
+function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW)
     self.gameManager.assetManager:addAsset(
         AssetIds.ATTACK_BUTTON,
         __TS__New(
@@ -567,6 +574,59 @@ function Board.prototype.buildAttackButton(self)
             centerX,
             centerY,
             "Attack",
+            {size = 28}
+        )
+    )
+end
+function Board.prototype.buildDiscardButton(self, buttonX, buttonY, btnW, gap)
+    local discardX = buttonX + btnW + gap
+    self.gameManager.assetManager:addAsset(
+        AssetIds.DISCARD_BUTTON,
+        __TS__New(
+            Asset,
+            AssetIds.DISCARD_BUTTON,
+            self.discardButton,
+            discardX,
+            buttonY,
+            function() return self:handleDiscard() end
+        )
+    )
+    local centerX = discardX + btnW / 2
+    local centerY = buttonY + self.attackButton:getHeight() / 2
+    self.gameManager.assetManager.fontManager:addText(
+        FontIds.DISCARD_BUTTON_CAPTION,
+        __TS__New(
+            FontWithPosition,
+            centerX,
+            centerY,
+            "Discard",
+            {size = 28}
+        )
+    )
+    return discardX
+end
+function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, gap)
+    local deselectX = discardX + btnW + gap
+    self.gameManager.assetManager:addAsset(
+        AssetIds.DESELECT_BUTTON,
+        __TS__New(
+            Asset,
+            AssetIds.DESELECT_BUTTON,
+            self.deselectButton,
+            deselectX,
+            buttonY,
+            function() return self.gameManager.player:unselectCards() end
+        )
+    )
+    local centerX = deselectX + btnW / 2
+    local centerY = buttonY + self.attackButton:getHeight() / 2
+    self.gameManager.assetManager.fontManager:addText(
+        FontIds.DESELECT_BUTTON_CAPTION,
+        __TS__New(
+            FontWithPosition,
+            centerX,
+            centerY,
+            "Deselect",
             {size = 28}
         )
     )

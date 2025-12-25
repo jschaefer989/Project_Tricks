@@ -198,12 +198,7 @@ export default class CardAssets {
   }
 
   hideCardAssets(card: Card): void {
-    const assetManager = this.gameManager.assetManager;
-
-    assetManager.hideAsset(CardAssets.getBaseAssetId(card));
-    assetManager.hideAsset(CardAssets.getSuitAssetId(card, 0));
-    assetManager.hideAsset(CardAssets.getSuitAssetId(card, 1));
-    assetManager.hideAsset(CardAssets.getRankAssetId(card, 0));
+    this.gameManager.assetManager.hideAsset(CardAssets.getBaseAssetId(card));
   }
 
   centerCards(characterType: CharacterTypes): void {

@@ -44,31 +44,43 @@ function AssetManager.prototype.hideAsset(self, id)
 end
 function AssetManager.prototype.drawAssets(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
-        for ____, asset in ipairs(assets) do
-            love.graphics.draw(
-                asset.image,
-                asset.x,
-                asset.y,
-                asset.orientation,
-                asset.scaleX,
-                asset.scaleY,
-                asset.offsetX,
-                asset.offsetY
-            )
+        do
+            if isEmpty(assets) or #assets == 0 then
+                goto __continue10
+            end
+            for ____, asset in ipairs(assets) do
+                love.graphics.draw(
+                    asset.image,
+                    asset.x,
+                    asset.y,
+                    asset.orientation,
+                    asset.scaleX,
+                    asset.scaleY,
+                    asset.offsetX,
+                    asset.offsetY
+                )
+            end
         end
+        ::__continue10::
     end
     self.fontManager:drawText()
     self:drawHoverables()
 end
 function AssetManager.prototype.drawHoverables(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
-        local asset = assets[1]
-        if asset.isHovered then
-            local ____opt_4 = asset.onHover
-            if ____opt_4 ~= nil then
-                ____opt_4(asset, self.gameManager, asset)
+        do
+            if isEmpty(assets) or #assets == 0 then
+                goto __continue16
+            end
+            local asset = assets[1]
+            if asset.isHovered then
+                local ____opt_4 = asset.onHover
+                if ____opt_4 ~= nil then
+                    ____opt_4(asset, self.gameManager, asset)
+                end
             end
         end
+        ::__continue16::
     end
 end
 function AssetManager.prototype.handleMousePressed(self, x, y, button)
@@ -79,10 +91,16 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
         return
     end
     for ____, assets in __TS__Iterator(self.assets:values()) do
-        local asset = assets[1]
-        if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
-            asset:onClick()
+        do
+            if isEmpty(assets) or #assets == 0 then
+                goto __continue23
+            end
+            local asset = assets[1]
+            if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
+                asset:onClick()
+            end
         end
+        ::__continue23::
     end
 end
 function AssetManager.prototype.handleMouseHover(self)
@@ -92,12 +110,18 @@ function AssetManager.prototype.handleMouseHover(self)
         return
     end
     for ____, assets in __TS__Iterator(self.assets:values()) do
-        local asset = assets[1]
-        if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
-            asset:setHovered(true)
-        else
-            asset:setHovered(false)
+        do
+            if isEmpty(assets) or #assets == 0 then
+                goto __continue29
+            end
+            local asset = assets[1]
+            if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
+                asset:setHovered(true)
+            else
+                asset:setHovered(false)
+            end
         end
+        ::__continue29::
     end
 end
 return ____exports

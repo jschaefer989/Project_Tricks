@@ -104,7 +104,7 @@ export default class Player extends Character {
             if (card.isSelected) {
                 card.isSelected = false
                 card.onUnselect()
-                this.discardPile.push(card)
+                this.addToDiscards(card)
             } else {
                 newHand.push(card)
             }

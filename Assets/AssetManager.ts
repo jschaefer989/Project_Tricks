@@ -39,6 +39,9 @@ export default class AssetManager {
     drawAssets(): void {
         // Draw all assets
         for (const assets of this.assets.values()) {
+            if (isEmpty(assets) || assets.length === 0) {
+                continue
+            }
             for (const asset of assets) {
                 love.graphics.draw(asset.image, asset.x, asset.y, asset.orientation, asset.scaleX, asset.scaleY, asset.offsetX, asset.offsetY)
             }
@@ -53,6 +56,9 @@ export default class AssetManager {
 
     private drawHoverables(): void {
         for (const assets of this.assets.values()) {
+            if (isEmpty(assets) || assets.length === 0) {
+                continue
+            }
             const asset = assets[0]  // Assume hoverable is the same for all assets with the same ID
             if (asset.isHovered) {
                 asset.onHover?.(this.gameManager, asset)
@@ -83,6 +89,9 @@ export default class AssetManager {
         }
 
         for (const assets of this.assets.values()) {
+            if (isEmpty(assets) || assets.length === 0) {
+                continue
+            }
             const asset = assets[0]  // Assume click area is the same for all assets with the same ID
             if (gameX >= asset.x && gameX <= asset.x + asset.getWidth() &&
                 gameY >= asset.y && gameY <= asset.y + asset.getHeight()) {
@@ -100,6 +109,9 @@ export default class AssetManager {
         }
         
         for (const assets of this.assets.values()) {
+            if (isEmpty(assets) || assets.length === 0) {
+                continue
+            }
             const asset = assets[0]  // Assume hoverable is the same for all assets with the same ID
             
             if (gameX >= asset.x && gameX <= asset.x + asset.getWidth() &&

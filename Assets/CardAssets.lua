@@ -226,11 +226,7 @@ function CardAssets.getRankAssetId(self, card, orientation)
     return (((AssetIds.RANK .. "-") .. card.id) .. "-") .. tostring(orientation)
 end
 function CardAssets.prototype.hideCardAssets(self, card)
-    local assetManager = self.gameManager.assetManager
-    assetManager:hideAsset(____exports.default:getBaseAssetId(card))
-    assetManager:hideAsset(____exports.default:getSuitAssetId(card, 0))
-    assetManager:hideAsset(____exports.default:getSuitAssetId(card, 1))
-    assetManager:hideAsset(____exports.default:getRankAssetId(card, 0))
+    self.gameManager.assetManager:hideAsset(____exports.default:getBaseAssetId(card))
 end
 function CardAssets.prototype.centerCards(self, characterType)
     local character = self.gameManager:getCharacter(characterType)

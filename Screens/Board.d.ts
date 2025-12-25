@@ -32,6 +32,8 @@ export default class Board {
     cardAssets: CardAssets;
     letsFightButton: import("love.graphics").Image;
     attackButton: import("love.graphics").Image;
+    discardButton: import("love.graphics").Image;
+    deselectButton: import("love.graphics").Image;
     constructor(gameManager: GameManager, enemy?: Enemy);
     load(data: BoardData): void;
     save(): BoardData;
@@ -67,6 +69,9 @@ export default class Board {
     private buildCardAssets;
     private buildButtonAssets;
     private buildLetsFightButton;
+    private buildPrimaryButtons;
     private buildAttackButton;
+    private buildDiscardButton;
+    private buildDeselectButton;
 }
 export {};

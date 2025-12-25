@@ -103,8 +103,7 @@ function Player.prototype.discard(self)
         if card.isSelected then
             card.isSelected = false
             card:onUnselect()
-            local ____self_discardPile_0 = self.discardPile
-            ____self_discardPile_0[#____self_discardPile_0 + 1] = card
+            self:addToDiscards(card)
         else
             newHand[#newHand + 1] = card
         end
@@ -134,8 +133,8 @@ function Player.prototype.hasPerk(self, perkType)
     return false
 end
 function Player.prototype.addPerk(self, perk)
-    local ____self_perks_1 = self.perks
-    ____self_perks_1[#____self_perks_1 + 1] = perk
+    local ____self_perks_0 = self.perks
+    ____self_perks_0[#____self_perks_0 + 1] = perk
 end
 function Player.prototype.gatherExperience(self, exp)
     self.experience = self.experience + exp

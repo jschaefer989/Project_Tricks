@@ -43,8 +43,8 @@ export default class Board {
   cardAssets: CardAssets;
   letsFightButton = love.graphics.newImage("Assets/Images/LetsFightButton.png");
   attackButton = love.graphics.newImage("Assets/Images/AttackButton.png");
-  // discardButton = love.graphics.newImage("Assets/Images/DiscardButton.png")
-  // deselectButton = love.graphics.newImage("Assets/Images/DeselectButton.png")
+  discardButton = love.graphics.newImage("Assets/Images/DiscardButton.png");
+  deselectButton = love.graphics.newImage("Assets/Images/DeselectButton.png");
 
   constructor(gameManager: GameManager, enemy?: Enemy) {
     this.gameManager = gameManager;
@@ -562,7 +562,7 @@ export default class Board {
     this.gameManager.assetManager.hideAsset(AssetIds.LETS_FIGHT_BUTTON);
 
     this.dealer.startGame();
-    this.buildAttackButton();
+    this.buildPrimaryButtons();
   }
 
   handleAttack(): void {
@@ -674,7 +674,7 @@ export default class Board {
     );
   }
 
-  private buildAttackButton(): void {
+  private buildPrimaryButtons(): void {
     const gap = 20;
     const btnW = this.attackButton.getWidth();
     const totalW = btnW * 3 + gap * 2;
@@ -683,8 +683,16 @@ export default class Board {
       this.cardAssets.baseH +
       padding;
     const buttonX = Math.floor((push.getWidth() - totalW) / 2);
+    this.buildAttackButton(buttonX, buttonY, btnW);
+    const discardX = this.buildDiscardButton(buttonX, buttonY, btnW, gap);
+    this.buildDeselectButton(discardX, buttonY, btnW, gap);
+  }
 
-    // Attack Button
+  private buildAttackButton(
+    buttonX: number,
+    buttonY: number,
+    btnW: number
+  ): void {
     this.gameManager.assetManager.addAsset(
       AssetIds.ATTACK_BUTTON,
       new Asset(
@@ -702,31 +710,59 @@ export default class Board {
       FontIds.ATTACK_BUTTON_CAPTION,
       new FontWithPosition(centerX, centerY, "Attack", { size: 28 })
     );
+  }
 
-    // Discard Button
-    // const discardX = buttonX + btnW + gap
-    // this.gameManager.assetManager.addAsset(
-    //     AssetIds.DISCARD_BUTTON,
-    //     new Asset(
-    //         AssetIds.DISCARD_BUTTON,
-    //         this.discardButton,
-    //         discardX,
-    //         buttonY,
-    //         () => this.handleDiscard()
-    //     )
-    // )
+  private buildDiscardButton(
+    buttonX: number,
+    buttonY: number,
+    btnW: number,
+    gap: number
+  ): number {
+    const discardX = buttonX + btnW + gap;
+    this.gameManager.assetManager.addAsset(
+      AssetIds.DISCARD_BUTTON,
+      new Asset(
+        AssetIds.DISCARD_BUTTON,
+        this.discardButton,
+        discardX,
+        buttonY,
+        () => this.handleDiscard()
+      )
+    );
 
-    // // Deselect Button
-    // const deselectX = discardX + btnW + gap
-    // this.gameManager.assetManager.addAsset(
-    //     AssetIds.DESELECT_BUTTON,
-    //     new Asset(
-    //         AssetIds.DESELECT_BUTTON,
-    //         this.deselectButton,
-    //         deselectX,
-    //         buttonY,
-    //         () => this.gameManager.player.unselectCards()
-    //     )
-    // )
+    const centerX = discardX + btnW / 2;
+    const centerY = buttonY + this.attackButton.getHeight() / 2;
+    this.gameManager.assetManager.fontManager.addText(
+      FontIds.DISCARD_BUTTON_CAPTION,
+      new FontWithPosition(centerX, centerY, "Discard", { size: 28 })
+    );
+
+    return discardX
+  }
+
+  private buildDeselectButton(
+    discardX: number,
+    buttonY: number,
+    btnW: number,
+    gap: number
+  ): void {
+    const deselectX = discardX + btnW + gap;
+    this.gameManager.assetManager.addAsset(
+      AssetIds.DESELECT_BUTTON,
+      new Asset(
+        AssetIds.DESELECT_BUTTON,
+        this.deselectButton,
+        deselectX,
+        buttonY,
+        () => this.gameManager.player.unselectCards()
+      )
+    );
+
+    const centerX = deselectX + btnW / 2;
+    const centerY = buttonY + this.attackButton.getHeight() / 2;
+    this.gameManager.assetManager.fontManager.addText(
+      FontIds.DESELECT_BUTTON_CAPTION,
+      new FontWithPosition(centerX, centerY, "Deselect", { size: 28 })
+    );
   }
 }
