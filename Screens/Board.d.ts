@@ -34,6 +34,7 @@ export default class Board {
     attackButton: import("love.graphics").Image;
     discardButton: import("love.graphics").Image;
     deselectButton: import("love.graphics").Image;
+    pointBoard: import("love.graphics").Image;
     constructor(gameManager: GameManager, enemy?: Enemy);
     load(data: BoardData): void;
     save(): BoardData;
@@ -73,5 +74,6 @@ export default class Board {
     private buildAttackButton;
     private buildDiscardButton;
     private buildDeselectButton;
+    private buildPointBoard;
 }
 export {};

@@ -21,19 +21,13 @@ local ____Asset = require("Assets.Asset")
 local Asset = ____Asset.default
 local ____FontWithPosition = require("Assets.FontWithPosition")
 local FontWithPosition = ____FontWithPosition.default
+local Format = ____FontWithPosition.Format
 local padding = 20
 ____exports.default = __TS__Class()
 local Board = ____exports.default
 Board.name = "Board"
 function Board.prototype.____constructor(self, gameManager, enemy)
-    self.letsFightButton = love.graphics.newImage("Assets/Images/LetsFightButton.png")
-    self.attackButton = love.graphics.newImage("Assets/Images/AttackButton.png")
-    self.discardButton = love.graphics.newImage("Assets/Images/DiscardButton.png")
-    self.deselectButton = love.graphics.newImage("Assets/Images/DeselectButton.png")
-    self.gameManager = gameManager
     self.discardUsed = 0
-    self.enemy = enemy or __TS__New(Enemy, gameManager)
-    self.dealer = __TS__New(Dealer, gameManager)
     self.playerPoints = 0
     self.enemyPoints = 0
     self.trumpSuit = Suits.ACORNS
@@ -42,6 +36,14 @@ function Board.prototype.____constructor(self, gameManager, enemy)
     self.enemyPower = 0
     self.enemyValue = 0
     self.showingInitialView = true
+    self.letsFightButton = love.graphics.newImage("Assets/Images/LetsFightButton.png")
+    self.attackButton = love.graphics.newImage("Assets/Images/AttackButton.png")
+    self.discardButton = love.graphics.newImage("Assets/Images/DiscardButton.png")
+    self.deselectButton = love.graphics.newImage("Assets/Images/DeselectButton.png")
+    self.pointBoard = love.graphics.newImage("Assets/Images/PointBoard.png")
+    self.gameManager = gameManager
+    self.enemy = enemy or __TS__New(Enemy, gameManager)
+    self.dealer = __TS__New(Dealer, gameManager)
     self.cardAssets = __TS__New(CardAssets, gameManager)
 end
 function Board.prototype.load(self, data)
@@ -430,6 +432,7 @@ function Board.prototype.handleStartFight(self)
     self.gameManager.assetManager:hideAsset(AssetIds.LETS_FIGHT_BUTTON)
     self.dealer:startGame()
     self:buildPrimaryButtons()
+    self:buildPointBoard()
 end
 function Board.prototype.handleAttack(self)
     if not self.gameManager.player:anySelectedCards() then
@@ -524,7 +527,6 @@ function Board.prototype.buildButtonAssets(self)
     self:buildLetsFightButton()
 end
 function Board.prototype.buildLetsFightButton(self)
-    local assetId = AssetIds.LETS_FIGHT_BUTTON
     local cardY = self.cardAssets:getCardPosition(CharacterTypes.PLAYER)
     local buttonHeight = self.letsFightButton:getHeight()
     local buttonWidth = self.letsFightButton:getWidth()
@@ -532,10 +534,10 @@ function Board.prototype.buildLetsFightButton(self)
     local buttonX = math.floor((screenW - buttonWidth) / 2)
     local buttonY = cardY - buttonHeight - padding
     self.gameManager.assetManager:addAsset(
-        assetId,
+        AssetIds.LETS_FIGHT_BUTTON,
         __TS__New(
             Asset,
-            assetId,
+            AssetIds.LETS_FIGHT_BUTTON,
             self.letsFightButton,
             buttonX,
             buttonY,
@@ -574,7 +576,7 @@ function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW)
             centerX,
             centerY,
             "Attack",
-            {size = 28}
+            {size = 28, format = Format.CENTER}
         )
     )
 end
@@ -600,7 +602,7 @@ function Board.prototype.buildDiscardButton(self, buttonX, buttonY, btnW, gap)
             centerX,
             centerY,
             "Discard",
-            {size = 28}
+            {size = 28, format = Format.CENTER}
         )
     )
     return discardX
@@ -627,7 +629,46 @@ function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, gap)
             centerX,
             centerY,
             "Deselect",
-            {size = 28}
+            {size = 28, format = Format.CENTER}
+        )
+    )
+end
+function Board.prototype.buildPointBoard(self)
+    local boardWidth = self.pointBoard:getWidth()
+    local screenW = push:getWidth()
+    local buttonX = math.floor((screenW - boardWidth) / 2)
+    self.gameManager.assetManager:addAsset(
+        AssetIds.POINT_DISPLAY,
+        __TS__New(
+            Asset,
+            AssetIds.POINT_DISPLAY,
+            self.pointBoard,
+            buttonX,
+            10
+        )
+    )
+    local centerX = screenW / 2
+    local textY = 40
+    local playerText = (self.gameManager.player.name .. ": ") .. tostring(self.playerPoints)
+    local enemyText = (self.enemy.name .. ": ") .. tostring(self.enemyPoints)
+    self.gameManager.assetManager.fontManager:addText(
+        FontIds.POINTS_PLAYER,
+        __TS__New(
+            FontWithPosition,
+            centerX - boardWidth / 2 + 10,
+            textY,
+            playerText,
+            {size = 20}
+        )
+    )
+    self.gameManager.assetManager.fontManager:addText(
+        FontIds.POINTS_ENEMY,
+        __TS__New(
+            FontWithPosition,
+            centerX + boardWidth / 2 - 10,
+            textY,
+            enemyText,
+            {size = 20, format = Format.RIGHT}
         )
     )
 end

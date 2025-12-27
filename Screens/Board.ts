@@ -10,7 +10,7 @@ import CardAssets from "Assets/CardAssets";
 import * as push from "Libraries.push";
 import Asset from "Assets/Asset";
 import { isEmpty } from "Helpers";
-import FontWithPosition from "Assets/FontWithPosition";
+import FontWithPosition, { Format } from "Assets/FontWithPosition";
 
 const padding = 20;
 
@@ -29,36 +29,28 @@ interface BoardData {
 
 export default class Board {
   gameManager: GameManager;
-  discardUsed: number;
+  discardUsed = 0
   enemy: Enemy;
   dealer: Dealer;
-  playerPoints: number;
-  enemyPoints: number;
-  trumpSuit: Suits;
-  playerPower: number;
-  playerValue: number;
-  enemyPower: number;
-  enemyValue: number;
-  showingInitialView: boolean;
+  playerPoints = 0
+  enemyPoints = 0
+  trumpSuit = Suits.ACORNS;
+  playerPower = 0
+  playerValue = 0
+  enemyPower = 0
+  enemyValue = 0
+  showingInitialView = true
   cardAssets: CardAssets;
   letsFightButton = love.graphics.newImage("Assets/Images/LetsFightButton.png");
   attackButton = love.graphics.newImage("Assets/Images/AttackButton.png");
   discardButton = love.graphics.newImage("Assets/Images/DiscardButton.png");
   deselectButton = love.graphics.newImage("Assets/Images/DeselectButton.png");
+  pointBoard = love.graphics.newImage("Assets/Images/PointBoard.png");
 
   constructor(gameManager: GameManager, enemy?: Enemy) {
-    this.gameManager = gameManager;
-    this.discardUsed = 0;
+    this.gameManager = gameManager;    
     this.enemy = enemy ?? new Enemy(gameManager);
     this.dealer = new Dealer(gameManager);
-    this.playerPoints = 0;
-    this.enemyPoints = 0;
-    this.trumpSuit = Suits.ACORNS;
-    this.playerPower = 0;
-    this.playerValue = 0;
-    this.enemyPower = 0;
-    this.enemyValue = 0;
-    this.showingInitialView = true;
     this.cardAssets = new CardAssets(gameManager);
   }
 
@@ -563,6 +555,7 @@ export default class Board {
 
     this.dealer.startGame();
     this.buildPrimaryButtons();
+    this.buildPointBoard();
   }
 
   handleAttack(): void {
@@ -659,7 +652,6 @@ export default class Board {
   }
 
   private buildLetsFightButton(): void {
-    const assetId = `${AssetIds.LETS_FIGHT_BUTTON}`;
     const cardY = this.cardAssets.getCardPosition(CharacterTypes.PLAYER);
     const buttonHeight = this.letsFightButton.getHeight();
     const buttonWidth = this.letsFightButton.getWidth();
@@ -667,8 +659,8 @@ export default class Board {
     const buttonX = Math.floor((screenW - buttonWidth) / 2);
     const buttonY = cardY - buttonHeight - padding;
     this.gameManager.assetManager.addAsset(
-      assetId,
-      new Asset(assetId, this.letsFightButton, buttonX, buttonY, () =>
+      AssetIds.LETS_FIGHT_BUTTON,
+      new Asset(AssetIds.LETS_FIGHT_BUTTON, this.letsFightButton, buttonX, buttonY, () =>
         this.handleStartFight()
       )
     );
@@ -708,7 +700,7 @@ export default class Board {
     const centerY = buttonY + this.attackButton.getHeight() / 2;
     this.gameManager.assetManager.fontManager.addText(
       FontIds.ATTACK_BUTTON_CAPTION,
-      new FontWithPosition(centerX, centerY, "Attack", { size: 28 })
+      new FontWithPosition(centerX, centerY, "Attack", { size: 28, format: Format.CENTER })
     );
   }
 
@@ -734,7 +726,7 @@ export default class Board {
     const centerY = buttonY + this.attackButton.getHeight() / 2;
     this.gameManager.assetManager.fontManager.addText(
       FontIds.DISCARD_BUTTON_CAPTION,
-      new FontWithPosition(centerX, centerY, "Discard", { size: 28 })
+      new FontWithPosition(centerX, centerY, "Discard", { size: 28, format: Format.CENTER })
     );
 
     return discardX
@@ -762,7 +754,40 @@ export default class Board {
     const centerY = buttonY + this.attackButton.getHeight() / 2;
     this.gameManager.assetManager.fontManager.addText(
       FontIds.DESELECT_BUTTON_CAPTION,
-      new FontWithPosition(centerX, centerY, "Deselect", { size: 28 })
+      new FontWithPosition(centerX, centerY, "Deselect", { size: 28, format: Format.CENTER })
+    );
+  }
+
+  private buildPointBoard(): void {
+    const boardWidth = this.pointBoard.getWidth();
+    const screenW = push.getWidth();
+    const buttonX = Math.floor((screenW - boardWidth) / 2);
+    this.gameManager.assetManager.addAsset(
+      AssetIds.POINT_DISPLAY,
+      new Asset(
+        AssetIds.POINT_DISPLAY,
+        this.pointBoard,
+        buttonX,
+        10,
+      )
+    );
+
+    const centerX = screenW / 2;
+    const textY = 40;
+
+    const playerText = `${this.gameManager.player.name}: ${this.playerPoints}`;
+    const enemyText = `${this.enemy.name}: ${this.enemyPoints}`;
+
+    // Left label (player)
+    this.gameManager.assetManager.fontManager.addText(
+      FontIds.POINTS_PLAYER,
+      new FontWithPosition(centerX - (boardWidth / 2) + 10, textY, playerText, { size: 20 })
+    );
+
+    // Right label (enemy)
+    this.gameManager.assetManager.fontManager.addText(
+      FontIds.POINTS_ENEMY,
+      new FontWithPosition(centerX + (boardWidth / 2) - 10, textY, enemyText, { size: 20, format: Format.RIGHT })
     );
   }
 }
