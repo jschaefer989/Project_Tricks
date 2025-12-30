@@ -4,6 +4,7 @@ local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____Enums = require("Enums")
 local AssetIds = ____Enums.AssetIds
+local Biomes = ____Enums.Biomes
 local CharacterTypes = ____Enums.CharacterTypes
 local FontIds = ____Enums.FontIds
 local Suits = ____Enums.Suits
@@ -19,6 +20,9 @@ local CardAssets = ____CardAssets.default
 local push = require("Libraries.push")
 local ____Asset = require("Assets.Asset")
 local Asset = ____Asset.default
+local ____Helpers = require("Helpers")
+local exhaustiveGuard = ____Helpers.exhaustiveGuard
+local isEmpty = ____Helpers.isEmpty
 local ____FontWithPosition = require("Assets.FontWithPosition")
 local FontWithPosition = ____FontWithPosition.default
 local Format = ____FontWithPosition.Format
@@ -41,6 +45,9 @@ function Board.prototype.____constructor(self, gameManager, enemy)
     self.discardButton = love.graphics.newImage("Assets/Images/DiscardButton.png")
     self.deselectButton = love.graphics.newImage("Assets/Images/DeselectButton.png")
     self.pointBoard = love.graphics.newImage("Assets/Images/PointBoard.png")
+    self.playerPortrait = love.graphics.newImage("Assets/Images/PlayerPortrait.png")
+    self.enemyPortrait = love.graphics.newImage("Assets/Images/EnemyPortrait.png")
+    self.baseDeck = love.graphics.newImage("Assets/Images/BaseCardBack.png")
     self.gameManager = gameManager
     self.enemy = enemy or __TS__New(Enemy, gameManager)
     self.dealer = __TS__New(Dealer, gameManager)
@@ -443,9 +450,9 @@ function Board.prototype.handleAttack(self)
         return
     end
     if self.playerPower > self.enemyPower then
-        self.playerPoints = self.playerPoints + self:getPlayerCashout()
+        self:addPlayerPoints(self:getPlayerCashout())
     else
-        self.enemyPoints = self.enemyPoints + self:getEnemyCashout()
+        self:addEnemyPoints(self:getEnemyCashout())
     end
     self:clearStats()
     self.gameManager.player:removeSelectedCardsFromHand()
@@ -457,6 +464,20 @@ function Board.prototype.handleAttack(self)
     local ____opt_3 = self.gameManager.board
     if ____opt_3 ~= nil then
         ____opt_3.dealer:dealCards(CharacterTypes.ENEMY)
+    end
+end
+function Board.prototype.addPlayerPoints(self, points)
+    self.playerPoints = self.playerPoints + points
+    local text = self.gameManager.assetManager.fontManager:getText(FontIds.POINTS_PLAYER)
+    if not isEmpty(text) then
+        text.text = (self.gameManager.player.name .. ": ") .. tostring(self.playerPoints)
+    end
+end
+function Board.prototype.addEnemyPoints(self, points)
+    self.enemyPoints = self.enemyPoints + points
+    local text = self.gameManager.assetManager.fontManager:getText(FontIds.POINTS_ENEMY)
+    if not isEmpty(text) then
+        text.text = (self.enemy.name .. ": ") .. tostring(self.enemyPoints)
     end
 end
 function Board.prototype.handleDiscard(self)
@@ -498,8 +519,13 @@ function Board.prototype.clearStats(self)
     self.enemyValue = 0
 end
 function Board.prototype.buildAssets(self)
+    self:buildBackground(Biomes.GRASS)
     self:buildCardAssets()
-    self:buildButtonAssets()
+    self:buildLetsFightButton()
+    self:buildPlayerPortrait()
+    self:buildEnemyPortrait()
+    self:buildPlayerDeck()
+    self:buildEnemyDeck()
 end
 function Board.prototype.buildCardAssets(self)
     local playerCardPosition = self.cardAssets:determineCardStartingPosition(CharacterTypes.PLAYER)
@@ -522,9 +548,6 @@ function Board.prototype.buildCardAssets(self)
             i = i + 1
         end
     end
-end
-function Board.prototype.buildButtonAssets(self)
-    self:buildLetsFightButton()
 end
 function Board.prototype.buildLetsFightButton(self)
     local cardY = self.cardAssets:getCardPosition(CharacterTypes.PLAYER)
@@ -671,5 +694,80 @@ function Board.prototype.buildPointBoard(self)
             {size = 20, format = Format.RIGHT}
         )
     )
+end
+function Board.prototype.buildPlayerPortrait(self)
+    self.gameManager.assetManager:addAsset(
+        AssetIds.PLAYER_PORTRAIT,
+        __TS__New(
+            Asset,
+            AssetIds.PLAYER_PORTRAIT,
+            self.playerPortrait,
+            5,
+            5
+        )
+    )
+end
+function Board.prototype.buildEnemyPortrait(self)
+    self.gameManager.assetManager:addAsset(
+        AssetIds.ENEMY_PORTRAIT,
+        __TS__New(
+            Asset,
+            AssetIds.ENEMY_PORTRAIT,
+            self.enemyPortrait,
+            push:getWidth() - self.enemyPortrait:getWidth() - 5,
+            5
+        )
+    )
+end
+function Board.prototype.buildPlayerDeck(self)
+    local playerCardY = self.cardAssets:getCardPosition(CharacterTypes.PLAYER)
+    self.gameManager.assetManager:addAsset(
+        AssetIds.PLAYER_DECK,
+        __TS__New(
+            Asset,
+            AssetIds.PLAYER_DECK,
+            self.baseDeck,
+            5,
+            playerCardY
+        )
+    )
+end
+function Board.prototype.buildEnemyDeck(self)
+    local playerCardY = self.cardAssets:getCardPosition(CharacterTypes.PLAYER)
+    self.gameManager.assetManager:addAsset(
+        AssetIds.ENEMY_DECK,
+        __TS__New(
+            Asset,
+            AssetIds.ENEMY_DECK,
+            self.baseDeck,
+            push:getWidth() - self.baseDeck:getWidth() - 5,
+            playerCardY
+        )
+    )
+end
+function Board.prototype.buildBackground(self, biome)
+    local backgroundImage = self:getBackgroundImageForBiome(biome)
+    self.gameManager.assetManager:addAsset(
+        AssetIds.GRASS_BACKGROUND,
+        __TS__New(
+            Asset,
+            AssetIds.GRASS_BACKGROUND,
+            backgroundImage,
+            0,
+            0
+        )
+    )
+end
+function Board.prototype.getBackgroundImageForBiome(self, biome)
+    repeat
+        local ____switch86 = biome
+        local ____cond86 = ____switch86 == Biomes.GRASS
+        if ____cond86 then
+            return love.graphics.newImage("Assets/Images/GrassBackground.png")
+        end
+        do
+            exhaustiveGuard(biome)
+        end
+    until true
 end
 return ____exports

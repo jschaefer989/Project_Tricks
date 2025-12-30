@@ -191,8 +191,12 @@ function GameManager.prototype.switchToPauseMenu(self)
     GameStateManager:setState(pauseMenuState)
 end
 function GameManager.prototype.switchToBoard(self, enemy)
+    local myShader = love.graphics.newShader("Shaders/Waterfall.glsl")
+    love.graphics.setDefaultFilter("nearest", "nearest")
+    local elapsedTime = 0
     local boardState = {
         update = function(____, dt)
+            elapsedTime = elapsedTime + dt
             local ____opt_11 = self.board
             if ____opt_11 ~= nil then
                 ____opt_11:drawBoard()
@@ -203,6 +207,23 @@ function GameManager.prototype.switchToBoard(self, enemy)
         draw = function()
             if not self.devMode then
                 push:start()
+                love.graphics.setShader(myShader)
+                myShader:send(
+                    "uResolution",
+                    {
+                        love.graphics.getWidth(),
+                        love.graphics.getHeight()
+                    }
+                )
+                myShader:send("uTime", elapsedTime)
+                love.graphics.rectangle(
+                    "fill",
+                    0,
+                    0,
+                    love.graphics.getWidth(),
+                    love.graphics.getHeight()
+                )
+                love.graphics.setShader()
                 self.assetManager:drawAssets()
                 push:finish()
             end
@@ -223,7 +244,7 @@ function GameManager.prototype.switchToBoard(self, enemy)
     self.loseScreen = nil
     self.shop = nil
     self.levelUpScreen = nil
-    suit.theme.color.normal.fg = {1, 1, 1}
+    push:setBorderColor(1, 1, 1)
     if isEmpty(self.board) then
         self.board = __TS__New(
             Board,

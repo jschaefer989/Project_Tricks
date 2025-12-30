@@ -186,8 +186,14 @@ export default class GameManager {
     }
 
     switchToBoard(enemy?: Enemy): void {
+        const myShader = love.graphics.newShader("Shaders/Waterfall.glsl")
+        love.graphics.setDefaultFilter("nearest", "nearest")
+        
+        let elapsedTime = 0
+
         const boardState: GameState = {
             update: (dt: number) => {
+                elapsedTime += dt
                 this.board?.drawBoard()
                 this.assetManager.handleMouseHover()
                 this.animationManager.updateAnimations(dt)
@@ -195,7 +201,12 @@ export default class GameManager {
             draw: () => {
                 if (!this.devMode) {
                     push.start()
-                    this.assetManager.drawAssets()                    
+                    love.graphics.setShader(myShader)
+                    myShader.send("uResolution", [love.graphics.getWidth(), love.graphics.getHeight()])
+                    myShader.send("uTime", elapsedTime)
+                    love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+                    love.graphics.setShader()
+                    this.assetManager.drawAssets()                  
                     push.finish()
                 }
             },
@@ -217,8 +228,7 @@ export default class GameManager {
         this.shop = undefined
         this.levelUpScreen = undefined
 
-        // Reset to white text for dark backgrounds
-        suit.theme.color.normal.fg = [1, 1, 1]
+        push.setBorderColor(1, 1, 1)
 
         if (isEmpty(this.board)) {
             this.board = new Board(this, enemy ?? new Enemy(this))
