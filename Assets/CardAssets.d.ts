@@ -1,6 +1,6 @@
 import Card from "../Cards/Card";
 import Asset from "./Asset";
-import { Suits, Ranks, TrumpRanks, CharacterTypes } from "Enums";
+import { Suits, Ranks, EdelRanks, CharacterTypes } from "Enums";
 import GameManager from "GameManager";
 import Point from "Point";
 import { Image } from "love.graphics";
@@ -34,7 +34,7 @@ export default class CardAssets {
     getRankPosition(x: number, y: number, rankImage: Image): Point;
     static getSuitAssetPath(suit: Suits): string;
     static getSuitAssetId(card: Card, orientation: number): string;
-    static getRankAssetPath(rank: Ranks | TrumpRanks): string;
+    static getRankAssetPath(rank: Ranks | EdelRanks): string;
     static getRankAssetId(card: Card, orientation: number): string;
     hideCardAssets(card: Card): void;
     centerCards(characterType: CharacterTypes): void;

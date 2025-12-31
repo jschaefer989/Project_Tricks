@@ -1,5 +1,5 @@
 /** @noSelfInFile */
-import { Suits, Ranks, CharacterTypes, TrumpRanks } from "./Enums";
+import { Suits, Ranks, CharacterTypes, EdelRanks } from "./Enums";
 import Card from "Cards/Card";
 import GameManager from "./GameManager";
 export default class Dealer {
@@ -10,13 +10,13 @@ export default class Dealer {
     startGame(): void;
     static initializePlayerDeck(gameManager: GameManager): void;
     static shuffle(gameManager: GameManager, characterType: string): void;
-    static getNewCard(gameManager: GameManager, rank: Ranks | TrumpRanks, suit: Suits): Card;
+    static getNewCard(gameManager: GameManager, rank: Ranks | EdelRanks, suit: Suits): Card;
     static getRandomCard(gameManager: GameManager): Card;
     dealCards(characterType: CharacterTypes): void;
     initializeEnemyDeck(): void;
-    determineTrumpSuit(): void;
-    convertToTrumpSuit(card: Card): Card;
-    convertToTrumpSuitForCharacter(characterType: string): void;
+    determineEdelSuit(): void;
+    convertToEdelSuit(card: Card): Card;
+    convertToEdelSuitForCharacter(characterType: string): void;
     convertBackToOriginalSuit(card: Card): Card;
     convertBackToOriginalSuitForCharacter(characterType: string): void;
     getLootCards(): Card[];

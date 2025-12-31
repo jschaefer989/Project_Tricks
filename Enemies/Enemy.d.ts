@@ -1,18 +1,8 @@
 /** @noSelfInFile */
+import { CardData } from "Cards/Card";
 import Character from "../Character";
 import { EnemyTypes } from "Enums";
 import GameManager from "GameManager";
-interface CardData {
-    id: string;
-    suit: any;
-    rank: any;
-    power: number;
-    value: number;
-    isSelected: boolean;
-    cost: number;
-    isTrump: boolean;
-    name: string;
-}
 export interface EnemyData {
     hand: CardData[];
     deck: CardData[];
@@ -34,4 +24,3 @@ export default class Enemy extends Character {
     load(gameManager: GameManager, data?: EnemyData): void;
     save(): EnemyData;
 }
-export {};

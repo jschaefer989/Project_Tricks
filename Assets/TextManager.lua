@@ -7,12 +7,12 @@ local ____exports = {}
 local ____Helpers = require("Helpers")
 local isEmpty = ____Helpers.isEmpty
 ____exports.default = __TS__Class()
-local FontManager = ____exports.default
-FontManager.name = "FontManager"
-function FontManager.prototype.____constructor(self)
+local TextManager = ____exports.default
+TextManager.name = "TextManager"
+function TextManager.prototype.____constructor(self)
     self.texts = __TS__New(Map)
 end
-function FontManager.prototype.drawText(self)
+function TextManager.prototype.drawText(self)
     local prevFont = love.graphics.getFont()
     for ____, font in __TS__Iterator(self.texts:values()) do
         font:printFont()
@@ -22,19 +22,19 @@ function FontManager.prototype.drawText(self)
         love.graphics.setFont(prevFont)
     end
 end
-function FontManager.prototype.addText(self, id, font)
+function TextManager.prototype.addText(self, id, font)
     self.texts:set(id, font)
 end
-function FontManager.prototype.getText(self, id)
+function TextManager.prototype.getText(self, id)
     return self.texts:get(id)
 end
-function FontManager.prototype.hideAsset(self, id)
+function TextManager.prototype.hideText(self, id)
     self.texts:delete(id)
 end
-function FontManager.getDefaultFontFilepath(self)
-    return "Assets/Fonts/Gothic Pixels.ttf"
+function TextManager.getDefaultFontFilepath(self)
+    return "Assets/Fonts/Germania.ttf"
 end
-function FontManager.setDefaultFont(self)
+function TextManager.setDefaultFont(self)
     local mainFont = love.graphics.newFont(self:getDefaultFontFilepath())
     love.graphics.setFont(mainFont)
     return mainFont

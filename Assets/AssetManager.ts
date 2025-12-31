@@ -2,17 +2,17 @@ import * as push from "Libraries.push";
 import Asset from "./Asset";
 import { isEmpty } from "Helpers";
 import GameManager from "GameManager";
-import FontManager from "Assets/TextManager";
+import TextManager from "Assets/TextManager";
 
 export default class AssetManager {
     gameManager: GameManager
     assets: Map<string, Asset[]>
-    fontManager: FontManager
+    textManager: TextManager
 
     constructor(gameManager: GameManager) {
         this.gameManager = gameManager
         this.assets = new Map<string, Asset[]>()
-        this.fontManager = new FontManager()
+        this.textManager = new TextManager()
     }
 
     addAsset(id: string, asset: Asset): void {
@@ -48,7 +48,7 @@ export default class AssetManager {
         }
 
         // Draw text above assets
-        this.fontManager.drawText()
+        this.textManager.drawText()
 
         // Draw hover content above assets and text
         this.drawHoverables()

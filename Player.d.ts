@@ -11,7 +11,7 @@ interface CardData {
     value: number;
     isSelected: boolean;
     cost: number;
-    isTrump: boolean;
+    isEdel: boolean;
     name: string;
 }
 interface PlayerData {

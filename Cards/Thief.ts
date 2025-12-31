@@ -1,4 +1,4 @@
-import { Ranks, Suits, TrumpRanks } from "../Enums"
+import { Ranks, Suits, EdelRanks } from "../Enums"
 import GameManager from "../GameManager"
 import Card from "./Card"
 

@@ -1,21 +1,9 @@
 /** @noSelfInFile */
 
-import Card from "Cards/Card"
+import Card, { CardData } from "Cards/Card"
 import Character from "../Character"
 import { CharacterTypes, EnemyTypes } from "Enums"
 import GameManager from "GameManager"
-
-interface CardData {
-    id: string
-    suit: any
-    rank: any
-    power: number
-    value: number
-    isSelected: boolean
-    cost: number
-    isTrump: boolean
-    name: string
-}
 
 export interface EnemyData {
     hand: CardData[]

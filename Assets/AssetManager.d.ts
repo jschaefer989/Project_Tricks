@@ -1,10 +1,10 @@
 import Asset from "./Asset";
 import GameManager from "GameManager";
-import FontManager from "Assets/TextManager";
+import TextManager from "Assets/TextManager";
 export default class AssetManager {
     gameManager: GameManager;
     assets: Map<string, Asset[]>;
-    fontManager: FontManager;
+    textManager: TextManager;
     constructor(gameManager: GameManager);
     addAsset(id: string, asset: Asset): void;
     getAssets(baseId: string): Asset[] | undefined;

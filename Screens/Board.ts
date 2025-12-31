@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { AssetIds, Biomes, CharacterTypes, FontIds, Suits } from "../Enums";
+import { AssetIds, CharacterTypes, FontIds, Suits } from "../Enums";
 import Dealer from "../Dealer";
 import Draw from "../Draw";
 import Enemy, { EnemyData } from "Enemies/Enemy";
@@ -9,9 +9,11 @@ import type GameManager from "../GameManager";
 import CardAssets from "Assets/CardAssets";
 import * as push from "Libraries.push";
 import Asset from "Assets/Asset";
-import { exhaustiveGuard, isEmpty } from "Helpers";
+import { isEmpty } from "Helpers";
 import FontWithPosition, { Format } from "Assets/FontWithPosition";
-import { Image } from "love.graphics";
+import Grass from "Biomes/Grass";
+import Biome from "Biomes/Biome";
+import Card from "Cards/Card";
 
 const padding = 20;
 
@@ -20,7 +22,7 @@ interface BoardData {
   playerPoints: number;
   enemyPoints: number;
   enemy: EnemyData;
-  trumpSuit: Suits;
+  edelSuit: Suits;
   playerPower: number;
   playerValue: number;
   enemyPower: number;
@@ -35,7 +37,7 @@ export default class Board {
   dealer: Dealer;
   playerPoints = 0
   enemyPoints = 0
-  trumpSuit = Suits.ACORNS;
+  edelSuit = Suits.ACORNS;
   playerPower = 0
   playerValue = 0
   enemyPower = 0
@@ -47,22 +49,26 @@ export default class Board {
   discardButton = love.graphics.newImage("Assets/Images/DiscardButton.png");
   deselectButton = love.graphics.newImage("Assets/Images/DeselectButton.png");
   pointBoard = love.graphics.newImage("Assets/Images/PointBoard.png");
-  playerPortrait = love.graphics.newImage("Assets/Images/PlayerPortrait.png");
-  enemyPortrait = love.graphics.newImage("Assets/Images/EnemyPortrait.png");
+  portraitBackground = love.graphics.newImage("Assets/Images/PortraitBackground.png");
+  portrait = love.graphics.newImage("Assets/Images/Portrait.png")
   baseDeck = love.graphics.newImage("Assets/Images/BaseCardBack.png");
+  perksButton = love.graphics.newImage("Assets/Images/PerksButton.png");
+  mark = love.graphics.newImage("Assets/Images/Mark.png")
+  biome: Biome;
 
   constructor(gameManager: GameManager, enemy?: Enemy) {
     this.gameManager = gameManager;    
     this.enemy = enemy ?? new Enemy(gameManager);
     this.dealer = new Dealer(gameManager);
     this.cardAssets = new CardAssets(gameManager);
+    this.biome = new Grass(); // TODO: initialize this based on data from the map
   }
 
   load(data: BoardData): void {
     this.discardUsed = data.discardUsed;
     this.playerPoints = data.playerPoints;
     this.enemyPoints = data.enemyPoints;
-    this.trumpSuit = data.trumpSuit;
+    this.edelSuit = data.edelSuit;
     this.playerPower = data.playerPower;
     this.playerValue = data.playerValue;
     this.enemyPower = data.enemyPower;
@@ -79,7 +85,7 @@ export default class Board {
       playerPoints: this.playerPoints,
       enemyPoints: this.enemyPoints,
       enemy: this.enemy.save(),
-      trumpSuit: this.trumpSuit,
+      edelSuit: this.edelSuit,
       playerPower: this.playerPower,
       playerValue: this.playerValue,
       enemyPower: this.enemyPower,
@@ -283,7 +289,7 @@ export default class Board {
 
     suit.layout.reset(panelX, 20, 10, 10);
     suit.Label(
-      "Trump Suit: " + this.trumpSuit,
+      "Trump Suit: " + this.edelSuit,
       { align: "center" },
       ...suit.layout.row(panelW, 40)
     );
@@ -560,6 +566,7 @@ export default class Board {
     this.dealer.startGame();
     this.buildPrimaryButtons();
     this.buildPointBoard();
+    this.gameManager.assetManager.textManager.hideText(FontIds.EDEL_SUIT_LABEL);
   }
 
   handleAttack(): void {
@@ -586,7 +593,7 @@ export default class Board {
 
   private addPlayerPoints(points: number): void {
     this.playerPoints += points;
-    const text = this.gameManager.assetManager.fontManager.getText(FontIds.POINTS_PLAYER);
+    const text = this.gameManager.assetManager.textManager.getText(FontIds.POINTS_PLAYER);
     if (!isEmpty(text)) {
       text.text = `${this.gameManager.player.name}: ${this.playerPoints}`;
     }
@@ -594,7 +601,7 @@ export default class Board {
 
   private addEnemyPoints(points: number): void {
     this.enemyPoints += points;
-    const text = this.gameManager.assetManager.fontManager.getText(FontIds.POINTS_ENEMY);
+    const text = this.gameManager.assetManager.textManager.getText(FontIds.POINTS_ENEMY);
     if (!isEmpty(text)) {
       text.text = `${this.enemy.name}: ${this.enemyPoints}`;
     }
@@ -642,13 +649,14 @@ export default class Board {
   }
 
   buildAssets(): void {
-    this.buildBackground(Biomes.GRASS);
+    this.buildBackground();
     this.buildCardAssets();
     this.buildLetsFightButton();
     this.buildPlayerPortrait();
     this.buildEnemyPortrait();
     this.buildPlayerDeck();
     this.buildEnemyDeck();
+    this.buildEdelSuitText();
   }
 
   private buildCardAssets(): void {
@@ -719,7 +727,7 @@ export default class Board {
 
     const centerX = buttonX + btnW / 2;
     const centerY = buttonY + this.attackButton.getHeight() / 2;
-    this.gameManager.assetManager.fontManager.addText(
+    this.gameManager.assetManager.textManager.addText(
       FontIds.ATTACK_BUTTON_CAPTION,
       new FontWithPosition(centerX, centerY, "Attack", { size: 28, format: Format.CENTER })
     );
@@ -745,7 +753,7 @@ export default class Board {
 
     const centerX = discardX + btnW / 2;
     const centerY = buttonY + this.attackButton.getHeight() / 2;
-    this.gameManager.assetManager.fontManager.addText(
+    this.gameManager.assetManager.textManager.addText(
       FontIds.DISCARD_BUTTON_CAPTION,
       new FontWithPosition(centerX, centerY, "Discard", { size: 28, format: Format.CENTER })
     );
@@ -773,7 +781,7 @@ export default class Board {
 
     const centerX = deselectX + btnW / 2;
     const centerY = buttonY + this.attackButton.getHeight() / 2;
-    this.gameManager.assetManager.fontManager.addText(
+    this.gameManager.assetManager.textManager.addText(
       FontIds.DESELECT_BUTTON_CAPTION,
       new FontWithPosition(centerX, centerY, "Deselect", { size: 28, format: Format.CENTER })
     );
@@ -794,67 +802,143 @@ export default class Board {
     );
 
     const centerX = screenW / 2;
-    const textY = 40;
+    const textY = 30;
 
     const playerText = `${this.gameManager.player.name}: ${this.playerPoints}`;
     const enemyText = `${this.enemy.name}: ${this.enemyPoints}`;
 
     // Left label (player)
-    this.gameManager.assetManager.fontManager.addText(
+    this.gameManager.assetManager.textManager.addText(
       FontIds.POINTS_PLAYER,
       new FontWithPosition(centerX - (boardWidth / 2) + 10, textY, playerText, { size: 20 })
     );
 
     // Right label (enemy)
-    this.gameManager.assetManager.fontManager.addText(
+    this.gameManager.assetManager.textManager.addText(
       FontIds.POINTS_ENEMY,
       new FontWithPosition(centerX + (boardWidth / 2) - 10, textY, enemyText, { size: 20, format: Format.RIGHT })
     );
   }
 
   private buildPlayerPortrait(): void {
-    this.gameManager.assetManager.addAsset(
-      AssetIds.PLAYER_PORTRAIT,
-      new Asset(
-        AssetIds.PLAYER_PORTRAIT,
-        this.playerPortrait,
-        5,
-        5,
-      )
-    );
+    this.buildPortrait(CharacterTypes.PLAYER);
   }
 
   private buildEnemyPortrait(): void {
-    this.gameManager.assetManager.addAsset(
-      AssetIds.ENEMY_PORTRAIT,
-      new Asset(
-        AssetIds.ENEMY_PORTRAIT,
-        this.enemyPortrait,
-        push.getWidth() - this.enemyPortrait.getWidth() - 5,
-        5,
-      )
-    );
+    this.buildPortrait(CharacterTypes.ENEMY);
   }
 
-  private buildPlayerDeck(): void {
-    const playerCardY = this.cardAssets.getCardPosition(CharacterTypes.PLAYER);
+  private buildPortrait(characterType: CharacterTypes): void {
+    const playerCardY = characterType === CharacterTypes.PLAYER
+      ? this.cardAssets.getCardPosition(characterType)
+      : 5;
+
+    const portraitBackgroundAssetId = characterType === CharacterTypes.PLAYER
+      ? AssetIds.PLAYER_PORTRAIT_BACKGROUND
+      : AssetIds.ENEMY_PORTRAIT_BACKGROUND;
     this.gameManager.assetManager.addAsset(
-      AssetIds.PLAYER_DECK,
+      portraitBackgroundAssetId,
       new Asset(
-        AssetIds.PLAYER_DECK,
-        this.baseDeck,
+        portraitBackgroundAssetId,
+        this.portraitBackground,
         5,
         playerCardY,
       )
     );
+
+    const portraitAssetId = characterType === CharacterTypes.PLAYER
+      ? AssetIds.PLAYER_PORTRAIT
+      : AssetIds.ENEMY_PORTRAIT;
+    this.gameManager.assetManager.addAsset(
+      portraitAssetId,
+      new Asset(
+        portraitAssetId,
+        this.portrait,
+        5,
+        playerCardY,
+      )
+    );
+
+    const portraitWidth = this.portrait.getWidth();
+    const portraitHeight = this.portrait.getHeight();
+    const portraitBackgroundWidth = this.portraitBackground.getWidth();
+
+    const portraitNameId = characterType === CharacterTypes.PLAYER
+      ? FontIds.PLAYER_PORTRAIT_NAME
+      : FontIds.ENEMY_PORTRAIT_NAME;
+    this.gameManager.assetManager.textManager.addText(
+      portraitNameId,
+      new FontWithPosition(
+        10,
+        portraitHeight + playerCardY + 15,
+        characterType === CharacterTypes.PLAYER ? this.gameManager.player.name : this.enemy.name,
+        { size: 24 }
+      )
+    );
+
+    const portraitLevelId = characterType === CharacterTypes.PLAYER
+      ? FontIds.PLAYER_PORTRAIT_LEVEL
+      : FontIds.ENEMY_PORTRAIT_LEVEL;
+    this.gameManager.assetManager.textManager.addText(
+      portraitLevelId,
+      new FontWithPosition(
+        10,
+        portraitHeight + playerCardY + 40,
+        `Lvl ${characterType === CharacterTypes.PLAYER ? this.gameManager.player.level : this.enemy.level}`,
+        { size: 15 }
+      )
+    );
+
+    if (characterType === CharacterTypes.PLAYER) {
+      this.gameManager.assetManager.textManager.addText(
+        FontIds.PLAYER_PORTRAIT_EXPERIENCE,
+        new FontWithPosition(
+          portraitBackgroundWidth,
+          portraitHeight + playerCardY + 40,
+          `${this.gameManager.player.experience} XP`,
+          { size: 15, format: Format.RIGHT }
+        )
+      );
+
+      this.gameManager.assetManager.textManager.addText(
+        FontIds.PLAYER_PORTRAIT_MONEY,
+        new FontWithPosition(
+          30,
+          portraitHeight + playerCardY + 60,
+          `${this.gameManager.player.money} Mark`,
+          { size: 15, icon: this.mark }
+        )
+      );
+
+      this.gameManager.assetManager.addAsset(
+        AssetIds.PERKS_BUTTON,
+        new Asset(
+          AssetIds.PERKS_BUTTON,
+          this.perksButton,
+          portraitWidth + 15,
+          playerCardY + 10,
+          () => this.gameManager.switchToPerkScreen()
+        )
+      );
+
+      this.gameManager.assetManager.textManager.addText(
+        FontIds.PLAYER_PERKS,
+        new FontWithPosition(
+          portraitWidth  + (this.perksButton.getWidth() / 2),
+          playerCardY + 10  + (this.perksButton.getHeight() / 2),
+          "Perks",
+          { size: 15 }
+        )
+      );
+    }
   }
 
-  private buildEnemyDeck(): void {
-    const playerCardY = this.cardAssets.getCardPosition(CharacterTypes.PLAYER);
+  private buildPlayerDeck(): void {  
+    const playerCardY = this.cardAssets.getCardPosition(CharacterTypes.PLAYER);  
     this.gameManager.assetManager.addAsset(
-      AssetIds.ENEMY_DECK,
+      AssetIds.PLAYER_DECK,
       new Asset(
-        AssetIds.ENEMY_DECK,
+        AssetIds.PLAYER_DECK,
         this.baseDeck,
         push.getWidth() - this.baseDeck.getWidth() - 5,
         playerCardY,
@@ -862,25 +946,41 @@ export default class Board {
     );
   }
 
-  private buildBackground(biome: Biomes): void {
-    const backgroundImage = this.getBackgroundImageForBiome(biome);
+  private buildEnemyDeck(): void {
     this.gameManager.assetManager.addAsset(
-      AssetIds.GRASS_BACKGROUND,
+      AssetIds.ENEMY_DECK,
       new Asset(
-        AssetIds.GRASS_BACKGROUND,
-        backgroundImage,
-        0,
-        0,
+        AssetIds.ENEMY_DECK,
+        this.baseDeck,
+        push.getWidth() - this.baseDeck.getWidth() - 5,
+        5,
       )
     );
   }
 
-  private getBackgroundImageForBiome(biome: Biomes): Image {
-    switch (biome) {
-      case Biomes.GRASS:
-        return love.graphics.newImage("Assets/Images/GrassBackground.png");
-      default:
-        exhaustiveGuard(biome);
-    }
+  private buildEdelSuitText(): void {
+    const screenW = push.getWidth();
+    const centerX = screenW / 2;
+    this.gameManager.assetManager.textManager.addText(
+      FontIds.EDEL_SUIT_LABEL,
+      new FontWithPosition(
+        centerX,
+        40,
+        "Edel! \n" + Card.getSuitName(this.edelSuit),
+        { size: 24, format: Format.CENTER }
+      )
+    );
+  }
+
+  private buildBackground(): void {
+    this.gameManager.assetManager.addAsset(
+      AssetIds.GRASS_BACKGROUND,
+      new Asset(
+        AssetIds.GRASS_BACKGROUND,
+        love.graphics.newImage(this.biome.boardBackgroundImagePath),
+        0,
+        0,
+      )
+    );
   }
 }

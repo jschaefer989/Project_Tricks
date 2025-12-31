@@ -21,7 +21,7 @@ import PerkScreen from "Screens/PerkScreen"
 import * as push from "Libraries.push"
 import AssetManager from "Assets/AssetManager"
 import Card from "Cards/Card"
-import FontManager from "Assets/TextManager"
+import TextManager from "Assets/TextManager"
 import AnimationManager from "Assets/AnimationManager"
 
 interface GameState {
@@ -66,7 +66,7 @@ export default class GameManager {
         this.assetManager = new AssetManager(this)
         this.animationManager = new AnimationManager()
         if (!this.devMode) {
-            FontManager.setDefaultFont()
+            TextManager.setDefaultFont()
         }
     }
 

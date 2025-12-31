@@ -5,16 +5,18 @@ local __TS__StringSplit = ____lualib.__TS__StringSplit
 local ____exports = {}
 local ____Enums = require("Enums")
 local AnimationIds = ____Enums.AnimationIds
+local Suits = ____Enums.Suits
 local ____Helpers = require("Helpers")
+local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
 local ____Animation = require("Assets.Animation")
 local Animation = ____Animation.default
 ____exports.default = __TS__Class()
 local Card = ____exports.default
 Card.name = "Card"
-function Card.prototype.____constructor(self, gameManager, suit, rank, power, value, name, isTrump)
+function Card.prototype.____constructor(self, gameManager, suit, rank, power, value, name, isEdel)
     self.isSelected = false
-    self.isTrump = false
+    self.isEdel = false
     local id = (((suit .. "_") .. rank) .. "_") .. tostring(love.math.random(1000))
     self.gameManager = gameManager
     self.suit = suit
@@ -22,11 +24,11 @@ function Card.prototype.____constructor(self, gameManager, suit, rank, power, va
     self.power = power
     self.value = value
     self.cost = self:getCost()
-    local ____isTrump_0 = isTrump
-    if ____isTrump_0 == nil then
-        ____isTrump_0 = false
+    local ____isEdel_0 = isEdel
+    if ____isEdel_0 == nil then
+        ____isEdel_0 = false
     end
-    self.isTrump = ____isTrump_0
+    self.isEdel = ____isEdel_0
     self.name = name
     self.id = id
 end
@@ -50,7 +52,7 @@ function Card.prototype.save(self)
         value = self.value,
         isSelected = self.isSelected,
         cost = self.cost,
-        isTrump = self.isTrump,
+        isEdel = self.isEdel,
         name = self.name
     }
 end
@@ -63,7 +65,7 @@ function Card.load(self, gameManager, data)
         data.power,
         data.value,
         data.name,
-        data.isTrump
+        data.isEdel
     )
     card.id = data.id
     card.isSelected = data.isSelected
@@ -210,7 +212,7 @@ function Card.onHover(self, gameManager, asset)
         "left"
     )
     love.graphics.printf(
-        card.suit,
+        ____exports.default:getSuitName(card.suit),
         tooltipX,
         tooltipY,
         tooltipMaxWidth,
@@ -230,5 +232,29 @@ function Card.onHover(self, gameManager, asset)
         tooltipMaxWidth,
         "left"
     )
+end
+function Card.getSuitName(self, suit)
+    repeat
+        local ____switch26 = suit
+        local ____cond26 = ____switch26 == Suits.HEARTS
+        if ____cond26 then
+            return "Hearts"
+        end
+        ____cond26 = ____cond26 or ____switch26 == Suits.ACORNS
+        if ____cond26 then
+            return "Acorns"
+        end
+        ____cond26 = ____cond26 or ____switch26 == Suits.LEAVES
+        if ____cond26 then
+            return "Leaves"
+        end
+        ____cond26 = ____cond26 or ____switch26 == Suits.BELLS
+        if ____cond26 then
+            return "Bells"
+        end
+        do
+            exhaustiveGuard(suit)
+        end
+    until true
 end
 return ____exports

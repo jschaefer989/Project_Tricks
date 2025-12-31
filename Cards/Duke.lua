@@ -3,7 +3,7 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
 local ____exports = {}
 local ____Enums = require("Enums")
-local TrumpRanks = ____Enums.TrumpRanks
+local EdelRanks = ____Enums.EdelRanks
 local ____Card = require("Cards.Card")
 local Card = ____Card.default
 ____exports.default = __TS__Class()
@@ -15,7 +15,7 @@ function Duke.prototype.____constructor(self, gameManager, suit)
         self,
         gameManager,
         suit,
-        TrumpRanks.DUKE,
+        EdelRanks.DUKE,
         9,
         5,
         "Duke"

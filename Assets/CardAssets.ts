@@ -1,6 +1,6 @@
 import Card from "../Cards/Card";
 import Asset from "./Asset";
-import { Suits, AssetIds, Ranks, TrumpRanks, CharacterTypes } from "Enums";
+import { Suits, AssetIds, Ranks, EdelRanks, CharacterTypes } from "Enums";
 import { exhaustiveGuard, isEmpty } from "Helpers";
 import GameManager from "GameManager";
 import * as push from "Libraries.push";
@@ -152,7 +152,7 @@ export default class CardAssets {
     return `${AssetIds.SUIT}-${card.id}-${orientation}`;
   }
 
-  static getRankAssetPath(rank: Ranks | TrumpRanks): string {
+  static getRankAssetPath(rank: Ranks | EdelRanks): string {
     switch (rank) {
       case Ranks.BANNER:
         return "Assets/Images/BannerRank.png";
@@ -174,19 +174,19 @@ export default class CardAssets {
         return "Assets/Images/SoldierRank.png";
       case Ranks.THIEF:
         return "Assets/Images/ThiefRank.png";
-      case TrumpRanks.BARD:
+      case EdelRanks.BARD:
         return "Assets/Images/BardRank.png";
-      case TrumpRanks.CHOSEN:
+      case EdelRanks.CHOSEN:
         return "Assets/Images/ChosenRank.png";
-      case TrumpRanks.DEVIL:
+      case EdelRanks.DEVIL:
         return "Assets/Images/DevilRank.png";
-      case TrumpRanks.DUKE:
+      case EdelRanks.DUKE:
         return "Assets/Images/DukeRank.png";
-      case TrumpRanks.EMPEROR:
+      case EdelRanks.EMPEROR:
         return "Assets/Images/EmperorRank.png";
-      case TrumpRanks.POPE:
+      case EdelRanks.POPE:
         return "Assets/Images/PopeRank.png";
-      case TrumpRanks.KNIGHT:
+      case EdelRanks.KNIGHT:
         return "Assets/Images/KnightRank.png";
       default:
         exhaustiveGuard(rank);

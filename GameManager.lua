@@ -40,7 +40,7 @@ local push = require("Libraries.push")
 local ____AssetManager = require("Assets.AssetManager")
 local AssetManager = ____AssetManager.default
 local ____TextManager = require("Assets.TextManager")
-local FontManager = ____TextManager.default
+local TextManager = ____TextManager.default
 local ____AnimationManager = require("Assets.AnimationManager")
 local AnimationManager = ____AnimationManager.default
 ____exports.default = __TS__Class()
@@ -64,7 +64,7 @@ function GameManager.prototype.____constructor(self)
     self.assetManager = __TS__New(AssetManager, self)
     self.animationManager = __TS__New(AnimationManager)
     if not self.devMode then
-        FontManager:setDefaultFont()
+        TextManager:setDefaultFont()
     end
 end
 function GameManager.prototype.getCharacter(self, characterType)

@@ -2,7 +2,7 @@ import { isEmpty } from "Helpers"
 import FontWithPosition from "./FontWithPosition"
 import { Font } from "love.graphics"
 
-export default class FontManager {
+export default class TextManager {
     texts: Map<string, FontWithPosition>
 
     constructor() {
@@ -29,12 +29,12 @@ export default class FontManager {
         return this.texts.get(id)
     }
 
-    hideAsset(id: string): void {
+    hideText(id: string): void {
         this.texts.delete(id)
     }
 
     static getDefaultFontFilepath(): string {
-        return "Assets/Fonts/Gothic Pixels.ttf"
+        return "Assets/Fonts/Germania.ttf"
     }
 
     static setDefaultFont(): Font {

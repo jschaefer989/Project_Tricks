@@ -9,14 +9,14 @@ local push = require("Libraries.push")
 local ____Helpers = require("Helpers")
 local isEmpty = ____Helpers.isEmpty
 local ____TextManager = require("Assets.TextManager")
-local FontManager = ____TextManager.default
+local TextManager = ____TextManager.default
 ____exports.default = __TS__Class()
 local AssetManager = ____exports.default
 AssetManager.name = "AssetManager"
 function AssetManager.prototype.____constructor(self, gameManager)
     self.gameManager = gameManager
     self.assets = __TS__New(Map)
-    self.fontManager = __TS__New(FontManager)
+    self.textManager = __TS__New(TextManager)
 end
 function AssetManager.prototype.addAsset(self, id, asset)
     if self.assets:has(id) then
@@ -63,7 +63,7 @@ function AssetManager.prototype.drawAssets(self)
         end
         ::__continue10::
     end
-    self.fontManager:drawText()
+    self.textManager:drawText()
     self:drawHoverables()
 end
 function AssetManager.prototype.drawHoverables(self)

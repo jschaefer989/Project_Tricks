@@ -16,7 +16,7 @@ local ____Enums = require("Enums")
 local Suits = ____Enums.Suits
 local AssetIds = ____Enums.AssetIds
 local Ranks = ____Enums.Ranks
-local TrumpRanks = ____Enums.TrumpRanks
+local EdelRanks = ____Enums.EdelRanks
 local CharacterTypes = ____Enums.CharacterTypes
 local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
@@ -189,31 +189,31 @@ function CardAssets.getRankAssetPath(self, rank)
         if ____cond21 then
             return "Assets/Images/ThiefRank.png"
         end
-        ____cond21 = ____cond21 or ____switch21 == TrumpRanks.BARD
+        ____cond21 = ____cond21 or ____switch21 == EdelRanks.BARD
         if ____cond21 then
             return "Assets/Images/BardRank.png"
         end
-        ____cond21 = ____cond21 or ____switch21 == TrumpRanks.CHOSEN
+        ____cond21 = ____cond21 or ____switch21 == EdelRanks.CHOSEN
         if ____cond21 then
             return "Assets/Images/ChosenRank.png"
         end
-        ____cond21 = ____cond21 or ____switch21 == TrumpRanks.DEVIL
+        ____cond21 = ____cond21 or ____switch21 == EdelRanks.DEVIL
         if ____cond21 then
             return "Assets/Images/DevilRank.png"
         end
-        ____cond21 = ____cond21 or ____switch21 == TrumpRanks.DUKE
+        ____cond21 = ____cond21 or ____switch21 == EdelRanks.DUKE
         if ____cond21 then
             return "Assets/Images/DukeRank.png"
         end
-        ____cond21 = ____cond21 or ____switch21 == TrumpRanks.EMPEROR
+        ____cond21 = ____cond21 or ____switch21 == EdelRanks.EMPEROR
         if ____cond21 then
             return "Assets/Images/EmperorRank.png"
         end
-        ____cond21 = ____cond21 or ____switch21 == TrumpRanks.POPE
+        ____cond21 = ____cond21 or ____switch21 == EdelRanks.POPE
         if ____cond21 then
             return "Assets/Images/PopeRank.png"
         end
-        ____cond21 = ____cond21 or ____switch21 == TrumpRanks.KNIGHT
+        ____cond21 = ____cond21 or ____switch21 == EdelRanks.KNIGHT
         if ____cond21 then
             return "Assets/Images/KnightRank.png"
         end

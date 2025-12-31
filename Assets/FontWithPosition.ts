@@ -1,7 +1,8 @@
 /** @noSelfInFile */
 
+import { Image } from "love.graphics";
 import TextManager from "./TextManager";
-import { isEmpty } from "Helpers";
+import { exhaustiveGuard, isEmpty } from "Helpers";
 
 export enum Format {
     LEFT, 
@@ -12,7 +13,8 @@ export enum Format {
 interface ConstructionOptions {
   filepath?: string;
   size?: number;
-    format?: Format;
+  format?: Format;
+  icon?: Image;
 }
 
 export default class FontWithPosition {
@@ -22,6 +24,8 @@ export default class FontWithPosition {
   y: number;
   text: string;
   format: Format;
+  icon?: Image
+  iconFormat: Omit<Format, Format.CENTER> = Format.LEFT;
 
   constructor(
     x: number,
@@ -35,6 +39,7 @@ export default class FontWithPosition {
     this.y = y;
     this.text = text;
     this.format = options?.format ?? Format.LEFT;
+    this.icon = options?.icon;
   }
 
   printFont(): void {
@@ -45,23 +50,27 @@ export default class FontWithPosition {
 
     const textW = font.getWidth(this.text);
     const textH = font.getHeight();
+    const baseX = Math.floor(this.x - this.getFormatOffset(textW));
+    const baseY = Math.floor(this.y - textH / 2);
 
-    // Drop shadow then main text for readability
+    // Thicker outline for readability on light backgrounds
     love.graphics.setColor(0, 0, 0, 1);
-    love.graphics.print(
-      this.text,
-      Math.floor(this.x - this.getFormatOffset(textW)) + 1,
-      Math.floor(this.y - textH / 2) + 1
-    );
+    const offsets = [-2, -1, 0, 1, 2];
+    for (const ox of offsets) {
+      for (const oy of offsets) {
+        if (ox === 0 && oy === 0) {
+          continue;
+        }
+        love.graphics.print(this.text, baseX + ox, baseY + oy);
+      }
+    }
+
     love.graphics.setColor(1, 1, 1, 1);
-    love.graphics.print(
-      this.text,
-      Math.floor(this.x - this.getFormatOffset(textW)),
-      Math.floor(this.y - textH / 2)
-    );
+    love.graphics.print(this.text, baseX, baseY);
+    this.renderIcon();
   }
 
-  getFormatOffset(textW: number): number {
+  private getFormatOffset(textW: number): number {
     switch (this.format) {
       case Format.LEFT:
         return 0;
@@ -71,6 +80,20 @@ export default class FontWithPosition {
         return textW;
       default:
         return 0;
+    }
+  }
+
+  private renderIcon(): void {
+    if (isEmpty(this.icon)) {
+      return;
+    }
+    switch (this.iconFormat) {
+      case Format.LEFT:
+        love.graphics.draw(this.icon, this.x - this.icon.getWidth() - 5, this.y - (this.icon.getHeight() / 2) + 2);
+        break;
+      case Format.RIGHT:
+        love.graphics.draw(this.icon, this.x - 5, this.y - (this.icon.getHeight() / 2) + 2);
+        break;
     }
   }
 }

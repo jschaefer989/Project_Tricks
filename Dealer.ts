@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { Suits, Ranks, CharacterTypes, TrumpRanks } from "./Enums"
+import { Suits, Ranks, CharacterTypes, EdelRanks } from "./Enums"
 import { exhaustiveGuard, getRandomElementFromArray, getRandomElementFromEnum, isEmpty } from "./Helpers"
 import Card from "Cards/Card"
 import Banner from "Cards/Banner"
@@ -39,14 +39,14 @@ export default class Dealer {
         this.initializeEnemyDeck()
         this.dealCards(CharacterTypes.PLAYER)
         this.dealCards(CharacterTypes.ENEMY)
-        this.determineTrumpSuit()
+        this.determineEdelSuit()
     }
 
     startGame(): void {
         this.gameManager.player.putHandBackInDeck()
         this.gameManager.board?.enemy.putHandBackInDeck()
-        this.convertToTrumpSuitForCharacter(CharacterTypes.PLAYER)
-        this.convertToTrumpSuitForCharacter(CharacterTypes.ENEMY)
+        this.convertToEdelSuitForCharacter(CharacterTypes.PLAYER)
+        this.convertToEdelSuitForCharacter(CharacterTypes.ENEMY)
         Dealer.shuffle(this.gameManager, CharacterTypes.PLAYER)
         Dealer.shuffle(this.gameManager, CharacterTypes.ENEMY)
         this.dealCards(CharacterTypes.PLAYER)
@@ -80,7 +80,7 @@ export default class Dealer {
         }
     }
 
-    static getNewCard(gameManager: GameManager, rank: Ranks | TrumpRanks, suit: Suits): Card {
+    static getNewCard(gameManager: GameManager, rank: Ranks | EdelRanks, suit: Suits): Card {
         switch (rank) {
             case Ranks.BANNER:
                 return new Banner(gameManager, suit)
@@ -102,19 +102,19 @@ export default class Dealer {
                 return new Thief(gameManager, suit)
             case Ranks.SOLDIER:
                 return new Soldier(gameManager, suit)  
-            case TrumpRanks.BARD:
+            case EdelRanks.BARD:
                 return new Bard(gameManager, suit)
-            case TrumpRanks.DEVIL:
+            case EdelRanks.DEVIL:
                 return new Devil(gameManager, suit)
-            case TrumpRanks.DUKE:
+            case EdelRanks.DUKE:
                 return new Duke(gameManager, suit)
-            case TrumpRanks.EMPEROR:
+            case EdelRanks.EMPEROR:
                 return new Emperor(gameManager, suit)
-            case TrumpRanks.KNIGHT:
+            case EdelRanks.KNIGHT:
                 return new Knight(gameManager, suit)
-            case TrumpRanks.POPE:
+            case EdelRanks.POPE:
                 return new Pope(gameManager, suit)
-            case TrumpRanks.CHOSEN:
+            case EdelRanks.CHOSEN:
                 return new Chosen(gameManager, suit)
             default:
                 exhaustiveGuard(rank)
@@ -160,61 +160,61 @@ export default class Dealer {
         Dealer.shuffle(this.gameManager, CharacterTypes.ENEMY)
     }
 
-    determineTrumpSuit(): void {
+    determineEdelSuit(): void {
         if (isEmpty(this.gameManager.board)) {
             return
         }
 
         const player = this.gameManager.player 
-        let trumpSuit: Suits = Suits.HEARTS
+        let edelSuit: Suits = Suits.HEARTS
         let lowestPower: number = 100
         for (let index = 0; index < player.hand.length; index++) {
             const card = player.hand[index]
             if (index === 0 || card.power < lowestPower) {
                 lowestPower = card.power
-                trumpSuit = card.suit
+                edelSuit = card.suit
             }
         }
 
         for (const card of this.gameManager.board.enemy.hand) {
             if (card.power < lowestPower) {
                 lowestPower = card.power
-                trumpSuit = card.suit
+                edelSuit = card.suit
             }
         }
-        this.gameManager.board.trumpSuit = trumpSuit
+        this.gameManager.board.edelSuit = edelSuit
     }
 
-    convertToTrumpSuit(card: Card): Card {
+    convertToEdelSuit(card: Card): Card {
         if (isEmpty(this.gameManager.board)) {
             return card
         }
 
-        if (card.suit !== this.gameManager.board.trumpSuit) {
+        if (card.suit !== this.gameManager.board.edelSuit) {
             return card
         }
 
         switch (card.rank) {
             case Ranks.SOLDIER:
-                return new Knight(this.gameManager, this.gameManager.board.trumpSuit)
+                return new Knight(this.gameManager, this.gameManager.board.edelSuit)
             case Ranks.BARON:
-                return new Duke(this.gameManager, this.gameManager.board.trumpSuit)
+                return new Duke(this.gameManager, this.gameManager.board.edelSuit)
             case Ranks.JESTER:
-                return new Bard(this.gameManager, this.gameManager.board.trumpSuit)
+                return new Bard(this.gameManager, this.gameManager.board.edelSuit)
             case Ranks.DEUCE:
-                return new Emperor(this.gameManager, this.gameManager.board.trumpSuit)
+                return new Emperor(this.gameManager, this.gameManager.board.edelSuit)
             case Ranks.PRIEST:
-                return new Pope(this.gameManager, this.gameManager.board.trumpSuit)
+                return new Pope(this.gameManager, this.gameManager.board.edelSuit)
             case Ranks.THIEF:
-                return new Devil(this.gameManager, this.gameManager.board.trumpSuit)
+                return new Devil(this.gameManager, this.gameManager.board.edelSuit)
             case Ranks.SERGEANT:
-                return new Chosen(this.gameManager, this.gameManager.board.trumpSuit)
+                return new Chosen(this.gameManager, this.gameManager.board.edelSuit)
             default:
                 return card
         }
     }
 
-    convertToTrumpSuitForCharacter(characterType: string): void {
+    convertToEdelSuitForCharacter(characterType: string): void {
         const character = this.gameManager.getCharacter(characterType)
 
         if (isEmpty(character) || isEmpty(this.gameManager.board)) {
@@ -222,13 +222,13 @@ export default class Dealer {
         }
 
         for (const card of character.deck) {
-            if (card.suit !== this.gameManager.board.trumpSuit) {
+            if (card.suit !== this.gameManager.board.edelSuit) {
                 continue
             }
-            const trumpCard = this.convertToTrumpSuit(card)
-            if (trumpCard !== card) {
+            const edelCard = this.convertToEdelSuit(card)
+            if (edelCard !== card) {
                 character.removeFromDeck(card)
-                character.addToDeck(trumpCard)
+                character.addToDeck(edelCard)
             }
         }
     }
@@ -238,25 +238,25 @@ export default class Dealer {
             return card
         }
 
-        if (card.suit !== this.gameManager.board.trumpSuit) {
+        if (card.suit !== this.gameManager.board.edelSuit) {
             return card
         }
 
         switch (card.rank) {
-            case TrumpRanks.KNIGHT:
-                return new Soldier(this.gameManager, this.gameManager.board.trumpSuit)
-            case TrumpRanks.DUKE:
-                return new Baron(this.gameManager, this.gameManager.board.trumpSuit)
-            case TrumpRanks.BARD:
-                return new Jester(this.gameManager, this.gameManager.board.trumpSuit)
-            case TrumpRanks.EMPEROR:
-                return new Deuce(this.gameManager, this.gameManager.board.trumpSuit)
-            case TrumpRanks.POPE:
-                return new Priest(this.gameManager, this.gameManager.board.trumpSuit)
-            case TrumpRanks.DEVIL:
-                return new Thief(this.gameManager, this.gameManager.board.trumpSuit)
-            case TrumpRanks.CHOSEN:
-                return new Sergeant(this.gameManager, this.gameManager.board.trumpSuit)
+            case EdelRanks.KNIGHT:
+                return new Soldier(this.gameManager, this.gameManager.board.edelSuit)
+            case EdelRanks.DUKE:
+                return new Baron(this.gameManager, this.gameManager.board.edelSuit)
+            case EdelRanks.BARD:
+                return new Jester(this.gameManager, this.gameManager.board.edelSuit)
+            case EdelRanks.EMPEROR:
+                return new Deuce(this.gameManager, this.gameManager.board.edelSuit)
+            case EdelRanks.POPE:
+                return new Priest(this.gameManager, this.gameManager.board.edelSuit)
+            case EdelRanks.DEVIL:
+                return new Thief(this.gameManager, this.gameManager.board.edelSuit)
+            case EdelRanks.CHOSEN:
+                return new Sergeant(this.gameManager, this.gameManager.board.edelSuit)
             default:
                 return card
         }
@@ -269,13 +269,13 @@ export default class Dealer {
             return
         }
 
-        for (const trumpCard of character.deck) {
-            if (trumpCard.suit !== this.gameManager.board.trumpSuit) {
+        for (const edelCard of character.deck) {
+            if (edelCard.suit !== this.gameManager.board.edelSuit) {
                 continue
             }
-            const originalCard = this.convertBackToOriginalSuit(trumpCard)
-            if (originalCard !== trumpCard) {
-                character.removeFromDeck(trumpCard)
+            const originalCard = this.convertBackToOriginalSuit(edelCard)
+            if (originalCard !== edelCard) {
+                character.removeFromDeck(edelCard)
                 character.addToDeck(originalCard)
             }
         }

@@ -1,30 +1,30 @@
 /** @noSelfInFile */
 import GameManager from "GameManager";
-import { Ranks, Suits, TrumpRanks } from "../Enums";
+import { Ranks, Suits, EdelRanks } from "../Enums";
 import Asset from "Assets/Asset";
-interface CardData {
+export interface CardData {
     id: string;
     suit: Suits;
-    rank: Ranks | TrumpRanks;
+    rank: Ranks | EdelRanks;
     power: number;
     value: number;
     isSelected: boolean;
     cost: number;
-    isTrump: boolean;
+    isEdel: boolean;
     name: string;
 }
 export default class Card {
     gameManager: GameManager;
     id: string;
     suit: Suits;
-    rank: Ranks | TrumpRanks;
+    rank: Ranks | EdelRanks;
     power: number;
     value: number;
     isSelected: boolean;
     cost: number;
-    isTrump: boolean;
+    isEdel: boolean;
     name: string;
-    constructor(gameManager: GameManager, suit: Suits, rank: Ranks | TrumpRanks, power: number, value: number, name: string, isTrump?: boolean);
+    constructor(gameManager: GameManager, suit: Suits, rank: Ranks | EdelRanks, power: number, value: number, name: string, isEdel?: boolean);
     isEqual(otherCard: Card): boolean;
     getCost(): number;
     getBaseCost(): number;
@@ -34,5 +34,5 @@ export default class Card {
     onSelect(): void;
     onUnselect(): void;
     static onHover(gameManager: GameManager, asset: Asset): void;
+    static getSuitName(suit: Suits): string;
 }
-export {};
