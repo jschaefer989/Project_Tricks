@@ -5,7 +5,7 @@ local ____exports = {}
 local ____Enums = require("Enums")
 local AssetIds = ____Enums.AssetIds
 local CharacterTypes = ____Enums.CharacterTypes
-local TextIds = ____Enums.FontIds
+local TextIds = ____Enums.TextIds
 local Suits = ____Enums.Suits
 local ____Dealer = require("Dealer")
 local Dealer = ____Dealer.default
@@ -209,19 +209,19 @@ function Board.prototype.getContentWidth(self)
         300
     )
 end
-function Board.prototype.getPlayerCashout(self)
-    local cashout = self.playerValue - self.enemyValue
-    if cashout < 0 then
-        cashout = 0
+function Board.prototype.getPlayerWinnings(self)
+    local winnings = self.playerValue - self.enemyValue
+    if winnings < 0 then
+        winnings = 0
     end
-    return cashout
+    return winnings
 end
-function Board.prototype.getEnemyCashout(self)
-    local cashout = self.enemyValue - self.playerValue
-    if cashout < 0 then
-        cashout = 0
+function Board.prototype.getEnemyWinnings(self)
+    local winnings = self.enemyValue - self.playerValue
+    if winnings < 0 then
+        winnings = 0
     end
-    return cashout
+    return winnings
 end
 function Board.prototype.renderWinStatus(self, startX, startY)
     if self.playerPower > self.enemyPower then
@@ -237,7 +237,7 @@ function Board.prototype.renderWinStatus(self, startX, startY)
             suit.layout:row(panelW, 40)
         )
         suit.Label(
-            "Your cashout: " .. tostring(self:getPlayerCashout()),
+            "Your cashout: " .. tostring(self:getPlayerWinnings()),
             {align = "left"},
             suit.layout:row(panelW, 30)
         )
@@ -463,9 +463,9 @@ function Board.prototype.handleAttack(self)
         return
     end
     if self.playerPower > self.enemyPower then
-        self:addPlayerPoints(self:getPlayerCashout())
+        self:addPlayerPoints(self:getPlayerWinnings())
     else
-        self:addEnemyPoints(self:getEnemyCashout())
+        self:addEnemyPoints(self:getEnemyWinnings())
     end
     self:clearStats()
     self.gameManager.player:removeSelectedCardsFromHand()
@@ -537,6 +537,12 @@ function Board.prototype.addPlayerPower(self, power)
         TextIds.PLAYER_POWER,
         "Power: " .. tostring(self.playerPower)
     )
+    self:updatePowerEmphasis()
+    if self.playerPower > self.enemyPower then
+        self:buildWinFire()
+    else
+        self:removeWinFire()
+    end
 end
 function Board.prototype.addPlayerValue(self, value)
     self.playerValue = self.playerValue + value
@@ -544,6 +550,11 @@ function Board.prototype.addPlayerValue(self, value)
         TextIds.PLAYER_VALUE,
         "Value: " .. tostring(self.playerValue)
     )
+    self.gameManager.assetManager.textManager:updateText(
+        TextIds.WINNINGS,
+        "Winnings: " .. tostring(self:getPlayerWinnings())
+    )
+    self:updateValueEmphasis()
 end
 function Board.prototype.addEnemyPower(self, power)
     self.enemyPower = self.enemyPower + power
@@ -551,6 +562,7 @@ function Board.prototype.addEnemyPower(self, power)
         TextIds.ENEMY_POWER,
         "Power: " .. tostring(self.enemyPower)
     )
+    self:updatePowerEmphasis()
 end
 function Board.prototype.addEnemyValue(self, value)
     self.enemyValue = self.enemyValue + value
@@ -558,6 +570,7 @@ function Board.prototype.addEnemyValue(self, value)
         TextIds.ENEMY_VALUE,
         "Value: " .. tostring(self.enemyValue)
     )
+    self:updateValueEmphasis()
 end
 function Board.prototype.buildAssets(self)
     self:buildBackground()
@@ -571,6 +584,8 @@ function Board.prototype.buildAssets(self)
         self:buildEdelSuitText()
     else
         self:buildFightAssets()
+        self:updatePowerEmphasis()
+        self:updateValueEmphasis()
     end
 end
 function Board.prototype.buildCardAssets(self)
@@ -750,6 +765,9 @@ function Board.prototype.buildPowerAndValues(self, characterType)
     end
     local powerId = characterType == CharacterTypes.PLAYER and TextIds.PLAYER_POWER or TextIds.ENEMY_POWER
     local powerValue = characterType == CharacterTypes.PLAYER and self.playerPower or self.enemyPower
+    local isLeading = self.playerPower > self.enemyPower
+    local isTrailing = self.enemyPower > self.playerPower
+    local emphasize = characterType == CharacterTypes.PLAYER and isLeading or characterType == CharacterTypes.ENEMY and isTrailing
     self.gameManager.assetManager.textManager:addText(
         powerId,
         __TS__New(
@@ -757,11 +775,14 @@ function Board.prototype.buildPowerAndValues(self, characterType)
             30,
             portraitHeight + portraitAsset.y + 60,
             "Power: " .. tostring(powerValue),
-            {size = 15, icon = self.attackPowerIcon}
+            {size = emphasize and 18 or 15, icon = self.attackPowerIcon}
         )
     )
     local valueId = characterType == CharacterTypes.PLAYER and TextIds.PLAYER_VALUE or TextIds.ENEMY_VALUE
     local valueValue = characterType == CharacterTypes.PLAYER and self.playerValue or self.enemyValue
+    local valueLeading = self.playerValue > self.enemyValue
+    local valueTrailing = self.enemyValue > self.playerValue
+    local emphasizeValue = characterType == CharacterTypes.PLAYER and valueLeading or characterType == CharacterTypes.ENEMY and valueTrailing
     self.gameManager.assetManager.textManager:addText(
         valueId,
         __TS__New(
@@ -769,9 +790,31 @@ function Board.prototype.buildPowerAndValues(self, characterType)
             30,
             portraitHeight + portraitAsset.y + 80,
             "Value: " .. tostring(valueValue),
-            {size = 15, icon = self.valueIcon}
+            {size = emphasizeValue and 18 or 15, icon = self.valueIcon}
         )
     )
+end
+function Board.prototype.updatePowerEmphasis(self)
+    local playerText = self.gameManager.assetManager.textManager:getText(TextIds.PLAYER_POWER)
+    local enemyText = self.gameManager.assetManager.textManager:getText(TextIds.ENEMY_POWER)
+    if isEmpty(playerText) or isEmpty(enemyText) then
+        return
+    end
+    local playerLeading = self.playerPower > self.enemyPower
+    local enemyLeading = self.enemyPower > self.playerPower
+    playerText.size = playerLeading and 18 or 15
+    enemyText.size = enemyLeading and 18 or 15
+end
+function Board.prototype.updateValueEmphasis(self)
+    local playerText = self.gameManager.assetManager.textManager:getText(TextIds.PLAYER_VALUE)
+    local enemyText = self.gameManager.assetManager.textManager:getText(TextIds.ENEMY_VALUE)
+    if isEmpty(playerText) or isEmpty(enemyText) then
+        return
+    end
+    local playerLeading = self.playerValue > self.enemyValue
+    local enemyLeading = self.enemyValue > self.playerValue
+    playerText.size = playerLeading and 18 or 15
+    enemyText.size = enemyLeading and 18 or 15
 end
 function Board.prototype.buildPlayerPortrait(self)
     self:buildPortrait(CharacterTypes.PLAYER)
@@ -925,6 +968,69 @@ function Board.prototype.buildBackground(self)
             0
         )
     )
+end
+function Board.prototype.buildWinFire(self)
+    local fireSprite = self:getWinFireSprite()
+    local portraitWidth = self.portrait:getWidth()
+    local portraitHeight = self.portrait:getHeight()
+    local playerPortraitY = self:getPortraitPosition(CharacterTypes.PLAYER)
+    local enemyPortraitY = self:getPortraitPosition(CharacterTypes.ENEMY)
+    local portraitCenterX = 5 + portraitWidth / 2
+    local playerCenterY = playerPortraitY + portraitHeight / 2
+    local enemyCenterY = enemyPortraitY + portraitHeight / 2
+    local centerY = (playerCenterY + enemyCenterY) / 2
+    self.gameManager.assetManager:addAsset(
+        AssetIds.BASIC_WIN_FIRE,
+        __TS__New(
+            Asset,
+            AssetIds.BASIC_WIN_FIRE,
+            fireSprite,
+            portraitCenterX - fireSprite:getWidth() / 4,
+            centerY - fireSprite:getHeight() / 4
+        )
+    )
+    self.gameManager.assetManager.textManager:addText(
+        TextIds.WIN_FIRE_TEXT,
+        __TS__New(
+            FontWithPosition,
+            portraitCenterX * 2,
+            centerY + 20,
+            "You are\ndominating!",
+            {size = 32, format = Format.CENTER}
+        )
+    )
+    local winnings = self:getPlayerWinnings()
+    if winnings <= 0 then
+        self.gameManager.assetManager.textManager:addText(
+            TextIds.WINNINGS,
+            __TS__New(
+                FontWithPosition,
+                portraitCenterX * 2,
+                centerY + 100,
+                "But you'll get no winnings...",
+                {size = 20, format = Format.CENTER}
+            )
+        )
+    else
+        self.gameManager.assetManager.textManager:addText(
+            TextIds.WINNINGS,
+            __TS__New(
+                FontWithPosition,
+                portraitCenterX * 2,
+                centerY + 100,
+                "Winnings: " .. tostring(winnings),
+                {size = 20, format = Format.CENTER}
+            )
+        )
+    end
+end
+function Board.prototype.removeWinFire(self)
+    self.gameManager.assetManager:hideAsset(AssetIds.BASIC_WIN_FIRE)
+    self.gameManager.assetManager.textManager:hideText(TextIds.WIN_FIRE_TEXT)
+    self.gameManager.assetManager.textManager:hideText(TextIds.WINNINGS)
+end
+function Board.prototype.getWinFireSprite(self)
+    return love.graphics.newImage("Assets/Images/BasicWinFire.png")
 end
 function Board.prototype.getPortraitPosition(self, characterType)
     return characterType == CharacterTypes.PLAYER and (self.portraitPosition or self.cardAssets:getCardPosition(characterType)) or 5

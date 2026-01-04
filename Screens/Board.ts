@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { AssetIds, CharacterTypes, FontIds as TextIds, Suits } from "../Enums";
+import { AssetIds, CharacterTypes, TextIds as TextIds, Suits } from "../Enums";
 import Dealer from "../Dealer";
 import Draw from "../Draw";
 import Enemy, { EnemyData } from "Enemies/Enemy";
@@ -14,6 +14,7 @@ import FontWithPosition, { Format } from "Assets/FontWithPosition";
 import Grass from "Biomes/Grass";
 import Biome from "Biomes/Biome";
 import Card from "Cards/Card";
+import { Image } from "love.graphics";
 
 const padding = 20;
 
@@ -248,16 +249,16 @@ export default class Board {
     );
   }
 
-  getPlayerCashout(): number {
-    let cashout = this.playerValue - this.enemyValue;
-    if (cashout < 0) cashout = 0;
-    return cashout;
+  getPlayerWinnings(): number {
+    let winnings = this.playerValue - this.enemyValue;
+    if (winnings < 0) winnings = 0;
+    return winnings;
   }
 
-  getEnemyCashout(): number {
-    let cashout = this.enemyValue - this.playerValue;
-    if (cashout < 0) cashout = 0;
-    return cashout;
+  getEnemyWinnings(): number {
+    let winnings = this.enemyValue - this.playerValue;
+    if (winnings < 0) winnings = 0;
+    return winnings;
   }
 
   renderWinStatus(startX: number, startY: number): void {
@@ -279,7 +280,7 @@ export default class Board {
         ...suit.layout.row(panelW, 40)
       );
       suit.Label(
-        "Your cashout: " + this.getPlayerCashout(),
+        "Your cashout: " + this.getPlayerWinnings(),
         { align: "left" },
         ...suit.layout.row(panelW, 30)
       );
@@ -588,9 +589,9 @@ export default class Board {
     }
 
     if (this.playerPower > this.enemyPower) {
-      this.addPlayerPoints(this.getPlayerCashout());
+      this.addPlayerPoints(this.getPlayerWinnings());
     } else {
-      this.addEnemyPoints(this.getEnemyCashout());
+      this.addEnemyPoints(this.getEnemyWinnings());
     }
 
     this.clearStats();
@@ -666,6 +667,12 @@ export default class Board {
       TextIds.PLAYER_POWER,
       `Power: ${this.playerPower}`
     );
+    this.updatePowerEmphasis();
+    if (this.playerPower > this.enemyPower) {
+      this.buildWinFire();
+    } else {
+      this.removeWinFire();
+    }
   }
 
   addPlayerValue(value: number): void {
@@ -674,6 +681,11 @@ export default class Board {
       TextIds.PLAYER_VALUE,
       `Value: ${this.playerValue}`
     );
+    this.gameManager.assetManager.textManager.updateText(
+      TextIds.WINNINGS,
+      `Winnings: ${this.getPlayerWinnings()}`
+    );
+    this.updateValueEmphasis();
   }
 
   addEnemyPower(power: number): void {
@@ -682,6 +694,7 @@ export default class Board {
       TextIds.ENEMY_POWER,
       `Power: ${this.enemyPower}`
     );
+    this.updatePowerEmphasis();
   }
 
   addEnemyValue(value: number): void {
@@ -690,6 +703,7 @@ export default class Board {
       TextIds.ENEMY_VALUE,
       `Value: ${this.enemyValue}`
     );
+    this.updateValueEmphasis();
   }
 
   buildAssets(): void {
@@ -704,6 +718,8 @@ export default class Board {
       this.buildEdelSuitText();
     } else {
       this.buildFightAssets();
+      this.updatePowerEmphasis();
+      this.updateValueEmphasis();
     }
   }
 
@@ -903,13 +919,16 @@ export default class Board {
       characterType === CharacterTypes.PLAYER
         ? this.playerPower
         : this.enemyPower;
+    const isLeading = this.playerPower > this.enemyPower;
+    const isTrailing = this.enemyPower > this.playerPower;
+    const emphasize = (characterType === CharacterTypes.PLAYER && isLeading) || (characterType === CharacterTypes.ENEMY && isTrailing);
     this.gameManager.assetManager.textManager.addText(
       powerId,
       new FontWithPosition(
         30,
         portraitHeight + portraitAsset.y + 60,
         `Power: ${powerValue}`,
-        { size: 15, icon: this.attackPowerIcon }
+        { size: emphasize ? 18 : 15, icon: this.attackPowerIcon }
       )
     );
 
@@ -921,15 +940,48 @@ export default class Board {
       characterType === CharacterTypes.PLAYER
         ? this.playerValue
         : this.enemyValue;
+    const valueLeading = this.playerValue > this.enemyValue;
+    const valueTrailing = this.enemyValue > this.playerValue;
+    const emphasizeValue =
+      (characterType === CharacterTypes.PLAYER && valueLeading) ||
+      (characterType === CharacterTypes.ENEMY && valueTrailing);
     this.gameManager.assetManager.textManager.addText(
       valueId,
       new FontWithPosition(
         30,
         portraitHeight + portraitAsset.y + 80,
         `Value: ${valueValue}`,
-        { size: 15, icon: this.valueIcon }
+        { size: emphasizeValue ? 18 : 15, icon: this.valueIcon }
       )
     );
+  }
+
+  private updatePowerEmphasis(): void {
+    const playerText = this.gameManager.assetManager.textManager.getText(TextIds.PLAYER_POWER);
+    const enemyText = this.gameManager.assetManager.textManager.getText(TextIds.ENEMY_POWER);
+    if (isEmpty(playerText) || isEmpty(enemyText)) {
+      return;
+    }
+
+    const playerLeading = this.playerPower > this.enemyPower;
+    const enemyLeading = this.enemyPower > this.playerPower;
+
+    playerText.size = playerLeading ? 18 : 15;
+    enemyText.size = enemyLeading ? 18 : 15;
+  }
+
+  private updateValueEmphasis(): void {
+    const playerText = this.gameManager.assetManager.textManager.getText(TextIds.PLAYER_VALUE);
+    const enemyText = this.gameManager.assetManager.textManager.getText(TextIds.ENEMY_VALUE);
+    if (isEmpty(playerText) || isEmpty(enemyText)) {
+      return;
+    }
+
+    const playerLeading = this.playerValue > this.enemyValue;
+    const enemyLeading = this.enemyValue > this.playerValue;
+
+    playerText.size = playerLeading ? 18 : 15;
+    enemyText.size = enemyLeading ? 18 : 15;
   }
 
   private buildPlayerPortrait(): void {
@@ -1103,6 +1155,75 @@ export default class Board {
         0
       )
     );
+  }
+
+  private buildWinFire(): void {
+    const fireSprite = this.getWinFireSprite();
+    const portraitWidth = this.portrait.getWidth();
+    const portraitHeight = this.portrait.getHeight();
+
+    const playerPortraitY = this.getPortraitPosition(CharacterTypes.PLAYER);
+    const enemyPortraitY = this.getPortraitPosition(CharacterTypes.ENEMY);
+
+    const portraitCenterX = 5 + portraitWidth / 2;
+    const playerCenterY = playerPortraitY + portraitHeight / 2;
+    const enemyCenterY = enemyPortraitY + portraitHeight / 2;
+    const centerY = (playerCenterY + enemyCenterY) / 2;
+
+    this.gameManager.assetManager.addAsset(
+      AssetIds.BASIC_WIN_FIRE,
+      new Asset(
+        AssetIds.BASIC_WIN_FIRE,
+        fireSprite,
+        portraitCenterX - fireSprite.getWidth() / 4,
+        centerY - fireSprite.getHeight() / 4
+      )
+    );
+
+    this.gameManager.assetManager.textManager.addText(
+      TextIds.WIN_FIRE_TEXT,
+      new FontWithPosition(
+        portraitCenterX * 2,
+        centerY + 20,
+        "You are\ndominating!",
+        { size: 32, format: Format.CENTER }
+      )
+    );
+
+
+    const winnings = this.getPlayerWinnings();
+    if (winnings <= 0) {
+      this.gameManager.assetManager.textManager.addText(
+        TextIds.WINNINGS,
+        new FontWithPosition(
+          portraitCenterX * 2,
+          centerY + 100,
+          "But you'll get no winnings...",
+          { size: 20, format: Format.CENTER }
+        )
+      );
+    } else {
+      this.gameManager.assetManager.textManager.addText(
+        TextIds.WINNINGS,
+        new FontWithPosition(
+          portraitCenterX * 2,
+          centerY + 100,
+          "Winnings: " + winnings,
+          { size: 20, format: Format.CENTER }
+        )
+      );
+    }
+  }
+
+  private removeWinFire(): void {
+    this.gameManager.assetManager.hideAsset(AssetIds.BASIC_WIN_FIRE);
+    this.gameManager.assetManager.textManager.hideText(TextIds.WIN_FIRE_TEXT);
+    this.gameManager.assetManager.textManager.hideText(TextIds.WINNINGS);
+  }
+
+  private getWinFireSprite(): Image {
+    // TODO: render different fire sprites and animations based on how hard the player is about to win
+    return love.graphics.newImage("Assets/Images/BasicWinFire.png");
   }
 
   getPortraitPosition(characterType: CharacterTypes): number {

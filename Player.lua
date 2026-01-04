@@ -12,7 +12,7 @@ local ____Character = require("Character")
 local Character = ____Character.default
 local ____Enums = require("Enums")
 local CharacterTypes = ____Enums.CharacterTypes
-local FontIds = ____Enums.FontIds
+local TextIds = ____Enums.TextIds
 local ____Dealer = require("Dealer")
 local Dealer = ____Dealer.default
 ____exports.default = __TS__Class()
@@ -128,7 +128,7 @@ end
 function Player.prototype.addMoney(self, amount)
     self.money = self.money + amount
     self.gameManager.assetManager.textManager:updateText(
-        FontIds.PLAYER_PORTRAIT_MONEY,
+        TextIds.PLAYER_PORTRAIT_MONEY,
         tostring(self.money) .. " Mark"
     )
 end
@@ -182,7 +182,7 @@ end
 function Player.prototype.addExperience(self, exp)
     self.experience = self.experience + exp
     self.gameManager.assetManager.textManager:updateText(
-        FontIds.PLAYER_PORTRAIT_EXPERIENCE,
+        TextIds.PLAYER_PORTRAIT_EXPERIENCE,
         tostring(self.experience) .. " XP"
     )
 end

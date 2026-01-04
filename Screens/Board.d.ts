@@ -5,6 +5,7 @@ import Enemy, { EnemyData } from "Enemies/Enemy";
 import type GameManager from "../GameManager";
 import CardAssets from "Assets/CardAssets";
 import Biome from "Biomes/Biome";
+import { Image } from "love.graphics";
 interface BoardData {
     discardUsed: number;
     playerPoints: number;
@@ -31,18 +32,18 @@ export default class Board {
     enemyValue: number;
     showingInitialView: boolean;
     cardAssets: CardAssets;
-    letsFightButton: import("love.graphics").Image;
-    attackButton: import("love.graphics").Image;
-    discardButton: import("love.graphics").Image;
-    deselectButton: import("love.graphics").Image;
-    pointBoard: import("love.graphics").Image;
-    portraitBackground: import("love.graphics").Image;
-    portrait: import("love.graphics").Image;
-    baseDeck: import("love.graphics").Image;
-    perksButton: import("love.graphics").Image;
-    markIcon: import("love.graphics").Image;
-    attackPowerIcon: import("love.graphics").Image;
-    valueIcon: import("love.graphics").Image;
+    letsFightButton: Image;
+    attackButton: Image;
+    discardButton: Image;
+    deselectButton: Image;
+    pointBoard: Image;
+    portraitBackground: Image;
+    portrait: Image;
+    baseDeck: Image;
+    perksButton: Image;
+    markIcon: Image;
+    attackPowerIcon: Image;
+    valueIcon: Image;
     biome: Biome;
     portraitPosition: number | undefined;
     constructor(gameManager: GameManager, enemy?: Enemy);
@@ -56,8 +57,8 @@ export default class Board {
         startY: number;
     };
     getContentWidth(): number;
-    getPlayerCashout(): number;
-    getEnemyCashout(): number;
+    getPlayerWinnings(): number;
+    getEnemyWinnings(): number;
     renderWinStatus(startX: number, startY: number): void;
     renderTrumpSuitLabel(): void;
     renderPointsDisplay(): void;
@@ -92,6 +93,8 @@ export default class Board {
     private buildDeselectButton;
     private buildPointBoard;
     private buildPowerAndValues;
+    private updatePowerEmphasis;
+    private updateValueEmphasis;
     private buildPlayerPortrait;
     private buildEnemyPortrait;
     private buildPortrait;
@@ -99,6 +102,9 @@ export default class Board {
     private buildEnemyDeck;
     private buildEdelSuitText;
     private buildBackground;
+    private buildWinFire;
+    private removeWinFire;
+    private getWinFireSprite;
     getPortraitPosition(characterType: CharacterTypes): number;
 }
 export {};

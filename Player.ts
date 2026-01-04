@@ -3,7 +3,7 @@
 import Perk, { PerkData } from "Perk";
 import Card from "Cards/Card";
 import Character from "./Character";
-import { CharacterTypes, FontIds, Perks } from "Enums";
+import { CharacterTypes, TextIds, Perks } from "Enums";
 import Dealer from "Dealer";
 import GameManager from "GameManager";
 import { isEmpty } from "Helpers";
@@ -131,7 +131,7 @@ export default class Player extends Character {
 
   addMoney(amount: number): void {
     this.money += amount;
-    this.gameManager.assetManager.textManager.updateText(FontIds.PLAYER_PORTRAIT_MONEY, `${this.money} Mark`);
+    this.gameManager.assetManager.textManager.updateText(TextIds.PLAYER_PORTRAIT_MONEY, `${this.money} Mark`);
   }
 
   hasPerk(perkType: Perks): boolean {
@@ -178,7 +178,7 @@ export default class Player extends Character {
 
   addExperience(exp: number): void {
     this.experience += exp;
-    this.gameManager.assetManager.textManager.updateText(FontIds.PLAYER_PORTRAIT_EXPERIENCE, `${this.experience} XP`);
+    this.gameManager.assetManager.textManager.updateText(TextIds.PLAYER_PORTRAIT_EXPERIENCE, `${this.experience} XP`);
   }
 
   unselectCards(): void {
