@@ -5,7 +5,7 @@ local ____exports = {}
 local ____Enums = require("Enums")
 local AssetIds = ____Enums.AssetIds
 local CharacterTypes = ____Enums.CharacterTypes
-local FontIds = ____Enums.FontIds
+local TextIds = ____Enums.FontIds
 local Suits = ____Enums.Suits
 local ____Dealer = require("Dealer")
 local Dealer = ____Dealer.default
@@ -51,7 +51,9 @@ function Board.prototype.____constructor(self, gameManager, enemy)
     self.portrait = love.graphics.newImage("Assets/Images/Portrait.png")
     self.baseDeck = love.graphics.newImage("Assets/Images/BaseCardBack.png")
     self.perksButton = love.graphics.newImage("Assets/Images/PerksButton.png")
-    self.mark = love.graphics.newImage("Assets/Images/Mark.png")
+    self.markIcon = love.graphics.newImage("Assets/Images/Mark.png")
+    self.attackPowerIcon = love.graphics.newImage("Assets/Images/AttackPower.png")
+    self.valueIcon = love.graphics.newImage("Assets/Images/Value.png")
     self.gameManager = gameManager
     self.enemy = enemy or __TS__New(Enemy, gameManager)
     self.dealer = __TS__New(Dealer, gameManager)
@@ -443,9 +445,14 @@ function Board.prototype.handleStartFight(self)
     self.showingInitialView = false
     self.gameManager.assetManager:hideAsset(AssetIds.LETS_FIGHT_BUTTON)
     self.dealer:startGame()
+    self:buildFightAssets()
+    self.gameManager.assetManager.textManager:hideText(TextIds.EDEL_SUIT_LABEL)
+end
+function Board.prototype.buildFightAssets(self)
     self:buildPrimaryButtons()
     self:buildPointBoard()
-    self.gameManager.assetManager.textManager:hideText(FontIds.EDEL_SUIT_LABEL)
+    self:buildPowerAndValues(CharacterTypes.PLAYER)
+    self:buildPowerAndValues(CharacterTypes.ENEMY)
 end
 function Board.prototype.handleAttack(self)
     if not self.gameManager.player:anySelectedCards() then
@@ -474,17 +481,17 @@ function Board.prototype.handleAttack(self)
 end
 function Board.prototype.addPlayerPoints(self, points)
     self.playerPoints = self.playerPoints + points
-    local text = self.gameManager.assetManager.textManager:getText(FontIds.POINTS_PLAYER)
-    if not isEmpty(text) then
-        text.text = (self.gameManager.player.name .. ": ") .. tostring(self.playerPoints)
-    end
+    self.gameManager.assetManager.textManager:updateText(
+        TextIds.POINTS_PLAYER,
+        (self.gameManager.player.name .. ": ") .. tostring(self.playerPoints)
+    )
 end
 function Board.prototype.addEnemyPoints(self, points)
     self.enemyPoints = self.enemyPoints + points
-    local text = self.gameManager.assetManager.textManager:getText(FontIds.POINTS_ENEMY)
-    if not isEmpty(text) then
-        text.text = (self.enemy.name .. ": ") .. tostring(self.enemyPoints)
-    end
+    self.gameManager.assetManager.textManager:updateText(
+        TextIds.POINTS_ENEMY,
+        (self.enemy.name .. ": ") .. tostring(self.enemyPoints)
+    )
 end
 function Board.prototype.handleDiscard(self)
     if not self.gameManager.player:anySelectedCards() then
@@ -519,20 +526,52 @@ function Board.prototype.endFight(self)
     end
 end
 function Board.prototype.clearStats(self)
-    self.playerPower = 0
-    self.playerValue = 0
-    self.enemyPower = 0
-    self.enemyValue = 0
+    self:addPlayerPower(-self.playerPower)
+    self:addPlayerValue(-self.playerValue)
+    self:addEnemyPower(-self.enemyPower)
+    self:addEnemyValue(-self.enemyValue)
+end
+function Board.prototype.addPlayerPower(self, power)
+    self.playerPower = self.playerPower + power
+    self.gameManager.assetManager.textManager:updateText(
+        TextIds.PLAYER_POWER,
+        "Power: " .. tostring(self.playerPower)
+    )
+end
+function Board.prototype.addPlayerValue(self, value)
+    self.playerValue = self.playerValue + value
+    self.gameManager.assetManager.textManager:updateText(
+        TextIds.PLAYER_VALUE,
+        "Value: " .. tostring(self.playerValue)
+    )
+end
+function Board.prototype.addEnemyPower(self, power)
+    self.enemyPower = self.enemyPower + power
+    self.gameManager.assetManager.textManager:updateText(
+        TextIds.ENEMY_POWER,
+        "Power: " .. tostring(self.enemyPower)
+    )
+end
+function Board.prototype.addEnemyValue(self, value)
+    self.enemyValue = self.enemyValue + value
+    self.gameManager.assetManager.textManager:updateText(
+        TextIds.ENEMY_VALUE,
+        "Value: " .. tostring(self.enemyValue)
+    )
 end
 function Board.prototype.buildAssets(self)
     self:buildBackground()
     self:buildCardAssets()
-    self:buildLetsFightButton()
     self:buildPlayerPortrait()
     self:buildEnemyPortrait()
     self:buildPlayerDeck()
     self:buildEnemyDeck()
-    self:buildEdelSuitText()
+    if self.showingInitialView then
+        self:buildLetsFightButton()
+        self:buildEdelSuitText()
+    else
+        self:buildFightAssets()
+    end
 end
 function Board.prototype.buildCardAssets(self)
     local playerCardPosition = self.cardAssets:determineCardStartingPosition(CharacterTypes.PLAYER)
@@ -600,7 +639,7 @@ function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW)
     local centerX = buttonX + btnW / 2
     local centerY = buttonY + self.attackButton:getHeight() / 2
     self.gameManager.assetManager.textManager:addText(
-        FontIds.ATTACK_BUTTON_CAPTION,
+        TextIds.ATTACK_BUTTON_CAPTION,
         __TS__New(
             FontWithPosition,
             centerX,
@@ -626,7 +665,7 @@ function Board.prototype.buildDiscardButton(self, buttonX, buttonY, btnW, gap)
     local centerX = discardX + btnW / 2
     local centerY = buttonY + self.attackButton:getHeight() / 2
     self.gameManager.assetManager.textManager:addText(
-        FontIds.DISCARD_BUTTON_CAPTION,
+        TextIds.DISCARD_BUTTON_CAPTION,
         __TS__New(
             FontWithPosition,
             centerX,
@@ -653,7 +692,7 @@ function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, gap)
     local centerX = deselectX + btnW / 2
     local centerY = buttonY + self.attackButton:getHeight() / 2
     self.gameManager.assetManager.textManager:addText(
-        FontIds.DESELECT_BUTTON_CAPTION,
+        TextIds.DESELECT_BUTTON_CAPTION,
         __TS__New(
             FontWithPosition,
             centerX,
@@ -682,7 +721,7 @@ function Board.prototype.buildPointBoard(self)
     local playerText = (self.gameManager.player.name .. ": ") .. tostring(self.playerPoints)
     local enemyText = (self.enemy.name .. ": ") .. tostring(self.enemyPoints)
     self.gameManager.assetManager.textManager:addText(
-        FontIds.POINTS_PLAYER,
+        TextIds.POINTS_PLAYER,
         __TS__New(
             FontWithPosition,
             centerX - boardWidth / 2 + 10,
@@ -692,13 +731,45 @@ function Board.prototype.buildPointBoard(self)
         )
     )
     self.gameManager.assetManager.textManager:addText(
-        FontIds.POINTS_ENEMY,
+        TextIds.POINTS_ENEMY,
         __TS__New(
             FontWithPosition,
             centerX + boardWidth / 2 - 10,
             textY,
             enemyText,
             {size = 20, format = Format.RIGHT}
+        )
+    )
+end
+function Board.prototype.buildPowerAndValues(self, characterType)
+    local portraitHeight = self.portrait:getHeight()
+    local portraitAssetId = characterType == CharacterTypes.PLAYER and AssetIds.PLAYER_PORTRAIT or AssetIds.ENEMY_PORTRAIT
+    local portraitAsset = self.gameManager.assetManager:getAsset(portraitAssetId, portraitAssetId)
+    if isEmpty(portraitAsset) then
+        return
+    end
+    local powerId = characterType == CharacterTypes.PLAYER and TextIds.PLAYER_POWER or TextIds.ENEMY_POWER
+    local powerValue = characterType == CharacterTypes.PLAYER and self.playerPower or self.enemyPower
+    self.gameManager.assetManager.textManager:addText(
+        powerId,
+        __TS__New(
+            FontWithPosition,
+            30,
+            portraitHeight + portraitAsset.y + 60,
+            "Power: " .. tostring(powerValue),
+            {size = 15, icon = self.attackPowerIcon}
+        )
+    )
+    local valueId = characterType == CharacterTypes.PLAYER and TextIds.PLAYER_VALUE or TextIds.ENEMY_VALUE
+    local valueValue = characterType == CharacterTypes.PLAYER and self.playerValue or self.enemyValue
+    self.gameManager.assetManager.textManager:addText(
+        valueId,
+        __TS__New(
+            FontWithPosition,
+            30,
+            portraitHeight + portraitAsset.y + 80,
+            "Value: " .. tostring(valueValue),
+            {size = 15, icon = self.valueIcon}
         )
     )
 end
@@ -709,7 +780,10 @@ function Board.prototype.buildEnemyPortrait(self)
     self:buildPortrait(CharacterTypes.ENEMY)
 end
 function Board.prototype.buildPortrait(self, characterType)
-    local playerCardY = characterType == CharacterTypes.PLAYER and self.cardAssets:getCardPosition(characterType) or 5
+    if self.portraitPosition == nil and characterType == CharacterTypes.PLAYER then
+        self.portraitPosition = self.cardAssets:getCardPosition(characterType)
+    end
+    local portraitPosition = self:getPortraitPosition(characterType)
     local portraitBackgroundAssetId = characterType == CharacterTypes.PLAYER and AssetIds.PLAYER_PORTRAIT_BACKGROUND or AssetIds.ENEMY_PORTRAIT_BACKGROUND
     self.gameManager.assetManager:addAsset(
         portraitBackgroundAssetId,
@@ -718,7 +792,7 @@ function Board.prototype.buildPortrait(self, characterType)
             portraitBackgroundAssetId,
             self.portraitBackground,
             5,
-            playerCardY
+            portraitPosition
         )
     )
     local portraitAssetId = characterType == CharacterTypes.PLAYER and AssetIds.PLAYER_PORTRAIT or AssetIds.ENEMY_PORTRAIT
@@ -729,53 +803,43 @@ function Board.prototype.buildPortrait(self, characterType)
             portraitAssetId,
             self.portrait,
             5,
-            playerCardY
+            portraitPosition
         )
     )
     local portraitWidth = self.portrait:getWidth()
     local portraitHeight = self.portrait:getHeight()
     local portraitBackgroundWidth = self.portraitBackground:getWidth()
-    local portraitNameId = characterType == CharacterTypes.PLAYER and FontIds.PLAYER_PORTRAIT_NAME or FontIds.ENEMY_PORTRAIT_NAME
+    local portraitNameId = characterType == CharacterTypes.PLAYER and TextIds.PLAYER_PORTRAIT_NAME or TextIds.ENEMY_PORTRAIT_NAME
     self.gameManager.assetManager.textManager:addText(
         portraitNameId,
         __TS__New(
             FontWithPosition,
             10,
-            portraitHeight + playerCardY + 15,
+            portraitHeight + portraitPosition + 15,
             characterType == CharacterTypes.PLAYER and self.gameManager.player.name or self.enemy.name,
             {size = 24}
         )
     )
-    local portraitLevelId = characterType == CharacterTypes.PLAYER and FontIds.PLAYER_PORTRAIT_LEVEL or FontIds.ENEMY_PORTRAIT_LEVEL
+    local portraitLevelId = characterType == CharacterTypes.PLAYER and TextIds.PLAYER_PORTRAIT_LEVEL or TextIds.ENEMY_PORTRAIT_LEVEL
     self.gameManager.assetManager.textManager:addText(
         portraitLevelId,
         __TS__New(
             FontWithPosition,
             10,
-            portraitHeight + playerCardY + 40,
+            portraitHeight + portraitPosition + 40,
             "Lvl " .. tostring(characterType == CharacterTypes.PLAYER and self.gameManager.player.level or self.enemy.level),
             {size = 15}
         )
     )
     if characterType == CharacterTypes.PLAYER then
         self.gameManager.assetManager.textManager:addText(
-            FontIds.PLAYER_PORTRAIT_EXPERIENCE,
+            TextIds.PLAYER_PORTRAIT_EXPERIENCE,
             __TS__New(
                 FontWithPosition,
                 portraitBackgroundWidth,
-                portraitHeight + playerCardY + 40,
+                portraitHeight + portraitPosition + 40,
                 tostring(self.gameManager.player.experience) .. " XP",
                 {size = 15, format = Format.RIGHT}
-            )
-        )
-        self.gameManager.assetManager.textManager:addText(
-            FontIds.PLAYER_PORTRAIT_MONEY,
-            __TS__New(
-                FontWithPosition,
-                30,
-                portraitHeight + playerCardY + 60,
-                tostring(self.gameManager.player.money) .. " Mark",
-                {size = 15, icon = self.mark}
             )
         )
         self.gameManager.assetManager:addAsset(
@@ -785,24 +849,34 @@ function Board.prototype.buildPortrait(self, characterType)
                 AssetIds.PERKS_BUTTON,
                 self.perksButton,
                 portraitWidth + 15,
-                playerCardY + 10,
+                portraitPosition + 10,
                 function() return self.gameManager:switchToPerkScreen() end
             )
         )
         self.gameManager.assetManager.textManager:addText(
-            FontIds.PLAYER_PERKS,
+            TextIds.PLAYER_PERKS,
             __TS__New(
                 FontWithPosition,
                 portraitWidth + self.perksButton:getWidth() / 2,
-                playerCardY + 10 + self.perksButton:getHeight() / 2,
+                portraitPosition + 10 + self.perksButton:getHeight() / 2,
                 "Perks",
                 {size = 15}
+            )
+        )
+        self.gameManager.assetManager.textManager:addText(
+            TextIds.PLAYER_PORTRAIT_MONEY,
+            __TS__New(
+                FontWithPosition,
+                portraitBackgroundWidth,
+                portraitHeight + portraitPosition + 15,
+                tostring(self.gameManager.player.money),
+                {size = 15, icon = self.markIcon, format = Format.RIGHT}
             )
         )
     end
 end
 function Board.prototype.buildPlayerDeck(self)
-    local playerCardY = self.cardAssets:getCardPosition(CharacterTypes.PLAYER)
+    local portraitPosition = self:getPortraitPosition(CharacterTypes.PLAYER)
     self.gameManager.assetManager:addAsset(
         AssetIds.PLAYER_DECK,
         __TS__New(
@@ -810,7 +884,7 @@ function Board.prototype.buildPlayerDeck(self)
             AssetIds.PLAYER_DECK,
             self.baseDeck,
             push:getWidth() - self.baseDeck:getWidth() - 5,
-            playerCardY
+            portraitPosition
         )
     )
 end
@@ -830,7 +904,7 @@ function Board.prototype.buildEdelSuitText(self)
     local screenW = push:getWidth()
     local centerX = screenW / 2
     self.gameManager.assetManager.textManager:addText(
-        FontIds.EDEL_SUIT_LABEL,
+        TextIds.EDEL_SUIT_LABEL,
         __TS__New(
             FontWithPosition,
             centerX,
@@ -851,5 +925,8 @@ function Board.prototype.buildBackground(self)
             0
         )
     )
+end
+function Board.prototype.getPortraitPosition(self, characterType)
+    return characterType == CharacterTypes.PLAYER and (self.portraitPosition or self.cardAssets:getCardPosition(characterType)) or 5
 end
 return ____exports

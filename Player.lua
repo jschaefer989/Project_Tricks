@@ -12,6 +12,7 @@ local ____Character = require("Character")
 local Character = ____Character.default
 local ____Enums = require("Enums")
 local CharacterTypes = ____Enums.CharacterTypes
+local FontIds = ____Enums.FontIds
 local ____Dealer = require("Dealer")
 local Dealer = ____Dealer.default
 ____exports.default = __TS__Class()
@@ -122,7 +123,14 @@ function Player.prototype.cashout(self, points)
     if points < 0 then
         return
     end
-    self.money = self.money + points
+    self:addMoney(points)
+end
+function Player.prototype.addMoney(self, amount)
+    self.money = self.money + amount
+    self.gameManager.assetManager.textManager:updateText(
+        FontIds.PLAYER_PORTRAIT_MONEY,
+        tostring(self.money) .. " Mark"
+    )
 end
 function Player.prototype.hasPerk(self, perkType)
     for ____, perk in ipairs(self.perks) do
@@ -137,7 +145,7 @@ function Player.prototype.addPerk(self, perk)
     ____self_perks_0[#____self_perks_0 + 1] = perk
 end
 function Player.prototype.gatherExperience(self, exp)
-    self.experience = self.experience + exp
+    self:addExperience(exp)
     if self.experience >= self:getNextLevelExperience() then
         self:levelUp()
         return true
@@ -146,21 +154,21 @@ function Player.prototype.gatherExperience(self, exp)
 end
 function Player.prototype.getNextLevelExperience(self)
     repeat
-        local ____switch38 = self.level
-        local ____cond38 = ____switch38 == 1
-        if ____cond38 then
+        local ____switch39 = self.level
+        local ____cond39 = ____switch39 == 1
+        if ____cond39 then
             return 100
         end
-        ____cond38 = ____cond38 or ____switch38 == 2
-        if ____cond38 then
+        ____cond39 = ____cond39 or ____switch39 == 2
+        if ____cond39 then
             return 150
         end
-        ____cond38 = ____cond38 or ____switch38 == 3
-        if ____cond38 then
+        ____cond39 = ____cond39 or ____switch39 == 3
+        if ____cond39 then
             return 250
         end
-        ____cond38 = ____cond38 or ____switch38 == 4
-        if ____cond38 then
+        ____cond39 = ____cond39 or ____switch39 == 4
+        if ____cond39 then
             return 500
         end
         do
@@ -170,7 +178,13 @@ function Player.prototype.getNextLevelExperience(self)
 end
 function Player.prototype.levelUp(self)
     self.experience = 0
-    self.level = self.level + 1
+end
+function Player.prototype.addExperience(self, exp)
+    self.experience = self.experience + exp
+    self.gameManager.assetManager.textManager:updateText(
+        FontIds.PLAYER_PORTRAIT_EXPERIENCE,
+        tostring(self.experience) .. " XP"
+    )
 end
 function Player.prototype.unselectCards(self)
     for ____, card in ipairs(self.hand) do

@@ -85,14 +85,12 @@ function Card.prototype.onSelect(self)
     if isEmpty(self.gameManager.board) then
         return
     end
-    local ____self_gameManager_board_1, ____playerPower_2 = self.gameManager.board, "playerPower"
-    ____self_gameManager_board_1[____playerPower_2] = ____self_gameManager_board_1[____playerPower_2] + self.power
-    local ____self_gameManager_board_3, ____playerValue_4 = self.gameManager.board, "playerValue"
-    ____self_gameManager_board_3[____playerValue_4] = ____self_gameManager_board_3[____playerValue_4] + self.value
-    local ____temp_5 = self.gameManager.board.cardAssets:getCardAssets(self)
-    local baseAsset = ____temp_5.baseAsset
-    local suitAssets = ____temp_5.suitAssets
-    local rankAsset = ____temp_5.rankAsset
+    self.gameManager.board:addPlayerPower(self.power)
+    self.gameManager.board:addPlayerValue(self.value)
+    local ____temp_1 = self.gameManager.board.cardAssets:getCardAssets(self)
+    local baseAsset = ____temp_1.baseAsset
+    local suitAssets = ____temp_1.suitAssets
+    local rankAsset = ____temp_1.rankAsset
     local suitAssetNormal = suitAssets[1]
     local suitAssetFlipped = suitAssets[2]
     local baseId = AnimationIds.CARD_BASE_SELECT .. self.id
@@ -128,14 +126,12 @@ function Card.prototype.onUnselect(self)
     if isEmpty(self.gameManager.board) then
         return
     end
-    local ____self_gameManager_board_6, ____playerPower_7 = self.gameManager.board, "playerPower"
-    ____self_gameManager_board_6[____playerPower_7] = ____self_gameManager_board_6[____playerPower_7] - self.power
-    local ____self_gameManager_board_8, ____playerValue_9 = self.gameManager.board, "playerValue"
-    ____self_gameManager_board_8[____playerValue_9] = ____self_gameManager_board_8[____playerValue_9] - self.value
-    local ____temp_10 = self.gameManager.board.cardAssets:getCardAssets(self)
-    local baseAsset = ____temp_10.baseAsset
-    local suitAssets = ____temp_10.suitAssets
-    local rankAsset = ____temp_10.rankAsset
+    self.gameManager.board:addPlayerPower(-self.power)
+    self.gameManager.board:addPlayerValue(-self.value)
+    local ____temp_2 = self.gameManager.board.cardAssets:getCardAssets(self)
+    local baseAsset = ____temp_2.baseAsset
+    local suitAssets = ____temp_2.suitAssets
+    local rankAsset = ____temp_2.rankAsset
     local suitAssetNormal = suitAssets[1]
     local suitAssetFlipped = suitAssets[2]
     local baseId = AnimationIds.CARD_BASE_SELECT .. self.id

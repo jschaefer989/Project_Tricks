@@ -203,8 +203,8 @@ function Dealer.prototype.dealCards(self, characterType)
         ____opt_2.cardAssets:centerCards(characterType)
     end
     if characterType == CharacterTypes.ENEMY and not isEmpty(self.gameManager.board) then
-        self.gameManager.board.enemyPower = self.gameManager.board.enemy:getCardPower()
-        self.gameManager.board.enemyValue = self.gameManager.board.enemy:getCardValue()
+        self.gameManager.board:addEnemyPower(self.gameManager.board.enemy:getCardPower())
+        self.gameManager.board:addEnemyValue(self.gameManager.board.enemy:getCardValue())
     end
 end
 function Dealer.prototype.initializeEnemyDeck(self)

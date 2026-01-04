@@ -2,7 +2,7 @@
 
 import { Image } from "love.graphics";
 import TextManager from "./TextManager";
-import { exhaustiveGuard, isEmpty } from "Helpers";
+import { isEmpty } from "Helpers";
 
 export enum Format {
     LEFT, 
@@ -15,6 +15,7 @@ interface ConstructionOptions {
   size?: number;
   format?: Format;
   icon?: Image;
+  iconFormat?: Omit<Format, Format.CENTER>;
 }
 
 export default class FontWithPosition {
@@ -40,6 +41,7 @@ export default class FontWithPosition {
     this.text = text;
     this.format = options?.format ?? Format.LEFT;
     this.icon = options?.icon;
+    this.iconFormat = options?.iconFormat ?? (this.format === Format.CENTER ? Format.LEFT : this.format) as Omit<Format, Format.CENTER>;
   }
 
   printFont(): void {
@@ -77,7 +79,11 @@ export default class FontWithPosition {
       case Format.CENTER:
         return textW / 2;
       case Format.RIGHT:
-        return textW;
+        // If there's an icon that will be rendered to the right, account for its width
+        const iconWidth = (this.iconFormat === Format.RIGHT && !isEmpty(this.icon)) 
+          ? this.icon.getWidth() + 5 
+          : 0;
+        return textW + iconWidth;
       default:
         return 0;
     }
@@ -92,7 +98,7 @@ export default class FontWithPosition {
         love.graphics.draw(this.icon, this.x - this.icon.getWidth() - 5, this.y - (this.icon.getHeight() / 2) + 2);
         break;
       case Format.RIGHT:
-        love.graphics.draw(this.icon, this.x - 5, this.y - (this.icon.getHeight() / 2) + 2);
+        love.graphics.draw(this.icon, this.x - this.icon.getWidth(), this.y - (this.icon.getHeight() / 2) + 2);
         break;
     }
   }

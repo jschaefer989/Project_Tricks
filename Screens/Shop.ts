@@ -95,8 +95,8 @@ export default class Shop {
             return
         }
 
-        this.gameManager.player.money -= card.cost
-        this.gameManager.player.deck.push(card)
+        this.gameManager.player.addMoney(-card.cost)
+        this.gameManager.player.addToDeck(card)
         this.removeCardFromSale(card)
     }
 

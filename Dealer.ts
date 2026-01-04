@@ -144,8 +144,8 @@ export default class Dealer {
         this.gameManager.board?.cardAssets.centerCards(characterType);
 
         if (characterType === CharacterTypes.ENEMY && !isEmpty(this.gameManager.board)) {
-            this.gameManager.board.enemyPower = this.gameManager.board.enemy.getCardPower()
-            this.gameManager.board.enemyValue = this.gameManager.board.enemy.getCardValue()
+            this.gameManager.board.addEnemyPower(this.gameManager.board.enemy.getCardPower())
+            this.gameManager.board.addEnemyValue(this.gameManager.board.enemy.getCardValue())
         }
     }
 

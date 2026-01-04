@@ -33,6 +33,13 @@ export default class TextManager {
         this.texts.delete(id)
     }
 
+    updateText(id: string, newText: string): void {
+        const text = this.texts.get(id)
+        if (!isEmpty(text)) {
+            text.text = newText
+        }
+    }
+
     static getDefaultFontFilepath(): string {
         return "Assets/Fonts/Germania.ttf"
     }

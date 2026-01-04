@@ -1,181 +1,192 @@
 /** @noSelfInFile */
 
-import Perk, { PerkData } from "Perk"
-import Card from "Cards/Card"
-import Character from "./Character"
-import { CharacterTypes, Perks } from "Enums"
-import Dealer from "Dealer"
-import GameManager from "GameManager"
+import Perk, { PerkData } from "Perk";
+import Card from "Cards/Card";
+import Character from "./Character";
+import { CharacterTypes, FontIds, Perks } from "Enums";
+import Dealer from "Dealer";
+import GameManager from "GameManager";
+import { isEmpty } from "Helpers";
 
 interface CardData {
-    id: string
-    suit: any
-    rank: any
-    power: number
-    value: number
-    isSelected: boolean
-    cost: number
-    isEdel: boolean
-    name: string
+  id: string;
+  suit: any;
+  rank: any;
+  power: number;
+  value: number;
+  isSelected: boolean;
+  cost: number;
+  isEdel: boolean;
+  name: string;
 }
 
 interface PlayerData {
-    name: string
-    money: number
-    experience: number
-    level: number
-    discards: number
-    numberOfLootCards: number
-    hand: CardData[]
-    deck: CardData[]
-    discardPile: CardData[]
-   perks: PerkData[] 
+  name: string;
+  money: number;
+  experience: number;
+  level: number;
+  discards: number;
+  numberOfLootCards: number;
+  hand: CardData[];
+  deck: CardData[];
+  discardPile: CardData[];
+  perks: PerkData[];
 }
 
 export default class Player extends Character {
-    name: string
-    money: number
-    experience: number
-    level: number
-    discards: number
-    numberOfLootCards: number
-    perks: Perk[]
+  name = "Player";
+  money = 0;
+  experience = 0;
+  level = 1;
+  discards = 3;
+  numberOfLootCards = 3;
+  perks: Perk[] = [];
 
-    constructor(gameManager: GameManager) {
-        super(gameManager, CharacterTypes.PLAYER);
-        this.name = "Player"
-        this.money = 0
-        this.experience = 0
-        this.level = 1
-        this.discards = 3
-        this.numberOfLootCards = 3
-        this.perks = []
+  constructor(gameManager: GameManager) {
+    super(gameManager, CharacterTypes.PLAYER);
+  }
+
+  load(data: PlayerData): void {
+    this.name = data.name;
+    this.money = data.money;
+    this.experience = data.experience;
+    this.level = data.level;
+    this.discards = data.discards;
+    this.numberOfLootCards = data.numberOfLootCards;
+    this.hand = data.hand.map((cardData) =>
+      Card.load(this.gameManager, cardData)
+    );
+    this.deck = data.deck.map((cardData) =>
+      Card.load(this.gameManager, cardData)
+    );
+    this.discardPile = data.discardPile.map((cardData) =>
+      Card.load(this.gameManager, cardData)
+    );
+    this.perks = data.perks.map((perkData) =>
+      Perk.load(this.gameManager, perkData)
+    );
+  }
+
+  save(): PlayerData {
+    return {
+      name: this.name,
+      money: this.money,
+      experience: this.experience,
+      level: this.level,
+      discards: this.discards,
+      numberOfLootCards: this.numberOfLootCards,
+      hand: this.hand.map((card) => card.save()),
+      deck: this.deck.map((card) => card.save()),
+      discardPile: this.discardPile.map((card) => card.save()),
+      perks: this.perks.map((perk) => perk.save()),
+    };
+  }
+
+  setup(): void {
+    if (this.deck.length === 0) {
+      Dealer.initializePlayerDeck(this.gameManager);
+    }
+  }
+
+  removeSelectedCardsFromHand(): void {
+    for (let i = this.hand.length - 1; i >= 0; i--) {
+      const card = this.hand[i];
+      if (card.isSelected) {
+        card.isSelected = false;
+        this.addToDiscards(card);
+        this.hand.splice(i, 1);
+      }
+    }
+  }
+
+  discard(): void {
+    const newHand: Card[] = [];
+
+    for (const card of this.hand) {
+      if (card.isSelected) {
+        card.isSelected = false;
+        card.onUnselect();
+        this.addToDiscards(card);
+      } else {
+        newHand.push(card);
+      }
     }
 
-    load(data: PlayerData): void {
-        this.name = data.name
-        this.money = data.money
-        this.experience = data.experience
-        this.level = data.level
-        this.discards = data.discards
-        this.numberOfLootCards = data.numberOfLootCards
-        this.hand = data.hand.map(cardData => Card.load(this.gameManager, cardData))
-        this.deck = data.deck.map(cardData => Card.load(this.gameManager, cardData))
-        this.discardPile = data.discardPile.map(cardData => Card.load(this.gameManager, cardData))
-        this.perks = data.perks.map(perkData => Perk.load(this.gameManager, perkData))
+    this.hand = newHand;
+  }
+
+  anySelectedCards(): boolean {
+    for (const card of this.hand) {
+      if (card.isSelected) {
+        return true;
+      }
     }
+    return false;
+  }
 
-    save(): PlayerData {
-        return {
-            name: this.name,
-            money: this.money,
-            experience: this.experience,
-            level: this.level,
-            discards: this.discards,
-            numberOfLootCards: this.numberOfLootCards,
-            hand: this.hand.map(card => card.save()),
-            deck: this.deck.map(card => card.save()),
-            discardPile: this.discardPile.map(card => card.save()),
-            perks: this.perks.map(perk => perk.save())
-        }
+  cashout(points: number): void {
+    if (points < 0) return;
+    this.addMoney(points);
+  }
+
+  addMoney(amount: number): void {
+    this.money += amount;
+    this.gameManager.assetManager.textManager.updateText(FontIds.PLAYER_PORTRAIT_MONEY, `${this.money} Mark`);
+  }
+
+  hasPerk(perkType: Perks): boolean {
+    for (const perk of this.perks) {
+      if (perk.perkType === perkType) {
+        return true;
+      }
     }
+    return false;
+  }
 
-    setup(): void {
-        if (this.deck.length === 0) {
-            Dealer.initializePlayerDeck(this.gameManager)
-        }
+  addPerk(perk: Perk): void {
+    this.perks.push(perk);
+  }
+
+  gatherExperience(exp: number): boolean {
+    this.addExperience(exp);
+
+    if (this.experience >= this.getNextLevelExperience()) {
+      this.levelUp();
+      return true;
     }
+    return false;
+  }
 
-    removeSelectedCardsFromHand(): void {
-        for (let i = this.hand.length - 1; i >= 0; i--) {
-            const card = this.hand[i]
-            if (card.isSelected) {
-                card.isSelected = false
-                this.addToDiscards(card)
-                this.hand.splice(i, 1)
-            }
-        }
+  getNextLevelExperience(): number {
+    switch (this.level) {
+      case 1:
+        return 100;
+      case 2:
+        return 150;
+      case 3:
+        return 250;
+      case 4:
+        return 500;
+      default:
+        return 1000;
     }
+  }
 
-    discard(): void {
-        const newHand: Card[] = []
+  levelUp(): void {
+    this.experience = 0;
+  }
 
-        for (const card of this.hand) {
-            if (card.isSelected) {
-                card.isSelected = false
-                card.onUnselect()
-                this.addToDiscards(card)
-            } else {
-                newHand.push(card)
-            }
-        }
+  addExperience(exp: number): void {
+    this.experience += exp;
+    this.gameManager.assetManager.textManager.updateText(FontIds.PLAYER_PORTRAIT_EXPERIENCE, `${this.experience} XP`);
+  }
 
-        this.hand = newHand
+  unselectCards(): void {
+    for (const card of this.hand) {
+      if (card.isSelected) {
+        card.isSelected = false;
+        card.onUnselect();
+      }
     }
-
-    anySelectedCards(): boolean {
-        for (const card of this.hand) {
-            if (card.isSelected) {
-                return true
-            }
-        }
-        return false
-    }
-
-    cashout(points: number): void {
-        if (points < 0) return
-        this.money += points
-    }
-
-    hasPerk(perkType: Perks): boolean {
-        for (const perk of this.perks) {
-            if (perk.perkType === perkType) {
-                return true
-            }
-        }
-        return false
-    }
-
-    addPerk(perk: Perk): void {
-        this.perks.push(perk)
-    }
-
-    gatherExperience(exp: number): boolean {
-        this.experience += exp
-
-        if (this.experience >= this.getNextLevelExperience()) {
-            this.levelUp()
-            return true
-        }
-        return false
-    }
-
-    getNextLevelExperience(): number {
-        switch (this.level) {
-            case 1:
-                return 100
-            case 2:
-                return 150
-            case 3:
-                return 250
-            case 4:
-                return 500
-            default:
-                return 1000
-        }
-    }
-
-    levelUp(): void {
-        this.experience = 0
-        this.level += 1
-    }
-
-    unselectCards(): void {
-        for (const card of this.hand) {
-            if (card.isSelected) {
-                card.isSelected = false
-                card.onUnselect()
-            }
-        }
-    }
+  }
 }

@@ -89,10 +89,8 @@ function Shop.prototype.buyCard(self, card)
     if not self:canAfford(card) then
         return
     end
-    local ____self_gameManager_player_3, ____money_4 = self.gameManager.player, "money"
-    ____self_gameManager_player_3[____money_4] = ____self_gameManager_player_3[____money_4] - card.cost
-    local ____self_gameManager_player_deck_5 = self.gameManager.player.deck
-    ____self_gameManager_player_deck_5[#____self_gameManager_player_deck_5 + 1] = card
+    self.gameManager.player:addMoney(-card.cost)
+    self.gameManager.player:addToDeck(card)
     self:removeCardFromSale(card)
 end
 function Shop.prototype.removeCardFromSale(self, card)

@@ -244,7 +244,6 @@ function GameManager.prototype.switchToBoard(self, enemy)
     self.loseScreen = nil
     self.shop = nil
     self.levelUpScreen = nil
-    push:setBorderColor(1, 1, 1)
     if isEmpty(self.board) then
         self.board = __TS__New(
             Board,

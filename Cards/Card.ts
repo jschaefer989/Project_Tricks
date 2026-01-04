@@ -110,8 +110,8 @@ export default class Card {
       return;
     }
 
-    this.gameManager.board.playerPower += this.power;
-    this.gameManager.board.playerValue += this.value;
+    this.gameManager.board.addPlayerPower(this.power);
+    this.gameManager.board.addPlayerValue(this.value);
 
     const { baseAsset, suitAssets, rankAsset } =
       this.gameManager.board.cardAssets.getCardAssets(this);
@@ -165,8 +165,8 @@ export default class Card {
       return;
     }
 
-    this.gameManager.board.playerPower -= this.power;
-    this.gameManager.board.playerValue -= this.value;
+    this.gameManager.board.addPlayerPower(-this.power);
+    this.gameManager.board.addPlayerValue(-this.value);
 
     const { baseAsset, suitAssets, rankAsset } =
       this.gameManager.board.cardAssets.getCardAssets(this);

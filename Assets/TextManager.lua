@@ -31,6 +31,12 @@ end
 function TextManager.prototype.hideText(self, id)
     self.texts:delete(id)
 end
+function TextManager.prototype.updateText(self, id, newText)
+    local text = self.texts:get(id)
+    if not isEmpty(text) then
+        text.text = newText
+    end
+end
 function TextManager.getDefaultFontFilepath(self)
     return "Assets/Fonts/Germania.ttf"
 end

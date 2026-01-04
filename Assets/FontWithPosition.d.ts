@@ -10,6 +10,7 @@ interface ConstructionOptions {
     size?: number;
     format?: Format;
     icon?: Image;
+    iconFormat?: Omit<Format, Format.CENTER>;
 }
 export default class FontWithPosition {
     size?: number;

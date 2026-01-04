@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { AssetIds, CharacterTypes, FontIds, Suits } from "../Enums";
+import { AssetIds, CharacterTypes, FontIds as TextIds, Suits } from "../Enums";
 import Dealer from "../Dealer";
 import Draw from "../Draw";
 import Enemy, { EnemyData } from "Enemies/Enemy";
@@ -32,32 +32,37 @@ interface BoardData {
 
 export default class Board {
   gameManager: GameManager;
-  discardUsed = 0
+  discardUsed = 0;
   enemy: Enemy;
   dealer: Dealer;
-  playerPoints = 0
-  enemyPoints = 0
+  playerPoints = 0;
+  enemyPoints = 0;
   edelSuit = Suits.ACORNS;
-  playerPower = 0
-  playerValue = 0
-  enemyPower = 0
-  enemyValue = 0
-  showingInitialView = true
+  playerPower = 0;
+  playerValue = 0;
+  enemyPower = 0;
+  enemyValue = 0;
+  showingInitialView = true;
   cardAssets: CardAssets;
   letsFightButton = love.graphics.newImage("Assets/Images/LetsFightButton.png");
   attackButton = love.graphics.newImage("Assets/Images/AttackButton.png");
   discardButton = love.graphics.newImage("Assets/Images/DiscardButton.png");
   deselectButton = love.graphics.newImage("Assets/Images/DeselectButton.png");
   pointBoard = love.graphics.newImage("Assets/Images/PointBoard.png");
-  portraitBackground = love.graphics.newImage("Assets/Images/PortraitBackground.png");
-  portrait = love.graphics.newImage("Assets/Images/Portrait.png")
+  portraitBackground = love.graphics.newImage(
+    "Assets/Images/PortraitBackground.png"
+  );
+  portrait = love.graphics.newImage("Assets/Images/Portrait.png");
   baseDeck = love.graphics.newImage("Assets/Images/BaseCardBack.png");
   perksButton = love.graphics.newImage("Assets/Images/PerksButton.png");
-  mark = love.graphics.newImage("Assets/Images/Mark.png")
+  markIcon = love.graphics.newImage("Assets/Images/Mark.png");
+  attackPowerIcon = love.graphics.newImage("Assets/Images/AttackPower.png");
+  valueIcon = love.graphics.newImage("Assets/Images/Value.png");
   biome: Biome;
+  portraitPosition: number | undefined; // Saved off so it can be restored on resume
 
   constructor(gameManager: GameManager, enemy?: Enemy) {
-    this.gameManager = gameManager;    
+    this.gameManager = gameManager;
     this.enemy = enemy ?? new Enemy(gameManager);
     this.dealer = new Dealer(gameManager);
     this.cardAssets = new CardAssets(gameManager);
@@ -564,9 +569,15 @@ export default class Board {
     this.gameManager.assetManager.hideAsset(AssetIds.LETS_FIGHT_BUTTON);
 
     this.dealer.startGame();
+    this.buildFightAssets();
+    this.gameManager.assetManager.textManager.hideText(TextIds.EDEL_SUIT_LABEL);
+  }
+
+  buildFightAssets(): void {
     this.buildPrimaryButtons();
     this.buildPointBoard();
-    this.gameManager.assetManager.textManager.hideText(FontIds.EDEL_SUIT_LABEL);
+    this.buildPowerAndValues(CharacterTypes.PLAYER);
+    this.buildPowerAndValues(CharacterTypes.ENEMY);
   }
 
   handleAttack(): void {
@@ -593,18 +604,19 @@ export default class Board {
 
   private addPlayerPoints(points: number): void {
     this.playerPoints += points;
-    const text = this.gameManager.assetManager.textManager.getText(FontIds.POINTS_PLAYER);
-    if (!isEmpty(text)) {
-      text.text = `${this.gameManager.player.name}: ${this.playerPoints}`;
-    }
+
+    this.gameManager.assetManager.textManager.updateText(
+      TextIds.POINTS_PLAYER,
+      `${this.gameManager.player.name}: ${this.playerPoints}`
+    );
   }
 
   private addEnemyPoints(points: number): void {
     this.enemyPoints += points;
-    const text = this.gameManager.assetManager.textManager.getText(FontIds.POINTS_ENEMY);
-    if (!isEmpty(text)) {
-      text.text = `${this.enemy.name}: ${this.enemyPoints}`;
-    }
+    this.gameManager.assetManager.textManager.updateText(
+      TextIds.POINTS_ENEMY,
+      `${this.enemy.name}: ${this.enemyPoints}`
+    );
   }
 
   handleDiscard(): void {
@@ -642,21 +654,57 @@ export default class Board {
   }
 
   clearStats(): void {
-    this.playerPower = 0;
-    this.playerValue = 0;
-    this.enemyPower = 0;
-    this.enemyValue = 0;
+    this.addPlayerPower(-this.playerPower);
+    this.addPlayerValue(-this.playerValue);
+    this.addEnemyPower(-this.enemyPower);
+    this.addEnemyValue(-this.enemyValue);
+  }
+
+  addPlayerPower(power: number): void {
+    this.playerPower += power;
+    this.gameManager.assetManager.textManager.updateText(
+      TextIds.PLAYER_POWER,
+      `Power: ${this.playerPower}`
+    );
+  }
+
+  addPlayerValue(value: number): void {
+    this.playerValue += value;
+    this.gameManager.assetManager.textManager.updateText(
+      TextIds.PLAYER_VALUE,
+      `Value: ${this.playerValue}`
+    );
+  }
+
+  addEnemyPower(power: number): void {
+    this.enemyPower += power;
+    this.gameManager.assetManager.textManager.updateText(
+      TextIds.ENEMY_POWER,
+      `Power: ${this.enemyPower}`
+    );
+  }
+
+  addEnemyValue(value: number): void {
+    this.enemyValue += value;
+    this.gameManager.assetManager.textManager.updateText(
+      TextIds.ENEMY_VALUE,
+      `Value: ${this.enemyValue}`
+    );
   }
 
   buildAssets(): void {
     this.buildBackground();
     this.buildCardAssets();
-    this.buildLetsFightButton();
     this.buildPlayerPortrait();
     this.buildEnemyPortrait();
     this.buildPlayerDeck();
     this.buildEnemyDeck();
-    this.buildEdelSuitText();
+    if (this.showingInitialView) {
+      this.buildLetsFightButton();
+      this.buildEdelSuitText();
+    } else {
+      this.buildFightAssets();
+    }
   }
 
   private buildCardAssets(): void {
@@ -678,7 +726,7 @@ export default class Board {
       const x = enemyCardPosition.x + i * (this.cardAssets.baseW + padding);
       this.cardAssets.addAsset(card, x, enemyCardPosition.y);
     }
-  }  
+  }
 
   private buildLetsFightButton(): void {
     const cardY = this.cardAssets.getCardPosition(CharacterTypes.PLAYER);
@@ -689,8 +737,12 @@ export default class Board {
     const buttonY = cardY - buttonHeight - padding;
     this.gameManager.assetManager.addAsset(
       AssetIds.LETS_FIGHT_BUTTON,
-      new Asset(AssetIds.LETS_FIGHT_BUTTON, this.letsFightButton, buttonX, buttonY, () =>
-        this.handleStartFight()
+      new Asset(
+        AssetIds.LETS_FIGHT_BUTTON,
+        this.letsFightButton,
+        buttonX,
+        buttonY,
+        () => this.handleStartFight()
       )
     );
   }
@@ -728,8 +780,11 @@ export default class Board {
     const centerX = buttonX + btnW / 2;
     const centerY = buttonY + this.attackButton.getHeight() / 2;
     this.gameManager.assetManager.textManager.addText(
-      FontIds.ATTACK_BUTTON_CAPTION,
-      new FontWithPosition(centerX, centerY, "Attack", { size: 28, format: Format.CENTER })
+      TextIds.ATTACK_BUTTON_CAPTION,
+      new FontWithPosition(centerX, centerY, "Attack", {
+        size: 28,
+        format: Format.CENTER,
+      })
     );
   }
 
@@ -754,11 +809,14 @@ export default class Board {
     const centerX = discardX + btnW / 2;
     const centerY = buttonY + this.attackButton.getHeight() / 2;
     this.gameManager.assetManager.textManager.addText(
-      FontIds.DISCARD_BUTTON_CAPTION,
-      new FontWithPosition(centerX, centerY, "Discard", { size: 28, format: Format.CENTER })
+      TextIds.DISCARD_BUTTON_CAPTION,
+      new FontWithPosition(centerX, centerY, "Discard", {
+        size: 28,
+        format: Format.CENTER,
+      })
     );
 
-    return discardX
+    return discardX;
   }
 
   private buildDeselectButton(
@@ -782,8 +840,11 @@ export default class Board {
     const centerX = deselectX + btnW / 2;
     const centerY = buttonY + this.attackButton.getHeight() / 2;
     this.gameManager.assetManager.textManager.addText(
-      FontIds.DESELECT_BUTTON_CAPTION,
-      new FontWithPosition(centerX, centerY, "Deselect", { size: 28, format: Format.CENTER })
+      TextIds.DESELECT_BUTTON_CAPTION,
+      new FontWithPosition(centerX, centerY, "Deselect", {
+        size: 28,
+        format: Format.CENTER,
+      })
     );
   }
 
@@ -793,12 +854,7 @@ export default class Board {
     const buttonX = Math.floor((screenW - boardWidth) / 2);
     this.gameManager.assetManager.addAsset(
       AssetIds.POINT_DISPLAY,
-      new Asset(
-        AssetIds.POINT_DISPLAY,
-        this.pointBoard,
-        buttonX,
-        10,
-      )
+      new Asset(AssetIds.POINT_DISPLAY, this.pointBoard, buttonX, 10)
     );
 
     const centerX = screenW / 2;
@@ -809,14 +865,70 @@ export default class Board {
 
     // Left label (player)
     this.gameManager.assetManager.textManager.addText(
-      FontIds.POINTS_PLAYER,
-      new FontWithPosition(centerX - (boardWidth / 2) + 10, textY, playerText, { size: 20 })
+      TextIds.POINTS_PLAYER,
+      new FontWithPosition(centerX - boardWidth / 2 + 10, textY, playerText, {
+        size: 20,
+      })
     );
 
     // Right label (enemy)
     this.gameManager.assetManager.textManager.addText(
-      FontIds.POINTS_ENEMY,
-      new FontWithPosition(centerX + (boardWidth / 2) - 10, textY, enemyText, { size: 20, format: Format.RIGHT })
+      TextIds.POINTS_ENEMY,
+      new FontWithPosition(centerX + boardWidth / 2 - 10, textY, enemyText, {
+        size: 20,
+        format: Format.RIGHT,
+      })
+    );
+  }
+
+  private buildPowerAndValues(characterType: CharacterTypes): void {
+    const portraitHeight = this.portrait.getHeight();
+    const portraitAssetId =
+      characterType === CharacterTypes.PLAYER
+        ? AssetIds.PLAYER_PORTRAIT
+        : AssetIds.ENEMY_PORTRAIT;
+    const portraitAsset = this.gameManager.assetManager.getAsset(
+      portraitAssetId,
+      portraitAssetId
+    );
+    if (isEmpty(portraitAsset)) {
+      return;
+    }
+
+    const powerId =
+      characterType === CharacterTypes.PLAYER
+        ? TextIds.PLAYER_POWER
+        : TextIds.ENEMY_POWER;
+    const powerValue =
+      characterType === CharacterTypes.PLAYER
+        ? this.playerPower
+        : this.enemyPower;
+    this.gameManager.assetManager.textManager.addText(
+      powerId,
+      new FontWithPosition(
+        30,
+        portraitHeight + portraitAsset.y + 60,
+        `Power: ${powerValue}`,
+        { size: 15, icon: this.attackPowerIcon }
+      )
+    );
+
+    const valueId =
+      characterType === CharacterTypes.PLAYER
+        ? TextIds.PLAYER_VALUE
+        : TextIds.ENEMY_VALUE;
+    const valueValue =
+      characterType === CharacterTypes.PLAYER
+        ? this.playerValue
+        : this.enemyValue;
+    this.gameManager.assetManager.textManager.addText(
+      valueId,
+      new FontWithPosition(
+        30,
+        portraitHeight + portraitAsset.y + 80,
+        `Value: ${valueValue}`,
+        { size: 15, icon: this.valueIcon }
+      )
     );
   }
 
@@ -829,84 +941,83 @@ export default class Board {
   }
 
   private buildPortrait(characterType: CharacterTypes): void {
-    const playerCardY = characterType === CharacterTypes.PLAYER
-      ? this.cardAssets.getCardPosition(characterType)
-      : 5;
+    if (
+      this.portraitPosition === undefined &&
+      characterType === CharacterTypes.PLAYER
+    ) {
+      this.portraitPosition = this.cardAssets.getCardPosition(characterType);
+    }
+    const portraitPosition = this.getPortraitPosition(characterType);
 
-    const portraitBackgroundAssetId = characterType === CharacterTypes.PLAYER
-      ? AssetIds.PLAYER_PORTRAIT_BACKGROUND
-      : AssetIds.ENEMY_PORTRAIT_BACKGROUND;
+    const portraitBackgroundAssetId =
+      characterType === CharacterTypes.PLAYER
+        ? AssetIds.PLAYER_PORTRAIT_BACKGROUND
+        : AssetIds.ENEMY_PORTRAIT_BACKGROUND;
     this.gameManager.assetManager.addAsset(
       portraitBackgroundAssetId,
       new Asset(
         portraitBackgroundAssetId,
         this.portraitBackground,
         5,
-        playerCardY,
+        portraitPosition
       )
     );
 
-    const portraitAssetId = characterType === CharacterTypes.PLAYER
-      ? AssetIds.PLAYER_PORTRAIT
-      : AssetIds.ENEMY_PORTRAIT;
+    const portraitAssetId =
+      characterType === CharacterTypes.PLAYER
+        ? AssetIds.PLAYER_PORTRAIT
+        : AssetIds.ENEMY_PORTRAIT;
     this.gameManager.assetManager.addAsset(
       portraitAssetId,
-      new Asset(
-        portraitAssetId,
-        this.portrait,
-        5,
-        playerCardY,
-      )
+      new Asset(portraitAssetId, this.portrait, 5, portraitPosition)
     );
 
     const portraitWidth = this.portrait.getWidth();
     const portraitHeight = this.portrait.getHeight();
     const portraitBackgroundWidth = this.portraitBackground.getWidth();
 
-    const portraitNameId = characterType === CharacterTypes.PLAYER
-      ? FontIds.PLAYER_PORTRAIT_NAME
-      : FontIds.ENEMY_PORTRAIT_NAME;
+    const portraitNameId =
+      characterType === CharacterTypes.PLAYER
+        ? TextIds.PLAYER_PORTRAIT_NAME
+        : TextIds.ENEMY_PORTRAIT_NAME;
     this.gameManager.assetManager.textManager.addText(
       portraitNameId,
       new FontWithPosition(
         10,
-        portraitHeight + playerCardY + 15,
-        characterType === CharacterTypes.PLAYER ? this.gameManager.player.name : this.enemy.name,
+        portraitHeight + portraitPosition + 15,
+        characterType === CharacterTypes.PLAYER
+          ? this.gameManager.player.name
+          : this.enemy.name,
         { size: 24 }
       )
     );
 
-    const portraitLevelId = characterType === CharacterTypes.PLAYER
-      ? FontIds.PLAYER_PORTRAIT_LEVEL
-      : FontIds.ENEMY_PORTRAIT_LEVEL;
+    const portraitLevelId =
+      characterType === CharacterTypes.PLAYER
+        ? TextIds.PLAYER_PORTRAIT_LEVEL
+        : TextIds.ENEMY_PORTRAIT_LEVEL;
     this.gameManager.assetManager.textManager.addText(
       portraitLevelId,
       new FontWithPosition(
         10,
-        portraitHeight + playerCardY + 40,
-        `Lvl ${characterType === CharacterTypes.PLAYER ? this.gameManager.player.level : this.enemy.level}`,
+        portraitHeight + portraitPosition + 40,
+        `Lvl ${
+          characterType === CharacterTypes.PLAYER
+            ? this.gameManager.player.level
+            : this.enemy.level
+        }`,
         { size: 15 }
       )
     );
 
     if (characterType === CharacterTypes.PLAYER) {
       this.gameManager.assetManager.textManager.addText(
-        FontIds.PLAYER_PORTRAIT_EXPERIENCE,
+        TextIds.PLAYER_PORTRAIT_EXPERIENCE,
         new FontWithPosition(
           portraitBackgroundWidth,
-          portraitHeight + playerCardY + 40,
+          portraitHeight + portraitPosition + 40,
           `${this.gameManager.player.experience} XP`,
           { size: 15, format: Format.RIGHT }
-        )
-      );
-
-      this.gameManager.assetManager.textManager.addText(
-        FontIds.PLAYER_PORTRAIT_MONEY,
-        new FontWithPosition(
-          30,
-          portraitHeight + playerCardY + 60,
-          `${this.gameManager.player.money} Mark`,
-          { size: 15, icon: this.mark }
         )
       );
 
@@ -916,32 +1027,42 @@ export default class Board {
           AssetIds.PERKS_BUTTON,
           this.perksButton,
           portraitWidth + 15,
-          playerCardY + 10,
+          portraitPosition + 10,
           () => this.gameManager.switchToPerkScreen()
         )
       );
 
       this.gameManager.assetManager.textManager.addText(
-        FontIds.PLAYER_PERKS,
+        TextIds.PLAYER_PERKS,
         new FontWithPosition(
-          portraitWidth  + (this.perksButton.getWidth() / 2),
-          playerCardY + 10  + (this.perksButton.getHeight() / 2),
+          portraitWidth + this.perksButton.getWidth() / 2,
+          portraitPosition + 10 + this.perksButton.getHeight() / 2,
           "Perks",
           { size: 15 }
+        )
+      );
+
+      this.gameManager.assetManager.textManager.addText(
+        TextIds.PLAYER_PORTRAIT_MONEY,
+        new FontWithPosition(
+          portraitBackgroundWidth,
+          portraitHeight + portraitPosition + 15,
+          `${this.gameManager.player.money}`,
+          { size: 15, icon: this.markIcon, format: Format.RIGHT }
         )
       );
     }
   }
 
-  private buildPlayerDeck(): void {  
-    const playerCardY = this.cardAssets.getCardPosition(CharacterTypes.PLAYER);  
+  private buildPlayerDeck(): void {
+    const portraitPosition = this.getPortraitPosition(CharacterTypes.PLAYER);
     this.gameManager.assetManager.addAsset(
       AssetIds.PLAYER_DECK,
       new Asset(
         AssetIds.PLAYER_DECK,
         this.baseDeck,
         push.getWidth() - this.baseDeck.getWidth() - 5,
-        playerCardY,
+        portraitPosition
       )
     );
   }
@@ -953,7 +1074,7 @@ export default class Board {
         AssetIds.ENEMY_DECK,
         this.baseDeck,
         push.getWidth() - this.baseDeck.getWidth() - 5,
-        5,
+        5
       )
     );
   }
@@ -962,7 +1083,7 @@ export default class Board {
     const screenW = push.getWidth();
     const centerX = screenW / 2;
     this.gameManager.assetManager.textManager.addText(
-      FontIds.EDEL_SUIT_LABEL,
+      TextIds.EDEL_SUIT_LABEL,
       new FontWithPosition(
         centerX,
         40,
@@ -979,8 +1100,15 @@ export default class Board {
         AssetIds.GRASS_BACKGROUND,
         love.graphics.newImage(this.biome.boardBackgroundImagePath),
         0,
-        0,
+        0
       )
     );
+  }
+
+  getPortraitPosition(characterType: CharacterTypes): number {
+      return characterType === CharacterTypes.PLAYER
+        ? this.portraitPosition ??
+          this.cardAssets.getCardPosition(characterType)
+        : 5;
   }
 }

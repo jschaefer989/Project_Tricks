@@ -40,8 +40,11 @@ export default class Board {
     portrait: import("love.graphics").Image;
     baseDeck: import("love.graphics").Image;
     perksButton: import("love.graphics").Image;
-    mark: import("love.graphics").Image;
+    markIcon: import("love.graphics").Image;
+    attackPowerIcon: import("love.graphics").Image;
+    valueIcon: import("love.graphics").Image;
     biome: Biome;
+    portraitPosition: number | undefined;
     constructor(gameManager: GameManager, enemy?: Enemy);
     load(data: BoardData): void;
     save(): BoardData;
@@ -68,6 +71,7 @@ export default class Board {
     renderAttackButton(startY: number, btnW: number, btnH: number, padX: number, padY: number): void;
     renderDiscardCounter(): void;
     handleStartFight(): void;
+    buildFightAssets(): void;
     handleAttack(): void;
     private addPlayerPoints;
     private addEnemyPoints;
@@ -75,6 +79,10 @@ export default class Board {
     getWinner(): CharacterTypes;
     endFight(): void;
     clearStats(): void;
+    addPlayerPower(power: number): void;
+    addPlayerValue(value: number): void;
+    addEnemyPower(power: number): void;
+    addEnemyValue(value: number): void;
     buildAssets(): void;
     private buildCardAssets;
     private buildLetsFightButton;
@@ -83,6 +91,7 @@ export default class Board {
     private buildDiscardButton;
     private buildDeselectButton;
     private buildPointBoard;
+    private buildPowerAndValues;
     private buildPlayerPortrait;
     private buildEnemyPortrait;
     private buildPortrait;
@@ -90,5 +99,6 @@ export default class Board {
     private buildEnemyDeck;
     private buildEdelSuitText;
     private buildBackground;
+    getPortraitPosition(characterType: CharacterTypes): number;
 }
 export {};

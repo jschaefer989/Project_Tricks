@@ -42,11 +42,13 @@ export default class Player extends Character {
     discard(): void;
     anySelectedCards(): boolean;
     cashout(points: number): void;
+    addMoney(amount: number): void;
     hasPerk(perkType: Perks): boolean;
     addPerk(perk: Perk): void;
     gatherExperience(exp: number): boolean;
     getNextLevelExperience(): number;
     levelUp(): void;
+    addExperience(exp: number): void;
     unselectCards(): void;
 }
 export {};

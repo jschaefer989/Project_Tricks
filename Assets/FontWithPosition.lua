@@ -24,6 +24,7 @@ function FontWithPosition.prototype.____constructor(self, x, y, text, options)
     self.text = text
     self.format = options and options.format or ____exports.Format.LEFT
     self.icon = options and options.icon
+    self.iconFormat = options and options.iconFormat or (self.format == ____exports.Format.CENTER and ____exports.Format.LEFT or self.format)
 end
 function FontWithPosition.prototype.printFont(self)
     local font = not isEmpty(self.size) and love.graphics.newFont(self.filepath, self.size) or love.graphics.newFont(self.filepath)
@@ -58,6 +59,7 @@ end
 function FontWithPosition.prototype.getFormatOffset(self, textW)
     repeat
         local ____switch10 = self.format
+        local iconWidth
         local ____cond10 = ____switch10 == ____exports.Format.LEFT
         if ____cond10 then
             return 0
@@ -68,7 +70,8 @@ function FontWithPosition.prototype.getFormatOffset(self, textW)
         end
         ____cond10 = ____cond10 or ____switch10 == ____exports.Format.RIGHT
         if ____cond10 then
-            return textW
+            iconWidth = self.iconFormat == ____exports.Format.RIGHT and not isEmpty(self.icon) and self.icon:getWidth() + 5 or 0
+            return textW + iconWidth
         end
         do
             return 0
@@ -94,7 +97,7 @@ function FontWithPosition.prototype.renderIcon(self)
         if ____cond13 then
             love.graphics.draw(
                 self.icon,
-                self.x - 5,
+                self.x - self.icon:getWidth(),
                 self.y - self.icon:getHeight() / 2 + 2
             )
             break
