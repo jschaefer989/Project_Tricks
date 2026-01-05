@@ -74,10 +74,8 @@ function Card.load(self, gameManager, data)
 end
 function Card.prototype.onClick(self)
     if self.isSelected then
-        self.isSelected = false
         self:onUnselect()
     else
-        self.isSelected = true
         self:onSelect()
     end
 end
@@ -85,6 +83,7 @@ function Card.prototype.onSelect(self)
     if isEmpty(self.gameManager.board) then
         return
     end
+    self.isSelected = true
     self.gameManager.board:addPlayerPower(self.power)
     self.gameManager.board:addPlayerValue(self.value)
     local ____temp_1 = self.gameManager.board.cardAssets:getCardAssets(self)
@@ -123,6 +122,7 @@ function Card.prototype.onUnselect(self)
     if isEmpty(self.gameManager.board) then
         return
     end
+    self.isSelected = false
     self.gameManager.board:addPlayerPower(-self.power)
     self.gameManager.board:addPlayerValue(-self.value)
     local ____temp_4 = self.gameManager.board.cardAssets:getCardAssets(self)
@@ -168,7 +168,7 @@ function Card.onHover(self, gameManager, asset)
         return
     end
     local screenW = love.graphics.getWidth()
-    local defaultX = asset.x + asset:getWidth() + padding
+    local defaultX = asset.x + asset.image:getWidth() + padding
     local placeRight = defaultX + tooltipMaxWidth <= screenW - padding
     local tooltipX = placeRight and defaultX or math.max(padding, asset.x - padding - tooltipMaxWidth)
     local tooltipY = asset.y

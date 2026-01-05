@@ -401,7 +401,7 @@ function Dealer.prototype.hasLootCard(self, card)
 end
 function Dealer.prototype.deselectLootCards(self)
     for ____, card in ipairs(self.lootCards) do
-        card.isSelected = false
+        card:onUnselect()
     end
 end
 function Dealer.prototype.addLootCardsToPlayer(self)

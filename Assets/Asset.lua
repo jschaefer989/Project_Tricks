@@ -58,8 +58,8 @@ function Asset.prototype.setHovered(self, hovered)
                 local imgHeight = self.image:getHeight()
                 local oldWidth = imgWidth * self.scaleX
                 local oldHeight = imgHeight * self.scaleY
-                self.scaleX = self.scaleX + 0.2
-                self.scaleY = self.scaleY + 0.2
+                self.scaleX = self.scaleX * 1.06
+                self.scaleY = self.scaleY * 1.06
                 local newWidth = imgWidth * self.scaleX
                 local newHeight = imgHeight * self.scaleY
                 self.offsetX = self.offsetX + (newWidth - oldWidth) / 2
@@ -69,8 +69,8 @@ function Asset.prototype.setHovered(self, hovered)
                 local imgHeight = self.image:getHeight()
                 local oldWidth = imgWidth * self.scaleX
                 local oldHeight = imgHeight * self.scaleY
-                self.scaleX = self.scaleX - 0.2
-                self.scaleY = self.scaleY - 0.2
+                self.scaleX = self.scaleX / 1.06
+                self.scaleY = self.scaleY / 1.06
                 local newWidth = imgWidth * self.scaleX
                 local newHeight = imgHeight * self.scaleY
                 self.offsetX = self.offsetX + (newWidth - oldWidth) / 2

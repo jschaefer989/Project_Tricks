@@ -98,10 +98,8 @@ export default class Card {
 
   onClick(): void {
     if (this.isSelected) {
-      this.isSelected = false;
       this.onUnselect();
     } else {
-      this.isSelected = true;
       this.onSelect();
     }
   }
@@ -110,6 +108,8 @@ export default class Card {
     if (isEmpty(this.gameManager.board)) {
       return;
     }
+
+    this.isSelected = true;
 
     this.gameManager.board.addPlayerPower(this.power);
     this.gameManager.board.addPlayerValue(this.value);
@@ -162,6 +162,8 @@ export default class Card {
     if (isEmpty(this.gameManager.board)) {
       return;
     }
+
+    this.isSelected = false;
 
     this.gameManager.board.addPlayerPower(-this.power);
     this.gameManager.board.addPlayerValue(-this.value);
@@ -226,7 +228,7 @@ export default class Card {
     }
 
     const screenW = love.graphics.getWidth();
-    const defaultX = asset.x + asset.getWidth() + padding;
+    const defaultX = asset.x + asset.image.getWidth() + padding;
     const placeRight = defaultX + tooltipMaxWidth <= screenW - padding;
     const tooltipX = placeRight
       ? defaultX

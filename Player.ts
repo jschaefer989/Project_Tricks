@@ -92,7 +92,7 @@ export default class Player extends Character {
     for (let i = this.hand.length - 1; i >= 0; i--) {
       const card = this.hand[i];
       if (card.isSelected) {
-        card.isSelected = false;
+        card.onUnselect();
         this.addToDiscards(card);
         this.hand.splice(i, 1);
       }
@@ -104,7 +104,6 @@ export default class Player extends Character {
 
     for (const card of this.hand) {
       if (card.isSelected) {
-        card.isSelected = false;
         card.onUnselect();
         this.addToDiscards(card);
       } else {
@@ -184,7 +183,6 @@ export default class Player extends Character {
   unselectCards(): void {
     for (const card of this.hand) {
       if (card.isSelected) {
-        card.isSelected = false;
         card.onUnselect();
       }
     }

@@ -55,7 +55,7 @@ export default class Character {
 
     deselectAllCards(): void {
         for (const card of this.hand) {
-            card.isSelected = false
+            card.onUnselect()
         }
     }
 

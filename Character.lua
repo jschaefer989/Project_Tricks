@@ -54,7 +54,7 @@ function Character.prototype.addDiscardsToDeck(self)
 end
 function Character.prototype.deselectAllCards(self)
     for ____, card in ipairs(self.hand) do
-        card.isSelected = false
+        card:onUnselect()
     end
 end
 function Character.prototype.getCardPower(self)

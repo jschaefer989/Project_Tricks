@@ -90,7 +90,7 @@ function Player.prototype.removeSelectedCardsFromHand(self)
         while i >= 0 do
             local card = self.hand[i + 1]
             if card.isSelected then
-                card.isSelected = false
+                card:onUnselect()
                 self:addToDiscards(card)
                 __TS__ArraySplice(self.hand, i, 1)
             end
@@ -102,7 +102,6 @@ function Player.prototype.discard(self)
     local newHand = {}
     for ____, card in ipairs(self.hand) do
         if card.isSelected then
-            card.isSelected = false
             card:onUnselect()
             self:addToDiscards(card)
         else
@@ -189,7 +188,6 @@ end
 function Player.prototype.unselectCards(self)
     for ____, card in ipairs(self.hand) do
         if card.isSelected then
-            card.isSelected = false
             card:onUnselect()
         end
     end

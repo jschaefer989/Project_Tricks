@@ -313,7 +313,7 @@ export default class Dealer {
 
     deselectLootCards(): void {
         for (const card of this.lootCards) {
-            card.isSelected = false
+            card.onUnselect()
         }
     }
 

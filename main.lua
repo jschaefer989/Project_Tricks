@@ -11,11 +11,12 @@ _G.SYSLText = Text -- Make it globally available for TypeScript
 local GameManager = require("GameManager").default
 local gameManager = tsNew(GameManager)
 
+love.graphics.setDefaultFilter("nearest", "nearest")
+
 function love.load()    
     love.window.setTitle("Tricks")
     love.keyboard.setKeyRepeat(true)
     math.randomseed(os.time() + os.clock())
-    love.graphics.setDefaultFilter("nearest", "nearest")
 
     gameManager.settings:apply()
     gameManager:switchToMainMenu()
