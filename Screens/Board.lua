@@ -444,6 +444,7 @@ end
 function Board.prototype.handleStartFight(self)
     self.showingInitialView = false
     self.gameManager.assetManager:hideAsset(AssetIds.LETS_FIGHT_BUTTON)
+    self.gameManager.assetManager.textManager:hideText(TextIds.LETS_FIGHT_BUTTON_CAPTION)
     self.dealer:startGame()
     self:buildFightAssets()
     self.gameManager.assetManager.textManager:hideText(TextIds.EDEL_SUIT_LABEL)
@@ -497,12 +498,22 @@ function Board.prototype.handleDiscard(self)
     if not self.gameManager.player:anySelectedCards() then
         return
     end
+    if self:getRemainingDiscards() <= 0 then
+        return
+    end
     self.gameManager.player:discard()
     self.discardUsed = self.discardUsed + 1
+    self.gameManager.assetManager.textManager:updateText(
+        TextIds.DISCARD_BUTTON_COUNTER,
+        (tostring(self:getRemainingDiscards()) .. "/") .. tostring(self.gameManager.player.discards)
+    )
     local ____opt_5 = self.gameManager.board
     if ____opt_5 ~= nil then
         ____opt_5.dealer:dealCards(CharacterTypes.PLAYER)
     end
+end
+function Board.prototype.getRemainingDiscards(self)
+    return self.gameManager.player.discards - self.discardUsed
 end
 function Board.prototype.getWinner(self)
     if self.playerPoints > self.enemyPoints then
@@ -625,7 +636,19 @@ function Board.prototype.buildLetsFightButton(self)
             self.letsFightButton,
             buttonX,
             buttonY,
-            function() return self:handleStartFight() end
+            {onClick = function() return self:handleStartFight() end}
+        )
+    )
+    local centerX = buttonX + buttonWidth / 2
+    local centerY = buttonY + buttonHeight / 2
+    self.gameManager.assetManager.textManager:addText(
+        TextIds.LETS_FIGHT_BUTTON_CAPTION,
+        __TS__New(
+            FontWithPosition,
+            centerX,
+            centerY,
+            "Let's Fight!",
+            {size = 28, format = Format.CENTER}
         )
     )
 end
@@ -648,7 +671,7 @@ function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW)
             self.attackButton,
             buttonX,
             buttonY,
-            function() return self:handleAttack() end
+            {onClick = function() return self:handleAttack() end}
         )
     )
     local centerX = buttonX + btnW / 2
@@ -674,7 +697,7 @@ function Board.prototype.buildDiscardButton(self, buttonX, buttonY, btnW, gap)
             self.discardButton,
             discardX,
             buttonY,
-            function() return self:handleDiscard() end
+            {onClick = function() return self:handleDiscard() end}
         )
     )
     local centerX = discardX + btnW / 2
@@ -684,9 +707,20 @@ function Board.prototype.buildDiscardButton(self, buttonX, buttonY, btnW, gap)
         __TS__New(
             FontWithPosition,
             centerX,
-            centerY,
+            centerY - 8,
             "Discard",
             {size = 28, format = Format.CENTER}
+        )
+    )
+    local remaining = self.gameManager.player.discards - self.discardUsed
+    self.gameManager.assetManager.textManager:addText(
+        TextIds.DISCARD_BUTTON_COUNTER,
+        __TS__New(
+            FontWithPosition,
+            centerX,
+            centerY + 12,
+            (tostring(remaining) .. "/") .. tostring(self.gameManager.player.discards),
+            {size = 18, format = Format.CENTER}
         )
     )
     return discardX
@@ -701,7 +735,7 @@ function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, gap)
             self.deselectButton,
             deselectX,
             buttonY,
-            function() return self.gameManager.player:unselectCards() end
+            {onClick = function() return self.gameManager.player:unselectCards() end}
         )
     )
     local centerX = deselectX + btnW / 2
@@ -893,7 +927,7 @@ function Board.prototype.buildPortrait(self, characterType)
                 self.perksButton,
                 portraitWidth + 15,
                 portraitPosition + 10,
-                function() return self.gameManager:switchToPerkScreen() end
+                {onClick = function() return self.gameManager:switchToPerkScreen() end}
             )
         )
         self.gameManager.assetManager.textManager:addText(

@@ -32,7 +32,7 @@ function CardAssets.prototype.____constructor(self, gameManager)
     self.baseH = self.baseCard:getHeight()
     self.gameManager = gameManager
 end
-function CardAssets.prototype.addAsset(self, card, cardX, cardY, options)
+function CardAssets.prototype.addAsset(self, card, cardX, cardY)
     local assetId = ____exports.default:getBaseAssetId(card)
     local baseCardAsset = __TS__New(
         Asset,
@@ -40,8 +40,10 @@ function CardAssets.prototype.addAsset(self, card, cardX, cardY, options)
         self.baseCard,
         cardX,
         cardY,
-        function() return card:onClick() end,
-        function(____, gameManager, asset) return Card:onHover(gameManager, asset) end
+        {
+            onClick = function() return card:onClick() end,
+            onHover = function(____, gameManager, asset) return Card:onHover(gameManager, asset) end
+        }
     )
     self.gameManager.assetManager:addAsset(assetId, baseCardAsset)
     self:addSuitAsset(card, cardX, cardY)
@@ -63,8 +65,10 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y)
         love.graphics.newImage(suitImagePath),
         normalPosition.x,
         normalPosition.y,
-        function() return card:onClick() end,
-        onHoverCallback
+        {
+            onClick = function() return card:onClick() end,
+            onHover = onHoverCallback
+        }
     )
     self.gameManager.assetManager:addAsset(
         ____exports.default:getBaseAssetId(card),
@@ -78,11 +82,13 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y)
         love.graphics.newImage(suitImagePath),
         flippedPosition.x,
         flippedPosition.y,
-        function() return card:onClick() end,
-        onHoverCallback,
-        0,
-        -1,
-        -1
+        {
+            onClick = function() return card:onClick() end,
+            onHover = onHoverCallback,
+            orientation = 0,
+            scaleX = -1,
+            scaleY = -1
+        }
     )
     self.gameManager.assetManager:addAsset(
         ____exports.default:getBaseAssetId(card),
@@ -106,8 +112,10 @@ function CardAssets.prototype.addRankAsset(self, card, x, y)
         rankImage,
         rankPosition.x,
         rankPosition.y,
-        function() return card:onClick() end,
-        function(____, gameManager, asset) return Card:onHover(gameManager, asset) end
+        {
+            onClick = function() return card:onClick() end,
+            onHover = function(____, gameManager, asset) return Card:onHover(gameManager, asset) end
+        }
     )
     self.gameManager.assetManager:addAsset(
         ____exports.default:getBaseAssetId(card),

@@ -77,6 +77,7 @@ export default class Board {
     private addPlayerPoints;
     private addEnemyPoints;
     handleDiscard(): void;
+    getRemainingDiscards(): number;
     getWinner(): CharacterTypes;
     endFight(): void;
     clearStats(): void;

@@ -1,12 +1,21 @@
 import GameManager from "GameManager";
 import { Image } from "love.graphics";
 export type AssetCallback = (gameManager: GameManager, asset: Asset) => void;
+interface ConstructionOptions {
+    readonly onClick?: () => void;
+    readonly onHover?: AssetCallback;
+    readonly orientation?: number;
+    readonly scaleX?: number;
+    readonly scaleY?: number;
+    readonly offsetX?: number;
+    readonly offsetY?: number;
+}
 export default class Asset {
     id: string;
     image: Image;
     x: number;
     y: number;
-    onClick: () => void;
+    onClick?: () => void;
     onHover?: AssetCallback;
     orientation: number;
     scaleX: number;
@@ -15,7 +24,7 @@ export default class Asset {
     offsetY: number;
     isDisabled: boolean;
     isHovered: boolean;
-    constructor(id: string, image: Image, x: number, y: number, onClick?: () => void, onHover?: AssetCallback, orientation?: number, scaleX?: number, scaleY?: number, offsetX?: number, offsetY?: number);
+    constructor(id: string, image: Image, x: number, y: number, constructionOptions?: ConstructionOptions);
     updatePosition(x: number, y: number): void;
     updateOrientation(orientation: number): void;
     updateScale(scaleX: number, scaleY: number): void;
@@ -25,3 +34,4 @@ export default class Asset {
     getWidth(): number;
     getHeight(): number;
 }
+export {};

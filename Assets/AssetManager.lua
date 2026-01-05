@@ -96,7 +96,7 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
                 goto __continue23
             end
             local asset = assets[1]
-            if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
+            if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() and not isEmpty(asset.onClick) then
                 asset:onClick()
             end
         end

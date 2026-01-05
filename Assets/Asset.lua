@@ -4,21 +4,20 @@ local ____exports = {}
 ____exports.default = __TS__Class()
 local Asset = ____exports.default
 Asset.name = "Asset"
-function Asset.prototype.____constructor(self, id, image, x, y, onClick, onHover, orientation, scaleX, scaleY, offsetX, offsetY)
+function Asset.prototype.____constructor(self, id, image, x, y, constructionOptions)
     self.isDisabled = false
     self.isHovered = false
     self.id = id
     self.image = image
     self.x = x
     self.y = y
-    self.onClick = onClick or (function()
-    end)
-    self.onHover = onHover
-    self.orientation = orientation or 0
-    self.scaleX = scaleX or 1
-    self.scaleY = scaleY or 1
-    self.offsetX = offsetX or 0
-    self.offsetY = offsetY or 0
+    self.onClick = constructionOptions and constructionOptions.onClick
+    self.onHover = constructionOptions and constructionOptions.onHover
+    self.orientation = constructionOptions and constructionOptions.orientation or 0
+    self.scaleX = constructionOptions and constructionOptions.scaleX or 1
+    self.scaleY = constructionOptions and constructionOptions.scaleY or 1
+    self.offsetX = constructionOptions and constructionOptions.offsetX or 0
+    self.offsetY = constructionOptions and constructionOptions.offsetY or 0
 end
 function Asset.prototype.updatePosition(self, x, y)
     self.x = x

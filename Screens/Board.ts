@@ -568,6 +568,9 @@ export default class Board {
   handleStartFight(): void {
     this.showingInitialView = false;
     this.gameManager.assetManager.hideAsset(AssetIds.LETS_FIGHT_BUTTON);
+    this.gameManager.assetManager.textManager.hideText(
+      TextIds.LETS_FIGHT_BUTTON_CAPTION
+    );
 
     this.dealer.startGame();
     this.buildFightAssets();
@@ -622,13 +625,24 @@ export default class Board {
 
   handleDiscard(): void {
     if (!this.gameManager.player.anySelectedCards()) return;
+    if (this.getRemainingDiscards() <= 0) return;
 
     this.gameManager.player.discard();
 
     this.discardUsed = this.discardUsed + 1;
 
+    // Update the discard counter
+    this.gameManager.assetManager.textManager.updateText(
+      TextIds.DISCARD_BUTTON_COUNTER,
+      `${this.getRemainingDiscards()}/${this.gameManager.player.discards}`
+    );
+
     // Refill the player's hand after discarding
     this.gameManager.board?.dealer.dealCards(CharacterTypes.PLAYER);
+  }
+
+  getRemainingDiscards(): number {
+    return this.gameManager.player.discards - this.discardUsed;
   }
 
   getWinner(): CharacterTypes {
@@ -758,8 +772,18 @@ export default class Board {
         this.letsFightButton,
         buttonX,
         buttonY,
-        () => this.handleStartFight()
+        { onClick: () => this.handleStartFight() }
       )
+    );
+
+    const centerX = buttonX + buttonWidth / 2;
+    const centerY = buttonY + buttonHeight / 2;
+    this.gameManager.assetManager.textManager.addText(
+      TextIds.LETS_FIGHT_BUTTON_CAPTION,
+      new FontWithPosition(centerX, centerY, "Let's Fight!", {
+        size: 28,
+        format: Format.CENTER,
+      })
     );
   }
 
@@ -784,13 +808,9 @@ export default class Board {
   ): void {
     this.gameManager.assetManager.addAsset(
       AssetIds.ATTACK_BUTTON,
-      new Asset(
-        AssetIds.ATTACK_BUTTON,
-        this.attackButton,
-        buttonX,
-        buttonY,
-        () => this.handleAttack()
-      )
+      new Asset(AssetIds.ATTACK_BUTTON, this.attackButton, buttonX, buttonY, {
+        onClick: () => this.handleAttack(),
+      })
     );
 
     const centerX = buttonX + btnW / 2;
@@ -818,7 +838,7 @@ export default class Board {
         this.discardButton,
         discardX,
         buttonY,
-        () => this.handleDiscard()
+        { onClick: () => this.handleDiscard() }
       )
     );
 
@@ -826,8 +846,17 @@ export default class Board {
     const centerY = buttonY + this.attackButton.getHeight() / 2;
     this.gameManager.assetManager.textManager.addText(
       TextIds.DISCARD_BUTTON_CAPTION,
-      new FontWithPosition(centerX, centerY, "Discard", {
+      new FontWithPosition(centerX, centerY - 8, "Discard", {
         size: 28,
+        format: Format.CENTER,
+      })
+    );
+
+    const remaining = this.gameManager.player.discards - this.discardUsed;
+    this.gameManager.assetManager.textManager.addText(
+      TextIds.DISCARD_BUTTON_COUNTER,
+      new FontWithPosition(centerX, centerY + 12, `${remaining}/${this.gameManager.player.discards}`, {
+        size: 18,
         format: Format.CENTER,
       })
     );
@@ -849,7 +878,7 @@ export default class Board {
         this.deselectButton,
         deselectX,
         buttonY,
-        () => this.gameManager.player.unselectCards()
+        { onClick: () => this.gameManager.player.unselectCards() }
       )
     );
 
@@ -921,7 +950,9 @@ export default class Board {
         : this.enemyPower;
     const isLeading = this.playerPower > this.enemyPower;
     const isTrailing = this.enemyPower > this.playerPower;
-    const emphasize = (characterType === CharacterTypes.PLAYER && isLeading) || (characterType === CharacterTypes.ENEMY && isTrailing);
+    const emphasize =
+      (characterType === CharacterTypes.PLAYER && isLeading) ||
+      (characterType === CharacterTypes.ENEMY && isTrailing);
     this.gameManager.assetManager.textManager.addText(
       powerId,
       new FontWithPosition(
@@ -957,8 +988,12 @@ export default class Board {
   }
 
   private updatePowerEmphasis(): void {
-    const playerText = this.gameManager.assetManager.textManager.getText(TextIds.PLAYER_POWER);
-    const enemyText = this.gameManager.assetManager.textManager.getText(TextIds.ENEMY_POWER);
+    const playerText = this.gameManager.assetManager.textManager.getText(
+      TextIds.PLAYER_POWER
+    );
+    const enemyText = this.gameManager.assetManager.textManager.getText(
+      TextIds.ENEMY_POWER
+    );
     if (isEmpty(playerText) || isEmpty(enemyText)) {
       return;
     }
@@ -971,8 +1006,12 @@ export default class Board {
   }
 
   private updateValueEmphasis(): void {
-    const playerText = this.gameManager.assetManager.textManager.getText(TextIds.PLAYER_VALUE);
-    const enemyText = this.gameManager.assetManager.textManager.getText(TextIds.ENEMY_VALUE);
+    const playerText = this.gameManager.assetManager.textManager.getText(
+      TextIds.PLAYER_VALUE
+    );
+    const enemyText = this.gameManager.assetManager.textManager.getText(
+      TextIds.ENEMY_VALUE
+    );
     if (isEmpty(playerText) || isEmpty(enemyText)) {
       return;
     }
@@ -1080,7 +1119,7 @@ export default class Board {
           this.perksButton,
           portraitWidth + 15,
           portraitPosition + 10,
-          () => this.gameManager.switchToPerkScreen()
+          { onClick: () => this.gameManager.switchToPerkScreen() }
         )
       );
 
@@ -1190,7 +1229,6 @@ export default class Board {
       )
     );
 
-
     const winnings = this.getPlayerWinnings();
     if (winnings <= 0) {
       this.gameManager.assetManager.textManager.addText(
@@ -1227,9 +1265,8 @@ export default class Board {
   }
 
   getPortraitPosition(characterType: CharacterTypes): number {
-      return characterType === CharacterTypes.PLAYER
-        ? this.portraitPosition ??
-          this.cardAssets.getCardPosition(characterType)
-        : 5;
+    return characterType === CharacterTypes.PLAYER
+      ? this.portraitPosition ?? this.cardAssets.getCardPosition(characterType)
+      : 5;
   }
 }

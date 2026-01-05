@@ -4,16 +4,6 @@ import { Suits, Ranks, EdelRanks, CharacterTypes } from "Enums";
 import GameManager from "GameManager";
 import Point from "Point";
 import { Image } from "love.graphics";
-interface CardOptions {
-    multiSelect?: boolean;
-    /**
-     * Overrides the onSelect/onUnselect behavior for the card, which generally assumes that the card is rendered on the board
-     * @param card
-     * @returns
-     */
-    onClick?: (card: Card) => void;
-    displayCost?: boolean;
-}
 interface AssetsForCard {
     baseAsset: Asset;
     suitAssets: Asset[];
@@ -25,7 +15,7 @@ export default class CardAssets {
     baseW: number;
     baseH: number;
     constructor(gameManager: GameManager);
-    addAsset(card: Card, cardX: number, cardY: number, options?: CardOptions): void;
+    addAsset(card: Card, cardX: number, cardY: number): void;
     static getBaseAssetId(card: Card): string;
     addSuitAsset(card: Card, x: number, y: number): void;
     getNormalSuitPosition(x: number, y: number): Point;
