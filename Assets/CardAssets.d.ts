@@ -14,6 +14,7 @@ export default class CardAssets {
     baseCard: Image;
     baseW: number;
     baseH: number;
+    cardClick: import("love.audio").Source;
     constructor(gameManager: GameManager);
     addAsset(card: Card, cardX: number, cardY: number, includeClickHandler?: boolean): void;
     static getBaseAssetId(card: Card): string;

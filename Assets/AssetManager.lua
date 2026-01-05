@@ -194,9 +194,15 @@ function AssetManager.prototype.handleMouseHover(self)
             end
             local asset = assets[1]
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
-                asset:setHovered(true)
-            else
-                asset:setHovered(false)
+                if not asset.isHovered then
+                    for ____, a in ipairs(assets) do
+                        a:setHovered(true)
+                    end
+                end
+            elseif asset.isHovered then
+                for ____, a in ipairs(assets) do
+                    a:setHovered(false)
+                end
             end
         end
         ::__continue53::

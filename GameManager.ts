@@ -78,7 +78,9 @@ export default class GameManager {
 
   switchBasedOnGameState(gameState = this.gameState, enemy = this.board?.enemy): void {
     this.assetManager = new AssetManager(this);
-    this.musicPlayer.play(gameState, this.biome);
+    if (this.settings.playMusic) {
+      this.musicPlayer.play(gameState, this.biome);
+    }
 
     switch (gameState) {
       case GameStates.MAIN_MENU:

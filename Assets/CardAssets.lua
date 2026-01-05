@@ -18,6 +18,7 @@ local AssetIds = ____Enums.AssetIds
 local Ranks = ____Enums.Ranks
 local EdelRanks = ____Enums.EdelRanks
 local CharacterTypes = ____Enums.CharacterTypes
+local HoverEffects = ____Enums.HoverEffects
 local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
@@ -30,6 +31,7 @@ function CardAssets.prototype.____constructor(self, gameManager)
     self.baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png")
     self.baseW = self.baseCard:getWidth()
     self.baseH = self.baseCard:getHeight()
+    self.cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static")
     self.gameManager = gameManager
 end
 function CardAssets.prototype.addAsset(self, card, cardX, cardY, includeClickHandler)
@@ -45,7 +47,9 @@ function CardAssets.prototype.addAsset(self, card, cardX, cardY, includeClickHan
         cardY,
         {
             onClick = includeClickHandler and (function() return card:onClick() end) or nil,
-            onHover = function(____, gameManager, asset) return Card:onHover(gameManager, asset) end
+            onHover = function(____, gameManager, asset) return Card:onHover(gameManager, asset) end,
+            hoverEffect = includeClickHandler and HoverEffects.SCALE_UP or HoverEffects.NONE,
+            clickSound = includeClickHandler and self.cardClick or nil
         }
     )
     self.gameManager.assetManager:addAsset(assetId, baseCardAsset)
@@ -73,7 +77,9 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
         normalPosition.y,
         {
             onClick = includeClickHandler and (function() return card:onClick() end) or nil,
-            onHover = onHoverCallback
+            onHover = onHoverCallback,
+            hoverEffect = includeClickHandler and HoverEffects.SCALE_UP or HoverEffects.NONE,
+            clickSound = includeClickHandler and self.cardClick or nil
         }
     )
     self.gameManager.assetManager:addAsset(
@@ -92,8 +98,10 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
             onClick = includeClickHandler and (function() return card:onClick() end) or nil,
             onHover = onHoverCallback,
             orientation = 0,
+            hoverEffect = includeClickHandler and HoverEffects.SCALE_UP or HoverEffects.NONE,
             scaleX = -1,
-            scaleY = -1
+            scaleY = -1,
+            clickSound = includeClickHandler and self.cardClick or nil
         }
     )
     self.gameManager.assetManager:addAsset(
@@ -123,7 +131,9 @@ function CardAssets.prototype.addRankAsset(self, card, x, y, includeClickHandler
         rankPosition.y,
         {
             onClick = includeClickHandler and (function() return card:onClick() end) or nil,
-            onHover = function(____, gameManager, asset) return Card:onHover(gameManager, asset) end
+            onHover = function(____, gameManager, asset) return Card:onHover(gameManager, asset) end,
+            hoverEffect = includeClickHandler and HoverEffects.SCALE_UP or HoverEffects.NONE,
+            clickSound = includeClickHandler and self.cardClick or nil
         }
     )
     self.gameManager.assetManager:addAsset(

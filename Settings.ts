@@ -1,13 +1,34 @@
+import { exhaustiveGuard } from "Helpers"
 import * as push from "Libraries.push"
 
 /** @noSelfInFile */
 
+enum WindowOptions {
+    WINDOWED = "WINDOWED",
+    FULLSCREEN = "FULLSCREEN"
+}
+
 export default class Settings {
+    playMusic: boolean = true
+    playSoundEffects: boolean = true
+    windowSetting: WindowOptions = WindowOptions.WINDOWED
+
     constructor() {}
 
-    defaults(): void {
-        // Load settings from a file or set defaults
-        this.setupWindowedMode()
+    apply(): void {
+        // TODO: Load settings from a file or set defaults
+
+        switch (this.windowSetting) {
+            case WindowOptions.FULLSCREEN:
+                this.setupFullscreenMode()
+                break
+            case WindowOptions.WINDOWED:
+                this.setupWindowedMode()
+                break
+            default:
+                exhaustiveGuard(this.windowSetting)
+        }
+        this.playMusic = false // Temporary: disable music for now
     }
 
     setupWindowedMode(): void {

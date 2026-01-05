@@ -86,56 +86,58 @@ function GameManager.prototype.switchBasedOnGameState(self, gameState, enemy)
         enemy = ____opt_2 and ____opt_2.enemy
     end
     self.assetManager = __TS__New(AssetManager, self)
-    self.musicPlayer:play(gameState, self.biome)
+    if self.settings.playMusic then
+        self.musicPlayer:play(gameState, self.biome)
+    end
     repeat
-        local ____switch7 = gameState
-        local ____cond7 = ____switch7 == GameStates.MAIN_MENU
-        if ____cond7 then
+        local ____switch8 = gameState
+        local ____cond8 = ____switch8 == GameStates.MAIN_MENU
+        if ____cond8 then
             self:switchToMainMenu()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.NEW_GAME_MENU
-        if ____cond7 then
+        ____cond8 = ____cond8 or ____switch8 == GameStates.NEW_GAME_MENU
+        if ____cond8 then
             self:switchToNewGameMenu()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.BOARD
-        if ____cond7 then
+        ____cond8 = ____cond8 or ____switch8 == GameStates.BOARD
+        if ____cond8 then
             self:switchToBoard(enemy)
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.PAUSE_MENU
-        if ____cond7 then
+        ____cond8 = ____cond8 or ____switch8 == GameStates.PAUSE_MENU
+        if ____cond8 then
             self:switchToPauseMenu()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.WIN_SCREEN
-        if ____cond7 then
+        ____cond8 = ____cond8 or ____switch8 == GameStates.WIN_SCREEN
+        if ____cond8 then
             self:switchToWinScreen()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.LOSE_SCREEN
-        if ____cond7 then
+        ____cond8 = ____cond8 or ____switch8 == GameStates.LOSE_SCREEN
+        if ____cond8 then
             self:switchToLoseScreen()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.MAP
-        if ____cond7 then
+        ____cond8 = ____cond8 or ____switch8 == GameStates.MAP
+        if ____cond8 then
             self:switchToMap()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.SHOP
-        if ____cond7 then
+        ____cond8 = ____cond8 or ____switch8 == GameStates.SHOP
+        if ____cond8 then
             self:switchToShop()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.LEVEL_UP
-        if ____cond7 then
+        ____cond8 = ____cond8 or ____switch8 == GameStates.LEVEL_UP
+        if ____cond8 then
             self:switchToLevelUpScreen()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.PERKS
-        if ____cond7 then
+        ____cond8 = ____cond8 or ____switch8 == GameStates.PERKS
+        if ____cond8 then
             self:switchToPerkScreen()
             break
         end
@@ -230,6 +232,7 @@ function GameManager.prototype.switchToBoard(self, enemy)
         )
         self.board.dealer:setup()
     end
+    self.assetManager = __TS__New(AssetManager, self)
     self.board:buildAssets()
     GameStateManager:setState(boardState)
 end

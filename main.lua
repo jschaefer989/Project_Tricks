@@ -6,6 +6,7 @@ local suit = require('Libraries.suit-master.suit')
 local GameStateManager = require("Libraries.GameStateManager-main.gamestateManager")
 local lovelyToasts = require("Libraries.Lovely-Toasts-main.lovelyToasts")
 local Text = require("Libraries.SYSL-Text-master.example.library.slog-text")
+local push = require("Libraries.push")
 _G.SYSLText = Text -- Make it globally available for TypeScript
 local GameManager = require("GameManager").default
 local gameManager = tsNew(GameManager)
@@ -14,10 +15,9 @@ function love.load()
     love.window.setTitle("Tricks")
     love.keyboard.setKeyRepeat(true)
     math.randomseed(os.time() + os.clock())
+    love.graphics.setDefaultFilter("nearest", "nearest")
 
-    -- TODO: load settings properly
-    --global.GAME_MANAGER.settings:loadFromTable(saveData.settings or {})
-    gameManager.settings:defaults()
+    gameManager.settings:apply()
     gameManager:switchToMainMenu()
 end
 
@@ -66,4 +66,8 @@ end
 
 function love.mousereleased(x, y, button)
     GameStateManager:mousereleased(x, y, button)
+end
+
+function love.resize(w, h)
+    push:resize(w, h)
 end

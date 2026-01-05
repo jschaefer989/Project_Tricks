@@ -202,9 +202,15 @@ export default class AssetManager {
         gameY >= asset.y &&
         gameY <= asset.y + asset.getHeight()
       ) {
-        asset.setHovered(true);
-      } else {
-        asset.setHovered(false);
+        if (!asset.isHovered) {
+          for (const a of assets) {
+            a.setHovered(true);
+          }
+        }
+      } else if (asset.isHovered) {
+        for (const a of assets) {
+          a.setHovered(false);
+        }
       }
     }
   }

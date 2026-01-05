@@ -99,4 +99,12 @@ ____exports.AnimationIds.CARD_SUIT_FLIPPED_SELECT = "CARD_SUIT_FLIPPED_SELECT"
 ____exports.AnimationIds.CARD_SUIT_FLIPPED_UNSELECT = "CARD_SUIT_FLIPPED_UNSELECT"
 ____exports.AnimationIds.CARD_RANK_SELECT = "CARD_RANK_NORMAL_SELECT"
 ____exports.AnimationIds.CARD_RANK_UNSELECT = "CARD_RANK_NORMAL_UNSELECT"
+____exports.HoverEffects = HoverEffects or ({})
+____exports.HoverEffects.NONE = "NONE"
+____exports.HoverEffects.SCALE_UP = "SCALE_UP"
+____exports.HoverEffects.CHANGE_COLOR = "CHANGE_COLOR"
+____exports.MousePressEffects = MousePressEffects or ({})
+____exports.MousePressEffects.NONE = "NONE"
+____exports.MousePressEffects.SCALE_DOWN = "SCALE_DOWN"
+____exports.MousePressEffects.DARKEN = "DARKEN"
 return ____exports

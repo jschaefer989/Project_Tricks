@@ -108,3 +108,13 @@ export declare enum AnimationIds {
     CARD_RANK_SELECT = "CARD_RANK_NORMAL_SELECT",
     CARD_RANK_UNSELECT = "CARD_RANK_NORMAL_UNSELECT"
 }
+export declare enum HoverEffects {
+    NONE = "NONE",
+    SCALE_UP = "SCALE_UP",
+    CHANGE_COLOR = "CHANGE_COLOR"
+}
+export declare enum MousePressEffects {
+    NONE = "NONE",
+    SCALE_DOWN = "SCALE_DOWN",
+    DARKEN = "DARKEN"
+}

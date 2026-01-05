@@ -1,6 +1,13 @@
 import Card from "../Cards/Card";
 import Asset from "./Asset";
-import { Suits, AssetIds, Ranks, EdelRanks, CharacterTypes } from "Enums";
+import {
+  Suits,
+  AssetIds,
+  Ranks,
+  EdelRanks,
+  CharacterTypes,
+  HoverEffects,
+} from "Enums";
 import { exhaustiveGuard, isEmpty } from "Helpers";
 import GameManager from "GameManager";
 import * as push from "Libraries.push";
@@ -19,17 +26,25 @@ export default class CardAssets {
   baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png");
   baseW = this.baseCard.getWidth();
   baseH = this.baseCard.getHeight();
+  cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static");
 
   constructor(gameManager: GameManager) {
     this.gameManager = gameManager;
   }
 
-  addAsset(card: Card, cardX: number, cardY: number, includeClickHandler: boolean = true): void {
+  addAsset(
+    card: Card,
+    cardX: number,
+    cardY: number,
+    includeClickHandler: boolean = true
+  ): void {
     const assetId = CardAssets.getBaseAssetId(card);
     const baseCardAsset = new Asset(assetId, this.baseCard, cardX, cardY, {
       onClick: includeClickHandler ? () => card.onClick() : undefined,
       onHover: (gameManager: GameManager, asset: Asset) =>
         Card.onHover(gameManager, asset),
+      hoverEffect: includeClickHandler ? HoverEffects.SCALE_UP : HoverEffects.NONE,
+      clickSound: includeClickHandler ? this.cardClick : undefined,
     });
     this.gameManager.assetManager.addAsset(assetId, baseCardAsset);
     this.addSuitAsset(card, cardX, cardY, includeClickHandler);
@@ -40,7 +55,12 @@ export default class CardAssets {
     return `${AssetIds.BASE_CARD_TEMPLATE}-${card.id}`;
   }
 
-  addSuitAsset(card: Card, x: number, y: number, includeClickHandler: boolean = true): void {
+  addSuitAsset(
+    card: Card,
+    x: number,
+    y: number,
+    includeClickHandler: boolean = true
+  ): void {
     const suitImagePath = CardAssets.getSuitAssetPath(card.suit);
     const onHoverCallback = (gameManager: GameManager, asset: Asset) =>
       Card.onHover(gameManager, asset);
@@ -51,7 +71,12 @@ export default class CardAssets {
       love.graphics.newImage(suitImagePath),
       normalPosition.x,
       normalPosition.y,
-      { onClick: includeClickHandler ? () => card.onClick() : undefined, onHover: onHoverCallback }
+      {
+        onClick: includeClickHandler ? () => card.onClick() : undefined,
+        onHover: onHoverCallback,
+        hoverEffect: includeClickHandler ? HoverEffects.SCALE_UP : HoverEffects.NONE,
+        clickSound: includeClickHandler ? this.cardClick : undefined,
+      }
     );
     this.gameManager.assetManager.addAsset(
       CardAssets.getBaseAssetId(card),
@@ -68,8 +93,10 @@ export default class CardAssets {
         onClick: includeClickHandler ? () => card.onClick() : undefined,
         onHover: onHoverCallback,
         orientation: 0,
+        hoverEffect: includeClickHandler ? HoverEffects.SCALE_UP : HoverEffects.NONE,
         scaleX: -1,
         scaleY: -1,
+        clickSound: includeClickHandler ? this.cardClick : undefined,
       }
     );
     this.gameManager.assetManager.addAsset(
@@ -86,7 +113,12 @@ export default class CardAssets {
     return { x: x + this.baseW - 10, y: y + this.baseH - 10 };
   }
 
-  addRankAsset(card: Card, x: number, y: number, includeClickHandler: boolean = true): void {
+  addRankAsset(
+    card: Card,
+    x: number,
+    y: number,
+    includeClickHandler: boolean = true
+  ): void {
     const rankImagePath = CardAssets.getRankAssetPath(card.rank);
     const rankImage = love.graphics.newImage(rankImagePath);
     const assetId = CardAssets.getRankAssetId(card, 0);
@@ -100,6 +132,8 @@ export default class CardAssets {
         onClick: includeClickHandler ? () => card.onClick() : undefined,
         onHover: (gameManager: GameManager, asset: Asset) =>
           Card.onHover(gameManager, asset),
+        hoverEffect: includeClickHandler ? HoverEffects.SCALE_UP : HoverEffects.NONE,
+        clickSound: includeClickHandler ? this.cardClick : undefined,
       }
     );
     this.gameManager.assetManager.addAsset(
@@ -274,7 +308,12 @@ export default class CardAssets {
     const cardPosition = this.determineCardStartingPosition(characterType);
     const x =
       cardPosition.x + (character.hand.length - 1) * (this.baseW + padding);
-    this.addAsset(card, x, cardPosition.y, characterType === CharacterTypes.PLAYER);
+    this.addAsset(
+      card,
+      x,
+      cardPosition.y,
+      characterType === CharacterTypes.PLAYER
+    );
   }
 
   getCardAssets(card: Card): AssetsForCard {
