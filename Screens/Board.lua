@@ -7,6 +7,7 @@ local AssetIds = ____Enums.AssetIds
 local CharacterTypes = ____Enums.CharacterTypes
 local TextIds = ____Enums.TextIds
 local Suits = ____Enums.Suits
+local GameStates = ____Enums.GameStates
 local ____Dealer = require("Dealer")
 local Dealer = ____Dealer.default
 local ____Draw = require("Draw")
@@ -24,8 +25,6 @@ local isEmpty = ____Helpers.isEmpty
 local ____FontWithPosition = require("Assets.FontWithPosition")
 local FontWithPosition = ____FontWithPosition.default
 local Format = ____FontWithPosition.Format
-local ____Grass = require("Biomes.Grass")
-local Grass = ____Grass.default
 local ____Card = require("Cards.Card")
 local Card = ____Card.default
 local padding = 20
@@ -59,7 +58,6 @@ function Board.prototype.____constructor(self, gameManager, enemy)
     self.enemy = enemy or __TS__New(Enemy, gameManager)
     self.dealer = __TS__New(Dealer, gameManager)
     self.cardAssets = __TS__New(CardAssets, gameManager)
-    self.biome = __TS__New(Grass)
 end
 function Board.prototype.load(self, data)
     self.discardUsed = data.discardUsed
@@ -538,9 +536,9 @@ function Board.prototype.endFight(self)
         self.gameManager.player:addDiscardsToDeck()
         self.gameManager.player:cashout(self.playerPoints)
         self.dealer:getLootCards()
-        self.gameManager:switchToWinScreen()
+        self.gameManager:switchBasedOnGameState(GameStates.WIN_SCREEN)
     elseif winner == CharacterTypes.ENEMY then
-        self.gameManager:switchToLoseScreen()
+        self.gameManager:switchBasedOnGameState(GameStates.LOSE_SCREEN)
     end
 end
 function Board.prototype.clearStats(self)
@@ -978,7 +976,7 @@ function Board.prototype.buildPortrait(self, characterType)
                 self.perksButton,
                 portraitWidth + 15,
                 portraitPosition + 10,
-                {onClick = function() return self.gameManager:switchToPerkScreen() end}
+                {onClick = function() return self.gameManager:switchBasedOnGameState(GameStates.PERKS) end}
             )
         )
         self.gameManager.assetManager.textManager:addText(
@@ -1047,11 +1045,11 @@ function Board.prototype.buildEdelSuitText(self)
 end
 function Board.prototype.buildBackground(self)
     self.gameManager.assetManager:addAsset(
-        AssetIds.GRASS_BACKGROUND,
+        AssetIds.BACKGROUND,
         __TS__New(
             Asset,
-            AssetIds.GRASS_BACKGROUND,
-            love.graphics.newImage(self.biome.boardBackgroundImagePath),
+            AssetIds.BACKGROUND,
+            love.graphics.newImage(self.gameManager.biome.boardBackgroundImagePath),
             0,
             0
         )

@@ -3,6 +3,7 @@
 import Card from "Cards/Card"
 import Dealer from "Dealer"
 import Draw from "Draw"
+import { GameStates } from "Enums"
 import GameManager from "GameManager"
 import * as suit from "Libraries.suit-master.suit"
 
@@ -62,7 +63,7 @@ export default class Shop {
         const leaveResult = suit.Button("Leave Shop", {}, ...suit.layout.row(btnW, btnH))
         if (leaveResult.hit) {
             this.gameManager.map?.advanceToNextTier()
-            this.gameManager.switchToMap()
+            this.gameManager.switchBasedOnGameState(GameStates.MAP)
         }
 
         // Player info (upper-right)

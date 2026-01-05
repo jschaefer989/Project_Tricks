@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { GameStates } from "Enums"
 import GameManager from "GameManager"
 import * as suit from "Libraries.suit-master.suit"
 
@@ -81,7 +82,7 @@ export default class NewGameMenu {
         suit.layout.reset(panelX, backBtnY)
         const backResult = suit.Button("Back", {}, ...suit.layout.row(btnW, btnH))
         if (backResult.hit) {
-            this.gameManager.switchToMainMenu()
+            this.gameManager.switchBasedOnGameState(GameStates.MAIN_MENU)
         }
     }
 
@@ -96,7 +97,7 @@ export default class NewGameMenu {
         if (playerName.length > 0) {
             this.gameManager.player.name = playerName
             this.gameManager.map.generateNewMap()
-            this.gameManager.switchToMap()
+            this.gameManager.switchBasedOnGameState(GameStates.MAP)
         }
         this.gameManager.player.setup()
     }

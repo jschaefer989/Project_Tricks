@@ -2,7 +2,7 @@
 
 import Draw from "Draw"
 import Enemy, { EnemyData } from "Enemies/Enemy"
-import { EnemyTypes, MapNodeTypes } from "Enums"
+import { EnemyTypes, GameStates, MapNodeTypes } from "Enums"
 import GameManager from "GameManager"
 import { exhaustiveGuard, getRandomElementFromEnum } from "Helpers"
 import * as suit from "Libraries.suit-master.suit"
@@ -94,7 +94,7 @@ export default class MapNode {
         const result = suit.ImageButton(this.swordImage, {}, ...suit.layout.row(imageW, imageH))
         
         if (result.hit) {
-            this.gameManager.switchToBoard(this.enemy)
+            this.gameManager.switchBasedOnGameState(GameStates.BOARD, this.enemy)
         }
     }
 
@@ -121,7 +121,7 @@ export default class MapNode {
         const result = suit.ImageButton(this.marketImage, {}, ...suit.layout.row(imageW, imageH))
         
         if (result.hit) {
-            this.gameManager.switchToShop()
+            this.gameManager.switchBasedOnGameState(GameStates.SHOP)
         }
     }
 

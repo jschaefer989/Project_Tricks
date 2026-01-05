@@ -2,6 +2,8 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local ____exports = {}
+local ____Enums = require("Enums")
+local GameStates = ____Enums.GameStates
 local suit = require("Libraries.suit-master.suit")
 local panelW = 300
 local titleY = 50
@@ -79,7 +81,7 @@ function NewGameMenu.prototype.renderBackButton(self, panelX, startBtnY)
         suit.layout:row(btnW, btnH)
     )
     if backResult.hit then
-        self.gameManager:switchToMainMenu()
+        self.gameManager:switchBasedOnGameState(GameStates.MAIN_MENU)
     end
 end
 function NewGameMenu.prototype.renderRandomSeed(self)
@@ -99,7 +101,7 @@ function NewGameMenu.prototype.handleStartGame(self)
     if #playerName > 0 then
         self.gameManager.player.name = playerName
         self.gameManager.map:generateNewMap()
-        self.gameManager:switchToMap()
+        self.gameManager:switchBasedOnGameState(GameStates.MAP)
     end
     self.gameManager.player:setup()
 end

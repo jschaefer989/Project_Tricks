@@ -6,6 +6,7 @@ local ____exports = {}
 local ____Draw = require("Draw")
 local Draw = ____Draw.default
 local ____Enums = require("Enums")
+local GameStates = ____Enums.GameStates
 local Perks = ____Enums.Perks
 local suit = require("Libraries.suit-master.suit")
 local ____Perk = require("Perk")
@@ -53,7 +54,7 @@ end
 function LevelUpScreen.prototype.selectPerk(self, perk)
     self.gameManager.player:addPerk(perk)
     self.gameManager.map:advanceToNextTier()
-    self.gameManager:switchToMap()
+    self.gameManager:switchBasedOnGameState(GameStates.MAP)
 end
 function LevelUpScreen.prototype.getBaseLevelRequirement(self, perk)
     repeat

@@ -6,6 +6,8 @@ local ____Dealer = require("Dealer")
 local Dealer = ____Dealer.default
 local ____Draw = require("Draw")
 local Draw = ____Draw.default
+local ____Enums = require("Enums")
+local GameStates = ____Enums.GameStates
 local suit = require("Libraries.suit-master.suit")
 ____exports.default = __TS__Class()
 local Shop = ____exports.default
@@ -63,7 +65,7 @@ function Shop.prototype.drawShop(self)
         if ____opt_0 ~= nil then
             ____opt_0:advanceToNextTier()
         end
-        self.gameManager:switchToMap()
+        self.gameManager:switchBasedOnGameState(GameStates.MAP)
     end
     Draw:playerInfo(self.gameManager.player, self.gameManager)
     Draw:playerDeck(self.gameManager.player)

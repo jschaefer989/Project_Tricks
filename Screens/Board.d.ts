@@ -4,7 +4,6 @@ import Dealer from "../Dealer";
 import Enemy, { EnemyData } from "Enemies/Enemy";
 import type GameManager from "../GameManager";
 import CardAssets from "Assets/CardAssets";
-import Biome from "Biomes/Biome";
 import { Image } from "love.graphics";
 interface BoardData {
     discardUsed: number;
@@ -44,7 +43,6 @@ export default class Board {
     markIcon: Image;
     attackPowerIcon: Image;
     valueIcon: Image;
-    biome: Biome;
     portraitPosition: number | undefined;
     winFireSound: import("love.audio").Source;
     constructor(gameManager: GameManager, enemy?: Enemy);

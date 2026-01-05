@@ -4,6 +4,7 @@ import { Image } from "love.graphics"
 import { isEmpty } from "Helpers"
 import Player from "Player"
 import GameManager from "GameManager"
+import { GameStates } from "Enums"
 
 interface CardOptions {
     multiSelect?: boolean
@@ -91,7 +92,7 @@ export default class Draw {
         const btnH = 30
         const perkResult = suit.Button("Perks", {}, ...suit.layout.row(panelW, btnH))
         if (perkResult.hit) {
-            gameManager.switchToPerkScreen()
+            gameManager.switchBasedOnGameState(GameStates.PERKS)
         }
     }
 

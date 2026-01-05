@@ -14,7 +14,6 @@ import * as GameStateManager from "Libraries.GameStateManager-main.gamestateMana
 import Player from "Player";
 import Map from "Screens/Map/Map";
 import Enemy from "Enemies/Enemy";
-import * as suit from "Libraries.suit-master.suit";
 import Shop from "Screens/Shop";
 import LevelUpScreen from "Screens/LevelUpScreen";
 import PerkScreen from "Screens/PerkScreen";
@@ -23,6 +22,9 @@ import AssetManager from "Assets/AssetManager";
 import Card from "Cards/Card";
 import TextManager from "Assets/TextManager";
 import AnimationManager from "Assets/Animations/AnimationManager";
+import MusicPlayer from "Assets/Music/MusicPlayer";
+import Biome from "Biomes/Biome";
+import Grass from "Biomes/Grass";
 
 interface GameState {
   update: (dt: number) => void;
@@ -47,24 +49,19 @@ export default class GameManager {
   perkScreen?: PerkScreen;
   assetManager: AssetManager;
   animationManager: AnimationManager;
+  musicPlayer: MusicPlayer;
+  biome: Biome
   devMode: boolean = false; // Change if you want to test in dev mode
 
   constructor() {
     this.gameState = GameStates.MAIN_MENU;
     this.player = new Player(this);
     this.settings = new Settings();
-    this.mainMenu = undefined;
-    this.newGameMenu = undefined;
-    this.pauseMenu = undefined;
-    this.board = undefined;
-    this.winScreen = undefined;
-    this.loseScreen = undefined;
     this.map = new Map(this);
-    this.shop = undefined;
-    this.levelUpScreen = undefined;
-    this.perkScreen = undefined;
     this.assetManager = new AssetManager(this);
-    this.animationManager = new AnimationManager();
+    this.animationManager = new AnimationManager(this);
+    this.musicPlayer = new MusicPlayer(this);
+    this.biome = new Grass(); // TODO: initialize this based on data from the map
     if (!this.devMode) {
       TextManager.setDefaultFont();
     }
@@ -79,8 +76,11 @@ export default class GameManager {
     }
   }
 
-  switchBasedOnGameState(): void {
-    switch (this.gameState) {
+  switchBasedOnGameState(gameState = this.gameState, enemy = this.board?.enemy): void {
+    this.assetManager = new AssetManager(this);
+    this.musicPlayer.play(gameState, this.biome);
+
+    switch (gameState) {
       case GameStates.MAIN_MENU:
         this.switchToMainMenu();
         break;
@@ -88,7 +88,7 @@ export default class GameManager {
         this.switchToNewGameMenu();
         break;
       case GameStates.BOARD:
-        this.switchToBoard(this.board?.enemy);
+        this.switchToBoard(enemy);
         break;
       case GameStates.PAUSE_MENU:
         this.switchToPauseMenu();
@@ -112,11 +112,11 @@ export default class GameManager {
         this.switchToPerkScreen();
         break;
       default:
-        exhaustiveGuard(this.gameState);
+        exhaustiveGuard(gameState);
     }
   }
 
-  switchToMainMenu(): void {
+  private switchToMainMenu(): void {
     const mainMenuState: GameState = {
       update: (dt: number) => {
         this.mainMenu?.drawScreen();
@@ -129,20 +129,16 @@ export default class GameManager {
     this.loseScreen = undefined;
     this.shop = undefined;
     this.levelUpScreen = undefined;
-
-    // Reset to white text for dark backgrounds
-    suit.theme.color.normal.fg = [1, 1, 1];
+    this.perkScreen = undefined;
 
     if (isEmpty(this.mainMenu)) {
       this.mainMenu = new MainMenu(this);
     }
 
-    this.assetManager = new AssetManager(this);
-
     GameStateManager.setState(mainMenuState);
   }
 
-  switchToNewGameMenu(): void {
+  private switchToNewGameMenu(): void {
     const newGameMenuState: GameState = {
       update: (dt: number) => {
         this.newGameMenu?.drawScreen();
@@ -151,19 +147,14 @@ export default class GameManager {
 
     this.gameState = GameStates.NEW_GAME_MENU;
 
-    // Reset to white text for dark backgrounds
-    suit.theme.color.normal.fg = [1, 1, 1];
-
     if (isEmpty(this.newGameMenu)) {
       this.newGameMenu = new NewGameMenu(this);
     }
 
-    this.assetManager = new AssetManager(this);
-
     GameStateManager.setState(newGameMenuState);
   }
 
-  switchToPauseMenu(): void {
+  private switchToPauseMenu(): void {
     const pauseMenuState: GameState = {
       update: (dt: number) => {
         this.pauseMenu?.drawScreen();
@@ -173,27 +164,23 @@ export default class GameManager {
     // Game state needs to be the previous state in the pause menu so we save correctly
     // this.gameState = GameStates.PAUSE_MENU
 
-    // Reset to white text for dark backgrounds
-    suit.theme.color.normal.fg = [1, 1, 1];
 
     if (isEmpty(this.pauseMenu)) {
       this.pauseMenu = new PauseMenu(this);
     }
 
-    this.assetManager = new AssetManager(this);
-
     GameStateManager.setState(pauseMenuState);
   }
 
-  switchToBoard(enemy?: Enemy): void {
-    const myShader = love.graphics.newShader("Shaders/Waterfall.glsl");
-    love.graphics.setDefaultFilter("nearest", "nearest");
+  private switchToBoard(enemy?: Enemy): void {
+    // const myShader = love.graphics.newShader("Shaders/Waterfall.glsl");
+    // love.graphics.setDefaultFilter("nearest", "nearest");
 
-    let elapsedTime = 0;
+    // let elapsedTime = 0;
 
     const boardState: GameState = {
       update: (dt: number) => {
-        elapsedTime += dt;
+        //elapsedTime += dt;
         this.board?.drawBoard();
         this.assetManager.handleMouseHover();
         this.animationManager.updateAnimations(dt);
@@ -201,20 +188,20 @@ export default class GameManager {
       draw: () => {
         if (!this.devMode) {
           push.start();
-          love.graphics.setShader(myShader);
-          myShader.send("uResolution", [
-            love.graphics.getWidth(),
-            love.graphics.getHeight(),
-          ]);
-          myShader.send("uTime", elapsedTime);
-          love.graphics.rectangle(
-            "fill",
-            0,
-            0,
-            love.graphics.getWidth(),
-            love.graphics.getHeight()
-          );
-          love.graphics.setShader();
+        //   love.graphics.setShader(myShader);
+        //   myShader.send("uResolution", [
+        //     love.graphics.getWidth(),
+        //     love.graphics.getHeight(),
+        //   ]);
+        //   myShader.send("uTime", elapsedTime);
+        //   love.graphics.rectangle(
+        //     "fill",
+        //     0,
+        //     0,
+        //     love.graphics.getWidth(),
+        //     love.graphics.getHeight()
+        //   );
+        //   love.graphics.setShader();
           this.assetManager.drawAssets();
           push.finish();
         }
@@ -236,22 +223,22 @@ export default class GameManager {
     this.loseScreen = undefined;
     this.shop = undefined;
     this.levelUpScreen = undefined;
-
-    // Set background color to white
-    //push.setBorderColor(1, 1, 1)
+    this.perkScreen = undefined;
 
     if (isEmpty(this.board)) {
       this.board = new Board(this, enemy ?? new Enemy(this));
       this.board.dealer.setup();
     }
 
+    // For reasons I don't understand, we need to reinitialize the AssetManager here
+    // after creating the Board, or else the Board assets don't get created properly
     this.assetManager = new AssetManager(this);
     this.board.buildAssets();
 
     GameStateManager.setState(boardState);
   }
 
-  switchToWinScreen(): void {
+  private switchToWinScreen(): void {
     const winState: GameState = {
       update: (dt: number) => {
         this.winScreen?.drawScreen();
@@ -264,20 +251,16 @@ export default class GameManager {
     this.loseScreen = undefined;
     this.shop = undefined;
     this.levelUpScreen = undefined;
-
-    // Reset to white text for dark backgrounds
-    suit.theme.color.normal.fg = [1, 1, 1];
+    this.perkScreen = undefined;
 
     if (isEmpty(this.winScreen)) {
       this.winScreen = new WinScreen(this);
     }
 
-    this.assetManager = new AssetManager(this);
-
     GameStateManager.setState(winState);
   }
 
-  switchToLoseScreen(): void {
+  private switchToLoseScreen(): void {
     const loseState: GameState = {
       update: (dt: number) => {
         this.loseScreen?.drawScreen();
@@ -289,20 +272,16 @@ export default class GameManager {
     this.winScreen = undefined;
     this.shop = undefined;
     this.levelUpScreen = undefined;
-
-    // Reset to white text for dark backgrounds
-    suit.theme.color.normal.fg = [1, 1, 1];
+    this.perkScreen = undefined;
 
     if (isEmpty(this.loseScreen)) {
       this.loseScreen = new LoseScreen();
     }
 
-    this.assetManager = new AssetManager(this);
-
     GameStateManager.setState(loseState);
   }
 
-  switchToMap(): void {
+  private switchToMap(): void {
     const mapState: GameState = {
       update: (dt: number) => {
         this.map.drawMap();
@@ -319,16 +298,12 @@ export default class GameManager {
     this.loseScreen = undefined;
     this.shop = undefined;
     this.levelUpScreen = undefined;
-
-    // Set dark text color for labels to be readable on light backgrounds
-    // Draw.setThemeColors(0, 0, 0)
-
-    this.assetManager = new AssetManager(this);
+    this.perkScreen = undefined;
 
     GameStateManager.setState(mapState);
   }
 
-  switchToShop(): void {
+  private switchToShop(): void {
     const shopState: GameState = {
       update: (dt: number) => {
         this.shop?.drawShop();
@@ -341,18 +316,17 @@ export default class GameManager {
     this.winScreen = undefined;
     this.loseScreen = undefined;
     this.levelUpScreen = undefined;
+    this.perkScreen = undefined;
 
     if (isEmpty(this.shop)) {
       this.shop = new Shop(this);
       this.shop.setup();
     }
 
-    this.assetManager = new AssetManager(this);
-
     GameStateManager.setState(shopState);
   }
 
-  switchToLevelUpScreen(): void {
+  private switchToLevelUpScreen(): void {
     const levelUpState: GameState = {
       update: (dt: number) => {
         this.levelUpScreen?.drawScreen();
@@ -365,29 +339,34 @@ export default class GameManager {
     this.winScreen = undefined;
     this.loseScreen = undefined;
     this.shop = undefined;
+    this.perkScreen = undefined;
 
     if (isEmpty(this.levelUpScreen)) {
       this.levelUpScreen = new LevelUpScreen(this);
       this.levelUpScreen.setup();
     }
 
-    this.assetManager = new AssetManager(this);
-
     GameStateManager.setState(levelUpState);
   }
 
-  switchToPerkScreen(): void {
+  private switchToPerkScreen(): void {
     const perkState: GameState = {
       update: (dt: number) => {
         this.perkScreen?.drawScreen();
       },
     };
 
+    this.gameState = GameStates.PERKS;
+
+    this.board = undefined;
+    this.winScreen = undefined;
+    this.loseScreen = undefined;
+    this.shop = undefined;
+    this.levelUpScreen = undefined;
+
     if (isEmpty(this.perkScreen)) {
       this.perkScreen = new PerkScreen(this);
     }
-
-    this.assetManager = new AssetManager(this);
 
     GameStateManager.setState(perkState);
   }

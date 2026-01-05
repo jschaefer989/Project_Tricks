@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
 import Draw from "Draw"
-import { Perks } from "Enums"
+import { GameStates, Perks } from "Enums"
 import GameManager from "GameManager"
 import * as suit from "Libraries.suit-master.suit"
 import Perk from "Perk"
@@ -51,7 +51,7 @@ export default class LevelUpScreen {
     selectPerk(perk: Perk): void {
         this.gameManager.player.addPerk(perk)
         this.gameManager.map.advanceToNextTier()
-        this.gameManager.switchToMap()
+        this.gameManager.switchBasedOnGameState(GameStates.MAP)
     }
 
     getBaseLevelRequirement(perk: Perks): number {

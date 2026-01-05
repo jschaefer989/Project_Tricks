@@ -1,32 +1,34 @@
-import Animation from "./Animation"
-import WobbleAnimation from "./WobbleAnimation"
+import GameManager from "GameManager";
+import Animation from "./Animation";
+import WobbleAnimation from "./WobbleAnimation";
 
 export default class AnimationManager {
-    animations: Map<string, Animation> = new Map<string, Animation>()
+  gameManager: GameManager;
+  animations: Map<string, Animation> = new Map<string, Animation>();
 
-    constructor() {
+  constructor(gameManager: GameManager) {
+    this.gameManager = gameManager;
+  }
 
+  startAnimation(id: string, animation: Animation): void {
+    this.animations.set(id, animation);
+  }
+
+  updateAnimations(dt: number): void {
+    for (const [id, animation] of this.animations) {
+      animation.updateAnimation(dt);
+      if (animation.isFinished) {
+        this.animations.delete(id);
+      }
     }
+  }
 
-    startAnimation(id: string, animation: Animation): void {
-        this.animations.set(id, animation)
+  hasWobbleAnimation(): boolean {
+    for (const animation of this.animations.values()) {
+      if (animation instanceof WobbleAnimation) {
+        return true;
+      }
     }
-
-    updateAnimations(dt: number): void {
-        for (const [id, animation] of this.animations) {
-            animation.updateAnimation(dt)
-            if (animation.isFinished) {
-                this.animations.delete(id)
-            }
-        }
-    }
-
-    hasWobbleAnimation(): boolean {
-        for (const animation of this.animations.values()) {
-            if (animation instanceof WobbleAnimation) {
-                return true
-            }
-        }
-        return false
-    }
+    return false;
+  }
 }

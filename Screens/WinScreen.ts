@@ -4,6 +4,7 @@ import { isEmpty } from "Helpers"
 import * as suit from "Libraries.suit-master.suit"
 import GameManager from "../GameManager"
 import Card from "Cards/Card"
+import { GameStates } from "Enums"
 
 /**
  * WinScreen class handles the display of the victory screen
@@ -72,11 +73,11 @@ export default class WinScreen {
         this.gameManager.player.addToDeck(card)
         this.gameManager.board = undefined
         if (levelUp) {
-            this.gameManager.switchToLevelUpScreen()
+            this.gameManager.switchBasedOnGameState(GameStates.LEVEL_UP)
             return
         }
         this.gameManager.map?.advanceToNextTier()
-        this.gameManager.switchToMap()
+        this.gameManager.switchBasedOnGameState(GameStates.MAP)
     }
 
     addLootCardsToPlayer(): void {

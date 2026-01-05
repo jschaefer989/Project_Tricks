@@ -8,6 +8,7 @@ local ____Enemy = require("Enemies.Enemy")
 local Enemy = ____Enemy.default
 local ____Enums = require("Enums")
 local EnemyTypes = ____Enums.EnemyTypes
+local GameStates = ____Enums.GameStates
 local MapNodeTypes = ____Enums.MapNodeTypes
 local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
@@ -107,7 +108,7 @@ function MapNode.prototype.drawInteractiveBattleNode(self, x, y)
         suit.layout:row(imageW, imageH)
     )
     if result.hit then
-        self.gameManager:switchToBoard(self.enemy)
+        self.gameManager:switchBasedOnGameState(GameStates.BOARD, self.enemy)
     end
 end
 function MapNode.prototype.drawInteractiveShopNode(self, x, y)
@@ -148,7 +149,7 @@ function MapNode.prototype.drawInteractiveShopNode(self, x, y)
         suit.layout:row(imageW, imageH)
     )
     if result.hit then
-        self.gameManager:switchToShop()
+        self.gameManager:switchBasedOnGameState(GameStates.SHOP)
     end
 end
 function MapNode.prototype.drawMapNode(self, x, y)

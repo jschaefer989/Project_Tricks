@@ -10,8 +10,9 @@ local WobbleAnimation = ____WobbleAnimation.default
 ____exports.default = __TS__Class()
 local AnimationManager = ____exports.default
 AnimationManager.name = "AnimationManager"
-function AnimationManager.prototype.____constructor(self)
+function AnimationManager.prototype.____constructor(self, gameManager)
     self.animations = __TS__New(Map)
+    self.gameManager = gameManager
 end
 function AnimationManager.prototype.startAnimation(self, id, animation)
     self.animations:set(id, animation)

@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { GameStates } from "Enums"
 import GameManager from "GameManager"
 import * as suit from "Libraries.suit-master.suit"
 import Save from "Save"
@@ -43,7 +44,7 @@ export default class MainMenu {
         const newGameResult = suit.Button("New Game", {}, ...suit.layout.row(btnW, btnH))
         if (newGameResult.hit) {
             // TODO: need an are you sure prompt here
-            this.gameManager.switchToNewGameMenu()
+            this.gameManager.switchBasedOnGameState(GameStates.NEW_GAME_MENU)
         }
 
         // Create a quit button below the new game button

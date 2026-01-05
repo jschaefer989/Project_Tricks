@@ -6,6 +6,8 @@ local Draw = ____Draw.default
 local ____Helpers = require("Helpers")
 local isEmpty = ____Helpers.isEmpty
 local suit = require("Libraries.suit-master.suit")
+local ____Enums = require("Enums")
+local GameStates = ____Enums.GameStates
 ____exports.default = __TS__Class()
 local WinScreen = ____exports.default
 WinScreen.name = "WinScreen"
@@ -80,14 +82,14 @@ function WinScreen.prototype.handleLootCardSelection(self, card)
     self.gameManager.player:addToDeck(card)
     self.gameManager.board = nil
     if levelUp then
-        self.gameManager:switchToLevelUpScreen()
+        self.gameManager:switchBasedOnGameState(GameStates.LEVEL_UP)
         return
     end
     local ____opt_4 = self.gameManager.map
     if ____opt_4 ~= nil then
         ____opt_4:advanceToNextTier()
     end
-    self.gameManager:switchToMap()
+    self.gameManager:switchBasedOnGameState(GameStates.MAP)
 end
 function WinScreen.prototype.addLootCardsToPlayer(self)
     local ____opt_6 = self.gameManager.board

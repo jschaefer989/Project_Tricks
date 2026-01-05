@@ -1,6 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local ____exports = {}
+local ____Enums = require("Enums")
+local GameStates = ____Enums.GameStates
 local suit = require("Libraries.suit-master.suit")
 local ____Save = require("Save")
 local Save = ____Save.default
@@ -46,7 +48,7 @@ function MainMenu.prototype.drawScreen(self)
         suit.layout:row(btnW, btnH)
     )
     if newGameResult.hit then
-        self.gameManager:switchToNewGameMenu()
+        self.gameManager:switchBasedOnGameState(GameStates.NEW_GAME_MENU)
     end
     local quitBtnY = newGameBtnY + btnH + 10
     suit.layout:reset(panelX, quitBtnY)

@@ -9,6 +9,6 @@ local Grass = ____exports.default
 Grass.name = "Grass"
 __TS__ClassExtends(Grass, Biome)
 function Grass.prototype.____constructor(self)
-    Biome.prototype.____constructor(self, "Assets/Images/GrassBackground.png")
+    Biome.prototype.____constructor(self, "Assets/Images/GrassBackground.png", "Assets/Music/GrassBoard.mp3")
 end
 return ____exports

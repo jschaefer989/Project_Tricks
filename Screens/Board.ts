@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { AssetIds, CharacterTypes, TextIds as TextIds, Suits } from "../Enums";
+import { AssetIds, CharacterTypes, TextIds as TextIds, Suits, GameStates } from "../Enums";
 import Dealer from "../Dealer";
 import Draw from "../Draw";
 import Enemy, { EnemyData } from "Enemies/Enemy";
@@ -11,8 +11,6 @@ import * as push from "Libraries.push";
 import Asset from "Assets/Asset";
 import { isEmpty } from "Helpers";
 import FontWithPosition, { Format } from "Assets/FontWithPosition";
-import Grass from "Biomes/Grass";
-import Biome from "Biomes/Biome";
 import Card from "Cards/Card";
 import { Image } from "love.graphics";
 
@@ -59,7 +57,6 @@ export default class Board {
   markIcon = love.graphics.newImage("Assets/Images/Mark.png");
   attackPowerIcon = love.graphics.newImage("Assets/Images/AttackPower.png");
   valueIcon = love.graphics.newImage("Assets/Images/Value.png");
-  biome: Biome;
   portraitPosition: number | undefined; // Saved off so it can be restored on resume
   winFireSound = love.audio.newSource("Assets/Sounds/Dominating.wav", "static");
 
@@ -68,7 +65,6 @@ export default class Board {
     this.enemy = enemy ?? new Enemy(gameManager);
     this.dealer = new Dealer(gameManager);
     this.cardAssets = new CardAssets(gameManager);
-    this.biome = new Grass(); // TODO: initialize this based on data from the map
   }
 
   load(data: BoardData): void {
@@ -675,9 +671,9 @@ export default class Board {
       this.gameManager.player.addDiscardsToDeck();
       this.gameManager.player.cashout(this.playerPoints);
       this.dealer.getLootCards();
-      this.gameManager.switchToWinScreen();
+      this.gameManager.switchBasedOnGameState(GameStates.WIN_SCREEN);
     } else if (winner === CharacterTypes.ENEMY) {
-      this.gameManager.switchToLoseScreen();
+      this.gameManager.switchBasedOnGameState(GameStates.LOSE_SCREEN);
     }
   }
 
@@ -1171,7 +1167,7 @@ export default class Board {
           this.perksButton,
           portraitWidth + 15,
           portraitPosition + 10,
-          { onClick: () => this.gameManager.switchToPerkScreen() }
+          { onClick: () => this.gameManager.switchBasedOnGameState(GameStates.PERKS) }
         )
       );
 
@@ -1241,10 +1237,10 @@ export default class Board {
 
   private buildBackground(): void {
     this.gameManager.assetManager.addAsset(
-      AssetIds.GRASS_BACKGROUND,
+      AssetIds.BACKGROUND,
       new Asset(
-        AssetIds.GRASS_BACKGROUND,
-        love.graphics.newImage(this.biome.boardBackgroundImagePath),
+        AssetIds.BACKGROUND,
+        love.graphics.newImage(this.gameManager.biome.boardBackgroundImagePath),
         0,
         0
       )

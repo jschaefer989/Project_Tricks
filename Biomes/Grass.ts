@@ -2,6 +2,6 @@ import Biome from "./Biome";
 
 export default class Grass extends Biome {
     constructor() {
-        super("Assets/Images/GrassBackground.png");
+        super("Assets/Images/GrassBackground.png", "Assets/Music/GrassBoard.mp3");
     }
 }
