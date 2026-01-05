@@ -9,8 +9,8 @@ local Suits = ____Enums.Suits
 local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
-local ____Animation = require("Assets.Animation")
-local Animation = ____Animation.default
+local ____SlideAnimation = require("Assets.Animations.SlideAnimation")
+local SlideAnimation = ____SlideAnimation.default
 ____exports.default = __TS__Class()
 local Card = ____exports.default
 Card.name = "Card"
@@ -93,34 +93,27 @@ function Card.prototype.onSelect(self)
     local rankAsset = ____temp_1.rankAsset
     local suitAssetNormal = suitAssets[1]
     local suitAssetFlipped = suitAssets[2]
+    local animationAssets = {}
     local baseId = AnimationIds.CARD_BASE_SELECT .. self.id
     if not isEmpty(baseAsset) and not self.gameManager.animationManager.animations:has(baseId) then
-        self.gameManager.animationManager.animations:set(
-            baseId,
-            __TS__New(Animation, 0, -20, baseAsset)
-        )
+        animationAssets[#animationAssets + 1] = baseAsset
     end
     local suitNormalId = AnimationIds.CARD_SUIT_NORMAL_SELECT .. self.id
     if not isEmpty(suitAssetNormal) and not self.gameManager.animationManager.animations:has(suitNormalId) then
-        self.gameManager.animationManager.animations:set(
-            suitNormalId,
-            __TS__New(Animation, 0, -20, suitAssetNormal)
-        )
+        animationAssets[#animationAssets + 1] = suitAssetNormal
     end
     local suitFlippedId = AnimationIds.CARD_SUIT_FLIPPED_SELECT .. self.id
     if not isEmpty(suitAssetFlipped) and not self.gameManager.animationManager.animations:has(suitFlippedId) then
-        self.gameManager.animationManager.animations:set(
-            suitFlippedId,
-            __TS__New(Animation, 0, -20, suitAssetFlipped)
-        )
+        animationAssets[#animationAssets + 1] = suitAssetFlipped
     end
     local rankAssetId = AnimationIds.CARD_RANK_SELECT .. self.id
     if not isEmpty(rankAsset) and not self.gameManager.animationManager.animations:has(rankAssetId) then
-        self.gameManager.animationManager.animations:set(
-            rankAssetId,
-            __TS__New(Animation, 0, -20, rankAsset)
-        )
+        animationAssets[#animationAssets + 1] = rankAsset
     end
+    self.gameManager.animationManager.animations:set(
+        baseId,
+        __TS__New(SlideAnimation, 0, -20, animationAssets)
+    )
     local ____opt_2 = self.gameManager.board
     if ____opt_2 ~= nil then
         ____opt_2:updatePrimaryButtonStates()
@@ -138,34 +131,27 @@ function Card.prototype.onUnselect(self)
     local rankAsset = ____temp_4.rankAsset
     local suitAssetNormal = suitAssets[1]
     local suitAssetFlipped = suitAssets[2]
+    local animationAssets = {}
     local baseId = AnimationIds.CARD_BASE_SELECT .. self.id
     if not isEmpty(baseAsset) and not self.gameManager.animationManager.animations:has(baseId) then
-        self.gameManager.animationManager.animations:set(
-            baseId,
-            __TS__New(Animation, 0, 20, baseAsset)
-        )
+        animationAssets[#animationAssets + 1] = baseAsset
     end
     local suitNormalId = AnimationIds.CARD_SUIT_NORMAL_SELECT .. self.id
     if not isEmpty(suitAssetNormal) and not self.gameManager.animationManager.animations:has(suitNormalId) then
-        self.gameManager.animationManager.animations:set(
-            suitNormalId,
-            __TS__New(Animation, 0, 20, suitAssetNormal)
-        )
+        animationAssets[#animationAssets + 1] = suitAssetNormal
     end
     local suitFlippedId = AnimationIds.CARD_SUIT_FLIPPED_SELECT .. self.id
     if not isEmpty(suitAssetFlipped) and not self.gameManager.animationManager.animations:has(suitFlippedId) then
-        self.gameManager.animationManager.animations:set(
-            suitFlippedId,
-            __TS__New(Animation, 0, 20, suitAssetFlipped)
-        )
+        animationAssets[#animationAssets + 1] = suitAssetFlipped
     end
     local rankAssetId = AnimationIds.CARD_RANK_SELECT .. self.id
     if not isEmpty(rankAsset) and not self.gameManager.animationManager.animations:has(rankAssetId) then
-        self.gameManager.animationManager.animations:set(
-            rankAssetId,
-            __TS__New(Animation, 0, 20, rankAsset)
-        )
+        animationAssets[#animationAssets + 1] = rankAsset
     end
+    self.gameManager.animationManager.animations:set(
+        baseId,
+        __TS__New(SlideAnimation, 0, 20, animationAssets)
+    )
     local ____opt_5 = self.gameManager.board
     if ____opt_5 ~= nil then
         ____opt_5:updatePrimaryButtonStates()

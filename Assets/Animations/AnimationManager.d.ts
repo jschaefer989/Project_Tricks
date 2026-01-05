@@ -4,4 +4,5 @@ export default class AnimationManager {
     constructor();
     startAnimation(id: string, animation: Animation): void;
     updateAnimations(dt: number): void;
+    hasWobbleAnimation(): boolean;
 }

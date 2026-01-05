@@ -3,6 +3,7 @@ import Asset from "./Asset";
 import { isEmpty } from "Helpers";
 import GameManager from "GameManager";
 import TextManager from "Assets/TextManager";
+import WobbleAnimation from "./Animations/WobbleAnimation";
 
 export default class AssetManager {
   gameManager: GameManager;
@@ -128,16 +129,56 @@ export default class AssetManager {
         gameY <= asset.y + asset.getHeight()
       ) {
         if (asset.isDisabled) {
-          if (!this.disabledSound.isPlaying()) {
-            this.disabledSound.play();
+          this.handleDisabledAssetClick(assets);
+        } else {
+          this.handleAssetClick(asset);
+        }
+      }
+    }
+  }
+
+  handleDisabledAssetClick(assets: Asset[]): void {
+    if (this.gameManager.animationManager.hasWobbleAnimation()) {
+        return;
+    }
+    if (!this.disabledSound.isPlaying()) {
+      this.disabledSound.play();
+    }
+    this.triggerWobbleAnimation(assets);
+  }
+
+  triggerWobbleAnimation(assets: Asset[]): void {
+    for (const assetToWobble of assets) {
+      const wobbleId = `wobble-${assetToWobble.id}`;
+      if (!this.gameManager.animationManager.animations.has(wobbleId)) {
+        this.gameManager.animationManager.animations.set(
+          wobbleId,
+          new WobbleAnimation(10, [assetToWobble], { animDuration: 0.5 })
+        );
+      }
+
+      if (!isEmpty(assetToWobble.associatedTexts)) {
+        for (const textId of assetToWobble.associatedTexts) {
+          const textAsset = this.textManager.getText(textId);
+          if (isEmpty(textAsset)) {
+            continue;
           }
-        } else if (!isEmpty(asset.onClick)) {
-          asset.onClick();
-          if (!asset.clickSound?.isPlaying()) {
-            asset.clickSound?.play();
+          const wobbleTextId = `wobble-${textId}`;
+          if (!this.gameManager.animationManager.animations.has(wobbleTextId)) {
+            this.gameManager.animationManager.animations.set(
+              wobbleTextId,
+              new WobbleAnimation(10, [textAsset], { animDuration: 0.5 })
+            );
           }
         }
       }
+    }
+  }
+
+  handleAssetClick(asset: Asset): void {
+    asset.onClick?.();
+    if (!asset.clickSound?.isPlaying()) {
+      asset.clickSound?.play();
     }
   }
 

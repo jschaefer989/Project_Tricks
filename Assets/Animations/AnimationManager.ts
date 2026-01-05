@@ -1,4 +1,5 @@
 import Animation from "./Animation"
+import WobbleAnimation from "./WobbleAnimation"
 
 export default class AnimationManager {
     animations: Map<string, Animation> = new Map<string, Animation>()
@@ -18,5 +19,14 @@ export default class AnimationManager {
                 this.animations.delete(id)
             }
         }
+    }
+
+    hasWobbleAnimation(): boolean {
+        for (const animation of this.animations.values()) {
+            if (animation instanceof WobbleAnimation) {
+                return true
+            }
+        }
+        return false
     }
 }

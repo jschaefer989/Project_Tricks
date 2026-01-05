@@ -4,7 +4,8 @@ import GameManager from "GameManager";
 import { AnimationIds, Ranks, Suits, EdelRanks } from "../Enums";
 import { exhaustiveGuard, isEmpty } from "Helpers";
 import Asset from "Assets/Asset";
-import Animation from "Assets/Animation";
+import SlideAnimation from "Assets/Animations/SlideAnimation";
+import { AnimationAssets } from "Assets/Animations/Animation";
 
 export interface CardData {
   id: string;
@@ -118,46 +119,41 @@ export default class Card {
     const suitAssetNormal = suitAssets[0];
     const suitAssetFlipped = suitAssets[1];
 
+    const animationAssets: AnimationAssets[] = [];
+
     const baseId = AnimationIds.CARD_BASE_SELECT + this.id;
     if (
       !isEmpty(baseAsset) &&
       !this.gameManager.animationManager.animations.has(baseId)
     ) {
-      this.gameManager.animationManager.animations.set(
-        baseId,
-        new Animation(0, -20, baseAsset)
-      );
+      animationAssets.push(baseAsset);
     }
     const suitNormalId = AnimationIds.CARD_SUIT_NORMAL_SELECT + this.id;
     if (
       !isEmpty(suitAssetNormal) &&
       !this.gameManager.animationManager.animations.has(suitNormalId)
     ) {
-      this.gameManager.animationManager.animations.set(
-        suitNormalId,
-        new Animation(0, -20, suitAssetNormal)
-      );
+      animationAssets.push(suitAssetNormal);
     }
     const suitFlippedId = AnimationIds.CARD_SUIT_FLIPPED_SELECT + this.id;
     if (
       !isEmpty(suitAssetFlipped) &&
       !this.gameManager.animationManager.animations.has(suitFlippedId)
     ) {
-      this.gameManager.animationManager.animations.set(
-        suitFlippedId,
-        new Animation(0, -20, suitAssetFlipped)
-      );
+      animationAssets.push(suitAssetFlipped);
     }
     const rankAssetId = AnimationIds.CARD_RANK_SELECT + this.id;
     if (
       !isEmpty(rankAsset) &&
       !this.gameManager.animationManager.animations.has(rankAssetId)
     ) {
-      this.gameManager.animationManager.animations.set(
-        rankAssetId,
-        new Animation(0, -20, rankAsset)
-      );
+      animationAssets.push(rankAsset);
     }
+
+      this.gameManager.animationManager.animations.set(
+        baseId,
+        new SlideAnimation(0, -20, animationAssets)
+      );
 
     this.gameManager.board?.updatePrimaryButtonStates();
   }
@@ -175,46 +171,41 @@ export default class Card {
     const suitAssetNormal = suitAssets[0];
     const suitAssetFlipped = suitAssets[1];
 
+    const animationAssets: AnimationAssets[] = [];
+
     const baseId = AnimationIds.CARD_BASE_SELECT + this.id;
     if (
       !isEmpty(baseAsset) &&
       !this.gameManager.animationManager.animations.has(baseId)
     ) {
-      this.gameManager.animationManager.animations.set(
-        baseId,
-        new Animation(0, 20, baseAsset)
-      );
+      animationAssets.push(baseAsset);
     }
     const suitNormalId = AnimationIds.CARD_SUIT_NORMAL_SELECT + this.id;
     if (
       !isEmpty(suitAssetNormal) &&
       !this.gameManager.animationManager.animations.has(suitNormalId)
     ) {
-      this.gameManager.animationManager.animations.set(
-        suitNormalId,
-        new Animation(0, 20, suitAssetNormal)
-      );
+      animationAssets.push(suitAssetNormal);
     }
     const suitFlippedId = AnimationIds.CARD_SUIT_FLIPPED_SELECT + this.id;
     if (
       !isEmpty(suitAssetFlipped) &&
       !this.gameManager.animationManager.animations.has(suitFlippedId)
     ) {
-      this.gameManager.animationManager.animations.set(
-        suitFlippedId,
-        new Animation(0, 20, suitAssetFlipped)
-      );
+      animationAssets.push(suitAssetFlipped);
     }
     const rankAssetId = AnimationIds.CARD_RANK_SELECT + this.id;
     if (
       !isEmpty(rankAsset) &&
       !this.gameManager.animationManager.animations.has(rankAssetId)
     ) {
-      this.gameManager.animationManager.animations.set(
-        rankAssetId,
-        new Animation(0, 20, rankAsset)
-      );
+      animationAssets.push(rankAsset);
     }
+
+    this.gameManager.animationManager.animations.set(
+      baseId,
+      new SlideAnimation(0, 20, animationAssets)
+    );
 
     this.gameManager.board?.updatePrimaryButtonStates();
   }

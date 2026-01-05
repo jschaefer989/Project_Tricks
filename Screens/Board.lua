@@ -653,6 +653,7 @@ function Board.prototype.buildLetsFightButton(self)
         TextIds.LETS_FIGHT_BUTTON_CAPTION,
         __TS__New(
             FontWithPosition,
+            TextIds.LETS_FIGHT_BUTTON_CAPTION,
             centerX,
             centerY,
             "Let's Fight!",
@@ -672,6 +673,19 @@ function Board.prototype.buildPrimaryButtons(self)
     self:updatePrimaryButtonStates()
 end
 function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW)
+    local centerX = buttonX + btnW / 2
+    local centerY = buttonY + self.attackButton:getHeight() / 2
+    self.gameManager.assetManager.textManager:addText(
+        TextIds.ATTACK_BUTTON_CAPTION,
+        __TS__New(
+            FontWithPosition,
+            TextIds.ATTACK_BUTTON_CAPTION,
+            centerX,
+            centerY,
+            "Attack",
+            {size = 28, format = Format.CENTER}
+        )
+    )
     self.gameManager.assetManager:addAsset(
         AssetIds.ATTACK_BUTTON,
         __TS__New(
@@ -682,42 +696,21 @@ function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW)
             buttonY,
             {
                 onClick = function() return self:handleAttack() end,
-                clickSound = love.audio.newSource("Assets/Sounds/AttackClicked.flac", "static")
+                clickSound = love.audio.newSource("Assets/Sounds/AttackClicked.flac", "static"),
+                associatedTexts = {TextIds.ATTACK_BUTTON_CAPTION}
             }
-        )
-    )
-    local centerX = buttonX + btnW / 2
-    local centerY = buttonY + self.attackButton:getHeight() / 2
-    self.gameManager.assetManager.textManager:addText(
-        TextIds.ATTACK_BUTTON_CAPTION,
-        __TS__New(
-            FontWithPosition,
-            centerX,
-            centerY,
-            "Attack",
-            {size = 28, format = Format.CENTER}
         )
     )
 end
 function Board.prototype.buildDiscardButton(self, buttonX, buttonY, btnW, gap)
     local discardX = buttonX + btnW + gap
-    self.gameManager.assetManager:addAsset(
-        AssetIds.DISCARD_BUTTON,
-        __TS__New(
-            Asset,
-            AssetIds.DISCARD_BUTTON,
-            self.discardButton,
-            discardX,
-            buttonY,
-            {onClick = function() return self:handleDiscard() end}
-        )
-    )
     local centerX = discardX + btnW / 2
     local centerY = buttonY + self.attackButton:getHeight() / 2
     self.gameManager.assetManager.textManager:addText(
         TextIds.DISCARD_BUTTON_CAPTION,
         __TS__New(
             FontWithPosition,
+            TextIds.DISCARD_BUTTON_CAPTION,
             centerX,
             centerY - 8,
             "Discard",
@@ -729,16 +722,44 @@ function Board.prototype.buildDiscardButton(self, buttonX, buttonY, btnW, gap)
         TextIds.DISCARD_BUTTON_COUNTER,
         __TS__New(
             FontWithPosition,
+            TextIds.DISCARD_BUTTON_COUNTER,
             centerX,
             centerY + 12,
             (tostring(remaining) .. "/") .. tostring(self.gameManager.player.discards),
             {size = 18, format = Format.CENTER}
         )
     )
+    self.gameManager.assetManager:addAsset(
+        AssetIds.DISCARD_BUTTON,
+        __TS__New(
+            Asset,
+            AssetIds.DISCARD_BUTTON,
+            self.discardButton,
+            discardX,
+            buttonY,
+            {
+                onClick = function() return self:handleDiscard() end,
+                associatedTexts = {TextIds.DISCARD_BUTTON_CAPTION, TextIds.DISCARD_BUTTON_COUNTER}
+            }
+        )
+    )
     return discardX
 end
 function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, gap)
     local deselectX = discardX + btnW + gap
+    local centerX = deselectX + btnW / 2
+    local centerY = buttonY + self.attackButton:getHeight() / 2
+    self.gameManager.assetManager.textManager:addText(
+        TextIds.DESELECT_BUTTON_CAPTION,
+        __TS__New(
+            FontWithPosition,
+            TextIds.DESELECT_BUTTON_CAPTION,
+            centerX,
+            centerY,
+            "Deselect",
+            {size = 28, format = Format.CENTER}
+        )
+    )
     self.gameManager.assetManager:addAsset(
         AssetIds.DESELECT_BUTTON,
         __TS__New(
@@ -747,19 +768,10 @@ function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, gap)
             self.deselectButton,
             deselectX,
             buttonY,
-            {onClick = function() return self.gameManager.player:unselectCards() end}
-        )
-    )
-    local centerX = deselectX + btnW / 2
-    local centerY = buttonY + self.attackButton:getHeight() / 2
-    self.gameManager.assetManager.textManager:addText(
-        TextIds.DESELECT_BUTTON_CAPTION,
-        __TS__New(
-            FontWithPosition,
-            centerX,
-            centerY,
-            "Deselect",
-            {size = 28, format = Format.CENTER}
+            {
+                onClick = function() return self.gameManager.player:unselectCards() end,
+                associatedTexts = {TextIds.DESELECT_BUTTON_CAPTION}
+            }
         )
     )
 end
@@ -805,6 +817,7 @@ function Board.prototype.buildPointBoard(self)
         TextIds.POINTS_PLAYER,
         __TS__New(
             FontWithPosition,
+            TextIds.POINTS_PLAYER,
             centerX - boardWidth / 2 + 10,
             textY,
             playerText,
@@ -815,6 +828,7 @@ function Board.prototype.buildPointBoard(self)
         TextIds.POINTS_ENEMY,
         __TS__New(
             FontWithPosition,
+            TextIds.POINTS_ENEMY,
             centerX + boardWidth / 2 - 10,
             textY,
             enemyText,
@@ -838,6 +852,7 @@ function Board.prototype.buildPowerAndValues(self, characterType)
         powerId,
         __TS__New(
             FontWithPosition,
+            powerId,
             30,
             portraitHeight + portraitAsset.y + 60,
             "Power: " .. tostring(powerValue),
@@ -853,6 +868,7 @@ function Board.prototype.buildPowerAndValues(self, characterType)
         valueId,
         __TS__New(
             FontWithPosition,
+            valueId,
             30,
             portraitHeight + portraitAsset.y + 80,
             "Value: " .. tostring(valueValue),
@@ -923,6 +939,7 @@ function Board.prototype.buildPortrait(self, characterType)
         portraitNameId,
         __TS__New(
             FontWithPosition,
+            portraitNameId,
             10,
             portraitHeight + portraitPosition + 15,
             characterType == CharacterTypes.PLAYER and self.gameManager.player.name or self.enemy.name,
@@ -934,6 +951,7 @@ function Board.prototype.buildPortrait(self, characterType)
         portraitLevelId,
         __TS__New(
             FontWithPosition,
+            portraitLevelId,
             10,
             portraitHeight + portraitPosition + 40,
             "Lvl " .. tostring(characterType == CharacterTypes.PLAYER and self.gameManager.player.level or self.enemy.level),
@@ -945,6 +963,7 @@ function Board.prototype.buildPortrait(self, characterType)
             TextIds.PLAYER_PORTRAIT_EXPERIENCE,
             __TS__New(
                 FontWithPosition,
+                TextIds.PLAYER_PORTRAIT_EXPERIENCE,
                 portraitBackgroundWidth,
                 portraitHeight + portraitPosition + 40,
                 tostring(self.gameManager.player.experience) .. " XP",
@@ -966,6 +985,7 @@ function Board.prototype.buildPortrait(self, characterType)
             TextIds.PLAYER_PERKS,
             __TS__New(
                 FontWithPosition,
+                TextIds.PLAYER_PERKS,
                 portraitWidth + self.perksButton:getWidth() / 2,
                 portraitPosition + 10 + self.perksButton:getHeight() / 2,
                 "Perks",
@@ -976,6 +996,7 @@ function Board.prototype.buildPortrait(self, characterType)
             TextIds.PLAYER_PORTRAIT_MONEY,
             __TS__New(
                 FontWithPosition,
+                TextIds.PLAYER_PORTRAIT_MONEY,
                 portraitBackgroundWidth,
                 portraitHeight + portraitPosition + 15,
                 tostring(self.gameManager.player.money),
@@ -1016,6 +1037,7 @@ function Board.prototype.buildEdelSuitText(self)
         TextIds.EDEL_SUIT_LABEL,
         __TS__New(
             FontWithPosition,
+            TextIds.EDEL_SUIT_LABEL,
             centerX,
             40,
             "Edel! \n" .. Card:getSuitName(self.edelSuit),
@@ -1064,6 +1086,7 @@ function Board.prototype.buildWinFire(self)
         TextIds.WIN_FIRE_TEXT,
         __TS__New(
             FontWithPosition,
+            TextIds.WIN_FIRE_TEXT,
             portraitCenterX * 2,
             centerY + 20,
             "You are\ndominating!",
@@ -1076,6 +1099,7 @@ function Board.prototype.buildWinFire(self)
             TextIds.WINNINGS,
             __TS__New(
                 FontWithPosition,
+                TextIds.WINNINGS,
                 portraitCenterX * 2,
                 centerY + 100,
                 "But you'll get no winnings...",
@@ -1087,6 +1111,7 @@ function Board.prototype.buildWinFire(self)
             TextIds.WINNINGS,
             __TS__New(
                 FontWithPosition,
+                TextIds.WINNINGS,
                 portraitCenterX * 2,
                 centerY + 100,
                 "Winnings: " .. tostring(winnings),

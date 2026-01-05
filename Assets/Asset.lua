@@ -25,6 +25,7 @@ function Asset.prototype.____constructor(self, id, image, x, y, constructionOpti
     end
     self.isDisabled = ____temp_16
     self.clickSound = constructionOptions and constructionOptions.clickSound
+    self.associatedTexts = constructionOptions and constructionOptions.associatedTexts
 end
 function Asset.prototype.updatePosition(self, x, y)
     self.x = x

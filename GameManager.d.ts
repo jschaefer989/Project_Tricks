@@ -16,7 +16,7 @@ import LevelUpScreen from "Screens/LevelUpScreen";
 import PerkScreen from "Screens/PerkScreen";
 import AssetManager from "Assets/AssetManager";
 import Card from "Cards/Card";
-import AnimationManager from "Assets/AnimationManager";
+import AnimationManager from "Assets/Animations/AnimationManager";
 export default class GameManager {
     gameState: GameStates;
     player: Player;

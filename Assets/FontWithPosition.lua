@@ -15,10 +15,11 @@ ____exports.Format[____exports.Format.RIGHT] = "RIGHT"
 ____exports.default = __TS__Class()
 local FontWithPosition = ____exports.default
 FontWithPosition.name = "FontWithPosition"
-function FontWithPosition.prototype.____constructor(self, x, y, text, options)
+function FontWithPosition.prototype.____constructor(self, id, x, y, text, options)
     self.iconFormat = ____exports.Format.LEFT
     self.isDisabled = false
     self.color = {1, 1, 1, 1}
+    self.id = id
     self.size = options and options.size
     self.filepath = options and options.filepath or TextManager:getDefaultFontFilepath()
     self.x = x

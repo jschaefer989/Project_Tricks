@@ -20,6 +20,7 @@ interface ConstructionOptions {
 }
 
 export default class FontWithPosition {
+  id: string;
   size?: number;
   filepath: string;
   x: number;
@@ -32,11 +33,13 @@ export default class FontWithPosition {
   color: [number, number, number, number] = [1, 1, 1, 1];
 
   constructor(
+    id: string,
     x: number,
     y: number,
     text: string,
     options?: ConstructionOptions
   ) {
+    this.id = id;
     this.size = options?.size;
     this.filepath = options?.filepath ?? TextManager.getDefaultFontFilepath();
     this.x = x;

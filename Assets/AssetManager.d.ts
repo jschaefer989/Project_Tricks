@@ -17,5 +17,8 @@ export default class AssetManager {
     private drawHoverables;
     handleMousePressed(x: number, y: number, button: number): void;
     handleMouseReleased(x: number, y: number, button: number): void;
+    handleDisabledAssetClick(assets: Asset[]): void;
+    triggerWobbleAnimation(assets: Asset[]): void;
+    handleAssetClick(asset: Asset): void;
     handleMouseHover(): void;
 }

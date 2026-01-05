@@ -1,29 +1,27 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
+local ____Animation = require("Assets.Animations.Animation")
+local Animation = ____Animation.default
 ____exports.default = __TS__Class()
-local Animation = ____exports.default
-Animation.name = "Animation"
-function Animation.prototype.____constructor(self, offsetX, offsetY, asset)
-    self.animDuration = 0.15
-    self.animElapsed = 0
+local SlideAnimation = ____exports.default
+SlideAnimation.name = "SlideAnimation"
+__TS__ClassExtends(SlideAnimation, Animation)
+function SlideAnimation.prototype.____constructor(self, offsetX, offsetY, assets, constructionOptions)
+    Animation.prototype.____constructor(self, assets, constructionOptions)
     self.animOffsetX = 0
     self.animOffsetY = 0
     self.animTargetOffsetX = 0
     self.animTargetOffsetY = 0
-    self.isAnimating = false
-    self.originalX = 0
-    self.originalY = 0
-    self.originalX = asset.x
-    self.originalY = asset.y
     self.animTargetOffsetX = offsetX
     self.animTargetOffsetY = offsetY
     self.animElapsed = 0
     self.isAnimating = true
-    self.asset = asset
+    self.assets = assets
 end
-function Animation.prototype.updateAnimation(self, deltaTime)
+function SlideAnimation.prototype.updateAnimation(self, deltaTime)
     if not self.isAnimating then
         return
     end
@@ -35,11 +33,11 @@ function Animation.prototype.updateAnimation(self, deltaTime)
     local progress = self.animElapsed / self.animDuration
     self.animOffsetX = self.animTargetOffsetX * progress
     self.animOffsetY = self.animTargetOffsetY * progress
-    self.asset.y = self.originalY + self.animOffsetY
-    self.asset.x = self.originalX + self.animOffsetX
+    self:updateX(self.animOffsetX)
+    self:updateY(self.animOffsetY)
 end
 __TS__SetDescriptor(
-    Animation.prototype,
+    SlideAnimation.prototype,
     "isFinished",
     {get = function(self)
         return not self.isAnimating

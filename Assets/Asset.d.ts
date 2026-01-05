@@ -12,6 +12,7 @@ interface ConstructionOptions {
     readonly offsetY?: number;
     readonly isDisabled?: boolean;
     readonly clickSound?: Source;
+    readonly associatedTexts?: string[];
 }
 export default class Asset {
     id: string;
@@ -29,6 +30,7 @@ export default class Asset {
     isHovered: boolean;
     color: [number, number, number, number];
     clickSound?: Source;
+    associatedTexts?: string[];
     constructor(id: string, image: Image, x: number, y: number, constructionOptions?: ConstructionOptions);
     updatePosition(x: number, y: number): void;
     updateOrientation(orientation: number): void;

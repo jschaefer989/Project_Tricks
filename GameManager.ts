@@ -22,7 +22,7 @@ import * as push from "Libraries.push";
 import AssetManager from "Assets/AssetManager";
 import Card from "Cards/Card";
 import TextManager from "Assets/TextManager";
-import AnimationManager from "Assets/AnimationManager";
+import AnimationManager from "Assets/Animations/AnimationManager";
 
 interface GameState {
   update: (dt: number) => void;

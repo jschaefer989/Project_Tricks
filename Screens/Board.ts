@@ -794,7 +794,7 @@ export default class Board {
     const centerY = buttonY + buttonHeight / 2;
     this.gameManager.assetManager.textManager.addText(
       TextIds.LETS_FIGHT_BUTTON_CAPTION,
-      new FontWithPosition(centerX, centerY, "Let's Fight!", {
+      new FontWithPosition(TextIds.LETS_FIGHT_BUTTON_CAPTION, centerX, centerY, "Let's Fight!", {
         size: 28,
         format: Format.CENTER,
       })
@@ -823,21 +823,22 @@ export default class Board {
     buttonY: number,
     btnW: number
   ): void {
+    const centerX = buttonX + btnW / 2;
+    const centerY = buttonY + this.attackButton.getHeight() / 2;
+    this.gameManager.assetManager.textManager.addText(
+      TextIds.ATTACK_BUTTON_CAPTION,
+      new FontWithPosition(TextIds.ATTACK_BUTTON_CAPTION, centerX, centerY, "Attack", {
+        size: 28,
+        format: Format.CENTER,
+      })
+    );
+
     this.gameManager.assetManager.addAsset(
       AssetIds.ATTACK_BUTTON,
       new Asset(AssetIds.ATTACK_BUTTON, this.attackButton, buttonX, buttonY, {
         onClick: () => this.handleAttack(),
         clickSound: love.audio.newSource("Assets/Sounds/AttackClicked.flac", "static"),
-      })
-    );
-
-    const centerX = buttonX + btnW / 2;
-    const centerY = buttonY + this.attackButton.getHeight() / 2;
-    this.gameManager.assetManager.textManager.addText(
-      TextIds.ATTACK_BUTTON_CAPTION,
-      new FontWithPosition(centerX, centerY, "Attack", {
-        size: 28,
-        format: Format.CENTER,
+        associatedTexts: [TextIds.ATTACK_BUTTON_CAPTION],
       })
     );
   }
@@ -849,22 +850,12 @@ export default class Board {
     gap: number
   ): number {
     const discardX = buttonX + btnW + gap;
-    this.gameManager.assetManager.addAsset(
-      AssetIds.DISCARD_BUTTON,
-      new Asset(
-        AssetIds.DISCARD_BUTTON,
-        this.discardButton,
-        discardX,
-        buttonY,
-        { onClick: () => this.handleDiscard() }
-      )
-    );
 
     const centerX = discardX + btnW / 2;
     const centerY = buttonY + this.attackButton.getHeight() / 2;
     this.gameManager.assetManager.textManager.addText(
       TextIds.DISCARD_BUTTON_CAPTION,
-      new FontWithPosition(centerX, centerY - 8, "Discard", {
+      new FontWithPosition(TextIds.DISCARD_BUTTON_CAPTION, centerX, centerY - 8, "Discard", {
         size: 28,
         format: Format.CENTER,
       })
@@ -873,10 +864,21 @@ export default class Board {
     const remaining = this.gameManager.player.discards - this.discardUsed;
     this.gameManager.assetManager.textManager.addText(
       TextIds.DISCARD_BUTTON_COUNTER,
-      new FontWithPosition(centerX, centerY + 12, `${remaining}/${this.gameManager.player.discards}`, {
+      new FontWithPosition(TextIds.DISCARD_BUTTON_COUNTER, centerX, centerY + 12, `${remaining}/${this.gameManager.player.discards}`, {
         size: 18,
         format: Format.CENTER,
       })
+    );
+
+    this.gameManager.assetManager.addAsset(
+      AssetIds.DISCARD_BUTTON,
+      new Asset(
+        AssetIds.DISCARD_BUTTON,
+        this.discardButton,
+        discardX,
+        buttonY,
+        { onClick: () => this.handleDiscard(), associatedTexts: [TextIds.DISCARD_BUTTON_CAPTION, TextIds.DISCARD_BUTTON_COUNTER],}
+      )
     );
 
     return discardX;
@@ -889,25 +891,26 @@ export default class Board {
     gap: number
   ): void {
     const deselectX = discardX + btnW + gap;
-    this.gameManager.assetManager.addAsset(
+
+    const centerX = deselectX + btnW / 2;
+    const centerY = buttonY + this.attackButton.getHeight() / 2;
+    this.gameManager.assetManager.textManager.addText(
+      TextIds.DESELECT_BUTTON_CAPTION,
+      new FontWithPosition(TextIds.DESELECT_BUTTON_CAPTION, centerX, centerY, "Deselect", {
+        size: 28,
+        format: Format.CENTER,
+      })
+    );
+
+        this.gameManager.assetManager.addAsset(
       AssetIds.DESELECT_BUTTON,
       new Asset(
         AssetIds.DESELECT_BUTTON,
         this.deselectButton,
         deselectX,
         buttonY,
-        { onClick: () => this.gameManager.player.unselectCards() }
+        { onClick: () => this.gameManager.player.unselectCards(), associatedTexts: [TextIds.DESELECT_BUTTON_CAPTION], }
       )
-    );
-
-    const centerX = deselectX + btnW / 2;
-    const centerY = buttonY + this.attackButton.getHeight() / 2;
-    this.gameManager.assetManager.textManager.addText(
-      TextIds.DESELECT_BUTTON_CAPTION,
-      new FontWithPosition(centerX, centerY, "Deselect", {
-        size: 28,
-        format: Format.CENTER,
-      })
     );
   }
 
@@ -955,7 +958,7 @@ export default class Board {
     // Left label (player)
     this.gameManager.assetManager.textManager.addText(
       TextIds.POINTS_PLAYER,
-      new FontWithPosition(centerX - boardWidth / 2 + 10, textY, playerText, {
+      new FontWithPosition(TextIds.POINTS_PLAYER, centerX - boardWidth / 2 + 10, textY, playerText, {
         size: 20,
       })
     );
@@ -963,7 +966,7 @@ export default class Board {
     // Right label (enemy)
     this.gameManager.assetManager.textManager.addText(
       TextIds.POINTS_ENEMY,
-      new FontWithPosition(centerX + boardWidth / 2 - 10, textY, enemyText, {
+      new FontWithPosition(TextIds.POINTS_ENEMY, centerX + boardWidth / 2 - 10, textY, enemyText, {
         size: 20,
         format: Format.RIGHT,
       })
@@ -1000,6 +1003,7 @@ export default class Board {
     this.gameManager.assetManager.textManager.addText(
       powerId,
       new FontWithPosition(
+        powerId,
         30,
         portraitHeight + portraitAsset.y + 60,
         `Power: ${powerValue}`,
@@ -1023,6 +1027,7 @@ export default class Board {
     this.gameManager.assetManager.textManager.addText(
       valueId,
       new FontWithPosition(
+        valueId,
         30,
         portraitHeight + portraitAsset.y + 80,
         `Value: ${valueValue}`,
@@ -1118,6 +1123,7 @@ export default class Board {
     this.gameManager.assetManager.textManager.addText(
       portraitNameId,
       new FontWithPosition(
+        portraitNameId,
         10,
         portraitHeight + portraitPosition + 15,
         characterType === CharacterTypes.PLAYER
@@ -1134,6 +1140,7 @@ export default class Board {
     this.gameManager.assetManager.textManager.addText(
       portraitLevelId,
       new FontWithPosition(
+        portraitLevelId,
         10,
         portraitHeight + portraitPosition + 40,
         `Lvl ${
@@ -1149,6 +1156,7 @@ export default class Board {
       this.gameManager.assetManager.textManager.addText(
         TextIds.PLAYER_PORTRAIT_EXPERIENCE,
         new FontWithPosition(
+          TextIds.PLAYER_PORTRAIT_EXPERIENCE,
           portraitBackgroundWidth,
           portraitHeight + portraitPosition + 40,
           `${this.gameManager.player.experience} XP`,
@@ -1170,6 +1178,7 @@ export default class Board {
       this.gameManager.assetManager.textManager.addText(
         TextIds.PLAYER_PERKS,
         new FontWithPosition(
+          TextIds.PLAYER_PERKS,
           portraitWidth + this.perksButton.getWidth() / 2,
           portraitPosition + 10 + this.perksButton.getHeight() / 2,
           "Perks",
@@ -1180,6 +1189,7 @@ export default class Board {
       this.gameManager.assetManager.textManager.addText(
         TextIds.PLAYER_PORTRAIT_MONEY,
         new FontWithPosition(
+          TextIds.PLAYER_PORTRAIT_MONEY,
           portraitBackgroundWidth,
           portraitHeight + portraitPosition + 15,
           `${this.gameManager.player.money}`,
@@ -1220,6 +1230,7 @@ export default class Board {
     this.gameManager.assetManager.textManager.addText(
       TextIds.EDEL_SUIT_LABEL,
       new FontWithPosition(
+        TextIds.EDEL_SUIT_LABEL,
         centerX,
         40,
         "Edel! \n" + Card.getSuitName(this.edelSuit),
@@ -1272,6 +1283,7 @@ export default class Board {
     this.gameManager.assetManager.textManager.addText(
       TextIds.WIN_FIRE_TEXT,
       new FontWithPosition(
+        TextIds.WIN_FIRE_TEXT,
         portraitCenterX * 2,
         centerY + 20,
         "You are\ndominating!",
@@ -1284,6 +1296,7 @@ export default class Board {
       this.gameManager.assetManager.textManager.addText(
         TextIds.WINNINGS,
         new FontWithPosition(
+          TextIds.WINNINGS,
           portraitCenterX * 2,
           centerY + 100,
           "But you'll get no winnings...",
@@ -1294,6 +1307,7 @@ export default class Board {
       this.gameManager.assetManager.textManager.addText(
         TextIds.WINNINGS,
         new FontWithPosition(
+          TextIds.WINNINGS,
           portraitCenterX * 2,
           centerY + 100,
           "Winnings: " + winnings,

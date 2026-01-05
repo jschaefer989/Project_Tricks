@@ -14,6 +14,7 @@ interface ConstructionOptions {
     isDisabled?: boolean;
 }
 export default class FontWithPosition {
+    id: string;
     size?: number;
     filepath: string;
     x: number;
@@ -24,7 +25,7 @@ export default class FontWithPosition {
     iconFormat: Omit<Format, Format.CENTER>;
     isDisabled: boolean;
     color: [number, number, number, number];
-    constructor(x: number, y: number, text: string, options?: ConstructionOptions);
+    constructor(id: string, x: number, y: number, text: string, options?: ConstructionOptions);
     setDisabled(disabled: boolean): void;
     printFont(): void;
     private getFormatOffset;

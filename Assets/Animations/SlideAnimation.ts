@@ -1,25 +1,24 @@
-import Asset from "./Asset"
+import { isEmpty } from "Helpers";
+import Asset from "../Asset"
+import Animation, { AnimationAssets } from "./Animation"
 
-export default class Animation {
-    animDuration: number = 0.15  // seconds
-    animElapsed: number = 0
+interface ConstructionOptions {
+    readonly animDuration?: number;    
+}
+
+export default class SlideAnimation extends Animation {
     animOffsetX: number = 0  // Current animation offset
     animOffsetY: number = 0  // Current animation offset
     animTargetOffsetX: number = 0  // Target animation offset
     animTargetOffsetY: number = 0  // Target animation offset (e.g., -20 for up)
-    isAnimating: boolean = false
-    originalX: number = 0
-    originalY: number = 0   
-    asset: Asset 
 
-    constructor(offsetX: number, offsetY: number, asset: Asset) {
-        this.originalX = asset.x
-        this.originalY = asset.y
+    constructor(offsetX: number, offsetY: number, assets: AnimationAssets[], constructionOptions?: ConstructionOptions) {
+        super(assets, constructionOptions);
         this.animTargetOffsetX = offsetX
         this.animTargetOffsetY = offsetY
         this.animElapsed = 0
         this.isAnimating = true
-        this.asset = asset
+        this.assets = assets
     }
 
     updateAnimation(deltaTime: number): void {
@@ -39,9 +38,9 @@ export default class Animation {
         const progress = this.animElapsed / this.animDuration
         this.animOffsetX = this.animTargetOffsetX * progress
         this.animOffsetY = this.animTargetOffsetY * progress
-        
-        this.asset.y = this.originalY + this.animOffsetY
-        this.asset.x = this.originalX + this.animOffsetX
+
+        this.updateX(this.animOffsetX)
+        this.updateY(this.animOffsetY)
     }
 
     get isFinished(): boolean {

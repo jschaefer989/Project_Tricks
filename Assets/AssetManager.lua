@@ -10,6 +10,8 @@ local ____Helpers = require("Helpers")
 local isEmpty = ____Helpers.isEmpty
 local ____TextManager = require("Assets.TextManager")
 local TextManager = ____TextManager.default
+local ____WobbleAnimation = require("Assets.Animations.WobbleAnimation")
+local WobbleAnimation = ____WobbleAnimation.default
 ____exports.default = __TS__Class()
 local AssetManager = ____exports.default
 AssetManager.name = "AssetManager"
@@ -117,22 +119,66 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
             local asset = assets[1]
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
                 if asset.isDisabled then
-                    if not self.disabledSound:isPlaying() then
-                        self.disabledSound:play()
-                    end
-                elseif not isEmpty(asset.onClick) then
-                    asset:onClick()
-                    local ____opt_6 = asset.clickSound
-                    if not (____opt_6 and ____opt_6:isPlaying()) then
-                        local ____opt_8 = asset.clickSound
-                        if ____opt_8 ~= nil then
-                            ____opt_8:play()
-                        end
-                    end
+                    self:handleDisabledAssetClick(assets)
+                else
+                    self:handleAssetClick(asset)
                 end
             end
         end
         ::__continue31::
+    end
+end
+function AssetManager.prototype.handleDisabledAssetClick(self, assets)
+    if self.gameManager.animationManager:hasWobbleAnimation() then
+        return
+    end
+    if not self.disabledSound:isPlaying() then
+        self.disabledSound:play()
+    end
+    self:triggerWobbleAnimation(assets)
+end
+function AssetManager.prototype.triggerWobbleAnimation(self, assets)
+    for ____, assetToWobble in ipairs(assets) do
+        local wobbleId = "wobble-" .. assetToWobble.id
+        if not self.gameManager.animationManager.animations:has(wobbleId) then
+            self.gameManager.animationManager.animations:set(
+                wobbleId,
+                __TS__New(WobbleAnimation, 10, {assetToWobble}, {animDuration = 0.5})
+            )
+        end
+        if not isEmpty(assetToWobble.associatedTexts) then
+            for ____, textId in ipairs(assetToWobble.associatedTexts) do
+                do
+                    local textAsset = self.textManager:getText(textId)
+                    if isEmpty(textAsset) then
+                        goto __continue44
+                    end
+                    local wobbleTextId = "wobble-" .. textId
+                    if not self.gameManager.animationManager.animations:has(wobbleTextId) then
+                        self.gameManager.animationManager.animations:set(
+                            wobbleTextId,
+                            __TS__New(WobbleAnimation, 10, {textAsset}, {animDuration = 0.5})
+                        )
+                    end
+                end
+                ::__continue44::
+            end
+        end
+    end
+end
+function AssetManager.prototype.handleAssetClick(self, asset)
+    local ____this_7
+    ____this_7 = asset
+    local ____opt_6 = ____this_7.onClick
+    if ____opt_6 ~= nil then
+        ____opt_6(____this_7)
+    end
+    local ____opt_8 = asset.clickSound
+    if not (____opt_8 and ____opt_8:isPlaying()) then
+        local ____opt_10 = asset.clickSound
+        if ____opt_10 ~= nil then
+            ____opt_10:play()
+        end
     end
 end
 function AssetManager.prototype.handleMouseHover(self)
@@ -144,7 +190,7 @@ function AssetManager.prototype.handleMouseHover(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue41
+                goto __continue53
             end
             local asset = assets[1]
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
@@ -153,7 +199,7 @@ function AssetManager.prototype.handleMouseHover(self)
                 asset:setHovered(false)
             end
         end
-        ::__continue41::
+        ::__continue53::
     end
 end
 return ____exports

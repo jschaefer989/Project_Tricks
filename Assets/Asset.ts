@@ -1,6 +1,7 @@
 import GameManager from "GameManager";
 import { Source } from "love.audio";
-import { Image } from "love.graphics";
+import { Font, Image } from "love.graphics";
+import FontWithPosition from "./FontWithPosition";
 
 export type AssetCallback = (gameManager: GameManager, asset: Asset) => void;
 
@@ -14,6 +15,7 @@ interface ConstructionOptions {
   readonly offsetY?: number;
   readonly isDisabled?: boolean;
   readonly clickSound?: Source;
+  readonly associatedTexts?: string[];
 }
 
 export default class Asset {
@@ -32,6 +34,7 @@ export default class Asset {
   isHovered: boolean = false;
   color: [number, number, number, number] = [1, 1, 1, 1];
   clickSound?: Source;
+  associatedTexts?: string[];
 
   constructor(
     id: string,
@@ -53,6 +56,7 @@ export default class Asset {
     this.offsetY = constructionOptions?.offsetY ?? 0;
     this.isDisabled = constructionOptions?.isDisabled ?? false;
     this.clickSound = constructionOptions?.clickSound;
+    this.associatedTexts = constructionOptions?.associatedTexts;
   }
 
   updatePosition(x: number, y: number): void {
