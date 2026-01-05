@@ -24,23 +24,23 @@ export default class CardAssets {
     this.gameManager = gameManager;
   }
 
-  addAsset(card: Card, cardX: number, cardY: number): void {
+  addAsset(card: Card, cardX: number, cardY: number, includeClickHandler: boolean = true): void {
     const assetId = CardAssets.getBaseAssetId(card);
     const baseCardAsset = new Asset(assetId, this.baseCard, cardX, cardY, {
-      onClick: () => card.onClick(),
+      onClick: includeClickHandler ? () => card.onClick() : undefined,
       onHover: (gameManager: GameManager, asset: Asset) =>
         Card.onHover(gameManager, asset),
     });
     this.gameManager.assetManager.addAsset(assetId, baseCardAsset);
-    this.addSuitAsset(card, cardX, cardY);
-    this.addRankAsset(card, cardX, cardY);
+    this.addSuitAsset(card, cardX, cardY, includeClickHandler);
+    this.addRankAsset(card, cardX, cardY, includeClickHandler);
   }
 
   static getBaseAssetId(card: Card): string {
     return `${AssetIds.BASE_CARD_TEMPLATE}-${card.id}`;
   }
 
-  addSuitAsset(card: Card, x: number, y: number): void {
+  addSuitAsset(card: Card, x: number, y: number, includeClickHandler: boolean = true): void {
     const suitImagePath = CardAssets.getSuitAssetPath(card.suit);
     const onHoverCallback = (gameManager: GameManager, asset: Asset) =>
       Card.onHover(gameManager, asset);
@@ -51,7 +51,7 @@ export default class CardAssets {
       love.graphics.newImage(suitImagePath),
       normalPosition.x,
       normalPosition.y,
-      { onClick: () => card.onClick(), onHover: onHoverCallback }
+      { onClick: includeClickHandler ? () => card.onClick() : undefined, onHover: onHoverCallback }
     );
     this.gameManager.assetManager.addAsset(
       CardAssets.getBaseAssetId(card),
@@ -65,7 +65,7 @@ export default class CardAssets {
       flippedPosition.x,
       flippedPosition.y,
       {
-        onClick: () => card.onClick(),
+        onClick: includeClickHandler ? () => card.onClick() : undefined,
         onHover: onHoverCallback,
         orientation: 0,
         scaleX: -1,
@@ -86,7 +86,7 @@ export default class CardAssets {
     return { x: x + this.baseW - 10, y: y + this.baseH - 10 };
   }
 
-  addRankAsset(card: Card, x: number, y: number): void {
+  addRankAsset(card: Card, x: number, y: number, includeClickHandler: boolean = true): void {
     const rankImagePath = CardAssets.getRankAssetPath(card.rank);
     const rankImage = love.graphics.newImage(rankImagePath);
     const assetId = CardAssets.getRankAssetId(card, 0);
@@ -97,7 +97,7 @@ export default class CardAssets {
       rankPosition.x,
       rankPosition.y,
       {
-        onClick: () => card.onClick(),
+        onClick: includeClickHandler ? () => card.onClick() : undefined,
         onHover: (gameManager: GameManager, asset: Asset) =>
           Card.onHover(gameManager, asset),
       }
@@ -241,7 +241,7 @@ export default class CardAssets {
   getHeightModifier(characterType: CharacterTypes): number {
     switch (characterType) {
       case CharacterTypes.PLAYER:
-        return !this.gameManager.board?.showingInitialView
+        return !this.gameManager.board?.showingEdelView
           ? -(this.baseH * 0.25)
           : this.baseH / 2;
       case CharacterTypes.ENEMY:
@@ -274,7 +274,7 @@ export default class CardAssets {
     const cardPosition = this.determineCardStartingPosition(characterType);
     const x =
       cardPosition.x + (character.hand.length - 1) * (this.baseW + padding);
-    this.addAsset(card, x, cardPosition.y);
+    this.addAsset(card, x, cardPosition.y, characterType === CharacterTypes.PLAYER);
   }
 
   getCardAssets(card: Card): AssetsForCard {

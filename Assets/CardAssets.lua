@@ -32,7 +32,10 @@ function CardAssets.prototype.____constructor(self, gameManager)
     self.baseH = self.baseCard:getHeight()
     self.gameManager = gameManager
 end
-function CardAssets.prototype.addAsset(self, card, cardX, cardY)
+function CardAssets.prototype.addAsset(self, card, cardX, cardY, includeClickHandler)
+    if includeClickHandler == nil then
+        includeClickHandler = true
+    end
     local assetId = ____exports.default:getBaseAssetId(card)
     local baseCardAsset = __TS__New(
         Asset,
@@ -41,18 +44,21 @@ function CardAssets.prototype.addAsset(self, card, cardX, cardY)
         cardX,
         cardY,
         {
-            onClick = function() return card:onClick() end,
+            onClick = includeClickHandler and (function() return card:onClick() end) or nil,
             onHover = function(____, gameManager, asset) return Card:onHover(gameManager, asset) end
         }
     )
     self.gameManager.assetManager:addAsset(assetId, baseCardAsset)
-    self:addSuitAsset(card, cardX, cardY)
-    self:addRankAsset(card, cardX, cardY)
+    self:addSuitAsset(card, cardX, cardY, includeClickHandler)
+    self:addRankAsset(card, cardX, cardY, includeClickHandler)
 end
 function CardAssets.getBaseAssetId(self, card)
     return (AssetIds.BASE_CARD_TEMPLATE .. "-") .. card.id
 end
-function CardAssets.prototype.addSuitAsset(self, card, x, y)
+function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler)
+    if includeClickHandler == nil then
+        includeClickHandler = true
+    end
     local suitImagePath = ____exports.default:getSuitAssetPath(card.suit)
     local function onHoverCallback(____, gameManager, asset)
         return Card:onHover(gameManager, asset)
@@ -66,7 +72,7 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y)
         normalPosition.x,
         normalPosition.y,
         {
-            onClick = function() return card:onClick() end,
+            onClick = includeClickHandler and (function() return card:onClick() end) or nil,
             onHover = onHoverCallback
         }
     )
@@ -83,7 +89,7 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y)
         flippedPosition.x,
         flippedPosition.y,
         {
-            onClick = function() return card:onClick() end,
+            onClick = includeClickHandler and (function() return card:onClick() end) or nil,
             onHover = onHoverCallback,
             orientation = 0,
             scaleX = -1,
@@ -101,7 +107,10 @@ end
 function CardAssets.prototype.getFlippedSuitPosition(self, x, y)
     return {x = x + self.baseW - 10, y = y + self.baseH - 10}
 end
-function CardAssets.prototype.addRankAsset(self, card, x, y)
+function CardAssets.prototype.addRankAsset(self, card, x, y, includeClickHandler)
+    if includeClickHandler == nil then
+        includeClickHandler = true
+    end
     local rankImagePath = ____exports.default:getRankAssetPath(card.rank)
     local rankImage = love.graphics.newImage(rankImagePath)
     local assetId = ____exports.default:getRankAssetId(card, 0)
@@ -113,7 +122,7 @@ function CardAssets.prototype.addRankAsset(self, card, x, y)
         rankPosition.x,
         rankPosition.y,
         {
-            onClick = function() return card:onClick() end,
+            onClick = includeClickHandler and (function() return card:onClick() end) or nil,
             onHover = function(____, gameManager, asset) return Card:onHover(gameManager, asset) end
         }
     )
@@ -306,7 +315,7 @@ function CardAssets.prototype.getHeightModifier(self, characterType)
         local ____cond33 = ____switch33 == CharacterTypes.PLAYER
         if ____cond33 then
             local ____opt_8 = self.gameManager.board
-            return not (____opt_8 and ____opt_8.showingInitialView) and -(self.baseH * 0.25) or self.baseH / 2
+            return not (____opt_8 and ____opt_8.showingEdelView) and -(self.baseH * 0.25) or self.baseH / 2
         end
         ____cond33 = ____cond33 or ____switch33 == CharacterTypes.ENEMY
         if ____cond33 then
@@ -337,7 +346,7 @@ function CardAssets.prototype.appendAsset(self, card, characterType)
     end
     local cardPosition = self:determineCardStartingPosition(characterType)
     local x = cardPosition.x + (#character.hand - 1) * (self.baseW + padding)
-    self:addAsset(card, x, cardPosition.y)
+    self:addAsset(card, x, cardPosition.y, characterType == CharacterTypes.PLAYER)
 end
 function CardAssets.prototype.getCardAssets(self, card)
     local baseAssetId = ____exports.default:getBaseAssetId(card)

@@ -15,12 +15,12 @@ export default class CardAssets {
     baseW: number;
     baseH: number;
     constructor(gameManager: GameManager);
-    addAsset(card: Card, cardX: number, cardY: number): void;
+    addAsset(card: Card, cardX: number, cardY: number, includeClickHandler?: boolean): void;
     static getBaseAssetId(card: Card): string;
-    addSuitAsset(card: Card, x: number, y: number): void;
+    addSuitAsset(card: Card, x: number, y: number, includeClickHandler?: boolean): void;
     getNormalSuitPosition(x: number, y: number): Point;
     getFlippedSuitPosition(x: number, y: number): Point;
-    addRankAsset(card: Card, x: number, y: number): void;
+    addRankAsset(card: Card, x: number, y: number, includeClickHandler?: boolean): void;
     getRankPosition(x: number, y: number, rankImage: Image): Point;
     static getSuitAssetPath(suit: Suits): string;
     static getSuitAssetId(card: Card, orientation: number): string;

@@ -30,7 +30,7 @@ export default class Board {
     playerValue: number;
     enemyPower: number;
     enemyValue: number;
-    showingInitialView: boolean;
+    showingEdelView: boolean;
     cardAssets: CardAssets;
     letsFightButton: Image;
     attackButton: Image;

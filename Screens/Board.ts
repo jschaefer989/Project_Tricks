@@ -43,7 +43,7 @@ export default class Board {
   playerValue = 0;
   enemyPower = 0;
   enemyValue = 0;
-  showingInitialView = true;
+  showingEdelView = true;
   cardAssets: CardAssets;
   letsFightButton = love.graphics.newImage("Assets/Images/LetsFightButton.png");
   attackButton = love.graphics.newImage("Assets/Images/AttackButton.png");
@@ -80,7 +80,7 @@ export default class Board {
     this.playerValue = data.playerValue;
     this.enemyPower = data.enemyPower;
     this.enemyValue = data.enemyValue;
-    this.showingInitialView = data.showingInitialView ?? true;
+    this.showingEdelView = data.showingInitialView ?? true;
 
     this.enemy = new Enemy(this.gameManager);
     this.enemy.load(this.gameManager, data.enemy);
@@ -97,7 +97,7 @@ export default class Board {
       playerValue: this.playerValue,
       enemyPower: this.enemyPower,
       enemyValue: this.enemyValue,
-      showingInitialView: this.showingInitialView,
+      showingInitialView: this.showingEdelView,
     };
   }
 
@@ -105,7 +105,7 @@ export default class Board {
     if (!this.gameManager.devMode) {
       return;
     }
-    if (this.showingInitialView) {
+    if (this.showingEdelView) {
       this.drawInitialView();
     } else {
       this.drawNormalView();
@@ -567,7 +567,7 @@ export default class Board {
   }
 
   handleStartFight(): void {
-    this.showingInitialView = false;
+    this.showingEdelView = false;
     this.gameManager.assetManager.hideAsset(AssetIds.LETS_FIGHT_BUTTON);
     this.gameManager.assetManager.textManager.hideText(
       TextIds.LETS_FIGHT_BUTTON_CAPTION
@@ -741,7 +741,7 @@ export default class Board {
     this.buildEnemyPortrait();
     this.buildPlayerDeck();
     this.buildEnemyDeck();
-    if (this.showingInitialView) {
+    if (this.showingEdelView) {
       this.buildLetsFightButton();
       this.buildEdelSuitText();
     } else {
@@ -759,7 +759,7 @@ export default class Board {
     for (let i = 0; i < this.gameManager.player.hand.length; i++) {
       const card = this.gameManager.player.hand[i];
       const x = playerCardPosition.x + i * (this.cardAssets.baseW + padding);
-      this.cardAssets.addAsset(card, x, playerCardPosition.y);
+      this.cardAssets.addAsset(card, x, playerCardPosition.y, !this.showingEdelView);
     }
 
     const enemyCardPosition = this.cardAssets.determineCardStartingPosition(
@@ -768,7 +768,7 @@ export default class Board {
     for (let i = 0; i < this.enemy.hand.length; i++) {
       const card = this.enemy.hand[i];
       const x = enemyCardPosition.x + i * (this.cardAssets.baseW + padding);
-      this.cardAssets.addAsset(card, x, enemyCardPosition.y);
+      this.cardAssets.addAsset(card, x, enemyCardPosition.y, false);
     }
   }
 

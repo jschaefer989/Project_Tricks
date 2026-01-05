@@ -41,7 +41,7 @@ function Board.prototype.____constructor(self, gameManager, enemy)
     self.playerValue = 0
     self.enemyPower = 0
     self.enemyValue = 0
-    self.showingInitialView = true
+    self.showingEdelView = true
     self.letsFightButton = love.graphics.newImage("Assets/Images/LetsFightButton.png")
     self.attackButton = love.graphics.newImage("Assets/Images/AttackButton.png")
     self.discardButton = love.graphics.newImage("Assets/Images/DiscardButton.png")
@@ -74,7 +74,7 @@ function Board.prototype.load(self, data)
     if ____data_showingInitialView_0 == nil then
         ____data_showingInitialView_0 = true
     end
-    self.showingInitialView = ____data_showingInitialView_0
+    self.showingEdelView = ____data_showingInitialView_0
     self.enemy = __TS__New(Enemy, self.gameManager)
     self.enemy:load(self.gameManager, data.enemy)
 end
@@ -89,14 +89,14 @@ function Board.prototype.save(self)
         playerValue = self.playerValue,
         enemyPower = self.enemyPower,
         enemyValue = self.enemyValue,
-        showingInitialView = self.showingInitialView
+        showingInitialView = self.showingEdelView
     }
 end
 function Board.prototype.drawBoard(self)
     if not self.gameManager.devMode then
         return
     end
-    if self.showingInitialView then
+    if self.showingEdelView then
         self:drawInitialView()
     else
         self:drawNormalView()
@@ -443,7 +443,7 @@ function Board.prototype.renderDiscardCounter(self)
     )
 end
 function Board.prototype.handleStartFight(self)
-    self.showingInitialView = false
+    self.showingEdelView = false
     self.gameManager.assetManager:hideAsset(AssetIds.LETS_FIGHT_BUTTON)
     self.gameManager.assetManager.textManager:hideText(TextIds.LETS_FIGHT_BUTTON_CAPTION)
     self.dealer:startGame()
@@ -598,7 +598,7 @@ function Board.prototype.buildAssets(self)
     self:buildEnemyPortrait()
     self:buildPlayerDeck()
     self:buildEnemyDeck()
-    if self.showingInitialView then
+    if self.showingEdelView then
         self:buildLetsFightButton()
         self:buildEdelSuitText()
     else
@@ -614,7 +614,7 @@ function Board.prototype.buildCardAssets(self)
         while i < #self.gameManager.player.hand do
             local card = self.gameManager.player.hand[i + 1]
             local x = playerCardPosition.x + i * (self.cardAssets.baseW + padding)
-            self.cardAssets:addAsset(card, x, playerCardPosition.y)
+            self.cardAssets:addAsset(card, x, playerCardPosition.y, not self.showingEdelView)
             i = i + 1
         end
     end
@@ -624,7 +624,7 @@ function Board.prototype.buildCardAssets(self)
         while i < #self.enemy.hand do
             local card = self.enemy.hand[i + 1]
             local x = enemyCardPosition.x + i * (self.cardAssets.baseW + padding)
-            self.cardAssets:addAsset(card, x, enemyCardPosition.y)
+            self.cardAssets:addAsset(card, x, enemyCardPosition.y, false)
             i = i + 1
         end
     end
