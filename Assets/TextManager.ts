@@ -40,6 +40,20 @@ export default class TextManager {
         }
     }
 
+    disableText(id: string): void {
+        const text = this.texts.get(id)
+        if (!isEmpty(text)) {
+            text.setDisabled(true)
+        }
+    }
+
+    enableText(id: string): void {
+        const text = this.texts.get(id)
+        if (!isEmpty(text)) {
+            text.setDisabled(false)
+        }
+    }
+
     static getDefaultFontFilepath(): string {
         return "Assets/Fonts/Germania.ttf"
     }

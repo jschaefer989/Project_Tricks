@@ -61,6 +61,7 @@ export default class Board {
   valueIcon = love.graphics.newImage("Assets/Images/Value.png");
   biome: Biome;
   portraitPosition: number | undefined; // Saved off so it can be restored on resume
+  winFireSound = love.audio.newSource("Assets/Sounds/Dominating.wav", "static");
 
   constructor(gameManager: GameManager, enemy?: Enemy) {
     this.gameManager = gameManager;
@@ -632,12 +633,24 @@ export default class Board {
     this.discardUsed = this.discardUsed + 1;
 
     // Update the discard counter
+    const remaining = this.getRemainingDiscards();
     this.gameManager.assetManager.textManager.updateText(
       TextIds.DISCARD_BUTTON_COUNTER,
-      `${this.getRemainingDiscards()}/${this.gameManager.player.discards}`
+      `${remaining}/${this.gameManager.player.discards}`
     );
 
-    // Refill the player's hand after discarding
+    if (remaining <= 0) {
+      // Disable the discard button
+      this.gameManager.assetManager.disableAsset(AssetIds.DISCARD_BUTTON);
+      this.gameManager.assetManager.textManager.disableText(
+        TextIds.DISCARD_BUTTON_CAPTION
+      );
+      this.gameManager.assetManager.textManager.disableText(
+        TextIds.DISCARD_BUTTON_COUNTER
+      );
+    }
+
+    // Refill the player's hand after discarding!isEmpty(asset.onClick) 
     this.gameManager.board?.dealer.dealCards(CharacterTypes.PLAYER);
   }
 
@@ -683,6 +696,7 @@ export default class Board {
     );
     this.updatePowerEmphasis();
     if (this.playerPower > this.enemyPower) {
+      this.playWinFireSound();
       this.buildWinFire();
     } else {
       this.removeWinFire();
@@ -799,6 +813,9 @@ export default class Board {
     this.buildAttackButton(buttonX, buttonY, btnW);
     const discardX = this.buildDiscardButton(buttonX, buttonY, btnW, gap);
     this.buildDeselectButton(discardX, buttonY, btnW, gap);
+    
+    // Disable buttons initially since no cards are selected
+    this.updatePrimaryButtonStates();
   }
 
   private buildAttackButton(
@@ -810,6 +827,7 @@ export default class Board {
       AssetIds.ATTACK_BUTTON,
       new Asset(AssetIds.ATTACK_BUTTON, this.attackButton, buttonX, buttonY, {
         onClick: () => this.handleAttack(),
+        clickSound: love.audio.newSource("Assets/Sounds/AttackClicked.flac", "static"),
       })
     );
 
@@ -891,6 +909,32 @@ export default class Board {
         format: Format.CENTER,
       })
     );
+  }
+
+  updatePrimaryButtonStates(): void {
+    const hasSelectedCards = this.gameManager.player.anySelectedCards();
+    
+    if (hasSelectedCards) {
+      this.gameManager.assetManager.enableAsset(AssetIds.ATTACK_BUTTON);
+      this.gameManager.assetManager.textManager.enableText(TextIds.ATTACK_BUTTON_CAPTION);
+      
+      this.gameManager.assetManager.enableAsset(AssetIds.DISCARD_BUTTON);
+      this.gameManager.assetManager.textManager.enableText(TextIds.DISCARD_BUTTON_CAPTION);
+      this.gameManager.assetManager.textManager.enableText(TextIds.DISCARD_BUTTON_COUNTER);
+      
+      this.gameManager.assetManager.enableAsset(AssetIds.DESELECT_BUTTON);
+      this.gameManager.assetManager.textManager.enableText(TextIds.DESELECT_BUTTON_CAPTION);
+    } else {
+      this.gameManager.assetManager.disableAsset(AssetIds.ATTACK_BUTTON);
+      this.gameManager.assetManager.textManager.disableText(TextIds.ATTACK_BUTTON_CAPTION);
+      
+      this.gameManager.assetManager.disableAsset(AssetIds.DISCARD_BUTTON);
+      this.gameManager.assetManager.textManager.disableText(TextIds.DISCARD_BUTTON_CAPTION);
+      this.gameManager.assetManager.textManager.disableText(TextIds.DISCARD_BUTTON_COUNTER);
+      
+      this.gameManager.assetManager.disableAsset(AssetIds.DESELECT_BUTTON);
+      this.gameManager.assetManager.textManager.disableText(TextIds.DESELECT_BUTTON_CAPTION);
+    }
   }
 
   private buildPointBoard(): void {
@@ -1194,6 +1238,12 @@ export default class Board {
         0
       )
     );
+  }
+
+  private playWinFireSound(): void {
+    if (!this.winFireSound.isPlaying()) {
+      this.winFireSound.play();
+    }
   }
 
   private buildWinFire(): void {

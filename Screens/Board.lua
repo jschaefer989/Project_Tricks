@@ -54,6 +54,7 @@ function Board.prototype.____constructor(self, gameManager, enemy)
     self.markIcon = love.graphics.newImage("Assets/Images/Mark.png")
     self.attackPowerIcon = love.graphics.newImage("Assets/Images/AttackPower.png")
     self.valueIcon = love.graphics.newImage("Assets/Images/Value.png")
+    self.winFireSound = love.audio.newSource("Assets/Sounds/Dominating.wav", "static")
     self.gameManager = gameManager
     self.enemy = enemy or __TS__New(Enemy, gameManager)
     self.dealer = __TS__New(Dealer, gameManager)
@@ -503,10 +504,16 @@ function Board.prototype.handleDiscard(self)
     end
     self.gameManager.player:discard()
     self.discardUsed = self.discardUsed + 1
+    local remaining = self:getRemainingDiscards()
     self.gameManager.assetManager.textManager:updateText(
         TextIds.DISCARD_BUTTON_COUNTER,
-        (tostring(self:getRemainingDiscards()) .. "/") .. tostring(self.gameManager.player.discards)
+        (tostring(remaining) .. "/") .. tostring(self.gameManager.player.discards)
     )
+    if remaining <= 0 then
+        self.gameManager.assetManager:disableAsset(AssetIds.DISCARD_BUTTON)
+        self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_CAPTION)
+        self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_COUNTER)
+    end
     local ____opt_5 = self.gameManager.board
     if ____opt_5 ~= nil then
         ____opt_5.dealer:dealCards(CharacterTypes.PLAYER)
@@ -550,6 +557,7 @@ function Board.prototype.addPlayerPower(self, power)
     )
     self:updatePowerEmphasis()
     if self.playerPower > self.enemyPower then
+        self:playWinFireSound()
         self:buildWinFire()
     else
         self:removeWinFire()
@@ -661,6 +669,7 @@ function Board.prototype.buildPrimaryButtons(self)
     self:buildAttackButton(buttonX, buttonY, btnW)
     local discardX = self:buildDiscardButton(buttonX, buttonY, btnW, gap)
     self:buildDeselectButton(discardX, buttonY, btnW, gap)
+    self:updatePrimaryButtonStates()
 end
 function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW)
     self.gameManager.assetManager:addAsset(
@@ -671,7 +680,10 @@ function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW)
             self.attackButton,
             buttonX,
             buttonY,
-            {onClick = function() return self:handleAttack() end}
+            {
+                onClick = function() return self:handleAttack() end,
+                clickSound = love.audio.newSource("Assets/Sounds/AttackClicked.flac", "static")
+            }
         )
     )
     local centerX = buttonX + btnW / 2
@@ -750,6 +762,26 @@ function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, gap)
             {size = 28, format = Format.CENTER}
         )
     )
+end
+function Board.prototype.updatePrimaryButtonStates(self)
+    local hasSelectedCards = self.gameManager.player:anySelectedCards()
+    if hasSelectedCards then
+        self.gameManager.assetManager:enableAsset(AssetIds.ATTACK_BUTTON)
+        self.gameManager.assetManager.textManager:enableText(TextIds.ATTACK_BUTTON_CAPTION)
+        self.gameManager.assetManager:enableAsset(AssetIds.DISCARD_BUTTON)
+        self.gameManager.assetManager.textManager:enableText(TextIds.DISCARD_BUTTON_CAPTION)
+        self.gameManager.assetManager.textManager:enableText(TextIds.DISCARD_BUTTON_COUNTER)
+        self.gameManager.assetManager:enableAsset(AssetIds.DESELECT_BUTTON)
+        self.gameManager.assetManager.textManager:enableText(TextIds.DESELECT_BUTTON_CAPTION)
+    else
+        self.gameManager.assetManager:disableAsset(AssetIds.ATTACK_BUTTON)
+        self.gameManager.assetManager.textManager:disableText(TextIds.ATTACK_BUTTON_CAPTION)
+        self.gameManager.assetManager:disableAsset(AssetIds.DISCARD_BUTTON)
+        self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_CAPTION)
+        self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_COUNTER)
+        self.gameManager.assetManager:disableAsset(AssetIds.DESELECT_BUTTON)
+        self.gameManager.assetManager.textManager:disableText(TextIds.DESELECT_BUTTON_CAPTION)
+    end
 end
 function Board.prototype.buildPointBoard(self)
     local boardWidth = self.pointBoard:getWidth()
@@ -1002,6 +1034,11 @@ function Board.prototype.buildBackground(self)
             0
         )
     )
+end
+function Board.prototype.playWinFireSound(self)
+    if not self.winFireSound:isPlaying() then
+        self.winFireSound:play()
+    end
 end
 function Board.prototype.buildWinFire(self)
     local fireSprite = self:getWinFireSprite()

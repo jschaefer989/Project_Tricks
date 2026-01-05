@@ -1,4 +1,5 @@
 import GameManager from "GameManager";
+import { Source } from "love.audio";
 import { Image } from "love.graphics";
 
 export type AssetCallback = (gameManager: GameManager, asset: Asset) => void;
@@ -11,6 +12,8 @@ interface ConstructionOptions {
   readonly scaleY?: number;
   readonly offsetX?: number;
   readonly offsetY?: number;
+  readonly isDisabled?: boolean;
+  readonly clickSound?: Source;
 }
 
 export default class Asset {
@@ -27,6 +30,8 @@ export default class Asset {
   offsetY: number;
   isDisabled: boolean = false;
   isHovered: boolean = false;
+  color: [number, number, number, number] = [1, 1, 1, 1];
+  clickSound?: Source;
 
   constructor(
     id: string,
@@ -46,6 +51,8 @@ export default class Asset {
     this.scaleY = constructionOptions?.scaleY ?? 1;
     this.offsetX = constructionOptions?.offsetX ?? 0;
     this.offsetY = constructionOptions?.offsetY ?? 0;
+    this.isDisabled = constructionOptions?.isDisabled ?? false;
+    this.clickSound = constructionOptions?.clickSound;
   }
 
   updatePosition(x: number, y: number): void {
@@ -67,12 +74,13 @@ export default class Asset {
     this.offsetY = offsetY;
   }
 
-  setDisabled(disabled: boolean): void {
-    this.isDisabled = disabled;
-  }
-
   setHovered(hovered: boolean): void {
     this.isHovered = hovered;
+  }
+
+  setDisabled(disabled: boolean): void {
+    this.isDisabled = disabled;
+    this.color = disabled ? [0.5, 0.5, 0.5, 1] : [1, 1, 1, 1];
   }
 
   getWidth(): number {

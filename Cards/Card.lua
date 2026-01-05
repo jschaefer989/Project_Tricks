@@ -121,6 +121,10 @@ function Card.prototype.onSelect(self)
             __TS__New(Animation, 0, -20, rankAsset)
         )
     end
+    local ____opt_2 = self.gameManager.board
+    if ____opt_2 ~= nil then
+        ____opt_2:updatePrimaryButtonStates()
+    end
 end
 function Card.prototype.onUnselect(self)
     if isEmpty(self.gameManager.board) then
@@ -128,10 +132,10 @@ function Card.prototype.onUnselect(self)
     end
     self.gameManager.board:addPlayerPower(-self.power)
     self.gameManager.board:addPlayerValue(-self.value)
-    local ____temp_2 = self.gameManager.board.cardAssets:getCardAssets(self)
-    local baseAsset = ____temp_2.baseAsset
-    local suitAssets = ____temp_2.suitAssets
-    local rankAsset = ____temp_2.rankAsset
+    local ____temp_4 = self.gameManager.board.cardAssets:getCardAssets(self)
+    local baseAsset = ____temp_4.baseAsset
+    local suitAssets = ____temp_4.suitAssets
+    local rankAsset = ____temp_4.rankAsset
     local suitAssetNormal = suitAssets[1]
     local suitAssetFlipped = suitAssets[2]
     local baseId = AnimationIds.CARD_BASE_SELECT .. self.id
@@ -161,6 +165,10 @@ function Card.prototype.onUnselect(self)
             rankAssetId,
             __TS__New(Animation, 0, 20, rankAsset)
         )
+    end
+    local ____opt_5 = self.gameManager.board
+    if ____opt_5 ~= nil then
+        ____opt_5:updatePrimaryButtonStates()
     end
 end
 function Card.onHover(self, gameManager, asset)

@@ -14,6 +14,7 @@ ____exports.default = __TS__Class()
 local AssetManager = ____exports.default
 AssetManager.name = "AssetManager"
 function AssetManager.prototype.____constructor(self, gameManager)
+    self.disabledSound = love.audio.newSource("Assets/Sounds/Disabled.wav", "static")
     self.gameManager = gameManager
     self.assets = __TS__New(Map)
     self.textManager = __TS__New(TextManager)
@@ -42,13 +43,30 @@ end
 function AssetManager.prototype.hideAsset(self, id)
     self.assets:delete(id)
 end
+function AssetManager.prototype.disableAsset(self, baseId)
+    local assets = self:getAssets(baseId)
+    if not isEmpty(assets) then
+        for ____, asset in ipairs(assets) do
+            asset:setDisabled(true)
+        end
+    end
+end
+function AssetManager.prototype.enableAsset(self, baseId)
+    local assets = self:getAssets(baseId)
+    if not isEmpty(assets) then
+        for ____, asset in ipairs(assets) do
+            asset:setDisabled(false)
+        end
+    end
+end
 function AssetManager.prototype.drawAssets(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue10
+                goto __continue18
             end
             for ____, asset in ipairs(assets) do
+                love.graphics.setColor(asset.color)
                 love.graphics.draw(
                     asset.image,
                     asset.x,
@@ -59,9 +77,10 @@ function AssetManager.prototype.drawAssets(self)
                     asset.offsetX,
                     asset.offsetY
                 )
+                love.graphics.setColor(1, 1, 1, 1)
             end
         end
-        ::__continue10::
+        ::__continue18::
     end
     self.textManager:drawText()
     self:drawHoverables()
@@ -70,7 +89,7 @@ function AssetManager.prototype.drawHoverables(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue16
+                goto __continue24
             end
             local asset = assets[1]
             if asset.isHovered then
@@ -80,7 +99,7 @@ function AssetManager.prototype.drawHoverables(self)
                 end
             end
         end
-        ::__continue16::
+        ::__continue24::
     end
 end
 function AssetManager.prototype.handleMousePressed(self, x, y, button)
@@ -93,14 +112,27 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue23
+                goto __continue31
             end
             local asset = assets[1]
-            if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() and not isEmpty(asset.onClick) then
-                asset:onClick()
+            if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
+                if asset.isDisabled then
+                    if not self.disabledSound:isPlaying() then
+                        self.disabledSound:play()
+                    end
+                elseif not isEmpty(asset.onClick) then
+                    asset:onClick()
+                    local ____opt_6 = asset.clickSound
+                    if not (____opt_6 and ____opt_6:isPlaying()) then
+                        local ____opt_8 = asset.clickSound
+                        if ____opt_8 ~= nil then
+                            ____opt_8:play()
+                        end
+                    end
+                end
             end
         end
-        ::__continue23::
+        ::__continue31::
     end
 end
 function AssetManager.prototype.handleMouseHover(self)
@@ -112,7 +144,7 @@ function AssetManager.prototype.handleMouseHover(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue29
+                goto __continue41
             end
             local asset = assets[1]
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
@@ -121,7 +153,7 @@ function AssetManager.prototype.handleMouseHover(self)
                 asset:setHovered(false)
             end
         end
-        ::__continue29::
+        ::__continue41::
     end
 end
 return ____exports

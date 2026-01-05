@@ -158,6 +158,8 @@ export default class Card {
         new Animation(0, -20, rankAsset)
       );
     }
+
+    this.gameManager.board?.updatePrimaryButtonStates();
   }
 
   onUnselect(): void {
@@ -213,6 +215,8 @@ export default class Card {
         new Animation(0, 20, rankAsset)
       );
     }
+
+    this.gameManager.board?.updatePrimaryButtonStates();
   }
 
   static onHover(gameManager: GameManager, asset: Asset): void {

@@ -37,6 +37,18 @@ function TextManager.prototype.updateText(self, id, newText)
         text.text = newText
     end
 end
+function TextManager.prototype.disableText(self, id)
+    local text = self.texts:get(id)
+    if not isEmpty(text) then
+        text:setDisabled(true)
+    end
+end
+function TextManager.prototype.enableText(self, id)
+    local text = self.texts:get(id)
+    if not isEmpty(text) then
+        text:setDisabled(false)
+    end
+end
 function TextManager.getDefaultFontFilepath(self)
     return "Assets/Fonts/Germania.ttf"
 end

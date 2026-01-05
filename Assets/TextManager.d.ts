@@ -8,6 +8,8 @@ export default class TextManager {
     getText(id: string): FontWithPosition | undefined;
     hideText(id: string): void;
     updateText(id: string, newText: string): void;
+    disableText(id: string): void;
+    enableText(id: string): void;
     static getDefaultFontFilepath(): string;
     static setDefaultFont(): Font;
 }

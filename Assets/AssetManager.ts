@@ -8,6 +8,7 @@ export default class AssetManager {
   gameManager: GameManager;
   assets: Map<string, Asset[]>;
   textManager: TextManager;
+  disabledSound = love.audio.newSource("Assets/Sounds/Disabled.wav", "static");
 
   constructor(gameManager: GameManager) {
     this.gameManager = gameManager;
@@ -36,6 +37,24 @@ export default class AssetManager {
     this.assets.delete(id);
   }
 
+  disableAsset(baseId: string): void {
+    const assets = this.getAssets(baseId);
+    if (!isEmpty(assets)) {
+      for (const asset of assets) {
+        asset.setDisabled(true);
+      }
+    }
+  }
+
+  enableAsset(baseId: string): void {
+    const assets = this.getAssets(baseId);
+    if (!isEmpty(assets)) {
+      for (const asset of assets) {
+        asset.setDisabled(false);
+      }
+    }
+  }
+
   drawAssets(): void {
     // Draw all assets
     for (const assets of this.assets.values()) {
@@ -43,6 +62,7 @@ export default class AssetManager {
         continue;
       }
       for (const asset of assets) {
+        love.graphics.setColor(asset.color);
         love.graphics.draw(
           asset.image,
           asset.x,
@@ -53,6 +73,7 @@ export default class AssetManager {
           asset.offsetX,
           asset.offsetY
         );
+        love.graphics.setColor(1, 1, 1, 1);
       }
     }
 
@@ -104,10 +125,18 @@ export default class AssetManager {
         gameX >= asset.x &&
         gameX <= asset.x + asset.getWidth() &&
         gameY >= asset.y &&
-        gameY <= asset.y + asset.getHeight() &&
-        !isEmpty(asset.onClick)
+        gameY <= asset.y + asset.getHeight()
       ) {
-        asset.onClick();
+        if (asset.isDisabled) {
+          if (!this.disabledSound.isPlaying()) {
+            this.disabledSound.play();
+          }
+        } else if (!isEmpty(asset.onClick)) {
+          asset.onClick();
+          if (!asset.clickSound?.isPlaying()) {
+            asset.clickSound?.play();
+          }
+        }
       }
     }
   }

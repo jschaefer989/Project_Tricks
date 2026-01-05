@@ -1,4 +1,5 @@
 import GameManager from "GameManager";
+import { Source } from "love.audio";
 import { Image } from "love.graphics";
 export type AssetCallback = (gameManager: GameManager, asset: Asset) => void;
 interface ConstructionOptions {
@@ -9,6 +10,8 @@ interface ConstructionOptions {
     readonly scaleY?: number;
     readonly offsetX?: number;
     readonly offsetY?: number;
+    readonly isDisabled?: boolean;
+    readonly clickSound?: Source;
 }
 export default class Asset {
     id: string;
@@ -24,13 +27,15 @@ export default class Asset {
     offsetY: number;
     isDisabled: boolean;
     isHovered: boolean;
+    color: [number, number, number, number];
+    clickSound?: Source;
     constructor(id: string, image: Image, x: number, y: number, constructionOptions?: ConstructionOptions);
     updatePosition(x: number, y: number): void;
     updateOrientation(orientation: number): void;
     updateScale(scaleX: number, scaleY: number): void;
     updateOffset(offsetX: number, offsetY: number): void;
-    setDisabled(disabled: boolean): void;
     setHovered(hovered: boolean): void;
+    setDisabled(disabled: boolean): void;
     getWidth(): number;
     getHeight(): number;
 }

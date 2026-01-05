@@ -17,6 +17,8 @@ local FontWithPosition = ____exports.default
 FontWithPosition.name = "FontWithPosition"
 function FontWithPosition.prototype.____constructor(self, x, y, text, options)
     self.iconFormat = ____exports.Format.LEFT
+    self.isDisabled = false
+    self.color = {1, 1, 1, 1}
     self.size = options and options.size
     self.filepath = options and options.filepath or TextManager:getDefaultFontFilepath()
     self.x = x
@@ -25,6 +27,15 @@ function FontWithPosition.prototype.____constructor(self, x, y, text, options)
     self.format = options and options.format or ____exports.Format.LEFT
     self.icon = options and options.icon
     self.iconFormat = options and options.iconFormat or (self.format == ____exports.Format.CENTER and ____exports.Format.LEFT or self.format)
+    local ____temp_12 = options and options.isDisabled
+    if ____temp_12 == nil then
+        ____temp_12 = false
+    end
+    self.isDisabled = ____temp_12
+end
+function FontWithPosition.prototype.setDisabled(self, disabled)
+    self.isDisabled = disabled
+    self.color = disabled and ({0.5, 0.5, 0.5, 1}) or ({1, 1, 1, 1})
 end
 function FontWithPosition.prototype.printFont(self)
     local font = not isEmpty(self.size) and love.graphics.newFont(self.filepath, self.size) or love.graphics.newFont(self.filepath)
@@ -33,7 +44,7 @@ function FontWithPosition.prototype.printFont(self)
     local textH = font:getHeight()
     local baseX = math.floor(self.x - self:getFormatOffset(textW))
     local baseY = math.floor(self.y - textH / 2)
-    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.setColor(0, 0, 0, self.color[4])
     local offsets = {
         -2,
         -1,
@@ -45,31 +56,31 @@ function FontWithPosition.prototype.printFont(self)
         for ____, oy in ipairs(offsets) do
             do
                 if ox == 0 and oy == 0 then
-                    goto __continue5
+                    goto __continue6
                 end
                 love.graphics.print(self.text, baseX + ox, baseY + oy)
             end
-            ::__continue5::
+            ::__continue6::
         end
     end
-    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setColor(self.color)
     love.graphics.print(self.text, baseX, baseY)
     self:renderIcon()
 end
 function FontWithPosition.prototype.getFormatOffset(self, textW)
     repeat
-        local ____switch10 = self.format
+        local ____switch11 = self.format
         local iconWidth
-        local ____cond10 = ____switch10 == ____exports.Format.LEFT
-        if ____cond10 then
+        local ____cond11 = ____switch11 == ____exports.Format.LEFT
+        if ____cond11 then
             return 0
         end
-        ____cond10 = ____cond10 or ____switch10 == ____exports.Format.CENTER
-        if ____cond10 then
+        ____cond11 = ____cond11 or ____switch11 == ____exports.Format.CENTER
+        if ____cond11 then
             return textW / 2
         end
-        ____cond10 = ____cond10 or ____switch10 == ____exports.Format.RIGHT
-        if ____cond10 then
+        ____cond11 = ____cond11 or ____switch11 == ____exports.Format.RIGHT
+        if ____cond11 then
             iconWidth = self.iconFormat == ____exports.Format.RIGHT and not isEmpty(self.icon) and self.icon:getWidth() + 5 or 0
             return textW + iconWidth
         end
@@ -82,10 +93,11 @@ function FontWithPosition.prototype.renderIcon(self)
     if isEmpty(self.icon) then
         return
     end
+    love.graphics.setColor(self.color)
     repeat
-        local ____switch13 = self.iconFormat
-        local ____cond13 = ____switch13 == ____exports.Format.LEFT
-        if ____cond13 then
+        local ____switch14 = self.iconFormat
+        local ____cond14 = ____switch14 == ____exports.Format.LEFT
+        if ____cond14 then
             love.graphics.draw(
                 self.icon,
                 self.x - self.icon:getWidth() - 5,
@@ -93,8 +105,8 @@ function FontWithPosition.prototype.renderIcon(self)
             )
             break
         end
-        ____cond13 = ____cond13 or ____switch13 == ____exports.Format.RIGHT
-        if ____cond13 then
+        ____cond14 = ____cond14 or ____switch14 == ____exports.Format.RIGHT
+        if ____cond14 then
             love.graphics.draw(
                 self.icon,
                 self.x - self.icon:getWidth(),

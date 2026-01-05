@@ -46,6 +46,7 @@ export default class Board {
     valueIcon: Image;
     biome: Biome;
     portraitPosition: number | undefined;
+    winFireSound: import("love.audio").Source;
     constructor(gameManager: GameManager, enemy?: Enemy);
     load(data: BoardData): void;
     save(): BoardData;
@@ -92,6 +93,7 @@ export default class Board {
     private buildAttackButton;
     private buildDiscardButton;
     private buildDeselectButton;
+    updatePrimaryButtonStates(): void;
     private buildPointBoard;
     private buildPowerAndValues;
     private updatePowerEmphasis;
@@ -103,6 +105,7 @@ export default class Board {
     private buildEnemyDeck;
     private buildEdelSuitText;
     private buildBackground;
+    private playWinFireSound;
     private buildWinFire;
     private removeWinFire;
     private getWinFireSprite;

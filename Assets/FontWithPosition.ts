@@ -16,6 +16,7 @@ interface ConstructionOptions {
   format?: Format;
   icon?: Image;
   iconFormat?: Omit<Format, Format.CENTER>;
+  isDisabled?: boolean;
 }
 
 export default class FontWithPosition {
@@ -27,6 +28,8 @@ export default class FontWithPosition {
   format: Format;
   icon?: Image
   iconFormat: Omit<Format, Format.CENTER> = Format.LEFT;
+  isDisabled: boolean = false;
+  color: [number, number, number, number] = [1, 1, 1, 1];
 
   constructor(
     x: number,
@@ -42,6 +45,12 @@ export default class FontWithPosition {
     this.format = options?.format ?? Format.LEFT;
     this.icon = options?.icon;
     this.iconFormat = options?.iconFormat ?? (this.format === Format.CENTER ? Format.LEFT : this.format) as Omit<Format, Format.CENTER>;
+    this.isDisabled = options?.isDisabled ?? false;
+  }
+
+  setDisabled(disabled: boolean): void {
+    this.isDisabled = disabled;
+    this.color = disabled ? [0.5, 0.5, 0.5, 1] : [1, 1, 1, 1];
   }
 
   printFont(): void {
@@ -56,7 +65,7 @@ export default class FontWithPosition {
     const baseY = Math.floor(this.y - textH / 2);
 
     // Thicker outline for readability on light backgrounds
-    love.graphics.setColor(0, 0, 0, 1);
+    love.graphics.setColor(0, 0, 0, this.color[3]);
     const offsets = [-2, -1, 0, 1, 2];
     for (const ox of offsets) {
       for (const oy of offsets) {
@@ -67,7 +76,7 @@ export default class FontWithPosition {
       }
     }
 
-    love.graphics.setColor(1, 1, 1, 1);
+    love.graphics.setColor(this.color);
     love.graphics.print(this.text, baseX, baseY);
     this.renderIcon();
   }
@@ -93,6 +102,7 @@ export default class FontWithPosition {
     if (isEmpty(this.icon)) {
       return;
     }
+    love.graphics.setColor(this.color);
     switch (this.iconFormat) {
       case Format.LEFT:
         love.graphics.draw(this.icon, this.x - this.icon.getWidth() - 5, this.y - (this.icon.getHeight() / 2) + 2);
