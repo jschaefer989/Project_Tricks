@@ -99,7 +99,7 @@ export declare enum TextIds {
     ENEMY_POWER = "ENEMY_POWER",
     ENEMY_VALUE = "ENEMY_VALUE",
     WIN_FIRE_TEXT = "WIN_FIRE_TEXT",
-    WINNINGS = "WINNINGS"
+    POINTS = "POINTS"
 }
 export declare enum AnimationIds {
     CARD_BASE_SELECT = "CARD_BASE_SELECT",

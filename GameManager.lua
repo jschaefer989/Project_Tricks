@@ -188,10 +188,6 @@ end
 function GameManager.prototype.switchToBoard(self, enemy)
     local boardState = {
         update = function(____, dt)
-            local ____opt_10 = self.board
-            if ____opt_10 ~= nil then
-                ____opt_10:drawBoard()
-            end
             self.assetManager:handleMouseHover()
             self.animationManager:updateAnimations(dt)
         end,
@@ -233,9 +229,9 @@ function GameManager.prototype.switchToBoard(self, enemy)
 end
 function GameManager.prototype.switchToWinScreen(self)
     local winState = {update = function(____, dt)
-        local ____opt_12 = self.winScreen
-        if ____opt_12 ~= nil then
-            ____opt_12:drawScreen()
+        local ____opt_10 = self.winScreen
+        if ____opt_10 ~= nil then
+            ____opt_10:drawScreen()
         end
     end}
     self.gameState = GameStates.WIN_SCREEN
@@ -250,9 +246,9 @@ function GameManager.prototype.switchToWinScreen(self)
 end
 function GameManager.prototype.switchToLoseScreen(self)
     local loseState = {update = function(____, dt)
-        local ____opt_14 = self.loseScreen
-        if ____opt_14 ~= nil then
-            ____opt_14:drawScreen()
+        local ____opt_12 = self.loseScreen
+        if ____opt_12 ~= nil then
+            ____opt_12:drawScreen()
         end
     end}
     self.gameState = GameStates.LOSE_SCREEN
@@ -286,9 +282,9 @@ function GameManager.prototype.switchToMap(self)
 end
 function GameManager.prototype.switchToShop(self)
     local shopState = {update = function(____, dt)
-        local ____opt_16 = self.shop
-        if ____opt_16 ~= nil then
-            ____opt_16:drawShop()
+        local ____opt_14 = self.shop
+        if ____opt_14 ~= nil then
+            ____opt_14:drawShop()
         end
     end}
     self.gameState = GameStates.SHOP
@@ -305,9 +301,9 @@ function GameManager.prototype.switchToShop(self)
 end
 function GameManager.prototype.switchToLevelUpScreen(self)
     local levelUpState = {update = function(____, dt)
-        local ____opt_18 = self.levelUpScreen
-        if ____opt_18 ~= nil then
-            ____opt_18:drawScreen()
+        local ____opt_16 = self.levelUpScreen
+        if ____opt_16 ~= nil then
+            ____opt_16:drawScreen()
         end
     end}
     self.gameState = GameStates.LEVEL_UP
@@ -324,9 +320,9 @@ function GameManager.prototype.switchToLevelUpScreen(self)
 end
 function GameManager.prototype.switchToPerkScreen(self)
     local perkState = {update = function(____, dt)
-        local ____opt_20 = self.perkScreen
-        if ____opt_20 ~= nil then
-            ____opt_20:drawScreen()
+        local ____opt_18 = self.perkScreen
+        if ____opt_18 ~= nil then
+            ____opt_18:drawScreen()
         end
     end}
     self.gameState = GameStates.PERKS
@@ -356,8 +352,8 @@ function GameManager.prototype.getCard(self, id)
             return card
         end
     end
-    local ____opt_22 = self.board
-    local enemy = ____opt_22 and ____opt_22.enemy
+    local ____opt_20 = self.board
+    local enemy = ____opt_20 and ____opt_20.enemy
     if isEmpty(enemy) then
         return
     end

@@ -16,7 +16,10 @@ import CardAssets, { padding } from "Assets/CardAssets";
 import * as push from "Libraries.push";
 import Asset from "Assets/Asset";
 import { isEmpty } from "Helpers";
-import FontWithPosition, { Format, OutlineThickness } from "Assets/FontWithPosition";
+import FontWithPosition, {
+  Format,
+  OutlineThickness,
+} from "Assets/FontWithPosition";
 import Card from "Cards/Card";
 import { Image } from "love.graphics";
 
@@ -102,18 +105,17 @@ export default class Board {
     };
   }
 
-  getPlayerWinnings(): number {
-    let winnings = this.playerValue - this.enemyValue;
-    if (winnings < 0) winnings = 0;
-    return winnings;
+  getPlayerPoints(): number {
+    let points = this.playerValue - this.enemyValue;
+    if (points < 0) points = 0;
+    return points;
   }
 
-  getEnemyWinnings(): number {
-    let winnings = this.enemyValue - this.playerValue;
-    if (winnings < 0) winnings = 0;
-    return winnings;
+  getEnemyPoints(): number {
+    let points = this.enemyValue - this.playerValue;
+    if (points < 0) points = 0;
+    return points;
   }
-
 
   handleStartFight(): void {
     this.showingEdelView = false;
@@ -124,10 +126,7 @@ export default class Board {
 
     this.dealer.startGame();
     this.buildFightAssets();
-    this.gameManager.assetManager.textManager.hideText(TextIds.EDEL_LABEL);
-    this.gameManager.assetManager.hideAsset(AssetIds.EDEL_BOARD);
-    this.gameManager.assetManager.hideAsset(AssetIds.EDEL_SUIT_ICON_LEFT);
-    this.gameManager.assetManager.hideAsset(AssetIds.EDEL_SUIT_ICON_RIGHT);
+    this.hideEdelBoard();
   }
 
   buildFightAssets(): void {
@@ -135,6 +134,13 @@ export default class Board {
     this.buildPointBoard();
     this.buildPowerAndValues(CharacterTypes.PLAYER);
     this.buildPowerAndValues(CharacterTypes.ENEMY);
+  }
+
+  private hideEdelBoard(): void {
+    this.gameManager.assetManager.textManager.hideText(TextIds.EDEL_LABEL);
+    this.gameManager.assetManager.hideAsset(AssetIds.EDEL_BOARD);
+    this.gameManager.assetManager.hideAsset(AssetIds.EDEL_SUIT_ICON_LEFT);
+    this.gameManager.assetManager.hideAsset(AssetIds.EDEL_SUIT_ICON_RIGHT);
   }
 
   handleAttack(): void {
@@ -145,17 +151,16 @@ export default class Board {
     }
 
     if (this.playerPower > this.enemyPower) {
-      this.addPlayerPoints(this.getPlayerWinnings());
+      this.addPlayerPoints(this.getPlayerPoints());
     } else {
-      this.addEnemyPoints(this.getEnemyWinnings());
+      this.addEnemyPoints(this.getEnemyPoints());
     }
-
-    this.clearStats();
 
     this.gameManager.player.removeSelectedCardsFromHand();
     this.gameManager.board?.dealer.dealCards(CharacterTypes.PLAYER);
 
     this.enemy.removeAllCardsFromHand();
+    this.clearEnemyStats();
     this.gameManager.board?.dealer.dealCards(CharacterTypes.ENEMY);
   }
 
@@ -233,9 +238,17 @@ export default class Board {
     }
   }
 
-  clearStats(): void {
+  private clearStats(): void {
+    this.clearPlayerStats();
+    this.clearEnemyStats();
+  }
+
+  private clearPlayerStats(): void {
     this.addPlayerPower(-this.playerPower);
     this.addPlayerValue(-this.playerValue);
+  }
+
+  private clearEnemyStats(): void {
     this.addEnemyPower(-this.enemyPower);
     this.addEnemyValue(-this.enemyValue);
   }
@@ -261,8 +274,8 @@ export default class Board {
       `Value: ${this.playerValue}`
     );
     this.gameManager.assetManager.textManager.updateText(
-      TextIds.WINNINGS,
-      `Winnings: ${this.getPlayerWinnings()}`
+      TextIds.POINTS,
+      `Points: ${this.getPlayerPoints()}`
     );
   }
 
@@ -330,6 +343,25 @@ export default class Board {
     const screenH = push.getHeight();
     const buttonX = Math.floor((screenW - buttonWidth) / 2);
     const buttonY = Math.floor((screenH - buttonHeight) / 2);
+    const centerX = buttonX + buttonWidth / 2;
+    const centerY = buttonY + buttonHeight / 2;
+
+    const letsFightButtonText = new FontWithPosition(
+      TextIds.LETS_FIGHT_BUTTON_CAPTION,
+      centerX,
+      centerY,
+      "Let's Fight!",
+      {
+        size: 27,
+        format: Format.CENTER,
+        outlineThickness: OutlineThickness.THICK,
+      }
+    );
+    this.gameManager.assetManager.textManager.addText(
+      TextIds.LETS_FIGHT_BUTTON_CAPTION,
+      letsFightButtonText
+    );
+
     this.gameManager.assetManager.addAsset(
       AssetIds.LETS_FIGHT_BUTTON,
       new Asset(
@@ -337,23 +369,14 @@ export default class Board {
         this.letsFightButton,
         buttonX,
         buttonY + 85,
-        { onClick: () => this.handleStartFight() }
-      )
-    );
-
-    const centerX = buttonX + buttonWidth / 2;
-    const centerY = buttonY + buttonHeight / 2;
-    this.gameManager.assetManager.textManager.addText(
-      TextIds.LETS_FIGHT_BUTTON_CAPTION,
-      new FontWithPosition(
-        TextIds.LETS_FIGHT_BUTTON_CAPTION,
-        centerX,
-        centerY,
-        "Let's Fight!",
         {
-          size: 27,
-          format: Format.CENTER,
-          outlineThickness: OutlineThickness.THICK,
+          onClick: () => this.handleStartFight(),
+          hoverEffect: [HoverEffects.CHANGE_COLOR],
+          mousePressEffect: [
+            MousePressEffects.DARKEN,
+            MousePressEffects.SHIFT_DOWN,
+          ],
+          associatedTexts: [letsFightButtonText],
         }
       )
     );
@@ -638,7 +661,7 @@ export default class Board {
       new FontWithPosition(
         powerId,
         15,
-        portraitHeight + portraitAsset.y + 18,
+        portraitHeight + portraitAsset.y + 24,
         `Power: ${powerValue}`,
         { size: 9, icon: this.attackPowerIcon }
       )
@@ -657,7 +680,7 @@ export default class Board {
       new FontWithPosition(
         valueId,
         15,
-        portraitHeight + portraitAsset.y + 28,
+        portraitHeight + portraitAsset.y + 34,
         `Value: ${valueValue}`,
         { size: 9, icon: this.valueIcon }
       )
@@ -717,11 +740,11 @@ export default class Board {
       new FontWithPosition(
         portraitNameId,
         10,
-        portraitHeight + portraitPosition + 8,
+        portraitHeight + portraitPosition + 12,
         characterType === CharacterTypes.PLAYER
           ? this.gameManager.player.name
           : this.enemy.name,
-        { size: 9, outlineThickness: OutlineThickness.THICK }
+        { size: 16, filepath: "Assets/Fonts/Bitmgothic.ttf" }
       )
     );
 
@@ -734,7 +757,7 @@ export default class Board {
       new FontWithPosition(
         portraitLevelId,
         10,
-        portraitHeight + portraitPosition + 20,
+        portraitHeight + portraitPosition + 26,
         `Lvl ${
           characterType === CharacterTypes.PLAYER
             ? this.gameManager.player.level
@@ -750,7 +773,7 @@ export default class Board {
         new FontWithPosition(
           TextIds.PLAYER_PORTRAIT_EXPERIENCE,
           portraitBackgroundWidth,
-          portraitHeight + portraitPosition + 20,
+          portraitHeight + portraitPosition + 26,
           `${this.gameManager.player.experience} xp`,
           { size: 9, format: Format.RIGHT }
         )
@@ -786,7 +809,7 @@ export default class Board {
         new FontWithPosition(
           TextIds.PLAYER_PORTRAIT_MONEY,
           portraitBackgroundWidth,
-          portraitHeight + portraitPosition + 8,
+          portraitHeight + portraitPosition + 10,
           `${this.gameManager.player.money}`,
           { size: 9, icon: this.markIcon, format: Format.RIGHT }
         )
@@ -823,12 +846,12 @@ export default class Board {
     const boardWidth = this.edelBoard.getWidth();
     const screenW = push.getWidth();
     const boardX = Math.floor((screenW - boardWidth) / 2);
-        this.gameManager.assetManager.addAsset(
+    this.gameManager.assetManager.addAsset(
       AssetIds.EDEL_BOARD,
       new Asset(AssetIds.EDEL_BOARD, this.edelBoard, boardX, 5)
     );
 
-    const centerX = screenW / 2;    
+    const centerX = screenW / 2;
 
     this.gameManager.assetManager.textManager.addText(
       TextIds.EDEL_LABEL,
@@ -837,23 +860,30 @@ export default class Board {
         centerX,
         20,
         Card.getSuitName(this.edelSuit),
-        { size: 16, format: Format.CENTER, filepath: "Assets/Fonts/Bitmgothic.ttf" }
+        {
+          size: 16,
+          format: Format.CENTER,
+          filepath: "Assets/Fonts/Bitmgothic.ttf",
+        }
       )
     );
 
-    const suitImage = love.graphics.newImage(CardAssets.getSuitAssetPath(this.edelSuit));
-    this.gameManager.assetManager.addAsset(AssetIds.EDEL_SUIT_ICON_LEFT, new Asset(
+    const suitImage = love.graphics.newImage(
+      CardAssets.getSuitAssetPath(this.edelSuit)
+    );
+    this.gameManager.assetManager.addAsset(
       AssetIds.EDEL_SUIT_ICON_LEFT,
-      suitImage,
-      boardX + 5,
-      10,
-    ));
-    this.gameManager.assetManager.addAsset(AssetIds.EDEL_SUIT_ICON_RIGHT, new Asset(
+      new Asset(AssetIds.EDEL_SUIT_ICON_LEFT, suitImage, boardX + 5, 10)
+    );
+    this.gameManager.assetManager.addAsset(
       AssetIds.EDEL_SUIT_ICON_RIGHT,
-      suitImage,
-      boardX + boardWidth - suitImage.getWidth() - 5,
-      10,
-    ));
+      new Asset(
+        AssetIds.EDEL_SUIT_ICON_RIGHT,
+        suitImage,
+        boardX + boardWidth - suitImage.getWidth() - 5,
+        10
+      )
+    );
   }
 
   private buildBackground(): void {
@@ -901,34 +931,34 @@ export default class Board {
       TextIds.WIN_FIRE_TEXT,
       new FontWithPosition(
         TextIds.WIN_FIRE_TEXT,
-        portraitCenterX * 2,
-        centerY + 10,
-        "You are\ndominating!",
-        { size: 16, format: Format.CENTER }
+        portraitCenterX + 20,
+        centerY + 20,
+        "You are winning!",
+        { size: 9, format: Format.CENTER, outlineThickness: OutlineThickness.THICK }
       )
     );
 
-    const winnings = this.getPlayerWinnings();
-    if (winnings <= 0) {
+    const points = this.getPlayerPoints();
+    if (points <= 0) {
       this.gameManager.assetManager.textManager.addText(
-        TextIds.WINNINGS,
+        TextIds.POINTS,
         new FontWithPosition(
-          TextIds.WINNINGS,
-          portraitCenterX * 2,
-          centerY + 50,
-          "But you'll get no winnings...",
-          { size: 10, format: Format.CENTER }
+          TextIds.POINTS,
+          portraitCenterX + 15,
+          centerY + 32,
+          "But you'll get no points...",
+          { size: 9, format: Format.CENTER }
         )
       );
     } else {
       this.gameManager.assetManager.textManager.addText(
-        TextIds.WINNINGS,
+        TextIds.POINTS,
         new FontWithPosition(
-          TextIds.WINNINGS,
-          portraitCenterX * 2,
-          centerY + 50,
-          "Winnings: " + winnings,
-          { size: 10, format: Format.CENTER }
+          TextIds.POINTS,
+          portraitCenterX + 10,
+          centerY + 32,
+          "Points: " + points,
+          { size: 9, format: Format.CENTER }
         )
       );
     }
@@ -937,7 +967,7 @@ export default class Board {
   private removeWinFire(): void {
     this.gameManager.assetManager.hideAsset(AssetIds.BASIC_WIN_FIRE);
     this.gameManager.assetManager.textManager.hideText(TextIds.WIN_FIRE_TEXT);
-    this.gameManager.assetManager.textManager.hideText(TextIds.WINNINGS);
+    this.gameManager.assetManager.textManager.hideText(TextIds.POINTS);
   }
 
   private getWinFireSprite(): Image {
