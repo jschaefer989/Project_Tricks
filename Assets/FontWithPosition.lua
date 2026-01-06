@@ -12,6 +12,13 @@ ____exports.Format.CENTER = 1
 ____exports.Format[____exports.Format.CENTER] = "CENTER"
 ____exports.Format.RIGHT = 2
 ____exports.Format[____exports.Format.RIGHT] = "RIGHT"
+____exports.OutlineThickness = OutlineThickness or ({})
+____exports.OutlineThickness.NONE = 0
+____exports.OutlineThickness[____exports.OutlineThickness.NONE] = "NONE"
+____exports.OutlineThickness.THIN = 1
+____exports.OutlineThickness[____exports.OutlineThickness.THIN] = "THIN"
+____exports.OutlineThickness.THICK = 2
+____exports.OutlineThickness[____exports.OutlineThickness.THICK] = "THICK"
 ____exports.default = __TS__Class()
 local FontWithPosition = ____exports.default
 FontWithPosition.name = "FontWithPosition"
@@ -33,6 +40,13 @@ function FontWithPosition.prototype.____constructor(self, id, x, y, text, option
         ____temp_12 = false
     end
     self.isDisabled = ____temp_12
+    self.outlineThickness = options and options.outlineThickness or ____exports.OutlineThickness.THIN
+    if self.isDisabled then
+        self:setDisabled(true)
+    end
+    self.color = options and options.color or ({1, 1, 1, 1})
+    self.limit = options and options.limit
+    self.alignMode = options and options.alignMode
 end
 function FontWithPosition.prototype.setDisabled(self, disabled)
     self.isDisabled = disabled
@@ -45,44 +59,61 @@ function FontWithPosition.prototype.printFont(self)
     local textH = font:getHeight()
     local baseX = math.floor(self.x - self:getFormatOffset(textW))
     local baseY = math.floor(self.y - textH / 2)
+    self:printOutline(baseX, baseY)
+    love.graphics.setColor(self.color)
+    local ____temp_21
+    if not isEmpty(self.limit) then
+        ____temp_21 = love.graphics.printf(
+            self.text,
+            baseX,
+            baseY,
+            self.limit,
+            self.alignMode or "left"
+        )
+    else
+        ____temp_21 = love.graphics.print(self.text, baseX, baseY)
+    end
+    self:renderIcon()
+end
+function FontWithPosition.prototype.printOutline(self, x, y)
+    if self.outlineThickness == ____exports.OutlineThickness.NONE then
+        return
+    end
     love.graphics.setColor(0, 0, 0, self.color[4])
-    local offsets = {
+    local offsets = self.outlineThickness == ____exports.OutlineThickness.THICK and ({
         -2,
         -1,
         0,
         1,
         2
-    }
+    }) or ({-1, 0, 1})
     for ____, ox in ipairs(offsets) do
         for ____, oy in ipairs(offsets) do
             do
                 if ox == 0 and oy == 0 then
-                    goto __continue6
+                    goto __continue9
                 end
-                love.graphics.print(self.text, baseX + ox, baseY + oy)
+                love.graphics.print(self.text, x + ox, y + oy)
             end
-            ::__continue6::
+            ::__continue9::
         end
     end
-    love.graphics.setColor(self.color)
-    love.graphics.print(self.text, baseX, baseY)
-    self:renderIcon()
 end
 function FontWithPosition.prototype.getFormatOffset(self, textW)
     repeat
-        local ____switch11 = self.format
+        local ____switch14 = self.format
         local iconWidth
-        local ____cond11 = ____switch11 == ____exports.Format.LEFT
-        if ____cond11 then
+        local ____cond14 = ____switch14 == ____exports.Format.LEFT
+        if ____cond14 then
             return 0
         end
-        ____cond11 = ____cond11 or ____switch11 == ____exports.Format.CENTER
-        if ____cond11 then
+        ____cond14 = ____cond14 or ____switch14 == ____exports.Format.CENTER
+        if ____cond14 then
             return textW / 2
         end
-        ____cond11 = ____cond11 or ____switch11 == ____exports.Format.RIGHT
-        if ____cond11 then
-            iconWidth = self.iconFormat == ____exports.Format.RIGHT and not isEmpty(self.icon) and self.icon:getWidth() + 5 or 0
+        ____cond14 = ____cond14 or ____switch14 == ____exports.Format.RIGHT
+        if ____cond14 then
+            iconWidth = self.iconFormat == ____exports.Format.RIGHT and not isEmpty(self.icon) and self.icon:getWidth() or 0
             return textW + iconWidth
         end
         do
@@ -96,22 +127,22 @@ function FontWithPosition.prototype.renderIcon(self)
     end
     love.graphics.setColor(self.color)
     repeat
-        local ____switch14 = self.iconFormat
-        local ____cond14 = ____switch14 == ____exports.Format.LEFT
-        if ____cond14 then
+        local ____switch17 = self.iconFormat
+        local ____cond17 = ____switch17 == ____exports.Format.LEFT
+        if ____cond17 then
             love.graphics.draw(
                 self.icon,
-                self.x - self.icon:getWidth() - 5,
-                self.y - self.icon:getHeight() / 2 + 2
+                self.x - self.icon:getWidth() - 1,
+                self.y - self.icon:getHeight() / 2
             )
             break
         end
-        ____cond14 = ____cond14 or ____switch14 == ____exports.Format.RIGHT
-        if ____cond14 then
+        ____cond17 = ____cond17 or ____switch17 == ____exports.Format.RIGHT
+        if ____cond17 then
             love.graphics.draw(
                 self.icon,
-                self.x - self.icon:getWidth(),
-                self.y - self.icon:getHeight() / 2 + 2
+                self.x - self.icon:getWidth() + 1,
+                self.y - self.icon:getHeight() / 2
             )
             break
         end

@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { Image } from "love.graphics";
+import { AlignMode, Image } from "love.graphics";
 import TextManager from "./TextManager";
 import { isEmpty } from "Helpers";
 
@@ -10,13 +10,23 @@ export enum Format {
     RIGHT
 }
 
+export enum OutlineThickness {
+    NONE = 0,
+    THIN = 1,
+    THICK = 2
+}
+
 interface ConstructionOptions {
   filepath?: string;
-  size?: number;
+  size?: number; // Powers of 9 look really crisp
   format?: Format;
   icon?: Image;
   iconFormat?: Omit<Format, Format.CENTER>;
   isDisabled?: boolean;
+  outlineThickness?: OutlineThickness;
+  color?: [number, number, number, number];
+  limit?: number;
+  alignMode?: AlignMode;
 }
 
 export default class FontWithPosition {
@@ -31,6 +41,9 @@ export default class FontWithPosition {
   iconFormat: Omit<Format, Format.CENTER> = Format.LEFT;
   isDisabled: boolean = false;
   color: [number, number, number, number] = [1, 1, 1, 1];
+  outlineThickness: OutlineThickness;
+  limit?: number;
+  alignMode?: AlignMode;
 
   constructor(
     id: string,
@@ -49,6 +62,13 @@ export default class FontWithPosition {
     this.icon = options?.icon;
     this.iconFormat = options?.iconFormat ?? (this.format === Format.CENTER ? Format.LEFT : this.format) as Omit<Format, Format.CENTER>;
     this.isDisabled = options?.isDisabled ?? false;
+    this.outlineThickness = options?.outlineThickness ?? OutlineThickness.THIN;
+    if (this.isDisabled) {
+      this.setDisabled(true);
+    }
+    this.color = options?.color ?? [1, 1, 1, 1];
+    this.limit = options?.limit;
+    this.alignMode = options?.alignMode;
   }
 
   setDisabled(disabled: boolean): void {
@@ -67,21 +87,28 @@ export default class FontWithPosition {
     const baseX = Math.floor(this.x - this.getFormatOffset(textW));
     const baseY = Math.floor(this.y - textH / 2);
 
-    // Thicker outline for readability on light backgrounds
+    this.printOutline(baseX, baseY);
+
+    love.graphics.setColor(this.color);
+    !isEmpty(this.limit) ? love.graphics.printf(this.text, baseX, baseY, this.limit, this.alignMode ?? "left") : love.graphics.print(this.text, baseX, baseY);
+    this.renderIcon();
+  }
+
+  private printOutline(x: number, y: number): void {
+    if (this.outlineThickness === OutlineThickness.NONE) {
+      return;
+    }
+
     love.graphics.setColor(0, 0, 0, this.color[3]);
-    const offsets = [-2, -1, 0, 1, 2];
+    const offsets = this.outlineThickness === OutlineThickness.THICK ? [-2, -1, 0, 1, 2] : [-1, 0, 1];
     for (const ox of offsets) {
       for (const oy of offsets) {
         if (ox === 0 && oy === 0) {
           continue;
         }
-        love.graphics.print(this.text, baseX + ox, baseY + oy);
+        love.graphics.print(this.text, x + ox, y + oy);
       }
     }
-
-    love.graphics.setColor(this.color);
-    love.graphics.print(this.text, baseX, baseY);
-    this.renderIcon();
   }
 
   private getFormatOffset(textW: number): number {
@@ -93,7 +120,7 @@ export default class FontWithPosition {
       case Format.RIGHT:
         // If there's an icon that will be rendered to the right, account for its width
         const iconWidth = (this.iconFormat === Format.RIGHT && !isEmpty(this.icon)) 
-          ? this.icon.getWidth() + 5 
+          ? this.icon.getWidth() 
           : 0;
         return textW + iconWidth;
       default:
@@ -108,10 +135,10 @@ export default class FontWithPosition {
     love.graphics.setColor(this.color);
     switch (this.iconFormat) {
       case Format.LEFT:
-        love.graphics.draw(this.icon, this.x - this.icon.getWidth() - 5, this.y - (this.icon.getHeight() / 2) + 2);
+        love.graphics.draw(this.icon, this.x - this.icon.getWidth() - 1, this.y - (this.icon.getHeight() / 2));
         break;
       case Format.RIGHT:
-        love.graphics.draw(this.icon, this.x - this.icon.getWidth(), this.y - (this.icon.getHeight() / 2) + 2);
+        love.graphics.draw(this.icon, this.x - this.icon.getWidth() + 1, this.y - (this.icon.getHeight() / 2));
         break;
     }
   }

@@ -11,7 +11,7 @@ _G.SYSLText = Text -- Make it globally available for TypeScript
 local GameManager = require("GameManager").default
 local gameManager = tsNew(GameManager)
 
-love.graphics.setDefaultFilter("nearest", "nearest")
+love.graphics.setDefaultFilter("nearest", "nearest", 1)
 
 function love.load()    
     love.window.setTitle("Tricks")

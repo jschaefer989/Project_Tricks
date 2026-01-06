@@ -94,8 +94,6 @@ export default class Board {
     updatePrimaryButtonStates(): void;
     private buildPointBoard;
     private buildPowerAndValues;
-    private updatePowerEmphasis;
-    private updateValueEmphasis;
     private buildPlayerPortrait;
     private buildEnemyPortrait;
     private buildPortrait;

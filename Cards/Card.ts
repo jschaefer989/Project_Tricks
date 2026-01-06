@@ -6,6 +6,7 @@ import { exhaustiveGuard, isEmpty } from "Helpers";
 import Asset from "Assets/Asset";
 import SlideAnimation from "Assets/Animations/SlideAnimation";
 import { AnimationAssets } from "Assets/Animations/Animation";
+import TextManager from "Assets/TextManager";
 
 export interface CardData {
   id: string;
@@ -213,15 +214,16 @@ export default class Card {
   }
 
   static onHover(gameManager: GameManager, asset: Asset): void {
-    const tooltipMaxWidth = 200;
-    const padding = 20;
-    const bgPadding = 8;
+    const tooltipMaxWidth = 100;
+    const padding = 10;
+    const bgPadding = 4;
 
     // Extract card ID from asset ID (format: "BASE_CARD_TEMPLATE-{cardId}")
     // TODO: move to its own method somewhere (not CardAssets)
     const cardId = asset.id.split("-")[1];
     const card = gameManager.getCard(cardId);
-    const font = love.graphics.getFont();
+    const font = love.graphics.newFont(TextManager.getDefaultFontFilepath(), 9);
+    love.graphics.setFont(font);
 
     if (isEmpty(card) || isEmpty(font)) {
       return;
@@ -239,7 +241,7 @@ export default class Card {
     const bgX = tooltipX - bgPadding;
     const bgY = tooltipY - bgPadding;
     const bgW = tooltipMaxWidth + bgPadding * 2;
-    const bgH = lineHeight * 4 + bgPadding * 2;
+    const bgH = lineHeight * 2 + bgPadding * 2;
 
     // Draw background
     love.graphics.setColor(0, 0, 0, 0.8);
@@ -266,14 +268,14 @@ export default class Card {
     love.graphics.printf(
       "Power: " + card.power,
       tooltipX,
-      tooltipY + 20,
+      tooltipY + 10,
       tooltipMaxWidth,
       "left"
     );
     love.graphics.printf(
       "Value: " + card.value,
       tooltipX,
-      tooltipY + 40,
+      tooltipY + 20,
       tooltipMaxWidth,
       "left"
     );

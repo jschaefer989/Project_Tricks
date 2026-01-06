@@ -38,8 +38,6 @@ local PerkScreen = ____PerkScreen.default
 local push = require("Libraries.push")
 local ____AssetManager = require("Assets.AssetManager")
 local AssetManager = ____AssetManager.default
-local ____TextManager = require("Assets.TextManager")
-local TextManager = ____TextManager.default
 local ____AnimationManager = require("Assets.Animations.AnimationManager")
 local AnimationManager = ____AnimationManager.default
 local ____MusicPlayer = require("Assets.Music.MusicPlayer")
@@ -59,19 +57,16 @@ function GameManager.prototype.____constructor(self)
     self.animationManager = __TS__New(AnimationManager, self)
     self.musicPlayer = __TS__New(MusicPlayer, self)
     self.biome = __TS__New(Grass)
-    if not self.devMode then
-        TextManager:setDefaultFont()
-    end
 end
 function GameManager.prototype.getCharacter(self, characterType)
     repeat
-        local ____switch5 = characterType
-        local ____cond5 = ____switch5 == CharacterTypes.PLAYER
-        if ____cond5 then
+        local ____switch4 = characterType
+        local ____cond4 = ____switch4 == CharacterTypes.PLAYER
+        if ____cond4 then
             return self.player
         end
-        ____cond5 = ____cond5 or ____switch5 == CharacterTypes.ENEMY
-        if ____cond5 then
+        ____cond4 = ____cond4 or ____switch4 == CharacterTypes.ENEMY
+        if ____cond4 then
             local ____opt_0 = self.board
             return ____opt_0 and ____opt_0.enemy
         end
@@ -90,54 +85,54 @@ function GameManager.prototype.switchBasedOnGameState(self, gameState, enemy)
         self.musicPlayer:play(gameState, self.biome)
     end
     repeat
-        local ____switch8 = gameState
-        local ____cond8 = ____switch8 == GameStates.MAIN_MENU
-        if ____cond8 then
+        local ____switch7 = gameState
+        local ____cond7 = ____switch7 == GameStates.MAIN_MENU
+        if ____cond7 then
             self:switchToMainMenu()
             break
         end
-        ____cond8 = ____cond8 or ____switch8 == GameStates.NEW_GAME_MENU
-        if ____cond8 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.NEW_GAME_MENU
+        if ____cond7 then
             self:switchToNewGameMenu()
             break
         end
-        ____cond8 = ____cond8 or ____switch8 == GameStates.BOARD
-        if ____cond8 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.BOARD
+        if ____cond7 then
             self:switchToBoard(enemy)
             break
         end
-        ____cond8 = ____cond8 or ____switch8 == GameStates.PAUSE_MENU
-        if ____cond8 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.PAUSE_MENU
+        if ____cond7 then
             self:switchToPauseMenu()
             break
         end
-        ____cond8 = ____cond8 or ____switch8 == GameStates.WIN_SCREEN
-        if ____cond8 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.WIN_SCREEN
+        if ____cond7 then
             self:switchToWinScreen()
             break
         end
-        ____cond8 = ____cond8 or ____switch8 == GameStates.LOSE_SCREEN
-        if ____cond8 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.LOSE_SCREEN
+        if ____cond7 then
             self:switchToLoseScreen()
             break
         end
-        ____cond8 = ____cond8 or ____switch8 == GameStates.MAP
-        if ____cond8 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.MAP
+        if ____cond7 then
             self:switchToMap()
             break
         end
-        ____cond8 = ____cond8 or ____switch8 == GameStates.SHOP
-        if ____cond8 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.SHOP
+        if ____cond7 then
             self:switchToShop()
             break
         end
-        ____cond8 = ____cond8 or ____switch8 == GameStates.LEVEL_UP
-        if ____cond8 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.LEVEL_UP
+        if ____cond7 then
             self:switchToLevelUpScreen()
             break
         end
-        ____cond8 = ____cond8 or ____switch8 == GameStates.PERKS
-        if ____cond8 then
+        ____cond7 = ____cond7 or ____switch7 == GameStates.PERKS
+        if ____cond7 then
             self:switchToPerkScreen()
             break
         end

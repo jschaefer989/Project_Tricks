@@ -4,6 +4,7 @@ import { Suits, Ranks, EdelRanks, CharacterTypes } from "Enums";
 import GameManager from "GameManager";
 import Point from "Point";
 import { Image } from "love.graphics";
+export declare const padding = 5;
 interface AssetsForCard {
     baseAsset: Asset;
     suitAssets: Asset[];

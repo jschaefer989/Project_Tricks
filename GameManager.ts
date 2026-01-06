@@ -62,9 +62,6 @@ export default class GameManager {
     this.animationManager = new AnimationManager(this);
     this.musicPlayer = new MusicPlayer(this);
     this.biome = new Grass(); // TODO: initialize this based on data from the map
-    if (!this.devMode) {
-      TextManager.setDefaultFont();
-    }
   }
 
   getCharacter(characterType: string): Character | undefined {

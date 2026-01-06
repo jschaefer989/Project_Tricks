@@ -23,7 +23,7 @@ local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
 local push = require("Libraries.push")
-local padding = 20
+____exports.padding = 5
 ____exports.default = __TS__Class()
 local CardAssets = ____exports.default
 CardAssets.name = "CardAssets"
@@ -110,10 +110,10 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
     )
 end
 function CardAssets.prototype.getNormalSuitPosition(self, x, y)
-    return {x = x + 10, y = y + 10}
+    return {x = x + ____exports.padding + 1, y = y + ____exports.padding + 1}
 end
 function CardAssets.prototype.getFlippedSuitPosition(self, x, y)
-    return {x = x + self.baseW - 10, y = y + self.baseH - 10}
+    return {x = x + self.baseW - ____exports.padding - 1, y = y + self.baseH - ____exports.padding - 1}
 end
 function CardAssets.prototype.addRankAsset(self, card, x, y, includeClickHandler)
     if includeClickHandler == nil then
@@ -262,14 +262,14 @@ function CardAssets.prototype.centerCards(self, characterType)
     end
     local cardCount = #character.hand
     local screenW = push:getWidth()
-    local totalW = cardCount * self.baseW + math.max(0, cardCount - 1) * padding
+    local totalW = cardCount * self.baseW + math.max(0, cardCount - 1) * ____exports.padding
     local startX = math.floor((screenW - totalW) / 2)
     local cardY = self:getCardPosition(characterType)
     do
         local i = 0
         while i < #character.hand do
             local card = character.hand[i + 1]
-            local x = startX + i * (self.baseW + padding)
+            local x = startX + i * (self.baseW + ____exports.padding)
             self:updateCardPosition(card, x, cardY)
             i = i + 1
         end
@@ -282,19 +282,21 @@ function CardAssets.prototype.updateCardPosition(self, card, x, y)
     if ____opt_0 ~= nil then
         ____opt_0:updatePosition(x, y)
     end
+    local normalSuitPosition = self:getNormalSuitPosition(x, y)
+    local flippedSuitPosition = self:getFlippedSuitPosition(x, y)
     local ____opt_2 = assetManager:getAsset(
         baseAssetId,
         ____exports.default:getSuitAssetId(card, 0)
     )
     if ____opt_2 ~= nil then
-        ____opt_2:updatePosition(x + 10, y + 10)
+        ____opt_2:updatePosition(normalSuitPosition.x, normalSuitPosition.y)
     end
     local ____opt_4 = assetManager:getAsset(
         baseAssetId,
         ____exports.default:getSuitAssetId(card, 1)
     )
     if ____opt_4 ~= nil then
-        ____opt_4:updatePosition(x + self.baseW - 10, y + self.baseH - 10)
+        ____opt_4:updatePosition(flippedSuitPosition.x, flippedSuitPosition.y)
     end
     local rankAsset = self:getRankAsset(card)
     if isEmpty(rankAsset) then
@@ -343,7 +345,7 @@ function CardAssets.prototype.determineCardStartingPosition(self, characterType)
     end
     local cardCount = #character.hand
     local screenW = push:getWidth()
-    local totalW = cardCount * self.baseW + math.max(0, cardCount - 1) * padding
+    local totalW = cardCount * self.baseW + math.max(0, cardCount - 1) * ____exports.padding
     return {
         x = math.floor((screenW - totalW) / 2),
         y = self:getCardPosition(characterType)
@@ -355,7 +357,7 @@ function CardAssets.prototype.appendAsset(self, card, characterType)
         return
     end
     local cardPosition = self:determineCardStartingPosition(characterType)
-    local x = cardPosition.x + (#character.hand - 1) * (self.baseW + padding)
+    local x = cardPosition.x + (#character.hand - 1) * (self.baseW + ____exports.padding)
     self:addAsset(card, x, cardPosition.y, characterType == CharacterTypes.PLAYER)
 end
 function CardAssets.prototype.getCardAssets(self, card)

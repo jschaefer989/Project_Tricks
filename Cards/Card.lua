@@ -11,6 +11,8 @@ local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
 local ____SlideAnimation = require("Assets.Animations.SlideAnimation")
 local SlideAnimation = ____SlideAnimation.default
+local ____TextManager = require("Assets.TextManager")
+local TextManager = ____TextManager.default
 ____exports.default = __TS__Class()
 local Card = ____exports.default
 Card.name = "Card"
@@ -158,12 +160,16 @@ function Card.prototype.onUnselect(self)
     end
 end
 function Card.onHover(self, gameManager, asset)
-    local tooltipMaxWidth = 200
-    local padding = 20
-    local bgPadding = 8
+    local tooltipMaxWidth = 100
+    local padding = 10
+    local bgPadding = 4
     local cardId = __TS__StringSplit(asset.id, "-")[2]
     local card = gameManager:getCard(cardId)
-    local font = love.graphics.getFont()
+    local font = love.graphics.newFont(
+        TextManager:getDefaultFontFilepath(),
+        9
+    )
+    love.graphics.setFont(font)
     if isEmpty(card) or isEmpty(font) then
         return
     end
@@ -176,7 +182,7 @@ function Card.onHover(self, gameManager, asset)
     local bgX = tooltipX - bgPadding
     local bgY = tooltipY - bgPadding
     local bgW = tooltipMaxWidth + bgPadding * 2
-    local bgH = lineHeight * 4 + bgPadding * 2
+    local bgH = lineHeight * 2 + bgPadding * 2
     love.graphics.setColor(0, 0, 0, 0.8)
     love.graphics.rectangle(
         "fill",
@@ -211,14 +217,14 @@ function Card.onHover(self, gameManager, asset)
     love.graphics.printf(
         "Power: " .. tostring(card.power),
         tooltipX,
-        tooltipY + 20,
+        tooltipY + 10,
         tooltipMaxWidth,
         "left"
     )
     love.graphics.printf(
         "Value: " .. tostring(card.value),
         tooltipX,
-        tooltipY + 40,
+        tooltipY + 20,
         tooltipMaxWidth,
         "left"
     )

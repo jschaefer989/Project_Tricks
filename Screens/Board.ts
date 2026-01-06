@@ -14,15 +14,13 @@ import Draw from "../Draw";
 import Enemy, { EnemyData } from "Enemies/Enemy";
 import * as suit from "Libraries.suit-master.suit";
 import type GameManager from "../GameManager";
-import CardAssets from "Assets/CardAssets";
+import CardAssets, { padding } from "Assets/CardAssets";
 import * as push from "Libraries.push";
 import Asset from "Assets/Asset";
 import { isEmpty } from "Helpers";
-import FontWithPosition, { Format } from "Assets/FontWithPosition";
+import FontWithPosition, { Format, OutlineThickness } from "Assets/FontWithPosition";
 import Card from "Cards/Card";
 import { Image } from "love.graphics";
-
-const padding = 20;
 
 interface BoardData {
   discardUsed: number;
@@ -117,11 +115,11 @@ export default class Board {
   }
 
   drawInitialView(): void {
-    const btnW = 140;
-    const btnH = 70;
-    const lblH = 30;
-    const padX = 20;
-    const padY = 20;
+    const btnW = 70;
+    const btnH = 35;
+    const lblH = 15;
+    const padX = 10;
+    const padY = 10;
 
     const contentW = this.getContentWidth();
     const coords = this.getStartingCoordinates(contentW, btnH, lblH, padY);
@@ -138,7 +136,7 @@ export default class Board {
     this.renderEnemyRow(startX, startY, contentW, btnW, btnH, lblH, padX, padY);
 
     // Player row (below enemy) with buttons instead of selectable cards
-    startY = startY + lblH + padY + btnH + 200;
+    startY = startY + lblH + padY + btnH + 100;
     this.renderPlayerRowInitial(
       startX,
       startY,
@@ -151,7 +149,7 @@ export default class Board {
     );
 
     // Let's Fight button
-    this.renderLetsFightButton(startY + lblH + btnH + padY + 50, btnW, btnH);
+    this.renderLetsFightButton(startY + lblH + btnH + padY + 12, btnW, btnH);
 
     // Player info (upper-right)
     Draw.playerInfo(this.gameManager.player, this.gameManager);
@@ -161,11 +159,11 @@ export default class Board {
   }
 
   drawNormalView(): void {
-    const btnW = 140;
-    const btnH = 70;
-    const lblH = 30;
-    const padX = 20;
-    const padY = 20;
+    const btnW = 70;
+    const btnH = 35;
+    const lblH = 15;
+    const padX = 10;
+    const padY = 10;
 
     const contentW = this.getContentWidth();
     const coords = this.getStartingCoordinates(contentW, btnH, lblH, padY);
@@ -185,7 +183,7 @@ export default class Board {
     this.renderEnemyRow(startX, startY, contentW, btnW, btnH, lblH, padX, padY);
 
     // Player row (below enemy)
-    startY = startY + lblH + padY + btnH + 200;
+    startY = startY + lblH + padY + btnH + 100;
     this.renderPlayerRow(
       startX,
       startY,
@@ -199,7 +197,7 @@ export default class Board {
 
     // Submit button centered below
     this.renderAttackButton(
-      startY + lblH + btnH + padY + 50,
+      startY + lblH + btnH + padY + 25,
       btnW,
       btnH,
       padX,
@@ -234,7 +232,7 @@ export default class Board {
     const centerY = love.graphics.getHeight() / 2;
     return {
       startX: Math.floor(centerX - contentW / 2),
-      startY: Math.floor(centerY - totalH / 2 - 200),
+      startY: Math.floor(centerY - totalH / 2 - 100),
     };
   }
 
@@ -243,14 +241,14 @@ export default class Board {
     const playerHand = this.gameManager.player.hand;
 
     const rowWidth = (count: number): number => {
-      if (count <= 0) return 100;
-      return count * 100 + (count - 1) * 20;
+      if (count <= 0) return 25;
+      return count * 25 + (count - 1) * 5;
     };
 
     return Math.max(
       rowWidth(enemyHand.length),
       rowWidth(playerHand.length),
-      300
+      75
     );
   }
 
@@ -268,26 +266,26 @@ export default class Board {
 
   renderWinStatus(startX: number, startY: number): void {
     if (this.playerPower > this.enemyPower) {
-      const gap = 30;
-      const panelW = 180;
+      const gap = 15;
+      const panelW = 90;
       const selectedStatsW = this.gameManager.player.anySelectedCards()
-        ? 180
+        ? 90
         : 0;
       const selectedStatsGap = this.gameManager.player.anySelectedCards()
         ? gap
         : 0;
       const x = startX - panelW - gap - selectedStatsW - selectedStatsGap;
 
-      suit.layout.reset(x, startY, 10, 10);
+      suit.layout.reset(x, startY, 5, 5);
       suit.Label(
         "You will slay your foe!",
         { align: "left" },
-        ...suit.layout.row(panelW, 40)
+        ...suit.layout.row(panelW, 20)
       );
       suit.Label(
         "Your cashout: " + this.getPlayerWinnings(),
         { align: "left" },
-        ...suit.layout.row(panelW, 30)
+        ...suit.layout.row(panelW, 15)
       );
     }
   }
@@ -295,64 +293,64 @@ export default class Board {
   renderTrumpSuitLabel(): void {
     const screenW = love.graphics.getWidth();
     const centerX = screenW / 2;
-    const panelW = 300;
+    const panelW = 150;
     const panelX = Math.floor(centerX - panelW / 2);
 
-    suit.layout.reset(panelX, 20, 10, 10);
+    suit.layout.reset(panelX, 10, 5, 5);
     suit.Label(
       "Trump Suit: " + this.edelSuit,
       { align: "center" },
-      ...suit.layout.row(panelW, 40)
+      ...suit.layout.row(panelW, 20)
     );
   }
 
   renderPointsDisplay(): void {
     const screenW = love.graphics.getWidth();
     const centerX = screenW / 2;
-    const panelW = 300;
+    const panelW = 150;
     const panelX = Math.floor(centerX - panelW / 2);
 
-    suit.layout.reset(panelX, 70, 10, 10);
+    suit.layout.reset(panelX, 35, 5, 5);
     suit.Label(
       `${this.enemy.name}: ${this.enemyPoints} | Player: ${this.playerPoints}`,
       { align: "center" },
-      ...suit.layout.row(panelW, 30)
+      ...suit.layout.row(panelW, 15)
     );
   }
 
   renderEnemyStats(startX: number, startY: number): void {
-    const gap = 30;
-    const panelW = 150;
+    const gap = 15;
+    const panelW = 75;
     const x = startX - panelW - gap;
 
-    suit.layout.reset(x, startY, 10, 10);
+    suit.layout.reset(x, startY, 5, 5);
     suit.Label(
       `${this.enemy.name} Hand`,
       { align: "center" },
-      ...suit.layout.row(panelW, 30)
+      ...suit.layout.row(panelW, 15)
     );
     suit.Label(
       "Value: " + this.enemyValue,
       { align: "center" },
-      ...suit.layout.row(panelW, 30)
+      ...suit.layout.row(panelW, 15)
     );
     suit.Label(
       "Power: " + this.enemyPower,
       { align: "center" },
-      ...suit.layout.row(panelW, 30)
+      ...suit.layout.row(panelW, 15)
     );
   }
 
   renderEnemyDeck(): void {
     const enemyDeck = this.enemy.deck;
 
-    suit.layout.reset(10, 10, 10, 10);
+    suit.layout.reset(5, 5, 5, 5);
     suit.Label(
       `${this.enemy.name} Deck (${enemyDeck.length} cards)`,
       { align: "left" },
-      ...suit.layout.row(150, 30)
+      ...suit.layout.row(75, 15)
     );
-    suit.layout.row(0, 5);
+    suit.layout.row(0, 2);
 
     // Display each card in the enemy's deck
     for (const card of enemyDeck) {
@@ -364,7 +362,7 @@ export default class Board {
         card.value +
         ", Pow: " +
         card.power;
-      suit.Label(cardText, { align: "left" }, ...suit.layout.row(150, 25));
+      suit.Label(cardText, { align: "left" }, ...suit.layout.row(75, 12));
     }
   }
 
@@ -377,25 +375,25 @@ export default class Board {
     // Only show when the player has at least one selected card
     if (!this.gameManager.player.anySelectedCards()) return;
 
-    const gap = 30;
-    const panelW = 180;
+    const gap = 15;
+    const panelW = 90;
     const x = startX - panelW - gap;
 
-    suit.layout.reset(x, startY, 10, 10);
+    suit.layout.reset(x, startY, 5, 5);
     suit.Label(
       "Selected Hand",
       { align: "center" },
-      ...suit.layout.row(panelW, 30)
+      ...suit.layout.row(panelW, 15)
     );
     suit.Label(
       "Value: " + this.playerValue,
       { align: "center" },
-      ...suit.layout.row(panelW, 30)
+      ...suit.layout.row(panelW, 15)
     );
     suit.Label(
       "Power: " + this.playerPower,
       { align: "center" },
-      ...suit.layout.row(panelW, 30)
+      ...suit.layout.row(panelW, 15)
     );
   }
 
@@ -488,10 +486,10 @@ export default class Board {
 
   renderLetsFightButton(startY: number, btnW: number, btnH: number): void {
     const screenW = love.graphics.getWidth();
-    const buttonW = 200;
+    const buttonW = 100;
     const buttonX = Math.floor(screenW / 2 - buttonW / 2);
 
-    suit.layout.reset(buttonX, startY, 20, 20);
+    suit.layout.reset(buttonX, startY, 10, 10);
     const hit = suit.Button(
       "Let's Fight!",
       {},
@@ -511,7 +509,7 @@ export default class Board {
     padY: number
   ): void {
     // Center the buttons horizontally
-    const gap = 20;
+    const gap = 10;
     const totalW = btnW * 3 + gap * 2;
 
     suit.layout.reset(
@@ -556,17 +554,17 @@ export default class Board {
   renderDiscardCounter(): void {
     const screenW = love.graphics.getWidth();
     const screenH = love.graphics.getHeight();
-    const panelX = screenW - 170; // Right side, aligned with discard pile
-    const panelY = screenH - 240; // Above the discard pile visualization
+    const panelX = screenW - 85; // Right side, aligned with discard pile
+    const panelY = screenH - 120; // Above the discard pile visualization
 
-    suit.layout.reset(panelX, panelY, 10, 10);
+    suit.layout.reset(panelX, panelY, 5, 5);
     suit.Label(
       "Discards Remaining: " +
         (this.gameManager.player.discards - this.discardUsed) +
         "/" +
         this.gameManager.player.discards,
       { align: "center" },
-      ...suit.layout.row(150, 30)
+      ...suit.layout.row(75, 15)
     );
   }
 
@@ -698,7 +696,6 @@ export default class Board {
       TextIds.PLAYER_POWER,
       `Power: ${this.playerPower}`
     );
-    this.updatePowerEmphasis();
     if (this.playerPower > this.enemyPower) {
       this.playWinFireSound();
       this.buildWinFire();
@@ -717,7 +714,6 @@ export default class Board {
       TextIds.WINNINGS,
       `Winnings: ${this.getPlayerWinnings()}`
     );
-    this.updateValueEmphasis();
   }
 
   addEnemyPower(power: number): void {
@@ -726,7 +722,6 @@ export default class Board {
       TextIds.ENEMY_POWER,
       `Power: ${this.enemyPower}`
     );
-    this.updatePowerEmphasis();
   }
 
   addEnemyValue(value: number): void {
@@ -735,7 +730,6 @@ export default class Board {
       TextIds.ENEMY_VALUE,
       `Value: ${this.enemyValue}`
     );
-    this.updateValueEmphasis();
   }
 
   buildAssets(): void {
@@ -750,8 +744,6 @@ export default class Board {
       this.buildEdelSuitText();
     } else {
       this.buildFightAssets();
-      this.updatePowerEmphasis();
-      this.updateValueEmphasis();
     }
   }
 
@@ -782,19 +774,19 @@ export default class Board {
   }
 
   private buildLetsFightButton(): void {
-    const cardY = this.cardAssets.getCardPosition(CharacterTypes.PLAYER);
     const buttonHeight = this.letsFightButton.getHeight();
     const buttonWidth = this.letsFightButton.getWidth();
     const screenW = push.getWidth();
+    const screenH = push.getHeight();
     const buttonX = Math.floor((screenW - buttonWidth) / 2);
-    const buttonY = cardY - buttonHeight - padding;
+    const buttonY = Math.floor((screenH - buttonHeight) / 2);
     this.gameManager.assetManager.addAsset(
       AssetIds.LETS_FIGHT_BUTTON,
       new Asset(
         AssetIds.LETS_FIGHT_BUTTON,
         this.letsFightButton,
         buttonX,
-        buttonY,
+        buttonY + 85,
         { onClick: () => this.handleStartFight() }
       )
     );
@@ -809,21 +801,22 @@ export default class Board {
         centerY,
         "Let's Fight!",
         {
-          size: 28,
+          size: 27,
           format: Format.CENTER,
+          outlineThickness: OutlineThickness.THICK,
         }
       )
     );
   }
 
   private buildPrimaryButtons(): void {
-    const gap = 20;
+    const gap = 10;
     const btnW = this.attackButton.getWidth();
     const totalW = btnW * 3 + gap * 2;
     const buttonY =
       this.cardAssets.getCardPosition(CharacterTypes.PLAYER) +
       this.cardAssets.baseH +
-      padding;
+      gap;
     const buttonX = Math.floor((push.getWidth() - totalW) / 2);
     this.buildAttackButton(buttonX, buttonY, btnW);
     const discardX = this.buildDiscardButton(buttonX, buttonY, btnW, gap);
@@ -846,7 +839,7 @@ export default class Board {
       centerY,
       "Attack",
       {
-        size: 28,
+        size: 18,
         format: Format.CENTER,
       }
     );
@@ -886,10 +879,10 @@ export default class Board {
     const discardButtonCaptionText = new FontWithPosition(
       TextIds.DISCARD_BUTTON_CAPTION,
       centerX,
-      centerY - 8,
+      centerY,
       "Discard",
       {
-        size: 28,
+        size: 18,
         format: Format.CENTER,
       }
     );
@@ -905,7 +898,7 @@ export default class Board {
       centerY + 12,
       `${remaining}/${this.gameManager.player.discards}`,
       {
-        size: 18,
+        size: 9,
         format: Format.CENTER,
       }
     );
@@ -948,11 +941,11 @@ export default class Board {
     const centerY = buttonY + this.attackButton.getHeight() / 2;
     const deselectButtonCaptionText = new FontWithPosition(
       TextIds.DESELECT_BUTTON_CAPTION,
-      centerX,
+      centerX + 2,
       centerY,
       "Deselect",
       {
-        size: 28,
+        size: 18,
         format: Format.CENTER,
       }
     );
@@ -1029,11 +1022,11 @@ export default class Board {
     const buttonX = Math.floor((screenW - boardWidth) / 2);
     this.gameManager.assetManager.addAsset(
       AssetIds.POINT_DISPLAY,
-      new Asset(AssetIds.POINT_DISPLAY, this.pointBoard, buttonX, 10)
+      new Asset(AssetIds.POINT_DISPLAY, this.pointBoard, buttonX, 5)
     );
 
     const centerX = screenW / 2;
-    const textY = 30;
+    const textY = this.pointBoard.getHeight() / 2 + 5;
 
     const playerText = `${this.gameManager.player.name}: ${this.playerPoints}`;
     const enemyText = `${this.enemy.name}: ${this.enemyPoints}`;
@@ -1043,11 +1036,11 @@ export default class Board {
       TextIds.POINTS_PLAYER,
       new FontWithPosition(
         TextIds.POINTS_PLAYER,
-        centerX - boardWidth / 2 + 10,
+        centerX - boardWidth / 2 + 5,
         textY,
         playerText,
         {
-          size: 20,
+          size: 9,
         }
       )
     );
@@ -1057,11 +1050,11 @@ export default class Board {
       TextIds.POINTS_ENEMY,
       new FontWithPosition(
         TextIds.POINTS_ENEMY,
-        centerX + boardWidth / 2 - 10,
+        centerX + boardWidth / 2 - 5,
         textY,
         enemyText,
         {
-          size: 20,
+          size: 9,
           format: Format.RIGHT,
         }
       )
@@ -1090,19 +1083,14 @@ export default class Board {
       characterType === CharacterTypes.PLAYER
         ? this.playerPower
         : this.enemyPower;
-    const isLeading = this.playerPower > this.enemyPower;
-    const isTrailing = this.enemyPower > this.playerPower;
-    const emphasize =
-      (characterType === CharacterTypes.PLAYER && isLeading) ||
-      (characterType === CharacterTypes.ENEMY && isTrailing);
     this.gameManager.assetManager.textManager.addText(
       powerId,
       new FontWithPosition(
         powerId,
-        30,
-        portraitHeight + portraitAsset.y + 60,
+        15,
+        portraitHeight + portraitAsset.y + 18,
         `Power: ${powerValue}`,
-        { size: emphasize ? 18 : 15, icon: this.attackPowerIcon }
+        { size: 9, icon: this.attackPowerIcon }
       )
     );
 
@@ -1114,57 +1102,16 @@ export default class Board {
       characterType === CharacterTypes.PLAYER
         ? this.playerValue
         : this.enemyValue;
-    const valueLeading = this.playerValue > this.enemyValue;
-    const valueTrailing = this.enemyValue > this.playerValue;
-    const emphasizeValue =
-      (characterType === CharacterTypes.PLAYER && valueLeading) ||
-      (characterType === CharacterTypes.ENEMY && valueTrailing);
     this.gameManager.assetManager.textManager.addText(
       valueId,
       new FontWithPosition(
         valueId,
-        30,
-        portraitHeight + portraitAsset.y + 80,
+        15,
+        portraitHeight + portraitAsset.y + 28,
         `Value: ${valueValue}`,
-        { size: emphasizeValue ? 18 : 15, icon: this.valueIcon }
+        { size: 9, icon: this.valueIcon }
       )
     );
-  }
-
-  private updatePowerEmphasis(): void {
-    const playerText = this.gameManager.assetManager.textManager.getText(
-      TextIds.PLAYER_POWER
-    );
-    const enemyText = this.gameManager.assetManager.textManager.getText(
-      TextIds.ENEMY_POWER
-    );
-    if (isEmpty(playerText) || isEmpty(enemyText)) {
-      return;
-    }
-
-    const playerLeading = this.playerPower > this.enemyPower;
-    const enemyLeading = this.enemyPower > this.playerPower;
-
-    playerText.size = playerLeading ? 18 : 15;
-    enemyText.size = enemyLeading ? 18 : 15;
-  }
-
-  private updateValueEmphasis(): void {
-    const playerText = this.gameManager.assetManager.textManager.getText(
-      TextIds.PLAYER_VALUE
-    );
-    const enemyText = this.gameManager.assetManager.textManager.getText(
-      TextIds.ENEMY_VALUE
-    );
-    if (isEmpty(playerText) || isEmpty(enemyText)) {
-      return;
-    }
-
-    const playerLeading = this.playerValue > this.enemyValue;
-    const enemyLeading = this.enemyValue > this.playerValue;
-
-    playerText.size = playerLeading ? 18 : 15;
-    enemyText.size = enemyLeading ? 18 : 15;
   }
 
   private buildPlayerPortrait(): void {
@@ -1207,9 +1154,9 @@ export default class Board {
       new Asset(portraitAssetId, this.portrait, 5, portraitPosition)
     );
 
-    const portraitWidth = this.portrait.getWidth();
-    const portraitHeight = this.portrait.getHeight();
-    const portraitBackgroundWidth = this.portraitBackground.getWidth();
+    const portraitWidth = this.portrait.getWidth() - 12;
+    const portraitHeight = this.portrait.getHeight() - 12;
+    const portraitBackgroundWidth = this.portraitBackground.getWidth() - 28;
 
     const portraitNameId =
       characterType === CharacterTypes.PLAYER
@@ -1220,11 +1167,11 @@ export default class Board {
       new FontWithPosition(
         portraitNameId,
         10,
-        portraitHeight + portraitPosition + 15,
+        portraitHeight + portraitPosition + 8,
         characterType === CharacterTypes.PLAYER
           ? this.gameManager.player.name
           : this.enemy.name,
-        { size: 24 }
+        { size: 9, outlineThickness: OutlineThickness.THICK }
       )
     );
 
@@ -1237,13 +1184,13 @@ export default class Board {
       new FontWithPosition(
         portraitLevelId,
         10,
-        portraitHeight + portraitPosition + 40,
+        portraitHeight + portraitPosition + 20,
         `Lvl ${
           characterType === CharacterTypes.PLAYER
             ? this.gameManager.player.level
             : this.enemy.level
         }`,
-        { size: 15 }
+        { size: 9 }
       )
     );
 
@@ -1253,9 +1200,9 @@ export default class Board {
         new FontWithPosition(
           TextIds.PLAYER_PORTRAIT_EXPERIENCE,
           portraitBackgroundWidth,
-          portraitHeight + portraitPosition + 40,
-          `${this.gameManager.player.experience} XP`,
-          { size: 15, format: Format.RIGHT }
+          portraitHeight + portraitPosition + 20,
+          `${this.gameManager.player.experience} xp`,
+          { size: 9, format: Format.RIGHT }
         )
       );
 
@@ -1264,7 +1211,7 @@ export default class Board {
         new Asset(
           AssetIds.PERKS_BUTTON,
           this.perksButton,
-          portraitWidth + 15,
+          portraitWidth + 10,
           portraitPosition + 10,
           {
             onClick: () =>
@@ -1277,10 +1224,10 @@ export default class Board {
         TextIds.PLAYER_PERKS,
         new FontWithPosition(
           TextIds.PLAYER_PERKS,
-          portraitWidth + this.perksButton.getWidth() / 2,
-          portraitPosition + 10 + this.perksButton.getHeight() / 2,
+          portraitWidth + 15,
+          portraitPosition + 20,
           "Perks",
-          { size: 15 }
+          { size: 9 }
         )
       );
 
@@ -1289,9 +1236,9 @@ export default class Board {
         new FontWithPosition(
           TextIds.PLAYER_PORTRAIT_MONEY,
           portraitBackgroundWidth,
-          portraitHeight + portraitPosition + 15,
+          portraitHeight + portraitPosition + 8,
           `${this.gameManager.player.money}`,
-          { size: 15, icon: this.markIcon, format: Format.RIGHT }
+          { size: 9, icon: this.markIcon, format: Format.RIGHT }
         )
       );
     }
@@ -1330,9 +1277,9 @@ export default class Board {
       new FontWithPosition(
         TextIds.EDEL_SUIT_LABEL,
         centerX,
-        40,
+        20,
         "Edel! \n" + Card.getSuitName(this.edelSuit),
-        { size: 24, format: Format.CENTER }
+        { size: 12, format: Format.CENTER }
       )
     );
   }
@@ -1383,9 +1330,9 @@ export default class Board {
       new FontWithPosition(
         TextIds.WIN_FIRE_TEXT,
         portraitCenterX * 2,
-        centerY + 20,
+        centerY + 10,
         "You are\ndominating!",
-        { size: 32, format: Format.CENTER }
+        { size: 16, format: Format.CENTER }
       )
     );
 
@@ -1396,9 +1343,9 @@ export default class Board {
         new FontWithPosition(
           TextIds.WINNINGS,
           portraitCenterX * 2,
-          centerY + 100,
+          centerY + 50,
           "But you'll get no winnings...",
-          { size: 20, format: Format.CENTER }
+          { size: 10, format: Format.CENTER }
         )
       );
     } else {
@@ -1407,9 +1354,9 @@ export default class Board {
         new FontWithPosition(
           TextIds.WINNINGS,
           portraitCenterX * 2,
-          centerY + 100,
+          centerY + 50,
           "Winnings: " + winnings,
-          { size: 20, format: Format.CENTER }
+          { size: 10, format: Format.CENTER }
         )
       );
     }

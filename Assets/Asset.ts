@@ -91,8 +91,8 @@ export default class Asset {
             const oldWidth = imgWidth * this.scaleX;
             const oldHeight = imgHeight * this.scaleY;
 
-            this.scaleX *= 1.06;
-            this.scaleY *= 1.06;
+            this.scaleX *= 1.1;
+            this.scaleY *= 1.1;
 
             const newWidth = imgWidth * this.scaleX;
             const newHeight = imgHeight * this.scaleY;
@@ -106,8 +106,8 @@ export default class Asset {
             const oldWidth = imgWidth * this.scaleX;
             const oldHeight = imgHeight * this.scaleY;
 
-            this.scaleX /= 1.06;
-            this.scaleY /= 1.06;
+            this.scaleX /= 1.1;
+            this.scaleY /= 1.1;
 
             const newWidth = imgWidth * this.scaleX;
             const newHeight = imgHeight * this.scaleY;

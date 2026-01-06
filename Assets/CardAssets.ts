@@ -13,7 +13,8 @@ import GameManager from "GameManager";
 import * as push from "Libraries.push";
 import Point from "Point";
 import { Image } from "love.graphics";
-const padding = 20;
+
+export const padding = 5;
 
 interface AssetsForCard {
   baseAsset: Asset;
@@ -106,11 +107,11 @@ export default class CardAssets {
   }
 
   getNormalSuitPosition(x: number, y: number): Point {
-    return { x: x + 10, y: y + 10 };
+    return { x: x + padding + 1, y: y + padding + 1 };
   }
 
   getFlippedSuitPosition(x: number, y: number): Point {
-    return { x: x + this.baseW - 10, y: y + this.baseH - 10 };
+    return { x: x + this.baseW - padding - 1, y: y + this.baseH - padding - 1 };
   }
 
   addRankAsset(
@@ -243,12 +244,14 @@ export default class CardAssets {
     const assetManager = this.gameManager.assetManager;
     const baseAssetId = CardAssets.getBaseAssetId(card);
     assetManager.getAsset(baseAssetId, baseAssetId)?.updatePosition(x, y);
+    const normalSuitPosition = this.getNormalSuitPosition(x, y);
+    const flippedSuitPosition = this.getFlippedSuitPosition(x, y);
     assetManager
       .getAsset(baseAssetId, CardAssets.getSuitAssetId(card, 0))
-      ?.updatePosition(x + 10, y + 10);
+      ?.updatePosition(normalSuitPosition.x, normalSuitPosition.y);
     assetManager
       .getAsset(baseAssetId, CardAssets.getSuitAssetId(card, 1))
-      ?.updatePosition(x + this.baseW - 10, y + this.baseH - 10);
+      ?.updatePosition(flippedSuitPosition.x, flippedSuitPosition.y);
 
     const rankAsset = this.getRankAsset(card);
     if (isEmpty(rankAsset)) {
