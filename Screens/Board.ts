@@ -54,6 +54,7 @@ export default class Board {
   discardButton = love.graphics.newImage("Assets/Images/DiscardButton.png");
   deselectButton = love.graphics.newImage("Assets/Images/DeselectButton.png");
   pointBoard = love.graphics.newImage("Assets/Images/PointBoard.png");
+  edelBoard = love.graphics.newImage("Assets/Images/EdelBoard.png");
   portraitBackground = love.graphics.newImage(
     "Assets/Images/PortraitBackground.png"
   );
@@ -577,7 +578,10 @@ export default class Board {
 
     this.dealer.startGame();
     this.buildFightAssets();
-    this.gameManager.assetManager.textManager.hideText(TextIds.EDEL_SUIT_LABEL);
+    this.gameManager.assetManager.textManager.hideText(TextIds.EDEL_LABEL);
+    this.gameManager.assetManager.hideAsset(AssetIds.EDEL_BOARD);
+    this.gameManager.assetManager.hideAsset(AssetIds.EDEL_SUIT_ICON_LEFT);
+    this.gameManager.assetManager.hideAsset(AssetIds.EDEL_SUIT_ICON_RIGHT);
   }
 
   buildFightAssets(): void {
@@ -741,7 +745,7 @@ export default class Board {
     this.buildEnemyDeck();
     if (this.showingEdelView) {
       this.buildLetsFightButton();
-      this.buildEdelSuitText();
+      this.buildEdelBoard();
     } else {
       this.buildFightAssets();
     }
@@ -1269,19 +1273,41 @@ export default class Board {
     );
   }
 
-  private buildEdelSuitText(): void {
+  private buildEdelBoard(): void {
+    const boardWidth = this.edelBoard.getWidth();
     const screenW = push.getWidth();
-    const centerX = screenW / 2;
+    const boardX = Math.floor((screenW - boardWidth) / 2);
+        this.gameManager.assetManager.addAsset(
+      AssetIds.EDEL_BOARD,
+      new Asset(AssetIds.EDEL_BOARD, this.edelBoard, boardX, 5)
+    );
+
+    const centerX = screenW / 2;    
+
     this.gameManager.assetManager.textManager.addText(
-      TextIds.EDEL_SUIT_LABEL,
+      TextIds.EDEL_LABEL,
       new FontWithPosition(
-        TextIds.EDEL_SUIT_LABEL,
+        TextIds.EDEL_LABEL,
         centerX,
         20,
-        "Edel! \n" + Card.getSuitName(this.edelSuit),
-        { size: 12, format: Format.CENTER }
+        Card.getSuitName(this.edelSuit),
+        { size: 16, format: Format.CENTER, filepath: "Assets/Fonts/Bitmgothic.ttf" }
       )
     );
+
+    const suitImage = love.graphics.newImage(CardAssets.getSuitAssetPath(this.edelSuit));
+    this.gameManager.assetManager.addAsset(AssetIds.EDEL_SUIT_ICON_LEFT, new Asset(
+      AssetIds.EDEL_SUIT_ICON_LEFT,
+      suitImage,
+      boardX + 5,
+      10,
+    ));
+    this.gameManager.assetManager.addAsset(AssetIds.EDEL_SUIT_ICON_RIGHT, new Asset(
+      AssetIds.EDEL_SUIT_ICON_RIGHT,
+      suitImage,
+      boardX + boardWidth - suitImage.getWidth() - 5,
+      10,
+    ));
   }
 
   private buildBackground(): void {

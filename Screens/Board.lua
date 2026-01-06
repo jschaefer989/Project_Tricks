@@ -49,6 +49,7 @@ function Board.prototype.____constructor(self, gameManager, enemy)
     self.discardButton = love.graphics.newImage("Assets/Images/DiscardButton.png")
     self.deselectButton = love.graphics.newImage("Assets/Images/DeselectButton.png")
     self.pointBoard = love.graphics.newImage("Assets/Images/PointBoard.png")
+    self.edelBoard = love.graphics.newImage("Assets/Images/EdelBoard.png")
     self.portraitBackground = love.graphics.newImage("Assets/Images/PortraitBackground.png")
     self.portrait = love.graphics.newImage("Assets/Images/Portrait.png")
     self.baseDeck = love.graphics.newImage("Assets/Images/BaseCardBack.png")
@@ -449,7 +450,10 @@ function Board.prototype.handleStartFight(self)
     self.gameManager.assetManager.textManager:hideText(TextIds.LETS_FIGHT_BUTTON_CAPTION)
     self.dealer:startGame()
     self:buildFightAssets()
-    self.gameManager.assetManager.textManager:hideText(TextIds.EDEL_SUIT_LABEL)
+    self.gameManager.assetManager.textManager:hideText(TextIds.EDEL_LABEL)
+    self.gameManager.assetManager:hideAsset(AssetIds.EDEL_BOARD)
+    self.gameManager.assetManager:hideAsset(AssetIds.EDEL_SUIT_ICON_LEFT)
+    self.gameManager.assetManager:hideAsset(AssetIds.EDEL_SUIT_ICON_RIGHT)
 end
 function Board.prototype.buildFightAssets(self)
     self:buildPrimaryButtons()
@@ -597,7 +601,7 @@ function Board.prototype.buildAssets(self)
     self:buildEnemyDeck()
     if self.showingEdelView then
         self:buildLetsFightButton()
-        self:buildEdelSuitText()
+        self:buildEdelBoard()
     else
         self:buildFightAssets()
     end
@@ -995,18 +999,51 @@ function Board.prototype.buildEnemyDeck(self)
         )
     )
 end
-function Board.prototype.buildEdelSuitText(self)
+function Board.prototype.buildEdelBoard(self)
+    local boardWidth = self.edelBoard:getWidth()
     local screenW = push:getWidth()
+    local boardX = math.floor((screenW - boardWidth) / 2)
+    self.gameManager.assetManager:addAsset(
+        AssetIds.EDEL_BOARD,
+        __TS__New(
+            Asset,
+            AssetIds.EDEL_BOARD,
+            self.edelBoard,
+            boardX,
+            5
+        )
+    )
     local centerX = screenW / 2
     self.gameManager.assetManager.textManager:addText(
-        TextIds.EDEL_SUIT_LABEL,
+        TextIds.EDEL_LABEL,
         __TS__New(
             FontWithPosition,
-            TextIds.EDEL_SUIT_LABEL,
+            TextIds.EDEL_LABEL,
             centerX,
             20,
-            "Edel! \n" .. Card:getSuitName(self.edelSuit),
-            {size = 12, format = Format.CENTER}
+            Card:getSuitName(self.edelSuit),
+            {size = 16, format = Format.CENTER, filepath = "Assets/Fonts/Bitmgothic.ttf"}
+        )
+    )
+    local suitImage = love.graphics.newImage(CardAssets:getSuitAssetPath(self.edelSuit))
+    self.gameManager.assetManager:addAsset(
+        AssetIds.EDEL_SUIT_ICON_LEFT,
+        __TS__New(
+            Asset,
+            AssetIds.EDEL_SUIT_ICON_LEFT,
+            suitImage,
+            boardX + 5,
+            10
+        )
+    )
+    self.gameManager.assetManager:addAsset(
+        AssetIds.EDEL_SUIT_ICON_RIGHT,
+        __TS__New(
+            Asset,
+            AssetIds.EDEL_SUIT_ICON_RIGHT,
+            suitImage,
+            boardX + boardWidth - suitImage:getWidth() - 5,
+            10
         )
     )
 end

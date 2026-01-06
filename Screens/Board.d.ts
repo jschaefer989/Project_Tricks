@@ -36,6 +36,7 @@ export default class Board {
     discardButton: Image;
     deselectButton: Image;
     pointBoard: Image;
+    edelBoard: Image;
     portraitBackground: Image;
     portrait: Image;
     baseDeck: Image;
@@ -99,7 +100,7 @@ export default class Board {
     private buildPortrait;
     private buildPlayerDeck;
     private buildEnemyDeck;
-    private buildEdelSuitText;
+    private buildEdelBoard;
     private buildBackground;
     private playWinFireSound;
     private buildWinFire;
