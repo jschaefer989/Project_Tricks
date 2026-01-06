@@ -135,4 +135,5 @@ export enum MousePressEffects {
     NONE = "NONE",
     SCALE_DOWN = "SCALE_DOWN",
     DARKEN = "DARKEN",
+    SHIFT_DOWN = "SHIFT_DOWN",
 }

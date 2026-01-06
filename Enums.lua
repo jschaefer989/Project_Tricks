@@ -107,4 +107,5 @@ ____exports.MousePressEffects = MousePressEffects or ({})
 ____exports.MousePressEffects.NONE = "NONE"
 ____exports.MousePressEffects.SCALE_DOWN = "SCALE_DOWN"
 ____exports.MousePressEffects.DARKEN = "DARKEN"
+____exports.MousePressEffects.SHIFT_DOWN = "SHIFT_DOWN"
 return ____exports

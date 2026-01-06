@@ -8,6 +8,8 @@ local CharacterTypes = ____Enums.CharacterTypes
 local TextIds = ____Enums.TextIds
 local Suits = ____Enums.Suits
 local GameStates = ____Enums.GameStates
+local HoverEffects = ____Enums.HoverEffects
+local MousePressEffects = ____Enums.MousePressEffects
 local ____Dealer = require("Dealer")
 local Dealer = ____Dealer.default
 local ____Draw = require("Draw")
@@ -673,17 +675,15 @@ end
 function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW)
     local centerX = buttonX + btnW / 2
     local centerY = buttonY + self.attackButton:getHeight() / 2
-    self.gameManager.assetManager.textManager:addText(
+    local attackButtonText = __TS__New(
+        FontWithPosition,
         TextIds.ATTACK_BUTTON_CAPTION,
-        __TS__New(
-            FontWithPosition,
-            TextIds.ATTACK_BUTTON_CAPTION,
-            centerX,
-            centerY,
-            "Attack",
-            {size = 28, format = Format.CENTER}
-        )
+        centerX,
+        centerY,
+        "Attack",
+        {size = 28, format = Format.CENTER}
     )
+    self.gameManager.assetManager.textManager:addText(TextIds.ATTACK_BUTTON_CAPTION, attackButtonText)
     self.gameManager.assetManager:addAsset(
         AssetIds.ATTACK_BUTTON,
         __TS__New(
@@ -695,7 +695,9 @@ function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW)
             {
                 onClick = function() return self:handleAttack() end,
                 clickSound = love.audio.newSource("Assets/Sounds/AttackClicked.flac", "static"),
-                associatedTexts = {TextIds.ATTACK_BUTTON_CAPTION}
+                associatedTexts = {attackButtonText},
+                hoverEffect = {HoverEffects.CHANGE_COLOR},
+                mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
             }
         )
     )
@@ -704,29 +706,25 @@ function Board.prototype.buildDiscardButton(self, buttonX, buttonY, btnW, gap)
     local discardX = buttonX + btnW + gap
     local centerX = discardX + btnW / 2
     local centerY = buttonY + self.attackButton:getHeight() / 2
-    self.gameManager.assetManager.textManager:addText(
+    local discardButtonCaptionText = __TS__New(
+        FontWithPosition,
         TextIds.DISCARD_BUTTON_CAPTION,
-        __TS__New(
-            FontWithPosition,
-            TextIds.DISCARD_BUTTON_CAPTION,
-            centerX,
-            centerY - 8,
-            "Discard",
-            {size = 28, format = Format.CENTER}
-        )
+        centerX,
+        centerY - 8,
+        "Discard",
+        {size = 28, format = Format.CENTER}
     )
+    self.gameManager.assetManager.textManager:addText(TextIds.DISCARD_BUTTON_CAPTION, discardButtonCaptionText)
     local remaining = self.gameManager.player.discards - self.discardUsed
-    self.gameManager.assetManager.textManager:addText(
+    local discardButtonCounterText = __TS__New(
+        FontWithPosition,
         TextIds.DISCARD_BUTTON_COUNTER,
-        __TS__New(
-            FontWithPosition,
-            TextIds.DISCARD_BUTTON_COUNTER,
-            centerX,
-            centerY + 12,
-            (tostring(remaining) .. "/") .. tostring(self.gameManager.player.discards),
-            {size = 18, format = Format.CENTER}
-        )
+        centerX,
+        centerY + 12,
+        (tostring(remaining) .. "/") .. tostring(self.gameManager.player.discards),
+        {size = 18, format = Format.CENTER}
     )
+    self.gameManager.assetManager.textManager:addText(TextIds.DISCARD_BUTTON_COUNTER, discardButtonCounterText)
     self.gameManager.assetManager:addAsset(
         AssetIds.DISCARD_BUTTON,
         __TS__New(
@@ -737,7 +735,9 @@ function Board.prototype.buildDiscardButton(self, buttonX, buttonY, btnW, gap)
             buttonY,
             {
                 onClick = function() return self:handleDiscard() end,
-                associatedTexts = {TextIds.DISCARD_BUTTON_CAPTION, TextIds.DISCARD_BUTTON_COUNTER}
+                associatedTexts = {discardButtonCaptionText, discardButtonCounterText},
+                hoverEffect = {HoverEffects.CHANGE_COLOR},
+                mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
             }
         )
     )
@@ -747,17 +747,15 @@ function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, gap)
     local deselectX = discardX + btnW + gap
     local centerX = deselectX + btnW / 2
     local centerY = buttonY + self.attackButton:getHeight() / 2
-    self.gameManager.assetManager.textManager:addText(
+    local deselectButtonCaptionText = __TS__New(
+        FontWithPosition,
         TextIds.DESELECT_BUTTON_CAPTION,
-        __TS__New(
-            FontWithPosition,
-            TextIds.DESELECT_BUTTON_CAPTION,
-            centerX,
-            centerY,
-            "Deselect",
-            {size = 28, format = Format.CENTER}
-        )
+        centerX,
+        centerY,
+        "Deselect",
+        {size = 28, format = Format.CENTER}
     )
+    self.gameManager.assetManager.textManager:addText(TextIds.DESELECT_BUTTON_CAPTION, deselectButtonCaptionText)
     self.gameManager.assetManager:addAsset(
         AssetIds.DESELECT_BUTTON,
         __TS__New(
@@ -768,7 +766,9 @@ function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, gap)
             buttonY,
             {
                 onClick = function() return self.gameManager.player:unselectCards() end,
-                associatedTexts = {TextIds.DESELECT_BUTTON_CAPTION}
+                associatedTexts = {deselectButtonCaptionText},
+                hoverEffect = {HoverEffects.CHANGE_COLOR},
+                mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
             }
         )
     )

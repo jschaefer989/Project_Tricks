@@ -105,6 +105,24 @@ function AssetManager.prototype.drawHoverables(self)
     end
 end
 function AssetManager.prototype.handleMousePressed(self, x, y, button)
+    local gameX, gameY = push:toGame(x, y)
+    if isEmpty(gameX) or isEmpty(gameY) then
+        return
+    end
+    for ____, assets in __TS__Iterator(self.assets:values()) do
+        do
+            if isEmpty(assets) or #assets == 0 then
+                goto __continue30
+            end
+            local asset = assets[1]
+            if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
+                for ____, a in ipairs(assets) do
+                    a:setMousePressed(true)
+                end
+            end
+        end
+        ::__continue30::
+    end
 end
 function AssetManager.prototype.handleMouseReleased(self, x, y, button)
     local gameX, gameY = push:toGame(x, y)
@@ -114,7 +132,7 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue31
+                goto __continue38
             end
             local asset = assets[1]
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
@@ -124,8 +142,11 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
                     self:handleAssetClick(asset)
                 end
             end
+            for ____, a in ipairs(assets) do
+                a:setMousePressed(false)
+            end
         end
-        ::__continue31::
+        ::__continue38::
     end
 end
 function AssetManager.prototype.handleDisabledAssetClick(self, assets)
@@ -147,21 +168,14 @@ function AssetManager.prototype.triggerWobbleAnimation(self, assets)
             )
         end
         if not isEmpty(assetToWobble.associatedTexts) then
-            for ____, textId in ipairs(assetToWobble.associatedTexts) do
-                do
-                    local textAsset = self.textManager:getText(textId)
-                    if isEmpty(textAsset) then
-                        goto __continue44
-                    end
-                    local wobbleTextId = "wobble-" .. textId
-                    if not self.gameManager.animationManager.animations:has(wobbleTextId) then
-                        self.gameManager.animationManager.animations:set(
-                            wobbleTextId,
-                            __TS__New(WobbleAnimation, 10, {textAsset}, {animDuration = 0.5})
-                        )
-                    end
+            for ____, text in ipairs(assetToWobble.associatedTexts) do
+                local wobbleTextId = "wobble-" .. tostring(text)
+                if not self.gameManager.animationManager.animations:has(wobbleTextId) then
+                    self.gameManager.animationManager.animations:set(
+                        wobbleTextId,
+                        __TS__New(WobbleAnimation, 10, {text}, {animDuration = 0.5})
+                    )
                 end
-                ::__continue44::
             end
         end
     end
@@ -190,7 +204,7 @@ function AssetManager.prototype.handleMouseHover(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue53
+                goto __continue61
             end
             local asset = assets[1]
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
@@ -205,7 +219,7 @@ function AssetManager.prototype.handleMouseHover(self)
                 end
             end
         end
-        ::__continue53::
+        ::__continue61::
     end
 end
 return ____exports

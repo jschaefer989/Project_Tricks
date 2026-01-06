@@ -48,7 +48,7 @@ function CardAssets.prototype.addAsset(self, card, cardX, cardY, includeClickHan
         {
             onClick = includeClickHandler and (function() return card:onClick() end) or nil,
             onHover = function(____, gameManager, asset) return Card:onHover(gameManager, asset) end,
-            hoverEffect = includeClickHandler and HoverEffects.SCALE_UP or HoverEffects.NONE,
+            hoverEffect = includeClickHandler and ({HoverEffects.SCALE_UP}) or ({HoverEffects.NONE}),
             clickSound = includeClickHandler and self.cardClick or nil
         }
     )
@@ -78,7 +78,7 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
         {
             onClick = includeClickHandler and (function() return card:onClick() end) or nil,
             onHover = onHoverCallback,
-            hoverEffect = includeClickHandler and HoverEffects.SCALE_UP or HoverEffects.NONE,
+            hoverEffect = includeClickHandler and ({HoverEffects.SCALE_UP}) or ({HoverEffects.NONE}),
             clickSound = includeClickHandler and self.cardClick or nil
         }
     )
@@ -98,7 +98,7 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
             onClick = includeClickHandler and (function() return card:onClick() end) or nil,
             onHover = onHoverCallback,
             orientation = 0,
-            hoverEffect = includeClickHandler and HoverEffects.SCALE_UP or HoverEffects.NONE,
+            hoverEffect = includeClickHandler and ({HoverEffects.SCALE_UP}) or ({HoverEffects.NONE}),
             scaleX = -1,
             scaleY = -1,
             clickSound = includeClickHandler and self.cardClick or nil
@@ -132,7 +132,7 @@ function CardAssets.prototype.addRankAsset(self, card, x, y, includeClickHandler
         {
             onClick = includeClickHandler and (function() return card:onClick() end) or nil,
             onHover = function(____, gameManager, asset) return Card:onHover(gameManager, asset) end,
-            hoverEffect = includeClickHandler and HoverEffects.SCALE_UP or HoverEffects.NONE,
+            hoverEffect = includeClickHandler and ({HoverEffects.SCALE_UP}) or ({HoverEffects.NONE}),
             clickSound = includeClickHandler and self.cardClick or nil
         }
     )

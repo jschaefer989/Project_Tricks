@@ -98,16 +98,26 @@ export default class AssetManager {
   }
 
   handleMousePressed(x: number, y: number, button: number): void {
-    // const [gameX, gameY] = push.toGame(x, y)
-    // if (isEmpty(gameX) || isEmpty(gameY)) {
-    //     return
-    // }
-    // for (const asset of this.assets.values()) {
-    //     if (gameX >= asset.x && gameX <= asset.x + asset.getWidth() &&
-    //         gameY >= asset.y && gameY <= asset.y + asset.getHeight()) {
-    //         asset.onClick()
-    //     }
-    // }
+    const [gameX, gameY] = push.toGame(x, y);
+    if (isEmpty(gameX) || isEmpty(gameY)) {
+      return;
+    }
+    for (const assets of this.assets.values()) {
+      if (isEmpty(assets) || assets.length === 0) {
+        continue;
+      }
+      const asset = assets[0]; // Assume click area is the same for all assets with the same ID
+      if (
+        gameX >= asset.x &&
+        gameX <= asset.x + asset.getWidth() &&
+        gameY >= asset.y &&
+        gameY <= asset.y + asset.getHeight()
+      ) {
+        for (const a of assets) {
+          a.setMousePressed(true);
+        }
+      }
+    }
   }
 
   handleMouseReleased(x: number, y: number, button: number): void {
@@ -134,12 +144,15 @@ export default class AssetManager {
           this.handleAssetClick(asset);
         }
       }
+      for (const a of assets) {
+        a.setMousePressed(false);
+      }
     }
   }
 
   handleDisabledAssetClick(assets: Asset[]): void {
     if (this.gameManager.animationManager.hasWobbleAnimation()) {
-        return;
+      return;
     }
     if (!this.disabledSound.isPlaying()) {
       this.disabledSound.play();
@@ -158,16 +171,12 @@ export default class AssetManager {
       }
 
       if (!isEmpty(assetToWobble.associatedTexts)) {
-        for (const textId of assetToWobble.associatedTexts) {
-          const textAsset = this.textManager.getText(textId);
-          if (isEmpty(textAsset)) {
-            continue;
-          }
-          const wobbleTextId = `wobble-${textId}`;
+        for (const text of assetToWobble.associatedTexts) {
+          const wobbleTextId = `wobble-${text}`;
           if (!this.gameManager.animationManager.animations.has(wobbleTextId)) {
             this.gameManager.animationManager.animations.set(
               wobbleTextId,
-              new WobbleAnimation(10, [textAsset], { animDuration: 0.5 })
+              new WobbleAnimation(10, [text], { animDuration: 0.5 })
             );
           }
         }

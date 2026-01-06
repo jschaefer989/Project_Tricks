@@ -116,5 +116,6 @@ export declare enum HoverEffects {
 export declare enum MousePressEffects {
     NONE = "NONE",
     SCALE_DOWN = "SCALE_DOWN",
-    DARKEN = "DARKEN"
+    DARKEN = "DARKEN",
+    SHIFT_DOWN = "SHIFT_DOWN"
 }

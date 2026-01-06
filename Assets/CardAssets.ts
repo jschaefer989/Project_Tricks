@@ -43,7 +43,7 @@ export default class CardAssets {
       onClick: includeClickHandler ? () => card.onClick() : undefined,
       onHover: (gameManager: GameManager, asset: Asset) =>
         Card.onHover(gameManager, asset),
-      hoverEffect: includeClickHandler ? HoverEffects.SCALE_UP : HoverEffects.NONE,
+      hoverEffect: includeClickHandler ? [HoverEffects.SCALE_UP] : [HoverEffects.NONE]  ,
       clickSound: includeClickHandler ? this.cardClick : undefined,
     });
     this.gameManager.assetManager.addAsset(assetId, baseCardAsset);
@@ -74,7 +74,7 @@ export default class CardAssets {
       {
         onClick: includeClickHandler ? () => card.onClick() : undefined,
         onHover: onHoverCallback,
-        hoverEffect: includeClickHandler ? HoverEffects.SCALE_UP : HoverEffects.NONE,
+        hoverEffect: includeClickHandler ? [HoverEffects.SCALE_UP] : [HoverEffects.NONE],
         clickSound: includeClickHandler ? this.cardClick : undefined,
       }
     );
@@ -93,7 +93,7 @@ export default class CardAssets {
         onClick: includeClickHandler ? () => card.onClick() : undefined,
         onHover: onHoverCallback,
         orientation: 0,
-        hoverEffect: includeClickHandler ? HoverEffects.SCALE_UP : HoverEffects.NONE,
+        hoverEffect: includeClickHandler ? [HoverEffects.SCALE_UP] : [HoverEffects.NONE],
         scaleX: -1,
         scaleY: -1,
         clickSound: includeClickHandler ? this.cardClick : undefined,
@@ -132,7 +132,7 @@ export default class CardAssets {
         onClick: includeClickHandler ? () => card.onClick() : undefined,
         onHover: (gameManager: GameManager, asset: Asset) =>
           Card.onHover(gameManager, asset),
-        hoverEffect: includeClickHandler ? HoverEffects.SCALE_UP : HoverEffects.NONE,
+        hoverEffect: includeClickHandler ? [HoverEffects.SCALE_UP] : [HoverEffects.NONE],
         clickSound: includeClickHandler ? this.cardClick : undefined,
       }
     );
