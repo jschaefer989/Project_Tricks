@@ -180,7 +180,6 @@ export default class GameManager {
     const boardState: GameState = {
       update: (dt: number) => {
         //elapsedTime += dt;
-        this.board?.drawBoard();
         this.assetManager.handleMouseHover();
         this.animationManager.updateAnimations(dt);
       },
