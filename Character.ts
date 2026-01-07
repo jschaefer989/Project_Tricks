@@ -30,7 +30,7 @@ export default class Character {
 
     addToDeck(card: Card): void {
         this.deck.push(card)
-        this.gameManager.board?.cardAssets.hideCardAssets(card)
+        this.gameManager.board?.cardAssets.removeCardAssets(card)
     }
 
     getCardFromDeck(position: number): Card | undefined {
@@ -39,7 +39,7 @@ export default class Character {
 
     addToDiscards(card: Card): void {
         this.discardPile.push(card)        
-        this.gameManager.board?.cardAssets.hideCardAssets(card)
+        this.gameManager.board?.cardAssets.removeCardAssets(card)
     }
 
     getCardFromDiscards(position: number): Card | undefined {
@@ -98,7 +98,7 @@ export default class Character {
         // Hide all card assets first without centering
         for (const card of this.hand) {
             this.deck.push(card)
-            board?.cardAssets.hideCardAssets(card)
+            board?.cardAssets.removeCardAssets(card)
         }
         
         this.hand = []

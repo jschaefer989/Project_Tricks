@@ -47,10 +47,10 @@ function AssetManager.prototype.getAsset(self, baseId, assetId)
         function(____, asset) return asset.id == assetId end
     )
 end
-function AssetManager.prototype.hideAssets(self, id)
+function AssetManager.prototype.removeAssets(self, id)
     self.assets:delete(id)
 end
-function AssetManager.prototype.hideAsset(self, baseId, assetId)
+function AssetManager.prototype.removeAsset(self, baseId, assetId)
     local assets = self:getAssets(baseId)
     if not isEmpty(assets) then
         local index = __TS__ArrayFindIndex(

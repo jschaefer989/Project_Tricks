@@ -29,7 +29,7 @@ function Character.prototype.addToDeck(self, card)
     ____self_deck_3[#____self_deck_3 + 1] = card
     local ____opt_4 = self.gameManager.board
     if ____opt_4 ~= nil then
-        ____opt_4.cardAssets:hideCardAssets(card)
+        ____opt_4.cardAssets:removeCardAssets(card)
     end
 end
 function Character.prototype.getCardFromDeck(self, position)
@@ -40,7 +40,7 @@ function Character.prototype.addToDiscards(self, card)
     ____self_discardPile_6[#____self_discardPile_6 + 1] = card
     local ____opt_7 = self.gameManager.board
     if ____opt_7 ~= nil then
-        ____opt_7.cardAssets:hideCardAssets(card)
+        ____opt_7.cardAssets:removeCardAssets(card)
     end
 end
 function Character.prototype.getCardFromDiscards(self, position)
@@ -100,7 +100,7 @@ function Character.prototype.putHandBackInDeck(self)
         local ____self_deck_9 = self.deck
         ____self_deck_9[#____self_deck_9 + 1] = card
         if board ~= nil then
-            board.cardAssets:hideCardAssets(card)
+            board.cardAssets:removeCardAssets(card)
         end
     end
     self.hand = {}

@@ -43,6 +43,7 @@ export default class Board {
     private hideEdelBoard;
     handleAttack(): void;
     startCutAnimation(card: Card, winner: CharacterTypes): void;
+    startFlickerAnimation(card: Card, winner: CharacterTypes): void;
     dealNextRound(winner: CharacterTypes): void;
     private addPlayerPoints;
     private addEnemyPoints;

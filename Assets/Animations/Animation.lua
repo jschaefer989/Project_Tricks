@@ -44,7 +44,8 @@ function Animation.prototype.updateAnimation(self, deltaTime)
         self.isAnimating = false
     end
 end
-function Animation.prototype.drawAnimation(self)
+function Animation.prototype.getAssets(self)
+    return self.assets
 end
 function Animation.prototype.updateX(self, deltaX)
     __TS__ArrayForEach(

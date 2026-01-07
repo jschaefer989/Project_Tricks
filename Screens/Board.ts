@@ -27,6 +27,7 @@ import { Image } from "love.graphics";
 import IconAsset from "Assets/IconAsset";
 import { AnimationAssets } from "Assets/Animations/Animation";
 import CutAnimation from "Assets/Animations/CutAnimation";
+import FlickerAnimation from "Assets/Animations/FlickerAnimation";
 import SlideAnimation from "Assets/Animations/SlideAnimation";
 import * as suit from "Libraries.suit-master.suit";
 
@@ -113,7 +114,7 @@ export default class Board {
 
   handleStartFight(): void {
     this.showingEdelView = false;
-    this.gameManager.assetManager.hideAssets(AssetIds.LETS_FIGHT_BUTTON);
+    this.gameManager.assetManager.removeAssets(AssetIds.LETS_FIGHT_BUTTON);
     this.gameManager.assetManager.textManager.hideText(
       TextIds.LETS_FIGHT_BUTTON_CAPTION
     );
@@ -133,9 +134,9 @@ export default class Board {
 
   private hideEdelBoard(): void {
     this.gameManager.assetManager.textManager.hideText(TextIds.EDEL_LABEL);
-    this.gameManager.assetManager.hideAssets(AssetIds.EDEL_BOARD);
-    this.gameManager.assetManager.hideAssets(AssetIds.EDEL_SUIT_ICON_LEFT);
-    this.gameManager.assetManager.hideAssets(AssetIds.EDEL_SUIT_ICON_RIGHT);
+    this.gameManager.assetManager.removeAssets(AssetIds.EDEL_BOARD);
+    this.gameManager.assetManager.removeAssets(AssetIds.EDEL_SUIT_ICON_LEFT);
+    this.gameManager.assetManager.removeAssets(AssetIds.EDEL_SUIT_ICON_RIGHT);
   }
 
   handleAttack(): void {
@@ -163,10 +164,6 @@ export default class Board {
   startCutAnimation(card: Card, winner: CharacterTypes): void {
     const { baseAsset, suitAssets, rankAsset } = this.cardAssets.getCardAssets(card);
     const normalSuitAsset = suitAssets[0];
-    const flippedSuitAsset = suitAssets[1];
-
-    // Hide all card assets so they can be handled by the animation
-    this.cardAssets.hideCardAssets(card);
 
     // Start up the cut animation on the card base and rank
     const cutAnimationAssets: AnimationAssets[] = [];
@@ -185,15 +182,10 @@ export default class Board {
       cutAnimationAssets.push(rankAsset);
     }
 
-    const stationaryAssets: AnimationAssets[] = [];
-    if (!isEmpty(flippedSuitAsset)) {
-      stationaryAssets.push(flippedSuitAsset);
-    }
-
     this.gameManager.animationManager.animations.set(
       baseId,
-      new CutAnimation(0, -40, cutAnimationAssets, stationaryAssets, {
-        onFinish: () => this.dealNextRound(winner),
+      new CutAnimation(0, -40, cutAnimationAssets, {
+        onFinish: () => this.startFlickerAnimation(card, winner),
         animDuration: 0.25,
       })
     );
@@ -219,9 +211,39 @@ export default class Board {
     // Leave the bottom suit where it is
   }
 
+  startFlickerAnimation(card: Card, winner: CharacterTypes): void {
+    const { baseAsset, suitAssets, rankAsset } = this.cardAssets.getCardAssets(card);
+    const normalSuitAsset = suitAssets[0];
+    const flippedSuitAsset = suitAssets[1];
+
+    const flickerAssets: AnimationAssets[] = [];
+    
+    if (!isEmpty(baseAsset)) {
+      flickerAssets.push(baseAsset);
+    }
+    if (!isEmpty(rankAsset)) {
+      flickerAssets.push(rankAsset);
+    }
+    if (!isEmpty(normalSuitAsset)) {
+      flickerAssets.push(normalSuitAsset);
+    }
+    if (!isEmpty(flippedSuitAsset)) {
+      flickerAssets.push(flippedSuitAsset);
+    }
+
+    const flickerId = AnimationIds.CARD_BASE_FLICKER + card.id;
+    this.gameManager.animationManager.animations.set(
+      flickerId,
+        new FlickerAnimation(flickerAssets, {
+        onFinish: () => this.dealNextRound(winner),
+        animDuration: 0.6,
+      })
+    );
+  }
+
   dealNextRound(winner: CharacterTypes): void {
-    if (this.gameManager.animationManager.hasCutAnimation()) {
-      return; // Wait for all cut animations to finish
+    if (this.gameManager.animationManager.hasAnimations() ) {
+      return; // Wait for all animations to finish
     }
 
     if (winner === CharacterTypes.PLAYER) {
@@ -1141,7 +1163,7 @@ export default class Board {
   }
 
   private removeWinFire(): void {
-    this.gameManager.assetManager.hideAssets(AssetIds.BASIC_WIN_FIRE);
+    this.gameManager.assetManager.removeAssets(AssetIds.BASIC_WIN_FIRE);
     this.gameManager.assetManager.textManager.hideText(TextIds.WIN_FIRE_TEXT);
     this.gameManager.assetManager.textManager.hideText(TextIds.POINTS);
   }

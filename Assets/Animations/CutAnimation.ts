@@ -1,26 +1,19 @@
 import Asset from "Assets/Asset";
 import { AnimationAssets, ConstructionOptions } from "./Animation";
 import SlideAnimation from "./SlideAnimation";
-import { Quad } from "love.graphics";
-import FontWithPosition from "Assets/FontWithPosition";
+import QuadWithPosition from "Assets/QuadWithPosition";
+import { isEmpty } from "Helpers";
 
 export default class CutAnimation extends SlideAnimation {
-    topQuads: Map<Asset, Quad> = new Map<Asset, Quad>();
-    bottomQuads: Map<Asset, Quad> = new Map<Asset, Quad>();
-    stationaryAssets: AnimationAssets[] = [];
+    topQuads: QuadWithPosition[] = []
 
   constructor(
     offsetX: number,
     offsetY: number,
     animationAssets: AnimationAssets[],
-    stationaryAssets?: AnimationAssets[],
     constructionOptions?: ConstructionOptions
   ) {
     super(offsetX, offsetY, animationAssets, constructionOptions);
-
-    if (stationaryAssets) {
-      this.stationaryAssets = stationaryAssets;
-    }
 
     for (const asset of this.assets) {
         if (!(asset instanceof Asset)) {
@@ -28,8 +21,11 @@ export default class CutAnimation extends SlideAnimation {
         }        
         const imageWidth = asset.image.getWidth();
         const spriteHeight = asset.getHeight();
-        this.topQuads.set(asset, love.graphics.newQuad(0, 0, imageWidth, spriteHeight / 2, imageWidth, imageWidth));
-        this.bottomQuads.set(asset, love.graphics.newQuad(0, spriteHeight / 2, imageWidth, spriteHeight / 2, imageWidth, imageWidth));
+        const topQuad = love.graphics.newQuad(0, 0, imageWidth, spriteHeight / 2, imageWidth, imageWidth)
+        const bottomQuad = love.graphics.newQuad(0, spriteHeight / 2, imageWidth, spriteHeight / 2, imageWidth, imageWidth)
+        const topQuadWithPosition = new QuadWithPosition(topQuad, 0, 0)
+        asset.quads.push(topQuadWithPosition, new QuadWithPosition(bottomQuad, 0, spriteHeight / 2));
+        this.topQuads.push(topQuadWithPosition);
     }
   }
 
@@ -44,22 +40,9 @@ export default class CutAnimation extends SlideAnimation {
     }
 
     this.calculateAnimationOffset();
-  }
 
-  drawAnimation(): void {
-    for (const [asset, topQuad] of this.topQuads) {
-        love.graphics.draw(asset.image, topQuad, asset.x, asset.y + this.animOffsetY)
-    }
-    for (const [asset, bottomQuad] of this.bottomQuads) {
-        love.graphics.draw(asset.image, bottomQuad, asset.x, asset.y + asset.getHeight() / 2)
-    }
-    for (const asset of this.stationaryAssets) {
-        if (asset instanceof Asset) {
-            asset.drawAsset();
-        }
-        if (asset instanceof FontWithPosition) {
-            asset.printText();
-        }
+    for (const topQuad of this.topQuads) {
+        topQuad.y = this.animOffsetY;
     }
   }
 }

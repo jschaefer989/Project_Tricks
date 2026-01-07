@@ -8,10 +8,8 @@ export default class SlideAnimation extends Animation {
     animOffsetY: number;
     animTargetOffsetX: number;
     animTargetOffsetY: number;
-    drawSeparately: boolean;
     constructor(offsetX: number, offsetY: number, assets: AnimationAssets[], constructionOptions?: ConstructionOptions);
     updateAnimation(deltaTime: number): void;
     calculateAnimationOffset(): void;
-    drawAnimation(): void;
 }
 export {};

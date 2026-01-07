@@ -231,8 +231,24 @@ export default class CardAssets {
     return `${AssetIds.RANK}-${card.id}-${orientation}`;
   }
 
+  removeCardAssets(card: Card): void {
+    this.gameManager.assetManager.removeAssets(CardAssets.getBaseAssetId(card));
+  }
+
   hideCardAssets(card: Card): void {
-    this.gameManager.assetManager.hideAssets(CardAssets.getBaseAssetId(card));
+    const assetsForCard = this.getCardAssets(card);
+    if (isEmpty(assetsForCard.baseAsset)) {
+      return;
+    }
+    assetsForCard.baseAsset.isHidden = true;
+    for (const suitAsset of assetsForCard.suitAssets) {
+      if (!isEmpty(suitAsset)) {
+        suitAsset.isHidden = true;
+      }
+    }
+    if (!isEmpty(assetsForCard.rankAsset)) {
+      assetsForCard.rankAsset.isHidden = true;
+    }
   }
 
   centerCards(characterType: CharacterTypes): void {

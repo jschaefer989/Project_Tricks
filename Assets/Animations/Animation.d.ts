@@ -16,7 +16,7 @@ export default abstract class Animation {
     constructor(assets: AnimationAssets[], constructionOptions?: ConstructionOptions);
     updateAnimation(deltaTime: number): void;
     get isFinished(): boolean;
-    drawAnimation(): void;
+    getAssets(): AnimationAssets[];
     updateX(deltaX: number): void;
     updateY(deltaY: number): void;
 }

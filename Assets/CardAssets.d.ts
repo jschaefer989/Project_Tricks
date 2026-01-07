@@ -28,6 +28,7 @@ export default class CardAssets {
     static getSuitAssetId(card: Card, orientation: number): string;
     static getRankAssetPath(rank: Ranks | EdelRanks): string;
     static getRankAssetId(card: Card, orientation: number): string;
+    removeCardAssets(card: Card): void;
     hideCardAssets(card: Card): void;
     centerCards(characterType: CharacterTypes): void;
     updateCardPosition(card: Card, x: number, y: number): void;

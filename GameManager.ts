@@ -200,8 +200,7 @@ export default class GameManager {
         //     love.graphics.getHeight()
         //   );
         //   love.graphics.setShader();
-          this.assetManager.drawAssets();        
-          this.animationManager.drawAnimations();  
+          this.assetManager.drawAssets();         
           push.finish();
         }
       },

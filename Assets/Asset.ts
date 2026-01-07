@@ -3,6 +3,7 @@ import { Image } from "love.graphics";
 import FontWithPosition from "./FontWithPosition";
 import { HoverEffects, MousePressEffects } from "Enums";
 import { exhaustiveGuard, isEmpty } from "Helpers";
+import QuadWithPosition from "./QuadWithPosition";
 
 export type AssetCallback = (asset: Asset) => void;
 
@@ -15,6 +16,7 @@ export interface ConstructionOptions {
   readonly scaleY?: number;
   readonly offsetX?: number;
   readonly offsetY?: number;
+  readonly quads?: QuadWithPosition[];
   readonly isDisabled?: boolean;
   readonly clickSound?: Source;
   readonly associatedTexts?: FontWithPosition[];
@@ -37,6 +39,7 @@ export default class Asset {
   scaleY: number;
   offsetX: number;
   offsetY: number;
+  quads: QuadWithPosition[] = [];
   isDisabled = false;
   isHovered = false;
   isPressed = false;
@@ -45,6 +48,7 @@ export default class Asset {
   associatedTexts?: FontWithPosition[];
   hoverEffect: HoverEffects[];
   mousePressEffect: MousePressEffects[];
+  isHidden = false;
 
   constructor(
     id: string,
@@ -69,6 +73,7 @@ export default class Asset {
     this.scaleY = constructionOptions?.scaleY ?? 1;
     this.offsetX = constructionOptions?.offsetX ?? 0;
     this.offsetY = constructionOptions?.offsetY ?? 0;
+    this.quads = constructionOptions?.quads ?? [];
     this.isDisabled = constructionOptions?.isDisabled ?? false;
     this.clickSound = constructionOptions?.clickSound;
     this.associatedTexts = constructionOptions?.associatedTexts;
@@ -79,18 +84,38 @@ export default class Asset {
   }
 
   drawAsset(): void {
+    if (this.isHidden) {
+      return;
+    }
+
     love.graphics.setColor(this.color);
 
-    love.graphics.draw(
-      this.image,
-      this.x,
-      this.y,
-      this.orientation,
-      this.scaleX,
-      this.scaleY,
-      this.offsetX,
-      this.offsetY
-    );
+    if (this.quads.length > 0) {
+      for (const quad of this.quads) {
+        love.graphics.draw(
+          this.image,
+          quad.quad,
+          this.x + quad.x,
+          this.y + quad.y,
+          this.orientation,
+          this.scaleX,
+          this.scaleY,
+          this.offsetX,
+          this.offsetY
+        );
+      }
+    } else {
+      love.graphics.draw(
+        this.image,
+        this.x,
+        this.y,
+        this.orientation,
+        this.scaleX,
+        this.scaleY,
+        this.offsetX,
+        this.offsetY
+      );
+    }
 
     love.graphics.setColor(1, 1, 1, 1);
   }

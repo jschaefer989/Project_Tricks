@@ -117,6 +117,7 @@ ____exports.AnimationIds.CARD_BASE_CUT = "CARD_BASE_CUT"
 ____exports.AnimationIds.CARD_RANK_CUT = "CARD_RANK_CUT"
 ____exports.AnimationIds.CARD_SUIT_NORMAL_CUT = "CARD_SUIT_NORMAL_CUT"
 ____exports.AnimationIds.CARD_SUIT_FLIPPED_CUT = "CARD_SUIT_FLIPPED_CUT"
+____exports.AnimationIds.CARD_BASE_FLICKER = "CARD_BASE_FLICKER"
 ____exports.HoverEffects = HoverEffects or ({})
 ____exports.HoverEffects.NONE = "NONE"
 ____exports.HoverEffects.SCALE_UP = "SCALE_UP"

@@ -2,6 +2,7 @@ import GameManager from "GameManager";
 import Animation from "./Animation";
 import WobbleAnimation from "./WobbleAnimation";
 import CutAnimation from "./CutAnimation"
+import FlickerAnimation from "./FlickerAnimation";
 
 export default class AnimationManager {
   gameManager: GameManager;
@@ -25,12 +26,6 @@ export default class AnimationManager {
     }
   }
 
-  drawAnimations(): void {
-    for (const animation of this.animations.values()) {
-      animation.drawAnimation();
-    }
-  }
-
   hasWobbleAnimation(): boolean {
     for (const animation of this.animations.values()) {
       if (animation instanceof WobbleAnimation) {
@@ -47,5 +42,18 @@ export default class AnimationManager {
       }
     }
     return false;
+  }
+
+  hasFlickerAnimation(): boolean {
+    for (const animation of this.animations.values()) {
+      if (animation instanceof FlickerAnimation) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  hasAnimations(): boolean {
+    return this.animations.size > 0;
   }
 }

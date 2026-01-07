@@ -256,8 +256,23 @@ end
 function CardAssets.getRankAssetId(self, card, orientation)
     return (((AssetIds.RANK .. "-") .. card.id) .. "-") .. tostring(orientation)
 end
+function CardAssets.prototype.removeCardAssets(self, card)
+    self.gameManager.assetManager:removeAssets(____exports.default:getBaseAssetId(card))
+end
 function CardAssets.prototype.hideCardAssets(self, card)
-    self.gameManager.assetManager:hideAssets(____exports.default:getBaseAssetId(card))
+    local assetsForCard = self:getCardAssets(card)
+    if isEmpty(assetsForCard.baseAsset) then
+        return
+    end
+    assetsForCard.baseAsset.isHidden = true
+    for ____, suitAsset in ipairs(assetsForCard.suitAssets) do
+        if not isEmpty(suitAsset) then
+            suitAsset.isHidden = true
+        end
+    end
+    if not isEmpty(assetsForCard.rankAsset) then
+        assetsForCard.rankAsset.isHidden = true
+    end
 end
 function CardAssets.prototype.centerCards(self, characterType)
     local character = self.gameManager:getCharacter(characterType)
@@ -327,14 +342,14 @@ function CardAssets.prototype.getCardPosition(self, characterType)
 end
 function CardAssets.prototype.getHeightModifier(self, characterType)
     repeat
-        local ____switch37 = characterType
-        local ____cond37 = ____switch37 == CharacterTypes.PLAYER
-        if ____cond37 then
+        local ____switch43 = characterType
+        local ____cond43 = ____switch43 == CharacterTypes.PLAYER
+        if ____cond43 then
             local ____opt_8 = self.gameManager.board
             return not (____opt_8 and ____opt_8.showingEdelView) and -(____exports.cardHeight * 0.25) or ____exports.cardHeight / 2
         end
-        ____cond37 = ____cond37 or ____switch37 == CharacterTypes.ENEMY
-        if ____cond37 then
+        ____cond43 = ____cond43 or ____switch43 == CharacterTypes.ENEMY
+        if ____cond43 then
             return -(____exports.cardHeight * 1.5)
         end
         do

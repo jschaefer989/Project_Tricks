@@ -141,6 +141,7 @@ export enum AnimationIds {
     CARD_RANK_CUT = "CARD_RANK_CUT",
     CARD_SUIT_NORMAL_CUT = "CARD_SUIT_NORMAL_CUT",
     CARD_SUIT_FLIPPED_CUT = "CARD_SUIT_FLIPPED_CUT",
+    CARD_BASE_FLICKER = "CARD_BASE_FLICKER",
 }
 
 export enum HoverEffects {

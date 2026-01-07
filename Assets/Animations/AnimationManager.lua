@@ -9,6 +9,8 @@ local ____WobbleAnimation = require("Assets.Animations.WobbleAnimation")
 local WobbleAnimation = ____WobbleAnimation.default
 local ____CutAnimation = require("Assets.Animations.CutAnimation")
 local CutAnimation = ____CutAnimation.default
+local ____FlickerAnimation = require("Assets.Animations.FlickerAnimation")
+local FlickerAnimation = ____FlickerAnimation.default
 ____exports.default = __TS__Class()
 local AnimationManager = ____exports.default
 AnimationManager.name = "AnimationManager"
@@ -35,11 +37,6 @@ function AnimationManager.prototype.updateAnimations(self, dt)
         end
     end
 end
-function AnimationManager.prototype.drawAnimations(self)
-    for ____, animation in __TS__Iterator(self.animations:values()) do
-        animation:drawAnimation()
-    end
-end
 function AnimationManager.prototype.hasWobbleAnimation(self)
     for ____, animation in __TS__Iterator(self.animations:values()) do
         if __TS__InstanceOf(animation, WobbleAnimation) then
@@ -55,5 +52,16 @@ function AnimationManager.prototype.hasCutAnimation(self)
         end
     end
     return false
+end
+function AnimationManager.prototype.hasFlickerAnimation(self)
+    for ____, animation in __TS__Iterator(self.animations:values()) do
+        if __TS__InstanceOf(animation, FlickerAnimation) then
+            return true
+        end
+    end
+    return false
+end
+function AnimationManager.prototype.hasAnimations(self)
+    return self.animations.size > 0
 end
 return ____exports

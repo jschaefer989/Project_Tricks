@@ -11,10 +11,12 @@ ____exports.default = __TS__Class()
 local Asset = ____exports.default
 Asset.name = "Asset"
 function Asset.prototype.____constructor(self, id, image, x, y, width, height, constructionOptions)
+    self.quads = {}
     self.isDisabled = false
     self.isHovered = false
     self.isPressed = false
     self.color = {1, 1, 1, 1}
+    self.isHidden = false
     self.id = id
     self.image = image
     self.x = x
@@ -29,28 +31,48 @@ function Asset.prototype.____constructor(self, id, image, x, y, width, height, c
     self.scaleY = constructionOptions and constructionOptions.scaleY or 1
     self.offsetX = constructionOptions and constructionOptions.offsetX or 0
     self.offsetY = constructionOptions and constructionOptions.offsetY or 0
-    local ____temp_18 = constructionOptions and constructionOptions.isDisabled
-    if ____temp_18 == nil then
-        ____temp_18 = false
+    self.quads = constructionOptions and constructionOptions.quads or ({})
+    local ____temp_20 = constructionOptions and constructionOptions.isDisabled
+    if ____temp_20 == nil then
+        ____temp_20 = false
     end
-    self.isDisabled = ____temp_18
+    self.isDisabled = ____temp_20
     self.clickSound = constructionOptions and constructionOptions.clickSound
     self.associatedTexts = constructionOptions and constructionOptions.associatedTexts
     self.hoverEffect = constructionOptions and constructionOptions.hoverEffect or ({HoverEffects.NONE})
     self.mousePressEffect = constructionOptions and constructionOptions.mousePressEffect or ({MousePressEffects.NONE})
 end
 function Asset.prototype.drawAsset(self)
+    if self.isHidden then
+        return
+    end
     love.graphics.setColor(self.color)
-    love.graphics.draw(
-        self.image,
-        self.x,
-        self.y,
-        self.orientation,
-        self.scaleX,
-        self.scaleY,
-        self.offsetX,
-        self.offsetY
-    )
+    if #self.quads > 0 then
+        for ____, quad in ipairs(self.quads) do
+            love.graphics.draw(
+                self.image,
+                quad.quad,
+                self.x + quad.x,
+                self.y + quad.y,
+                self.orientation,
+                self.scaleX,
+                self.scaleY,
+                self.offsetX,
+                self.offsetY
+            )
+        end
+    else
+        love.graphics.draw(
+            self.image,
+            self.x,
+            self.y,
+            self.orientation,
+            self.scaleX,
+            self.scaleY,
+            self.offsetX,
+            self.offsetY
+        )
+    end
     love.graphics.setColor(1, 1, 1, 1)
 end
 function Asset.prototype.updatePosition(self, x, y)
@@ -64,18 +86,18 @@ end
 function Asset.prototype.handleHoverEffects(self, hovered)
     for ____, effect in ipairs(self.hoverEffect) do
         repeat
-            local ____switch8 = effect
-            local ____cond8 = ____switch8 == HoverEffects.NONE
-            if ____cond8 then
+            local ____switch13 = effect
+            local ____cond13 = ____switch13 == HoverEffects.NONE
+            if ____cond13 then
                 break
             end
-            ____cond8 = ____cond8 or ____switch8 == HoverEffects.CHANGE_COLOR
-            if ____cond8 then
+            ____cond13 = ____cond13 or ____switch13 == HoverEffects.CHANGE_COLOR
+            if ____cond13 then
                 self:setColor()
                 break
             end
-            ____cond8 = ____cond8 or ____switch8 == HoverEffects.SCALE_UP
-            if ____cond8 then
+            ____cond13 = ____cond13 or ____switch13 == HoverEffects.SCALE_UP
+            if ____cond13 then
                 self:scaleUp(hovered)
                 break
             end
@@ -93,23 +115,23 @@ end
 function Asset.prototype.handleMousePressEffects(self, pressed, wasPressed)
     for ____, effect in ipairs(self.mousePressEffect) do
         repeat
-            local ____switch13 = effect
-            local ____cond13 = ____switch13 == MousePressEffects.NONE
-            if ____cond13 then
+            local ____switch18 = effect
+            local ____cond18 = ____switch18 == MousePressEffects.NONE
+            if ____cond18 then
                 break
             end
-            ____cond13 = ____cond13 or ____switch13 == MousePressEffects.DARKEN
-            if ____cond13 then
+            ____cond18 = ____cond18 or ____switch18 == MousePressEffects.DARKEN
+            if ____cond18 then
                 self:setColor()
                 break
             end
-            ____cond13 = ____cond13 or ____switch13 == MousePressEffects.SCALE_DOWN
-            if ____cond13 then
+            ____cond18 = ____cond18 or ____switch18 == MousePressEffects.SCALE_DOWN
+            if ____cond18 then
                 self:scaleDown(pressed)
                 break
             end
-            ____cond13 = ____cond13 or ____switch13 == MousePressEffects.SHIFT_DOWN
-            if ____cond13 then
+            ____cond18 = ____cond18 or ____switch18 == MousePressEffects.SHIFT_DOWN
+            if ____cond18 then
                 self:shiftDown(pressed, wasPressed)
                 break
             end

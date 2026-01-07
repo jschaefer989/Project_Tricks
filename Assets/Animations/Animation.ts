@@ -48,8 +48,10 @@ export default abstract class Animation {
   get isFinished(): boolean {
     return !this.isAnimating;
   }
-
-  drawAnimation(): void {}
+  
+  getAssets(): AnimationAssets[] {
+    return this.assets;
+  }
 
   updateX(deltaX: number): void {
     this.assets.forEach((asset) => {
