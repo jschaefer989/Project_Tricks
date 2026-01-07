@@ -1,9 +1,11 @@
 import Asset from "./Asset";
 import GameManager from "GameManager";
 import TextManager from "Assets/TextManager";
+import TooltipManager from "./TooltipManager";
 export default class AssetManager {
     gameManager: GameManager;
     assets: Map<string, Asset[]>;
+    tooltipManager: TooltipManager;
     textManager: TextManager;
     disabledSound: import("love.audio").Source;
     constructor(gameManager: GameManager);
@@ -14,7 +16,6 @@ export default class AssetManager {
     disableAsset(baseId: string): void;
     enableAsset(baseId: string): void;
     drawAssets(): void;
-    private drawHoverables;
     handleMousePressed(x: number, y: number, button: number): void;
     handleMouseReleased(x: number, y: number, button: number): void;
     handleDisabledAssetClick(assets: Asset[]): void;

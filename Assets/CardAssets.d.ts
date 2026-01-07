@@ -5,6 +5,8 @@ import GameManager from "GameManager";
 import Point from "Point";
 import { Image } from "love.graphics";
 export declare const padding = 5;
+export declare const cardWidth = 70;
+export declare const cardHeight = 94;
 interface AssetsForCard {
     baseAsset: Asset;
     suitAssets: Asset[];
@@ -13,8 +15,6 @@ interface AssetsForCard {
 export default class CardAssets {
     gameManager: GameManager;
     baseCard: Image;
-    baseW: number;
-    baseH: number;
     cardClick: import("love.audio").Source;
     constructor(gameManager: GameManager);
     addAsset(card: Card, cardX: number, cardY: number, includeClickHandler?: boolean): void;

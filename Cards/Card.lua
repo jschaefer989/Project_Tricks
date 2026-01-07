@@ -1,18 +1,21 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
-local __TS__StringSplit = ____lualib.__TS__StringSplit
 local ____exports = {}
 local ____Enums = require("Enums")
 local AnimationIds = ____Enums.AnimationIds
 local Suits = ____Enums.Suits
+local AssetIds = ____Enums.AssetIds
+local TextIds = ____Enums.TextIds
 local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
 local ____SlideAnimation = require("Assets.Animations.SlideAnimation")
 local SlideAnimation = ____SlideAnimation.default
-local ____TextManager = require("Assets.TextManager")
-local TextManager = ____TextManager.default
+local ____FontWithPosition = require("Assets.FontWithPosition")
+local FontWithPosition = ____FontWithPosition.default
+local ____IconAsset = require("Assets.IconAsset")
+local IconAsset = ____IconAsset.default
 ____exports.default = __TS__Class()
 local Card = ____exports.default
 Card.name = "Card"
@@ -159,75 +162,38 @@ function Card.prototype.onUnselect(self)
         ____opt_5:updatePrimaryButtonStates()
     end
 end
-function Card.onHover(self, gameManager, asset)
-    local tooltipMaxWidth = 100
-    local padding = 10
-    local bgPadding = 4
-    local cardId = __TS__StringSplit(asset.id, "-")[2]
-    local card = gameManager:getCard(cardId)
-    local font = love.graphics.newFont(
-        TextManager:getDefaultFontFilepath(),
-        9
+function Card.prototype.onHover(self, asset)
+    self.gameManager.assetManager.tooltipManager:addTooltip(
+        {
+            __TS__New(
+                FontWithPosition,
+                TextIds.TOOLTIP_CARD_NAME,
+                5,
+                10,
+                (self.name .. " of ") .. ____exports.default:getSuitName(self.suit)
+            ),
+            __TS__New(
+                FontWithPosition,
+                TextIds.TOOLTIP_CARD_POWER,
+                5,
+                20,
+                tostring(self.power),
+                {icon = IconAsset:getPowerIconAsset(AssetIds.TOOLTIP_POWER_ICON)}
+            ),
+            __TS__New(
+                FontWithPosition,
+                TextIds.TOOLTIP_CARD_VALUE,
+                5,
+                30,
+                tostring(self.value),
+                {icon = IconAsset:getValueIconAsset(AssetIds.TOOLTIP_VALUE_ICON)}
+            )
+        },
+        asset
     )
-    love.graphics.setFont(font)
-    if isEmpty(card) or isEmpty(font) then
-        return
-    end
-    local screenW = love.graphics.getWidth()
-    local defaultX = asset.x + asset.image:getWidth() + padding
-    local placeRight = defaultX + tooltipMaxWidth <= screenW - padding
-    local tooltipX = placeRight and defaultX or math.max(padding, asset.x - padding - tooltipMaxWidth)
-    local tooltipY = asset.y
-    local lineHeight = font:getHeight()
-    local bgX = tooltipX - bgPadding
-    local bgY = tooltipY - bgPadding
-    local bgW = tooltipMaxWidth + bgPadding * 2
-    local bgH = lineHeight * 2 + bgPadding * 2
-    love.graphics.setColor(0, 0, 0, 0.8)
-    love.graphics.rectangle(
-        "fill",
-        bgX,
-        bgY,
-        bgW,
-        bgH
-    )
-    love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.rectangle(
-        "line",
-        bgX,
-        bgY,
-        bgW,
-        bgH
-    )
-    love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.printf(
-        card.name,
-        tooltipX,
-        tooltipY,
-        tooltipMaxWidth,
-        "left"
-    )
-    love.graphics.printf(
-        ____exports.default:getSuitName(card.suit),
-        tooltipX,
-        tooltipY,
-        tooltipMaxWidth,
-        "right"
-    )
-    love.graphics.printf(
-        "Power: " .. tostring(card.power),
-        tooltipX,
-        tooltipY + 10,
-        tooltipMaxWidth,
-        "left"
-    )
-    love.graphics.printf(
-        "Value: " .. tostring(card.value),
-        tooltipX,
-        tooltipY + 20,
-        tooltipMaxWidth,
-        "left"
-    )
+end
+function Card.prototype.onUnhover(self, asset)
+    self.gameManager.assetManager.tooltipManager:hideTooltip()
 end
 function Card.getSuitName(self, suit)
     repeat

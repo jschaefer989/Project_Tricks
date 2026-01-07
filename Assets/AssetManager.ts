@@ -4,17 +4,17 @@ import { isEmpty } from "Helpers";
 import GameManager from "GameManager";
 import TextManager from "Assets/TextManager";
 import WobbleAnimation from "./Animations/WobbleAnimation";
+import TooltipManager from "./TooltipManager";
 
 export default class AssetManager {
   gameManager: GameManager;
-  assets: Map<string, Asset[]>;
-  textManager: TextManager;
+  assets: Map<string, Asset[]> = new Map<string, Asset[]>();
+  tooltipManager = new TooltipManager();
+  textManager = new TextManager();
   disabledSound = love.audio.newSource("Assets/Sounds/Disabled.wav", "static");
 
   constructor(gameManager: GameManager) {
     this.gameManager = gameManager;
-    this.assets = new Map<string, Asset[]>();
-    this.textManager = new TextManager();
   }
 
   addAsset(id: string, asset: Asset): void {
@@ -63,18 +63,7 @@ export default class AssetManager {
         continue;
       }
       for (const asset of assets) {
-        love.graphics.setColor(asset.color);
-        love.graphics.draw(
-          asset.image,
-          asset.x,
-          asset.y,
-          asset.orientation,
-          asset.scaleX,
-          asset.scaleY,
-          asset.offsetX,
-          asset.offsetY
-        );
-        love.graphics.setColor(1, 1, 1, 1);
+        asset.drawAsset();
       }
     }
 
@@ -82,19 +71,7 @@ export default class AssetManager {
     this.textManager.drawText();
 
     // Draw hover content above assets and text
-    this.drawHoverables();
-  }
-
-  private drawHoverables(): void {
-    for (const assets of this.assets.values()) {
-      if (isEmpty(assets) || assets.length === 0) {
-        continue;
-      }
-      const asset = assets[0]; // Assume hoverable is the same for all assets with the same ID
-      if (asset.isHovered) {
-        asset.onHover?.(this.gameManager, asset);
-      }
-    }
+    this.tooltipManager.drawTooltips();
   }
 
   handleMousePressed(x: number, y: number, button: number): void {
@@ -215,11 +192,13 @@ export default class AssetManager {
           for (const a of assets) {
             a.setHovered(true);
           }
+          asset.onHover?.(asset);
         }
       } else if (asset.isHovered) {
         for (const a of assets) {
           a.setHovered(false);
         }
+        asset.onUnhover?.(asset);
       }
     }
   }

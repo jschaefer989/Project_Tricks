@@ -1,5 +1,6 @@
 /** @noSelfInFile */
-import { AlignMode, Image } from "love.graphics";
+import { AlignMode, Font } from "love.graphics";
+import IconAsset from "./IconAsset";
 export declare enum Format {
     LEFT = 0,
     CENTER = 1,
@@ -10,11 +11,16 @@ export declare enum OutlineThickness {
     THIN = 1,
     THICK = 2
 }
+export declare enum Fonts {
+    STANDARD = "Assets/Fonts/Germania.ttf",
+    FANTASY = "Assets/Fonts/dpcomic.ttf",
+    ELOQUENT = "Assets/Fonts/Bitmgothic.ttf"
+}
 interface ConstructionOptions {
-    filepath?: string;
+    font?: Fonts;
     size?: number;
     format?: Format;
-    icon?: Image;
+    icon?: IconAsset;
     iconFormat?: Omit<Format, Format.CENTER>;
     isDisabled?: boolean;
     outlineThickness?: OutlineThickness;
@@ -24,13 +30,12 @@ interface ConstructionOptions {
 }
 export default class FontWithPosition {
     id: string;
-    size?: number;
-    filepath: string;
     x: number;
     y: number;
     text: string;
     format: Format;
-    icon?: Image;
+    font: Font;
+    icon?: IconAsset;
     iconFormat: Omit<Format, Format.CENTER>;
     isDisabled: boolean;
     color: [number, number, number, number];
@@ -39,7 +44,7 @@ export default class FontWithPosition {
     alignMode?: AlignMode;
     constructor(id: string, x: number, y: number, text: string, options?: ConstructionOptions);
     setDisabled(disabled: boolean): void;
-    printFont(): void;
+    printText(): void;
     private printOutline;
     private getFormatOffset;
     private renderIcon;

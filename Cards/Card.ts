@@ -1,12 +1,13 @@
 /** @noSelfInFile */
 
 import GameManager from "GameManager";
-import { AnimationIds, Ranks, Suits, EdelRanks } from "../Enums";
+import { AnimationIds, Ranks, Suits, EdelRanks, AssetIds, TextIds } from "../Enums";
 import { exhaustiveGuard, isEmpty } from "Helpers";
 import Asset from "Assets/Asset";
 import SlideAnimation from "Assets/Animations/SlideAnimation";
 import { AnimationAssets } from "Assets/Animations/Animation";
-import TextManager from "Assets/TextManager";
+import FontWithPosition, { Fonts } from "Assets/FontWithPosition";
+import IconAsset from "Assets/IconAsset";
 
 export interface CardData {
   id: string;
@@ -213,72 +214,36 @@ export default class Card {
     this.gameManager.board?.updatePrimaryButtonStates();
   }
 
-  static onHover(gameManager: GameManager, asset: Asset): void {
-    const tooltipMaxWidth = 100;
-    const padding = 10;
-    const bgPadding = 4;
+  onHover(asset: Asset): void {
+    this.gameManager.assetManager.tooltipManager.addTooltip(
+      [
+        new FontWithPosition(
+          TextIds.TOOLTIP_CARD_NAME,
+          5,
+          10,
+          `${this.name} of ${Card.getSuitName(this.suit)}`
+        ),
+        new FontWithPosition(
+          TextIds.TOOLTIP_CARD_POWER,
+          5,
+          20,
+          this.power.toString(),
+          { icon: IconAsset.getPowerIconAsset(AssetIds.TOOLTIP_POWER_ICON) }
+        ),
+        new FontWithPosition(
+          TextIds.TOOLTIP_CARD_VALUE,
+          5,
+          30,
+          this.value.toString(),
+          { icon: IconAsset.getValueIconAsset(AssetIds.TOOLTIP_VALUE_ICON) }
+        )
+      ],
+      asset
+    )
+  }
 
-    // Extract card ID from asset ID (format: "BASE_CARD_TEMPLATE-{cardId}")
-    // TODO: move to its own method somewhere (not CardAssets)
-    const cardId = asset.id.split("-")[1];
-    const card = gameManager.getCard(cardId);
-    const font = love.graphics.newFont(TextManager.getDefaultFontFilepath(), 9);
-    love.graphics.setFont(font);
-
-    if (isEmpty(card) || isEmpty(font)) {
-      return;
-    }
-
-    const screenW = love.graphics.getWidth();
-    const defaultX = asset.x + asset.image.getWidth() + padding;
-    const placeRight = defaultX + tooltipMaxWidth <= screenW - padding;
-    const tooltipX = placeRight
-      ? defaultX
-      : math.max(padding, asset.x - padding - tooltipMaxWidth);
-    const tooltipY = asset.y;
-
-    const lineHeight = font.getHeight();
-    const bgX = tooltipX - bgPadding;
-    const bgY = tooltipY - bgPadding;
-    const bgW = tooltipMaxWidth + bgPadding * 2;
-    const bgH = lineHeight * 2 + bgPadding * 2;
-
-    // Draw background
-    love.graphics.setColor(0, 0, 0, 0.8);
-    love.graphics.rectangle("fill", bgX, bgY, bgW, bgH);
-    love.graphics.setColor(1, 1, 1, 1);
-    love.graphics.rectangle("line", bgX, bgY, bgW, bgH);
-
-    // Draw text
-    love.graphics.setColor(1, 1, 1, 1);
-    love.graphics.printf(
-      card.name,
-      tooltipX,
-      tooltipY,
-      tooltipMaxWidth,
-      "left"
-    );
-    love.graphics.printf(
-      Card.getSuitName(card.suit),
-      tooltipX,
-      tooltipY,
-      tooltipMaxWidth,
-      "right"
-    );
-    love.graphics.printf(
-      "Power: " + card.power,
-      tooltipX,
-      tooltipY + 10,
-      tooltipMaxWidth,
-      "left"
-    );
-    love.graphics.printf(
-      "Value: " + card.value,
-      tooltipX,
-      tooltipY + 20,
-      tooltipMaxWidth,
-      "left"
-    );
+  onUnhover(asset: Asset): void {
+    this.gameManager.assetManager.tooltipManager.hideTooltip();
   }
 
   static getSuitName(suit: Suits): string {

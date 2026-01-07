@@ -12,7 +12,7 @@ export default class TextManager {
     drawText(): void {
         const prevFont = love.graphics.getFont()
         for (const font of this.texts.values()) {            
-            font.printFont()
+            font.printText()
         }
         love.graphics.setColor(1, 1, 1, 1)
         // Restore previous font
@@ -52,15 +52,5 @@ export default class TextManager {
         if (!isEmpty(text)) {
             text.setDisabled(false)
         }
-    }
-
-    static getDefaultFontFilepath(): string {
-        return "Assets/Fonts/Germania.ttf"
-    }
-
-    static setDefaultFont(): Font {
-        const mainFont = love.graphics.newFont(this.getDefaultFontFilepath())
-        love.graphics.setFont(mainFont)
-        return mainFont
     }
 }

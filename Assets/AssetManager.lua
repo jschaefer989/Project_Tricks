@@ -12,14 +12,17 @@ local ____TextManager = require("Assets.TextManager")
 local TextManager = ____TextManager.default
 local ____WobbleAnimation = require("Assets.Animations.WobbleAnimation")
 local WobbleAnimation = ____WobbleAnimation.default
+local ____TooltipManager = require("Assets.TooltipManager")
+local TooltipManager = ____TooltipManager.default
 ____exports.default = __TS__Class()
 local AssetManager = ____exports.default
 AssetManager.name = "AssetManager"
 function AssetManager.prototype.____constructor(self, gameManager)
+    self.assets = __TS__New(Map)
+    self.tooltipManager = __TS__New(TooltipManager)
+    self.textManager = __TS__New(TextManager)
     self.disabledSound = love.audio.newSource("Assets/Sounds/Disabled.wav", "static")
     self.gameManager = gameManager
-    self.assets = __TS__New(Map)
-    self.textManager = __TS__New(TextManager)
 end
 function AssetManager.prototype.addAsset(self, id, asset)
     if self.assets:has(id) then
@@ -68,41 +71,13 @@ function AssetManager.prototype.drawAssets(self)
                 goto __continue18
             end
             for ____, asset in ipairs(assets) do
-                love.graphics.setColor(asset.color)
-                love.graphics.draw(
-                    asset.image,
-                    asset.x,
-                    asset.y,
-                    asset.orientation,
-                    asset.scaleX,
-                    asset.scaleY,
-                    asset.offsetX,
-                    asset.offsetY
-                )
-                love.graphics.setColor(1, 1, 1, 1)
+                asset:drawAsset()
             end
         end
         ::__continue18::
     end
     self.textManager:drawText()
-    self:drawHoverables()
-end
-function AssetManager.prototype.drawHoverables(self)
-    for ____, assets in __TS__Iterator(self.assets:values()) do
-        do
-            if isEmpty(assets) or #assets == 0 then
-                goto __continue24
-            end
-            local asset = assets[1]
-            if asset.isHovered then
-                local ____opt_4 = asset.onHover
-                if ____opt_4 ~= nil then
-                    ____opt_4(asset, self.gameManager, asset)
-                end
-            end
-        end
-        ::__continue24::
-    end
+    self.tooltipManager:drawTooltips()
 end
 function AssetManager.prototype.handleMousePressed(self, x, y, button)
     local gameX, gameY = push:toGame(x, y)
@@ -112,7 +87,7 @@ function AssetManager.prototype.handleMousePressed(self, x, y, button)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue30
+                goto __continue25
             end
             local asset = assets[1]
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
@@ -121,7 +96,7 @@ function AssetManager.prototype.handleMousePressed(self, x, y, button)
                 end
             end
         end
-        ::__continue30::
+        ::__continue25::
     end
 end
 function AssetManager.prototype.handleMouseReleased(self, x, y, button)
@@ -132,7 +107,7 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue38
+                goto __continue33
             end
             local asset = assets[1]
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
@@ -146,7 +121,7 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
                 a:setMousePressed(false)
             end
         end
-        ::__continue38::
+        ::__continue33::
     end
 end
 function AssetManager.prototype.handleDisabledAssetClick(self, assets)
@@ -181,17 +156,17 @@ function AssetManager.prototype.triggerWobbleAnimation(self, assets)
     end
 end
 function AssetManager.prototype.handleAssetClick(self, asset)
-    local ____this_7
-    ____this_7 = asset
-    local ____opt_6 = ____this_7.onClick
-    if ____opt_6 ~= nil then
-        ____opt_6(____this_7)
+    local ____this_5
+    ____this_5 = asset
+    local ____opt_4 = ____this_5.onClick
+    if ____opt_4 ~= nil then
+        ____opt_4(____this_5)
     end
-    local ____opt_8 = asset.clickSound
-    if not (____opt_8 and ____opt_8:isPlaying()) then
-        local ____opt_10 = asset.clickSound
-        if ____opt_10 ~= nil then
-            ____opt_10:play()
+    local ____opt_6 = asset.clickSound
+    if not (____opt_6 and ____opt_6:isPlaying()) then
+        local ____opt_8 = asset.clickSound
+        if ____opt_8 ~= nil then
+            ____opt_8:play()
         end
     end
 end
@@ -204,7 +179,7 @@ function AssetManager.prototype.handleMouseHover(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue61
+                goto __continue56
             end
             local asset = assets[1]
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
@@ -212,14 +187,22 @@ function AssetManager.prototype.handleMouseHover(self)
                     for ____, a in ipairs(assets) do
                         a:setHovered(true)
                     end
+                    local ____opt_10 = asset.onHover
+                    if ____opt_10 ~= nil then
+                        ____opt_10(asset, asset)
+                    end
                 end
             elseif asset.isHovered then
                 for ____, a in ipairs(assets) do
                     a:setHovered(false)
                 end
+                local ____opt_12 = asset.onUnhover
+                if ____opt_12 ~= nil then
+                    ____opt_12(asset, asset)
+                end
             end
         end
-        ::__continue61::
+        ::__continue56::
     end
 end
 return ____exports

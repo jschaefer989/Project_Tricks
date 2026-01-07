@@ -1,12 +1,12 @@
-import GameManager from "GameManager";
 import { Source } from "love.audio";
 import { Image } from "love.graphics";
 import FontWithPosition from "./FontWithPosition";
 import { HoverEffects, MousePressEffects } from "Enums";
-export type AssetCallback = (gameManager: GameManager, asset: Asset) => void;
-interface ConstructionOptions {
+export type AssetCallback = (asset: Asset) => void;
+export interface ConstructionOptions {
     readonly onClick?: () => void;
     readonly onHover?: AssetCallback;
+    readonly onUnhover?: AssetCallback;
     readonly orientation?: number;
     readonly scaleX?: number;
     readonly scaleY?: number;
@@ -23,8 +23,11 @@ export default class Asset {
     image: Image;
     x: number;
     y: number;
+    width: number;
+    height: number;
     onClick?: () => void;
     onHover?: AssetCallback;
+    onUnhover?: AssetCallback;
     orientation: number;
     scaleX: number;
     scaleY: number;
@@ -38,13 +41,18 @@ export default class Asset {
     associatedTexts?: FontWithPosition[];
     hoverEffect: HoverEffects[];
     mousePressEffect: MousePressEffects[];
-    constructor(id: string, image: Image, x: number, y: number, constructionOptions?: ConstructionOptions);
+    constructor(id: string, image: Image, x: number, y: number, width: number, height: number, constructionOptions?: ConstructionOptions);
+    drawAsset(): void;
     updatePosition(x: number, y: number): void;
     setHovered(hovered: boolean): void;
+    private handleHoverEffects;
     setMousePressed(pressed: boolean): void;
+    private handleMousePressEffects;
     setDisabled(disabled: boolean): void;
     setColor(): void;
     getWidth(): number;
     getHeight(): number;
+    private scaleDown;
+    private scaleUp;
+    private shiftDown;
 }
-export {};

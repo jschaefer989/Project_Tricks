@@ -1,8 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local ____exports = {}
-local ____TextManager = require("Assets.TextManager")
-local TextManager = ____TextManager.default
 local ____Helpers = require("Helpers")
 local isEmpty = ____Helpers.isEmpty
 ____exports.Format = Format or ({})
@@ -19,6 +17,10 @@ ____exports.OutlineThickness.THIN = 1
 ____exports.OutlineThickness[____exports.OutlineThickness.THIN] = "THIN"
 ____exports.OutlineThickness.THICK = 2
 ____exports.OutlineThickness[____exports.OutlineThickness.THICK] = "THICK"
+____exports.Fonts = Fonts or ({})
+____exports.Fonts.STANDARD = "Assets/Fonts/Germania.ttf"
+____exports.Fonts.FANTASY = "Assets/Fonts/dpcomic.ttf"
+____exports.Fonts.ELOQUENT = "Assets/Fonts/Bitmgothic.ttf"
 ____exports.default = __TS__Class()
 local FontWithPosition = ____exports.default
 FontWithPosition.name = "FontWithPosition"
@@ -26,9 +28,10 @@ function FontWithPosition.prototype.____constructor(self, id, x, y, text, option
     self.iconFormat = ____exports.Format.LEFT
     self.isDisabled = false
     self.color = {1, 1, 1, 1}
+    local size = options and options.size or 9
+    local font = options and options.font or ____exports.Fonts.STANDARD
+    self.font = love.graphics.newFont(font, size)
     self.id = id
-    self.size = options and options.size
-    self.filepath = options and options.filepath or TextManager:getDefaultFontFilepath()
     self.x = x
     self.y = y
     self.text = text
@@ -52,11 +55,10 @@ function FontWithPosition.prototype.setDisabled(self, disabled)
     self.isDisabled = disabled
     self.color = disabled and ({0.5, 0.5, 0.5, 1}) or ({1, 1, 1, 1})
 end
-function FontWithPosition.prototype.printFont(self)
-    local font = not isEmpty(self.size) and love.graphics.newFont(self.filepath, self.size) or love.graphics.newFont(self.filepath)
-    love.graphics.setFont(font)
-    local textW = font:getWidth(self.text)
-    local textH = font:getHeight()
+function FontWithPosition.prototype.printText(self)
+    love.graphics.setFont(self.font)
+    local textW = self.font:getWidth(self.text)
+    local textH = self.font:getHeight()
     local baseX = math.floor(self.x - self:getFormatOffset(textW))
     local baseY = math.floor(self.y - textH / 2)
     self:printOutline(baseX, baseY)
@@ -93,7 +95,18 @@ function FontWithPosition.prototype.printOutline(self, x, y)
                 if ox == 0 and oy == 0 then
                     goto __continue9
                 end
-                love.graphics.print(self.text, x + ox, y + oy)
+                local ____temp_22
+                if not isEmpty(self.limit) then
+                    ____temp_22 = love.graphics.printf(
+                        self.text,
+                        x + ox,
+                        y + oy,
+                        self.limit,
+                        self.alignMode or "left"
+                    )
+                else
+                    ____temp_22 = love.graphics.print(self.text, x + ox, y + oy)
+                end
             end
             ::__continue9::
         end
@@ -130,17 +143,25 @@ function FontWithPosition.prototype.renderIcon(self)
         local ____switch17 = self.iconFormat
         local ____cond17 = ____switch17 == ____exports.Format.LEFT
         if ____cond17 then
-            love.graphics.draw(
-                self.icon,
-                self.x - self.icon:getWidth() - 1,
-                self.y - self.icon:getHeight() / 2
-            )
+            if self.alignMode == "center" then
+                love.graphics.draw(
+                    self.icon.image,
+                    self.x + self.limit / 2 - self.font:getWidth(self.text) / 2 - self.icon:getWidth() - 2,
+                    self.y - self.icon:getHeight() / 2
+                )
+            else
+                love.graphics.draw(
+                    self.icon.image,
+                    self.x - self.icon:getWidth() - 2,
+                    self.y - self.icon:getHeight() / 2
+                )
+            end
             break
         end
         ____cond17 = ____cond17 or ____switch17 == ____exports.Format.RIGHT
         if ____cond17 then
             love.graphics.draw(
-                self.icon,
+                self.icon.image,
                 self.x - self.icon:getWidth() + 1,
                 self.y - self.icon:getHeight() / 2
             )

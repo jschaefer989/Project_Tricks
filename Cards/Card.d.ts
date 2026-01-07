@@ -33,6 +33,7 @@ export default class Card {
     onClick(): void;
     onSelect(): void;
     onUnselect(): void;
-    static onHover(gameManager: GameManager, asset: Asset): void;
+    onHover(asset: Asset): void;
+    onUnhover(asset: Asset): void;
     static getSuitName(suit: Suits): string;
 }

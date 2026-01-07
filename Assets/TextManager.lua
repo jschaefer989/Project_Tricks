@@ -15,7 +15,7 @@ end
 function TextManager.prototype.drawText(self)
     local prevFont = love.graphics.getFont()
     for ____, font in __TS__Iterator(self.texts:values()) do
-        font:printFont()
+        font:printText()
     end
     love.graphics.setColor(1, 1, 1, 1)
     if not isEmpty(prevFont) then
@@ -48,13 +48,5 @@ function TextManager.prototype.enableText(self, id)
     if not isEmpty(text) then
         text:setDisabled(false)
     end
-end
-function TextManager.getDefaultFontFilepath(self)
-    return "Assets/Fonts/Germania.ttf"
-end
-function TextManager.setDefaultFont(self)
-    local mainFont = love.graphics.newFont(self:getDefaultFontFilepath())
-    love.graphics.setFont(mainFont)
-    return mainFont
 end
 return ____exports

@@ -1,26 +1,32 @@
 /** @noSelfInFile */
 
-import { AlignMode, Image } from "love.graphics";
-import TextManager from "./TextManager";
+import { AlignMode, Font, Image } from "love.graphics";
 import { isEmpty } from "Helpers";
+import IconAsset from "./IconAsset";
 
 export enum Format {
-    LEFT, 
-    CENTER,
-    RIGHT
+  LEFT,
+  CENTER,
+  RIGHT,
 }
 
 export enum OutlineThickness {
-    NONE = 0,
-    THIN = 1,
-    THICK = 2
+  NONE = 0,
+  THIN = 1,
+  THICK = 2,
+}
+
+export enum Fonts {
+  STANDARD = "Assets/Fonts/Germania.ttf",
+  FANTASY = "Assets/Fonts/dpcomic.ttf",
+  ELOQUENT = "Assets/Fonts/Bitmgothic.ttf",
 }
 
 interface ConstructionOptions {
-  filepath?: string;
+  font?: Fonts;
   size?: number; // Powers of 9 look really crisp
   format?: Format;
-  icon?: Image;
+  icon?: IconAsset;
   iconFormat?: Omit<Format, Format.CENTER>;
   isDisabled?: boolean;
   outlineThickness?: OutlineThickness;
@@ -31,13 +37,12 @@ interface ConstructionOptions {
 
 export default class FontWithPosition {
   id: string;
-  size?: number;
-  filepath: string;
   x: number;
   y: number;
   text: string;
   format: Format;
-  icon?: Image
+  font: Font;
+  icon?: IconAsset;
   iconFormat: Omit<Format, Format.CENTER> = Format.LEFT;
   isDisabled: boolean = false;
   color: [number, number, number, number] = [1, 1, 1, 1];
@@ -52,15 +57,23 @@ export default class FontWithPosition {
     text: string,
     options?: ConstructionOptions
   ) {
+    const size = options?.size ?? 9;
+    const font = options?.font ?? Fonts.STANDARD;
+    this.font = love.graphics.newFont(font, size);
+
     this.id = id;
-    this.size = options?.size;
-    this.filepath = options?.filepath ?? TextManager.getDefaultFontFilepath();
     this.x = x;
     this.y = y;
     this.text = text;
+
     this.format = options?.format ?? Format.LEFT;
     this.icon = options?.icon;
-    this.iconFormat = options?.iconFormat ?? (this.format === Format.CENTER ? Format.LEFT : this.format) as Omit<Format, Format.CENTER>;
+    this.iconFormat =
+      options?.iconFormat ??
+      ((this.format === Format.CENTER ? Format.LEFT : this.format) as Omit<
+        Format,
+        Format.CENTER
+      >);
     this.isDisabled = options?.isDisabled ?? false;
     this.outlineThickness = options?.outlineThickness ?? OutlineThickness.THIN;
     if (this.isDisabled) {
@@ -76,21 +89,26 @@ export default class FontWithPosition {
     this.color = disabled ? [0.5, 0.5, 0.5, 1] : [1, 1, 1, 1];
   }
 
-  printFont(): void {
-    const font = !isEmpty(this.size)
-      ? love.graphics.newFont(this.filepath, this.size)
-      : love.graphics.newFont(this.filepath);
-    love.graphics.setFont(font);
+  printText(): void {
+    love.graphics.setFont(this.font);
 
-    const textW = font.getWidth(this.text);
-    const textH = font.getHeight();
+    const textW = this.font.getWidth(this.text);
+    const textH = this.font.getHeight();
     const baseX = Math.floor(this.x - this.getFormatOffset(textW));
     const baseY = Math.floor(this.y - textH / 2);
 
     this.printOutline(baseX, baseY);
 
     love.graphics.setColor(this.color);
-    !isEmpty(this.limit) ? love.graphics.printf(this.text, baseX, baseY, this.limit, this.alignMode ?? "left") : love.graphics.print(this.text, baseX, baseY);
+    !isEmpty(this.limit)
+      ? love.graphics.printf(
+          this.text,
+          baseX,
+          baseY,
+          this.limit,
+          this.alignMode ?? "left"
+        )
+      : love.graphics.print(this.text, baseX, baseY);
     this.renderIcon();
   }
 
@@ -100,13 +118,24 @@ export default class FontWithPosition {
     }
 
     love.graphics.setColor(0, 0, 0, this.color[3]);
-    const offsets = this.outlineThickness === OutlineThickness.THICK ? [-2, -1, 0, 1, 2] : [-1, 0, 1];
+    const offsets =
+      this.outlineThickness === OutlineThickness.THICK
+        ? [-2, -1, 0, 1, 2]
+        : [-1, 0, 1];
     for (const ox of offsets) {
       for (const oy of offsets) {
         if (ox === 0 && oy === 0) {
           continue;
         }
-        love.graphics.print(this.text, x + ox, y + oy);
+        !isEmpty(this.limit)
+          ? love.graphics.printf(
+              this.text,
+              x + ox,
+              y + oy,
+              this.limit,
+              this.alignMode ?? "left"
+            )
+          : love.graphics.print(this.text, x + ox, y + oy);
       }
     }
   }
@@ -119,9 +148,10 @@ export default class FontWithPosition {
         return textW / 2;
       case Format.RIGHT:
         // If there's an icon that will be rendered to the right, account for its width
-        const iconWidth = (this.iconFormat === Format.RIGHT && !isEmpty(this.icon)) 
-          ? this.icon.getWidth() 
-          : 0;
+        const iconWidth =
+          this.iconFormat === Format.RIGHT && !isEmpty(this.icon)
+            ? this.icon.getWidth()
+            : 0;
         return textW + iconWidth;
       default:
         return 0;
@@ -133,12 +163,34 @@ export default class FontWithPosition {
       return;
     }
     love.graphics.setColor(this.color);
+
+    // TODO: handle other align modes and formats
     switch (this.iconFormat) {
       case Format.LEFT:
-        love.graphics.draw(this.icon, this.x - this.icon.getWidth() - 1, this.y - (this.icon.getHeight() / 2));
+        if (this.alignMode === "center") {
+          love.graphics.draw(
+            this.icon.image,
+            this.x +
+              this.limit! / 2 -
+              this.font.getWidth(this.text) / 2 -
+              this.icon!.getWidth() -
+              2,
+            this.y - this.icon.getHeight() / 2
+          );
+        } else {
+          love.graphics.draw(
+            this.icon.image,
+            this.x - this.icon.getWidth() - 2,
+            this.y - this.icon.getHeight() / 2
+          );
+        }
         break;
       case Format.RIGHT:
-        love.graphics.draw(this.icon, this.x - this.icon.getWidth() + 1, this.y - (this.icon.getHeight() / 2));
+        love.graphics.draw(
+          this.icon.image,
+          this.x - this.icon.getWidth() + 1,
+          this.y - this.icon.getHeight() / 2
+        );
         break;
     }
   }

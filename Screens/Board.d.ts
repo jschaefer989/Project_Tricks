@@ -4,7 +4,6 @@ import Dealer from "../Dealer";
 import Enemy, { EnemyData } from "Enemies/Enemy";
 import type GameManager from "../GameManager";
 import CardAssets from "Assets/CardAssets";
-import { Image } from "love.graphics";
 interface BoardData {
     discardUsed: number;
     playerPoints: number;
@@ -31,19 +30,6 @@ export default class Board {
     enemyValue: number;
     showingEdelView: boolean;
     cardAssets: CardAssets;
-    letsFightButton: Image;
-    attackButton: Image;
-    discardButton: Image;
-    deselectButton: Image;
-    pointBoard: Image;
-    edelBoard: Image;
-    portraitBackground: Image;
-    portrait: Image;
-    baseDeck: Image;
-    perksButton: Image;
-    markIcon: Image;
-    attackPowerIcon: Image;
-    valueIcon: Image;
     portraitPosition: number | undefined;
     winFireSound: import("love.audio").Source;
     constructor(gameManager: GameManager, enemy?: Enemy);
@@ -79,6 +65,8 @@ export default class Board {
     private buildPointBoard;
     private buildPowerAndValues;
     private buildPlayerPortrait;
+    private getPortraitHeight;
+    private getPortraitWidth;
     private buildEnemyPortrait;
     private buildPortrait;
     private buildPlayerDeck;

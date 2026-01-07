@@ -10,7 +10,7 @@ local isEmpty = ____Helpers.isEmpty
 ____exports.default = __TS__Class()
 local Asset = ____exports.default
 Asset.name = "Asset"
-function Asset.prototype.____constructor(self, id, image, x, y, constructionOptions)
+function Asset.prototype.____constructor(self, id, image, x, y, width, height, constructionOptions)
     self.isDisabled = false
     self.isHovered = false
     self.isPressed = false
@@ -19,22 +19,39 @@ function Asset.prototype.____constructor(self, id, image, x, y, constructionOpti
     self.image = image
     self.x = x
     self.y = y
+    self.width = width
+    self.height = height
     self.onClick = constructionOptions and constructionOptions.onClick
     self.onHover = constructionOptions and constructionOptions.onHover
+    self.onUnhover = constructionOptions and constructionOptions.onUnhover
     self.orientation = constructionOptions and constructionOptions.orientation or 0
     self.scaleX = constructionOptions and constructionOptions.scaleX or 1
     self.scaleY = constructionOptions and constructionOptions.scaleY or 1
     self.offsetX = constructionOptions and constructionOptions.offsetX or 0
     self.offsetY = constructionOptions and constructionOptions.offsetY or 0
-    local ____temp_16 = constructionOptions and constructionOptions.isDisabled
-    if ____temp_16 == nil then
-        ____temp_16 = false
+    local ____temp_18 = constructionOptions and constructionOptions.isDisabled
+    if ____temp_18 == nil then
+        ____temp_18 = false
     end
-    self.isDisabled = ____temp_16
+    self.isDisabled = ____temp_18
     self.clickSound = constructionOptions and constructionOptions.clickSound
     self.associatedTexts = constructionOptions and constructionOptions.associatedTexts
     self.hoverEffect = constructionOptions and constructionOptions.hoverEffect or ({HoverEffects.NONE})
     self.mousePressEffect = constructionOptions and constructionOptions.mousePressEffect or ({MousePressEffects.NONE})
+end
+function Asset.prototype.drawAsset(self)
+    love.graphics.setColor(self.color)
+    love.graphics.draw(
+        self.image,
+        self.x,
+        self.y,
+        self.orientation,
+        self.scaleX,
+        self.scaleY,
+        self.offsetX,
+        self.offsetY
+    )
+    love.graphics.setColor(1, 1, 1, 1)
 end
 function Asset.prototype.updatePosition(self, x, y)
     self.x = x
@@ -42,43 +59,24 @@ function Asset.prototype.updatePosition(self, x, y)
 end
 function Asset.prototype.setHovered(self, hovered)
     self.isHovered = hovered
+    self:handleHoverEffects(hovered)
+end
+function Asset.prototype.handleHoverEffects(self, hovered)
     for ____, effect in ipairs(self.hoverEffect) do
         repeat
-            local ____switch6 = effect
-            local ____cond6 = ____switch6 == HoverEffects.NONE
-            if ____cond6 then
+            local ____switch8 = effect
+            local ____cond8 = ____switch8 == HoverEffects.NONE
+            if ____cond8 then
                 break
             end
-            ____cond6 = ____cond6 or ____switch6 == HoverEffects.CHANGE_COLOR
-            if ____cond6 then
+            ____cond8 = ____cond8 or ____switch8 == HoverEffects.CHANGE_COLOR
+            if ____cond8 then
                 self:setColor()
                 break
             end
-            ____cond6 = ____cond6 or ____switch6 == HoverEffects.SCALE_UP
-            if ____cond6 then
-                if hovered then
-                    local imgWidth = self.image:getWidth()
-                    local imgHeight = self.image:getHeight()
-                    local oldWidth = imgWidth * self.scaleX
-                    local oldHeight = imgHeight * self.scaleY
-                    self.scaleX = self.scaleX * 1.1
-                    self.scaleY = self.scaleY * 1.1
-                    local newWidth = imgWidth * self.scaleX
-                    local newHeight = imgHeight * self.scaleY
-                    self.offsetX = self.offsetX + (newWidth - oldWidth) / 2
-                    self.offsetY = self.offsetY + (newHeight - oldHeight) / 2
-                else
-                    local imgWidth = self.image:getWidth()
-                    local imgHeight = self.image:getHeight()
-                    local oldWidth = imgWidth * self.scaleX
-                    local oldHeight = imgHeight * self.scaleY
-                    self.scaleX = self.scaleX / 1.1
-                    self.scaleY = self.scaleY / 1.1
-                    local newWidth = imgWidth * self.scaleX
-                    local newHeight = imgHeight * self.scaleY
-                    self.offsetX = self.offsetX + (newWidth - oldWidth) / 2
-                    self.offsetY = self.offsetY + (newHeight - oldHeight) / 2
-                end
+            ____cond8 = ____cond8 or ____switch8 == HoverEffects.SCALE_UP
+            if ____cond8 then
+                self:scaleUp(hovered)
                 break
             end
             do
@@ -90,46 +88,29 @@ end
 function Asset.prototype.setMousePressed(self, pressed)
     local wasPressed = self.isPressed
     self.isPressed = pressed
+    self:handleMousePressEffects(pressed, wasPressed)
+end
+function Asset.prototype.handleMousePressEffects(self, pressed, wasPressed)
     for ____, effect in ipairs(self.mousePressEffect) do
         repeat
-            local ____switch12 = effect
-            local ____cond12 = ____switch12 == MousePressEffects.NONE
-            if ____cond12 then
+            local ____switch13 = effect
+            local ____cond13 = ____switch13 == MousePressEffects.NONE
+            if ____cond13 then
                 break
             end
-            ____cond12 = ____cond12 or ____switch12 == MousePressEffects.DARKEN
-            if ____cond12 then
+            ____cond13 = ____cond13 or ____switch13 == MousePressEffects.DARKEN
+            if ____cond13 then
                 self:setColor()
                 break
             end
-            ____cond12 = ____cond12 or ____switch12 == MousePressEffects.SCALE_DOWN
-            if ____cond12 then
-                if pressed then
-                    self.scaleX = self.scaleX * 0.95
-                    self.scaleY = self.scaleY * 0.95
-                else
-                    self.scaleX = self.scaleX / 0.95
-                    self.scaleY = self.scaleY / 0.95
-                end
+            ____cond13 = ____cond13 or ____switch13 == MousePressEffects.SCALE_DOWN
+            if ____cond13 then
+                self:scaleDown(pressed)
                 break
             end
-            ____cond12 = ____cond12 or ____switch12 == MousePressEffects.SHIFT_DOWN
-            if ____cond12 then
-                if pressed then
-                    self.offsetY = self.offsetY - 3
-                    if not isEmpty(self.associatedTexts) then
-                        for ____, text in ipairs(self.associatedTexts) do
-                            text.y = text.y + 3
-                        end
-                    end
-                elseif wasPressed then
-                    self.offsetY = self.offsetY + 3
-                    if not isEmpty(self.associatedTexts) then
-                        for ____, text in ipairs(self.associatedTexts) do
-                            text.y = text.y - 3
-                        end
-                    end
-                end
+            ____cond13 = ____cond13 or ____switch13 == MousePressEffects.SHIFT_DOWN
+            if ____cond13 then
+                self:shiftDown(pressed, wasPressed)
                 break
             end
             do
@@ -154,11 +135,60 @@ function Asset.prototype.setColor(self)
     end
 end
 function Asset.prototype.getWidth(self)
-    local imgWidth = self.image:getWidth()
-    return imgWidth * math.abs(self.scaleX)
+    return self.width
 end
 function Asset.prototype.getHeight(self)
-    local imgHeight = self.image:getHeight()
-    return imgHeight * math.abs(self.scaleY)
+    return self.height
+end
+function Asset.prototype.scaleDown(self, pressed)
+    if pressed then
+        self.scaleX = self.scaleX * 0.95
+        self.scaleY = self.scaleY * 0.95
+    else
+        self.scaleX = self.scaleX / 0.95
+        self.scaleY = self.scaleY / 0.95
+    end
+end
+function Asset.prototype.scaleUp(self, hovered)
+    if hovered then
+        local imgWidth = self:getWidth()
+        local imgHeight = self:getHeight()
+        local oldWidth = imgWidth * self.scaleX
+        local oldHeight = imgHeight * self.scaleY
+        self.scaleX = self.scaleX * 1.05
+        self.scaleY = self.scaleY * 1.05
+        local newWidth = imgWidth * self.scaleX
+        local newHeight = imgHeight * self.scaleY
+        self.offsetX = self.offsetX + (newWidth - oldWidth) / 2
+        self.offsetY = self.offsetY + (newHeight - oldHeight) / 2
+    else
+        local imgWidth = self:getWidth()
+        local imgHeight = self:getHeight()
+        local oldWidth = imgWidth * self.scaleX
+        local oldHeight = imgHeight * self.scaleY
+        self.scaleX = self.scaleX / 1.05
+        self.scaleY = self.scaleY / 1.05
+        local newWidth = imgWidth * self.scaleX
+        local newHeight = imgHeight * self.scaleY
+        self.offsetX = self.offsetX + (newWidth - oldWidth) / 2
+        self.offsetY = self.offsetY + (newHeight - oldHeight) / 2
+    end
+end
+function Asset.prototype.shiftDown(self, pressed, wasPressed)
+    if pressed then
+        self.offsetY = self.offsetY - 3
+        if not isEmpty(self.associatedTexts) then
+            for ____, text in ipairs(self.associatedTexts) do
+                text.y = text.y + 3
+            end
+        end
+    elseif wasPressed then
+        self.offsetY = self.offsetY + 3
+        if not isEmpty(self.associatedTexts) then
+            for ____, text in ipairs(self.associatedTexts) do
+                text.y = text.y - 3
+            end
+        end
+    end
 end
 return ____exports

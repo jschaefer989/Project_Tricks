@@ -1,5 +1,4 @@
 import FontWithPosition from "./FontWithPosition";
-import { Font } from "love.graphics";
 export default class TextManager {
     texts: Map<string, FontWithPosition>;
     constructor();
@@ -10,6 +9,4 @@ export default class TextManager {
     updateText(id: string, newText: string): void;
     disableText(id: string): void;
     enableText(id: string): void;
-    static getDefaultFontFilepath(): string;
-    static setDefaultFont(): Font;
 }

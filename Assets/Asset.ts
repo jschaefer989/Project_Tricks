@@ -1,15 +1,15 @@
-import GameManager from "GameManager";
 import { Source } from "love.audio";
-import { Font, Image } from "love.graphics";
+import { Image } from "love.graphics";
 import FontWithPosition from "./FontWithPosition";
 import { HoverEffects, MousePressEffects } from "Enums";
 import { exhaustiveGuard, isEmpty } from "Helpers";
 
-export type AssetCallback = (gameManager: GameManager, asset: Asset) => void;
+export type AssetCallback = (asset: Asset) => void;
 
-interface ConstructionOptions {
+export interface ConstructionOptions {
   readonly onClick?: () => void;
   readonly onHover?: AssetCallback;
+  readonly onUnhover?: AssetCallback;
   readonly orientation?: number;
   readonly scaleX?: number;
   readonly scaleY?: number;
@@ -27,8 +27,11 @@ export default class Asset {
   image: Image;
   x: number;
   y: number;
+  width: number;
+  height: number;
   onClick?: () => void;
   onHover?: AssetCallback;
+  onUnhover?: AssetCallback;
   orientation: number;
   scaleX: number;
   scaleY: number;
@@ -48,14 +51,19 @@ export default class Asset {
     image: Image,
     x: number,
     y: number,
+    width: number,
+    height: number,
     constructionOptions?: ConstructionOptions
   ) {
     this.id = id;
     this.image = image;
     this.x = x;
     this.y = y;
+    this.width = width;
+    this.height = height;
     this.onClick = constructionOptions?.onClick;
     this.onHover = constructionOptions?.onHover;
+    this.onUnhover = constructionOptions?.onUnhover;
     this.orientation = constructionOptions?.orientation ?? 0;
     this.scaleX = constructionOptions?.scaleX ?? 1;
     this.scaleY = constructionOptions?.scaleY ?? 1;
@@ -70,6 +78,21 @@ export default class Asset {
     ];
   }
 
+  drawAsset(): void {
+    love.graphics.setColor(this.color);
+    love.graphics.draw(
+      this.image,
+      this.x,
+      this.y,
+      this.orientation,
+      this.scaleX,
+      this.scaleY,
+      this.offsetX,
+      this.offsetY
+    );
+    love.graphics.setColor(1, 1, 1, 1);
+  }
+
   updatePosition(x: number, y: number): void {
     this.x = x;
     this.y = y;
@@ -77,6 +100,10 @@ export default class Asset {
 
   setHovered(hovered: boolean): void {
     this.isHovered = hovered;
+    this.handleHoverEffects(hovered);
+  }
+
+  private handleHoverEffects(hovered: boolean): void {
     for (const effect of this.hoverEffect) {
       switch (effect) {
         case HoverEffects.NONE:
@@ -85,37 +112,7 @@ export default class Asset {
           this.setColor();
           break;
         case HoverEffects.SCALE_UP:
-          if (hovered) {
-            const imgWidth = this.image.getWidth();
-            const imgHeight = this.image.getHeight();
-            const oldWidth = imgWidth * this.scaleX;
-            const oldHeight = imgHeight * this.scaleY;
-
-            this.scaleX *= 1.1;
-            this.scaleY *= 1.1;
-
-            const newWidth = imgWidth * this.scaleX;
-            const newHeight = imgHeight * this.scaleY;
-
-            // Adjust offsets to keep the asset centered
-            this.offsetX += (newWidth - oldWidth) / 2;
-            this.offsetY += (newHeight - oldHeight) / 2;
-          } else {
-            const imgWidth = this.image.getWidth();
-            const imgHeight = this.image.getHeight();
-            const oldWidth = imgWidth * this.scaleX;
-            const oldHeight = imgHeight * this.scaleY;
-
-            this.scaleX /= 1.1;
-            this.scaleY /= 1.1;
-
-            const newWidth = imgWidth * this.scaleX;
-            const newHeight = imgHeight * this.scaleY;
-
-            // Adjust offsets to keep the asset centered
-            this.offsetX += (newWidth - oldWidth) / 2;
-            this.offsetY += (newHeight - oldHeight) / 2;
-          }
+          this.scaleUp(hovered);
           break;
         default:
           exhaustiveGuard(effect);
@@ -126,6 +123,10 @@ export default class Asset {
   setMousePressed(pressed: boolean): void {
     const wasPressed = this.isPressed;
     this.isPressed = pressed;
+    this.handleMousePressEffects(pressed, wasPressed);
+  }
+
+  private handleMousePressEffects(pressed: boolean, wasPressed: boolean): void {
     for (const effect of this.mousePressEffect) {
       switch (effect) {
         case MousePressEffects.NONE:
@@ -134,30 +135,10 @@ export default class Asset {
           this.setColor();
           break;
         case MousePressEffects.SCALE_DOWN:
-          if (pressed) {
-            this.scaleX *= 0.95;
-            this.scaleY *= 0.95;
-          } else {
-            this.scaleX /= 0.95;
-            this.scaleY /= 0.95;
-          }
+          this.scaleDown(pressed);
           break;
         case MousePressEffects.SHIFT_DOWN:
-          if (pressed) {
-            this.offsetY -= 3;
-            if (!isEmpty(this.associatedTexts)) {
-              for (const text of this.associatedTexts) {
-                text.y += 3;
-              }
-            }
-          } else if (wasPressed) {
-            this.offsetY += 3;
-            if (!isEmpty(this.associatedTexts)) {
-              for (const text of this.associatedTexts) {
-                text.y -= 3;
-              }
-            }
-          }
+          this.shiftDown(pressed, wasPressed);
           break;
         default:
           exhaustiveGuard(effect);
@@ -183,12 +164,72 @@ export default class Asset {
   }
 
   getWidth(): number {
-    const imgWidth = this.image.getWidth();
-    return imgWidth * Math.abs(this.scaleX);
+    return this.width;
   }
 
   getHeight(): number {
-    const imgHeight = this.image.getHeight();
-    return imgHeight * Math.abs(this.scaleY);
+    return this.height;
+  }
+
+  private scaleDown(pressed: boolean): void {
+    if (pressed) {
+      this.scaleX *= 0.95;
+      this.scaleY *= 0.95;
+    } else {
+      this.scaleX /= 0.95;
+      this.scaleY /= 0.95;
+    }
+  }
+
+  private scaleUp(hovered: boolean): void {
+    if (hovered) {
+      const imgWidth = this.getWidth();
+      const imgHeight = this.getHeight();
+      const oldWidth = imgWidth * this.scaleX;
+      const oldHeight = imgHeight * this.scaleY;
+
+      this.scaleX *= 1.05;
+      this.scaleY *= 1.05;
+
+      const newWidth = imgWidth * this.scaleX;
+      const newHeight = imgHeight * this.scaleY;
+
+      // Adjust offsets to keep the asset centered
+      this.offsetX += (newWidth - oldWidth) / 2;
+      this.offsetY += (newHeight - oldHeight) / 2;
+    } else {
+      const imgWidth = this.getWidth();
+      const imgHeight = this.getHeight();
+      const oldWidth = imgWidth * this.scaleX;
+      const oldHeight = imgHeight * this.scaleY;
+
+      this.scaleX /= 1.05;
+      this.scaleY /= 1.05;
+
+      const newWidth = imgWidth * this.scaleX;
+      const newHeight = imgHeight * this.scaleY;
+
+      // Adjust offsets to keep the asset centered
+      this.offsetX += (newWidth - oldWidth) / 2;
+      this.offsetY += (newHeight - oldHeight) / 2;
+    }
+  }
+
+  private shiftDown(pressed: boolean, wasPressed: boolean): void {
+    if (pressed) {
+      this.offsetY -= 3;
+      if (!isEmpty(this.associatedTexts)) {
+        for (const text of this.associatedTexts) {
+          text.y += 3;
+        }
+      }
+    } else if (wasPressed) {
+      this.offsetY += 3;
+      if (!isEmpty(this.associatedTexts)) {
+        for (const text of this.associatedTexts) {
+          text.y -= 3;
+        }
+      }
+    }
   }
 }
