@@ -195,6 +195,7 @@ function GameManager.prototype.switchToBoard(self, enemy)
             if not self.devMode then
                 push:start()
                 self.assetManager:drawAssets()
+                self.animationManager:drawAnimations()
                 push:finish()
             end
         end,

@@ -12,7 +12,8 @@ export default class AssetManager {
     addAsset(id: string, asset: Asset): void;
     getAssets(baseId: string): Asset[] | undefined;
     getAsset(baseId: string, assetId: string): Asset | undefined;
-    hideAsset(id: string): void;
+    hideAssets(id: string): void;
+    hideAsset(baseId: string, assetId: string): void;
     disableAsset(baseId: string): void;
     enableAsset(baseId: string): void;
     drawAssets(): void;

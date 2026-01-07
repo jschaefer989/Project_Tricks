@@ -1,6 +1,7 @@
 import GameManager from "GameManager";
 import Animation from "./Animation";
 import WobbleAnimation from "./WobbleAnimation";
+import CutAnimation from "./CutAnimation"
 
 export default class AnimationManager {
   gameManager: GameManager;
@@ -19,13 +20,29 @@ export default class AnimationManager {
       animation.updateAnimation(dt);
       if (animation.isFinished) {
         this.animations.delete(id);
+        animation.onFinish?.();
       }
+    }
+  }
+
+  drawAnimations(): void {
+    for (const animation of this.animations.values()) {
+      animation.drawAnimation();
     }
   }
 
   hasWobbleAnimation(): boolean {
     for (const animation of this.animations.values()) {
       if (animation instanceof WobbleAnimation) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  hasCutAnimation(): boolean {
+    for (const animation of this.animations.values()) {
+      if (animation instanceof CutAnimation) {
         return true;
       }
     }

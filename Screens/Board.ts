@@ -8,6 +8,7 @@ import {
   GameStates,
   HoverEffects,
   MousePressEffects,
+  AnimationIds,
 } from "../Enums";
 import Dealer from "../Dealer";
 import Enemy, { EnemyData } from "Enemies/Enemy";
@@ -24,6 +25,10 @@ import FontWithPosition, {
 import Card from "Cards/Card";
 import { Image } from "love.graphics";
 import IconAsset from "Assets/IconAsset";
+import { AnimationAssets } from "Assets/Animations/Animation";
+import CutAnimation from "Assets/Animations/CutAnimation";
+import SlideAnimation from "Assets/Animations/SlideAnimation";
+import * as suit from "Libraries.suit-master.suit";
 
 const portraitGap = 12;
 
@@ -108,7 +113,7 @@ export default class Board {
 
   handleStartFight(): void {
     this.showingEdelView = false;
-    this.gameManager.assetManager.hideAsset(AssetIds.LETS_FIGHT_BUTTON);
+    this.gameManager.assetManager.hideAssets(AssetIds.LETS_FIGHT_BUTTON);
     this.gameManager.assetManager.textManager.hideText(
       TextIds.LETS_FIGHT_BUTTON_CAPTION
     );
@@ -128,9 +133,9 @@ export default class Board {
 
   private hideEdelBoard(): void {
     this.gameManager.assetManager.textManager.hideText(TextIds.EDEL_LABEL);
-    this.gameManager.assetManager.hideAsset(AssetIds.EDEL_BOARD);
-    this.gameManager.assetManager.hideAsset(AssetIds.EDEL_SUIT_ICON_LEFT);
-    this.gameManager.assetManager.hideAsset(AssetIds.EDEL_SUIT_ICON_RIGHT);
+    this.gameManager.assetManager.hideAssets(AssetIds.EDEL_BOARD);
+    this.gameManager.assetManager.hideAssets(AssetIds.EDEL_SUIT_ICON_LEFT);
+    this.gameManager.assetManager.hideAssets(AssetIds.EDEL_SUIT_ICON_RIGHT);
   }
 
   handleAttack(): void {
@@ -141,17 +146,96 @@ export default class Board {
     }
 
     if (this.playerPower > this.enemyPower) {
+      // Mark all enemy cards as cut and update the assets
+      for (const card of this.enemy.hand) {
+        this.startCutAnimation(card, CharacterTypes.PLAYER);
+      }
+      return; // Don't deal cards yet - let the animation play first
+    } else {
+      for (const card of this.gameManager.player.hand) {
+        if (card.isSelected) {
+          this.startCutAnimation(card, CharacterTypes.ENEMY);
+        }
+      }
+    }
+  }
+
+  startCutAnimation(card: Card, winner: CharacterTypes): void {
+    const { baseAsset, suitAssets, rankAsset } = this.cardAssets.getCardAssets(card);
+    const normalSuitAsset = suitAssets[0];
+    const flippedSuitAsset = suitAssets[1];
+
+    // Hide all card assets so they can be handled by the animation
+    this.cardAssets.hideCardAssets(card);
+
+    // Start up the cut animation on the card base and rank
+    const cutAnimationAssets: AnimationAssets[] = [];
+    const baseId = AnimationIds.CARD_BASE_CUT + card.id;
+    if (
+      !isEmpty(baseAsset) &&
+      !this.gameManager.animationManager.animations.has(baseId)
+    ) {
+      cutAnimationAssets.push(baseAsset);
+    }
+    const rankAssetId = AnimationIds.CARD_RANK_CUT + card.id;
+    if (
+      !isEmpty(rankAsset) &&
+      !this.gameManager.animationManager.animations.has(rankAssetId)
+    ) {
+      cutAnimationAssets.push(rankAsset);
+    }
+
+    const stationaryAssets: AnimationAssets[] = [];
+    if (!isEmpty(flippedSuitAsset)) {
+      stationaryAssets.push(flippedSuitAsset);
+    }
+
+    this.gameManager.animationManager.animations.set(
+      baseId,
+      new CutAnimation(0, -40, cutAnimationAssets, stationaryAssets, {
+        onFinish: () => this.dealNextRound(winner),
+        animDuration: 0.25,
+      })
+    );
+
+    // Just slide the top suit, don't cut it
+    const slideAnimationAssets: AnimationAssets[] = [];
+    const normalSuitAssetId = AnimationIds.CARD_SUIT_NORMAL_CUT + card.id;
+    if (
+      !isEmpty(normalSuitAsset) &&
+      !this.gameManager.animationManager.animations.has(normalSuitAssetId)
+    ) {
+      slideAnimationAssets.push(normalSuitAsset);
+    }
+
+    this.gameManager.animationManager.animations.set(
+      normalSuitAssetId,
+      new SlideAnimation(0, -40, slideAnimationAssets, {
+        animDuration: 0.25,
+        drawSeparately: true,
+      })
+    );
+
+    // Leave the bottom suit where it is
+  }
+
+  dealNextRound(winner: CharacterTypes): void {
+    if (this.gameManager.animationManager.hasCutAnimation()) {
+      return; // Wait for all cut animations to finish
+    }
+
+    if (winner === CharacterTypes.PLAYER) {
       this.addPlayerPoints(this.getPlayerPoints());
     } else {
       this.addEnemyPoints(this.getEnemyPoints());
     }
 
     this.gameManager.player.removeSelectedCardsFromHand();
-    this.gameManager.board?.dealer.dealCards(CharacterTypes.PLAYER);
+    this.dealer.dealCards(CharacterTypes.PLAYER);
 
     this.enemy.removeAllCardsFromHand();
     this.clearEnemyStats();
-    this.gameManager.board?.dealer.dealCards(CharacterTypes.ENEMY);
+    this.dealer.dealCards(CharacterTypes.ENEMY);
   }
 
   private addPlayerPoints(points: number): void {
@@ -228,17 +312,17 @@ export default class Board {
     }
   }
 
-  private clearStats(): void {
+  clearStats(): void {
     this.clearPlayerStats();
     this.clearEnemyStats();
   }
 
-  private clearPlayerStats(): void {
+  clearPlayerStats(): void {
     this.addPlayerPower(-this.playerPower);
     this.addPlayerValue(-this.playerValue);
   }
 
-  private clearEnemyStats(): void {
+  clearEnemyStats(): void {
     this.addEnemyPower(-this.enemyPower);
     this.addEnemyValue(-this.enemyValue);
   }
@@ -378,7 +462,7 @@ export default class Board {
   private buildPrimaryButtons(): void {
     const gap = 10;
     const btnW = 90;
-    const btnH = 70
+    const btnH = 70;
     const totalW = btnW * 3 + gap * 2;
     const buttonY =
       this.cardAssets.getCardPosition(CharacterTypes.PLAYER) + cardHeight + gap;
@@ -603,7 +687,14 @@ export default class Board {
     const buttonX = Math.floor((screenW - boardWidth) / 2);
     this.gameManager.assetManager.addAsset(
       AssetIds.POINT_DISPLAY,
-      new Asset(AssetIds.POINT_DISPLAY, love.graphics.newImage("Assets/Images/PointBoard.png"), buttonX, 5, boardWidth, boardHeight)
+      new Asset(
+        AssetIds.POINT_DISPLAY,
+        love.graphics.newImage("Assets/Images/PointBoard.png"),
+        buttonX,
+        5,
+        boardWidth,
+        boardHeight
+      )
     );
 
     const centerX = screenW / 2;
@@ -642,10 +733,18 @@ export default class Board {
     );
   }
 
-  private buildPowerAndValues(characterType: CharacterTypes, portraitHeight: number): void {
-    const levelText = characterType === CharacterTypes.PLAYER
-      ? this.gameManager.assetManager.textManager.getText(TextIds.PLAYER_PORTRAIT_LEVEL)
-      : this.gameManager.assetManager.textManager.getText(TextIds.ENEMY_PORTRAIT_LEVEL);
+  private buildPowerAndValues(
+    characterType: CharacterTypes,
+    portraitHeight: number
+  ): void {
+    const levelText =
+      characterType === CharacterTypes.PLAYER
+        ? this.gameManager.assetManager.textManager.getText(
+            TextIds.PLAYER_PORTRAIT_LEVEL
+          )
+        : this.gameManager.assetManager.textManager.getText(
+            TextIds.ENEMY_PORTRAIT_LEVEL
+          );
     if (isEmpty(levelText)) {
       return;
     }
@@ -658,24 +757,22 @@ export default class Board {
       characterType === CharacterTypes.PLAYER
         ? this.playerPower
         : this.enemyPower;
-    const attackPowerAssetId = characterType === CharacterTypes.PLAYER
-      ? AssetIds.PLAYER_ATTACK_POWER_ICON
-      : AssetIds.ENEMY_ATTACK_POWER_ICON;
+    const attackPowerAssetId =
+      characterType === CharacterTypes.PLAYER
+        ? AssetIds.PLAYER_ATTACK_POWER_ICON
+        : AssetIds.ENEMY_ATTACK_POWER_ICON;
     const powerY = levelText.y + portraitGap;
     this.gameManager.assetManager.textManager.addText(
       powerId,
-      new FontWithPosition(
-        powerId,
-        20,
-        powerY,
-        powerValue.toString(),
-        { icon: IconAsset.getPowerIconAsset(attackPowerAssetId) }
-      )
+      new FontWithPosition(powerId, 20, powerY, powerValue.toString(), {
+        icon: IconAsset.getPowerIconAsset(attackPowerAssetId),
+      })
     );
 
-    const valueAssetId = characterType === CharacterTypes.PLAYER
-      ? AssetIds.PLAYER_VALUE_ICON
-      : AssetIds.ENEMY_VALUE_ICON;
+    const valueAssetId =
+      characterType === CharacterTypes.PLAYER
+        ? AssetIds.PLAYER_VALUE_ICON
+        : AssetIds.ENEMY_VALUE_ICON;
     const valueId =
       characterType === CharacterTypes.PLAYER
         ? TextIds.PLAYER_VALUE
@@ -698,7 +795,10 @@ export default class Board {
 
   private buildPlayerPortrait(): void {
     this.buildPortrait(CharacterTypes.PLAYER);
-    this.buildPowerAndValues(CharacterTypes.PLAYER, this.getPortraitHeight() ?? 0);
+    this.buildPowerAndValues(
+      CharacterTypes.PLAYER,
+      this.getPortraitHeight() ?? 0
+    );
   }
 
   private getPortraitHeight(): number | undefined {
@@ -762,7 +862,14 @@ export default class Board {
         : AssetIds.ENEMY_PORTRAIT;
     this.gameManager.assetManager.addAsset(
       portraitAssetId,
-      new Asset(portraitAssetId, love.graphics.newImage("Assets/Images/Portrait.png"), 5, portraitPosition, portraitW, portraitH)
+      new Asset(
+        portraitAssetId,
+        love.graphics.newImage("Assets/Images/Portrait.png"),
+        5,
+        portraitPosition,
+        portraitW,
+        portraitH
+      )
     );
 
     const portraitNameId =
@@ -849,7 +956,16 @@ export default class Board {
           portraitBackgroundW - 2,
           nameY,
           `${this.gameManager.player.money}`,
-          { size: 9, icon: new IconAsset(AssetIds.MONEY_ICON, love.graphics.newImage("Assets/Images/Mark.png"), 9, 9), format: Format.RIGHT }
+          {
+            size: 9,
+            icon: new IconAsset(
+              AssetIds.MONEY_ICON,
+              love.graphics.newImage("Assets/Images/Mark.png"),
+              9,
+              9
+            ),
+            format: Format.RIGHT,
+          }
         )
       );
     }
@@ -891,7 +1007,14 @@ export default class Board {
     const boardX = Math.floor((screenW - boardWidth) / 2);
     this.gameManager.assetManager.addAsset(
       AssetIds.EDEL_BOARD,
-      new Asset(AssetIds.EDEL_BOARD, love.graphics.newImage("Assets/Images/EdelBoard.png"), boardX, 5, boardWidth, boardHeight)
+      new Asset(
+        AssetIds.EDEL_BOARD,
+        love.graphics.newImage("Assets/Images/EdelBoard.png"),
+        boardX,
+        5,
+        boardWidth,
+        boardHeight
+      )
     );
 
     const centerX = screenW / 2;
@@ -1018,7 +1141,7 @@ export default class Board {
   }
 
   private removeWinFire(): void {
-    this.gameManager.assetManager.hideAsset(AssetIds.BASIC_WIN_FIRE);
+    this.gameManager.assetManager.hideAssets(AssetIds.BASIC_WIN_FIRE);
     this.gameManager.assetManager.textManager.hideText(TextIds.WIN_FIRE_TEXT);
     this.gameManager.assetManager.textManager.hideText(TextIds.POINTS);
   }

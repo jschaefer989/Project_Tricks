@@ -4,5 +4,4 @@ export default class WobbleAnimation extends Animation {
     originalX: Map<string, number>;
     constructor(wobbleAmount: number, assets: AnimationAssets[], constructionOptions?: ConstructionOptions);
     updateAnimation(deltaTime: number): void;
-    get isFinished(): boolean;
 }

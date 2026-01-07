@@ -34,8 +34,18 @@ export default class AssetManager {
     return this.getAssets(baseId)?.find((asset) => asset.id === assetId);
   }
 
-  hideAsset(id: string): void {
+  hideAssets(id: string): void {
     this.assets.delete(id);
+  }
+
+  hideAsset(baseId: string, assetId: string): void {
+    const assets = this.getAssets(baseId);
+    if (!isEmpty(assets)) {
+      const index = assets.findIndex((asset) => asset.id === assetId);
+      if (index !== -1) {
+        assets.splice(index, 1);
+      }
+    }
   }
 
   disableAsset(baseId: string): void {

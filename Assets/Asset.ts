@@ -80,6 +80,7 @@ export default class Asset {
 
   drawAsset(): void {
     love.graphics.setColor(this.color);
+
     love.graphics.draw(
       this.image,
       this.x,
@@ -90,6 +91,7 @@ export default class Asset {
       this.offsetX,
       this.offsetY
     );
+
     love.graphics.setColor(1, 1, 1, 1);
   }
 

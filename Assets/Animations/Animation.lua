@@ -32,6 +32,19 @@ function Animation.prototype.____constructor(self, assets, constructionOptions)
             function(____, asset) return {asset.id, asset.y} end
         )
     )
+    self.onFinish = constructionOptions and constructionOptions.onFinish
+end
+function Animation.prototype.updateAnimation(self, deltaTime)
+    if not self.isAnimating then
+        return
+    end
+    self.animElapsed = self.animElapsed + deltaTime
+    if self.animElapsed >= self.animDuration then
+        self.animElapsed = self.animDuration
+        self.isAnimating = false
+    end
+end
+function Animation.prototype.drawAnimation(self)
 end
 function Animation.prototype.updateX(self, deltaX)
     __TS__ArrayForEach(

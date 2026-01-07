@@ -10,6 +10,7 @@ local Suits = ____Enums.Suits
 local GameStates = ____Enums.GameStates
 local HoverEffects = ____Enums.HoverEffects
 local MousePressEffects = ____Enums.MousePressEffects
+local AnimationIds = ____Enums.AnimationIds
 local ____Dealer = require("Dealer")
 local Dealer = ____Dealer.default
 local ____Enemy = require("Enemies.Enemy")
@@ -33,6 +34,10 @@ local ____Card = require("Cards.Card")
 local Card = ____Card.default
 local ____IconAsset = require("Assets.IconAsset")
 local IconAsset = ____IconAsset.default
+local ____CutAnimation = require("Assets.Animations.CutAnimation")
+local CutAnimation = ____CutAnimation.default
+local ____SlideAnimation = require("Assets.Animations.SlideAnimation")
+local SlideAnimation = ____SlideAnimation.default
 local portraitGap = 12
 ____exports.default = __TS__Class()
 local Board = ____exports.default
@@ -100,7 +105,7 @@ function Board.prototype.getEnemyPoints(self)
 end
 function Board.prototype.handleStartFight(self)
     self.showingEdelView = false
-    self.gameManager.assetManager:hideAsset(AssetIds.LETS_FIGHT_BUTTON)
+    self.gameManager.assetManager:hideAssets(AssetIds.LETS_FIGHT_BUTTON)
     self.gameManager.assetManager.textManager:hideText(TextIds.LETS_FIGHT_BUTTON_CAPTION)
     self.dealer:startGame()
     self:buildFightAssets()
@@ -115,9 +120,9 @@ function Board.prototype.buildFightAssets(self)
 end
 function Board.prototype.hideEdelBoard(self)
     self.gameManager.assetManager.textManager:hideText(TextIds.EDEL_LABEL)
-    self.gameManager.assetManager:hideAsset(AssetIds.EDEL_BOARD)
-    self.gameManager.assetManager:hideAsset(AssetIds.EDEL_SUIT_ICON_LEFT)
-    self.gameManager.assetManager:hideAsset(AssetIds.EDEL_SUIT_ICON_RIGHT)
+    self.gameManager.assetManager:hideAssets(AssetIds.EDEL_BOARD)
+    self.gameManager.assetManager:hideAssets(AssetIds.EDEL_SUIT_ICON_LEFT)
+    self.gameManager.assetManager:hideAssets(AssetIds.EDEL_SUIT_ICON_RIGHT)
 end
 function Board.prototype.handleAttack(self)
     if not self.gameManager.player:anySelectedCards() then
@@ -128,21 +133,83 @@ function Board.prototype.handleAttack(self)
         return
     end
     if self.playerPower > self.enemyPower then
+        for ____, card in ipairs(self.enemy.hand) do
+            self:startCutAnimation(card, CharacterTypes.PLAYER)
+        end
+        return
+    else
+        for ____, card in ipairs(self.gameManager.player.hand) do
+            if card.isSelected then
+                self:startCutAnimation(card, CharacterTypes.ENEMY)
+            end
+        end
+    end
+end
+function Board.prototype.startCutAnimation(self, card, winner)
+    local ____temp_1 = self.cardAssets:getCardAssets(card)
+    local baseAsset = ____temp_1.baseAsset
+    local suitAssets = ____temp_1.suitAssets
+    local rankAsset = ____temp_1.rankAsset
+    local normalSuitAsset = suitAssets[1]
+    local flippedSuitAsset = suitAssets[2]
+    self.cardAssets:hideCardAssets(card)
+    local cutAnimationAssets = {}
+    local baseId = AnimationIds.CARD_BASE_CUT .. card.id
+    if not isEmpty(baseAsset) and not self.gameManager.animationManager.animations:has(baseId) then
+        cutAnimationAssets[#cutAnimationAssets + 1] = baseAsset
+    end
+    local rankAssetId = AnimationIds.CARD_RANK_CUT .. card.id
+    if not isEmpty(rankAsset) and not self.gameManager.animationManager.animations:has(rankAssetId) then
+        cutAnimationAssets[#cutAnimationAssets + 1] = rankAsset
+    end
+    local stationaryAssets = {}
+    if not isEmpty(flippedSuitAsset) then
+        stationaryAssets[#stationaryAssets + 1] = flippedSuitAsset
+    end
+    self.gameManager.animationManager.animations:set(
+        baseId,
+        __TS__New(
+            CutAnimation,
+            0,
+            -40,
+            cutAnimationAssets,
+            stationaryAssets,
+            {
+                onFinish = function() return self:dealNextRound(winner) end,
+                animDuration = 0.25
+            }
+        )
+    )
+    local slideAnimationAssets = {}
+    local normalSuitAssetId = AnimationIds.CARD_SUIT_NORMAL_CUT .. card.id
+    if not isEmpty(normalSuitAsset) and not self.gameManager.animationManager.animations:has(normalSuitAssetId) then
+        slideAnimationAssets[#slideAnimationAssets + 1] = normalSuitAsset
+    end
+    self.gameManager.animationManager.animations:set(
+        normalSuitAssetId,
+        __TS__New(
+            SlideAnimation,
+            0,
+            -40,
+            slideAnimationAssets,
+            {animDuration = 0.25, drawSeparately = true}
+        )
+    )
+end
+function Board.prototype.dealNextRound(self, winner)
+    if self.gameManager.animationManager:hasCutAnimation() then
+        return
+    end
+    if winner == CharacterTypes.PLAYER then
         self:addPlayerPoints(self:getPlayerPoints())
     else
         self:addEnemyPoints(self:getEnemyPoints())
     end
     self.gameManager.player:removeSelectedCardsFromHand()
-    local ____opt_1 = self.gameManager.board
-    if ____opt_1 ~= nil then
-        ____opt_1.dealer:dealCards(CharacterTypes.PLAYER)
-    end
+    self.dealer:dealCards(CharacterTypes.PLAYER)
     self.enemy:removeAllCardsFromHand()
     self:clearEnemyStats()
-    local ____opt_3 = self.gameManager.board
-    if ____opt_3 ~= nil then
-        ____opt_3.dealer:dealCards(CharacterTypes.ENEMY)
-    end
+    self.dealer:dealCards(CharacterTypes.ENEMY)
 end
 function Board.prototype.addPlayerPoints(self, points)
     self.playerPoints = self.playerPoints + points
@@ -177,9 +244,9 @@ function Board.prototype.handleDiscard(self)
         self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_CAPTION)
         self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_COUNTER)
     end
-    local ____opt_5 = self.gameManager.board
-    if ____opt_5 ~= nil then
-        ____opt_5.dealer:dealCards(CharacterTypes.PLAYER)
+    local ____opt_2 = self.gameManager.board
+    if ____opt_2 ~= nil then
+        ____opt_2.dealer:dealCards(CharacterTypes.PLAYER)
     end
 end
 function Board.prototype.getRemainingDiscards(self)
@@ -525,13 +592,13 @@ function Board.prototype.buildPointBoard(self)
     )
 end
 function Board.prototype.buildPowerAndValues(self, characterType, portraitHeight)
-    local ____temp_7
+    local ____temp_4
     if characterType == CharacterTypes.PLAYER then
-        ____temp_7 = self.gameManager.assetManager.textManager:getText(TextIds.PLAYER_PORTRAIT_LEVEL)
+        ____temp_4 = self.gameManager.assetManager.textManager:getText(TextIds.PLAYER_PORTRAIT_LEVEL)
     else
-        ____temp_7 = self.gameManager.assetManager.textManager:getText(TextIds.ENEMY_PORTRAIT_LEVEL)
+        ____temp_4 = self.gameManager.assetManager.textManager:getText(TextIds.ENEMY_PORTRAIT_LEVEL)
     end
-    local levelText = ____temp_7
+    local levelText = ____temp_4
     if isEmpty(levelText) then
         return
     end
@@ -873,7 +940,7 @@ function Board.prototype.buildWinFire(self)
     end
 end
 function Board.prototype.removeWinFire(self)
-    self.gameManager.assetManager:hideAsset(AssetIds.BASIC_WIN_FIRE)
+    self.gameManager.assetManager:hideAssets(AssetIds.BASIC_WIN_FIRE)
     self.gameManager.assetManager.textManager:hideText(TextIds.WIN_FIRE_TEXT)
     self.gameManager.assetManager.textManager:hideText(TextIds.POINTS)
 end

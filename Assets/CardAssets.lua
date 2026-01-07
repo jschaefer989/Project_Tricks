@@ -1,12 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
-local Error = ____lualib.Error
-local RangeError = ____lualib.RangeError
-local ReferenceError = ____lualib.ReferenceError
-local SyntaxError = ____lualib.SyntaxError
-local TypeError = ____lualib.TypeError
-local URIError = ____lualib.URIError
 local ____exports = {}
 local ____Asset = require("Assets.Asset")
 local Asset = ____Asset.default
@@ -136,8 +130,8 @@ function CardAssets.prototype.addRankAsset(self, card, x, y, includeClickHandler
         rankImage,
         rankPosition.x,
         rankPosition.y,
-        32,
-        32,
+        64,
+        64,
         {
             onClick = includeClickHandler and (function() return card:onClick() end) or nil,
             onHover = function(____, asset) return card:onHover(asset) end,
@@ -263,7 +257,7 @@ function CardAssets.getRankAssetId(self, card, orientation)
     return (((AssetIds.RANK .. "-") .. card.id) .. "-") .. tostring(orientation)
 end
 function CardAssets.prototype.hideCardAssets(self, card)
-    self.gameManager.assetManager:hideAsset(____exports.default:getBaseAssetId(card))
+    self.gameManager.assetManager:hideAssets(____exports.default:getBaseAssetId(card))
 end
 function CardAssets.prototype.centerCards(self, characterType)
     local character = self.gameManager:getCharacter(characterType)
@@ -379,12 +373,6 @@ function CardAssets.prototype.getCardAssets(self, card)
     local suitAsset0 = self.gameManager.assetManager:getAsset(baseAssetId, suitAssetId0)
     local suitAsset1 = self.gameManager.assetManager:getAsset(baseAssetId, suitAssetId1)
     local rankAsset = self.gameManager.assetManager:getAsset(baseAssetId, rankAssetId)
-    if isEmpty(baseAsset) or isEmpty(suitAsset0) or isEmpty(suitAsset1) or isEmpty(rankAsset) then
-        error(
-            __TS__New(Error, ("One or more assets for card " .. card.id) .. " are missing."),
-            0
-        )
-    end
     return {baseAsset = baseAsset, suitAssets = {suitAsset0, suitAsset1}, rankAsset = rankAsset}
 end
 return ____exports

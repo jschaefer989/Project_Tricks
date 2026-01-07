@@ -4,6 +4,7 @@ import Dealer from "../Dealer";
 import Enemy, { EnemyData } from "Enemies/Enemy";
 import type GameManager from "../GameManager";
 import CardAssets from "Assets/CardAssets";
+import Card from "Cards/Card";
 interface BoardData {
     discardUsed: number;
     playerPoints: number;
@@ -41,15 +42,17 @@ export default class Board {
     buildFightAssets(): void;
     private hideEdelBoard;
     handleAttack(): void;
+    startCutAnimation(card: Card, winner: CharacterTypes): void;
+    dealNextRound(winner: CharacterTypes): void;
     private addPlayerPoints;
     private addEnemyPoints;
     handleDiscard(): void;
     getRemainingDiscards(): number;
     getWinner(): CharacterTypes;
     endFight(): void;
-    private clearStats;
-    private clearPlayerStats;
-    private clearEnemyStats;
+    clearStats(): void;
+    clearPlayerStats(): void;
+    clearEnemyStats(): void;
     addPlayerPower(power: number): void;
     addPlayerValue(value: number): void;
     addEnemyPower(power: number): void;

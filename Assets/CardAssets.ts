@@ -19,9 +19,9 @@ export const cardWidth = 70
 export const cardHeight = 94
 
 interface AssetsForCard {
-  baseAsset: Asset;
-  suitAssets: Asset[];
-  rankAsset: Asset;
+  baseAsset?: Asset;
+  suitAssets: (Asset | undefined)[];
+  rankAsset?: Asset;
 }
 
 export default class CardAssets {
@@ -140,8 +140,8 @@ export default class CardAssets {
       rankImage,
       rankPosition.x,
       rankPosition.y,
-      32,
-      32,
+      64,
+      64,
       {
         onClick: includeClickHandler ? () => card.onClick() : undefined,
         onHover: (asset: Asset) => card.onHover(asset),
@@ -232,7 +232,7 @@ export default class CardAssets {
   }
 
   hideCardAssets(card: Card): void {
-    this.gameManager.assetManager.hideAsset(CardAssets.getBaseAssetId(card));
+    this.gameManager.assetManager.hideAssets(CardAssets.getBaseAssetId(card));
   }
 
   centerCards(characterType: CharacterTypes): void {
@@ -356,15 +356,6 @@ export default class CardAssets {
       baseAssetId,
       rankAssetId
     );
-
-    if (
-      isEmpty(baseAsset) ||
-      isEmpty(suitAsset0) ||
-      isEmpty(suitAsset1) ||
-      isEmpty(rankAsset)
-    ) {
-      throw new Error(`One or more assets for card ${card.id} are missing.`);
-    }
 
     return {
       baseAsset: baseAsset,

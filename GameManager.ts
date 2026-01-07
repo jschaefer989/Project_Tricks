@@ -180,7 +180,7 @@ export default class GameManager {
     const boardState: GameState = {
       update: (dt: number) => {
         //elapsedTime += dt;
-        this.assetManager.handleMouseHover();
+        this.assetManager.handleMouseHover();        
         this.animationManager.updateAnimations(dt);
       },
       draw: () => {
@@ -200,7 +200,8 @@ export default class GameManager {
         //     love.graphics.getHeight()
         //   );
         //   love.graphics.setShader();
-          this.assetManager.drawAssets();
+          this.assetManager.drawAssets();        
+          this.animationManager.drawAnimations();  
           push.finish();
         }
       },

@@ -3,6 +3,8 @@ local __TS__Class = ____lualib.__TS__Class
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local __TS__ArrayFind = ____lualib.__TS__ArrayFind
+local __TS__ArrayFindIndex = ____lualib.__TS__ArrayFindIndex
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__Iterator = ____lualib.__TS__Iterator
 local ____exports = {}
 local push = require("Libraries.push")
@@ -45,8 +47,20 @@ function AssetManager.prototype.getAsset(self, baseId, assetId)
         function(____, asset) return asset.id == assetId end
     )
 end
-function AssetManager.prototype.hideAsset(self, id)
+function AssetManager.prototype.hideAssets(self, id)
     self.assets:delete(id)
+end
+function AssetManager.prototype.hideAsset(self, baseId, assetId)
+    local assets = self:getAssets(baseId)
+    if not isEmpty(assets) then
+        local index = __TS__ArrayFindIndex(
+            assets,
+            function(____, asset) return asset.id == assetId end
+        )
+        if index ~= -1 then
+            __TS__ArraySplice(assets, index, 1)
+        end
+    end
 end
 function AssetManager.prototype.disableAsset(self, baseId)
     local assets = self:getAssets(baseId)
@@ -68,13 +82,13 @@ function AssetManager.prototype.drawAssets(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue18
+                goto __continue22
             end
             for ____, asset in ipairs(assets) do
                 asset:drawAsset()
             end
         end
-        ::__continue18::
+        ::__continue22::
     end
     self.textManager:drawText()
     self.tooltipManager:drawTooltips()
@@ -87,7 +101,7 @@ function AssetManager.prototype.handleMousePressed(self, x, y, button)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue25
+                goto __continue29
             end
             local asset = assets[1]
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
@@ -96,7 +110,7 @@ function AssetManager.prototype.handleMousePressed(self, x, y, button)
                 end
             end
         end
-        ::__continue25::
+        ::__continue29::
     end
 end
 function AssetManager.prototype.handleMouseReleased(self, x, y, button)
@@ -107,7 +121,7 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue33
+                goto __continue37
             end
             local asset = assets[1]
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
@@ -121,7 +135,7 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
                 a:setMousePressed(false)
             end
         end
-        ::__continue33::
+        ::__continue37::
     end
 end
 function AssetManager.prototype.handleDisabledAssetClick(self, assets)
@@ -179,7 +193,7 @@ function AssetManager.prototype.handleMouseHover(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue56
+                goto __continue60
             end
             local asset = assets[1]
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
@@ -202,7 +216,7 @@ function AssetManager.prototype.handleMouseHover(self)
                 end
             end
         end
-        ::__continue56::
+        ::__continue60::
     end
 end
 return ____exports

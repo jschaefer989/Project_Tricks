@@ -1,49 +1,63 @@
-import { isEmpty } from "Helpers";
-import Asset from "../Asset"
-import Animation, { AnimationAssets } from "./Animation"
+import Asset from "Assets/Asset";
+import Animation, { AnimationAssets } from "./Animation";
 
 interface ConstructionOptions {
-    readonly animDuration?: number;    
+  readonly animDuration?: number;
+  readonly drawSeparately?: boolean;
 }
 
 export default class SlideAnimation extends Animation {
-    animOffsetX: number = 0  // Current animation offset
-    animOffsetY: number = 0  // Current animation offset
-    animTargetOffsetX: number = 0  // Target animation offset
-    animTargetOffsetY: number = 0  // Target animation offset (e.g., -20 for up)
+  animOffsetX: number = 0; // Current animation offset
+  animOffsetY: number = 0; // Current animation offset
+  animTargetOffsetX: number = 0; // Target animation offset
+  animTargetOffsetY: number = 0; // Target animation offset (e.g., -20 for up)
+  drawSeparately: boolean = false;
 
-    constructor(offsetX: number, offsetY: number, assets: AnimationAssets[], constructionOptions?: ConstructionOptions) {
-        super(assets, constructionOptions);
-        this.animTargetOffsetX = offsetX
-        this.animTargetOffsetY = offsetY
-        this.animElapsed = 0
-        this.isAnimating = true
-        this.assets = assets
+  constructor(
+    offsetX: number,
+    offsetY: number,
+    assets: AnimationAssets[],
+    constructionOptions?: ConstructionOptions
+  ) {
+    super(assets, constructionOptions);
+    this.animTargetOffsetX = offsetX;
+    this.animTargetOffsetY = offsetY;
+    this.drawSeparately = constructionOptions?.drawSeparately ?? false;
+  }
+
+  updateAnimation(deltaTime: number): void {
+    super.updateAnimation(deltaTime);
+    if (!this.isAnimating) {
+      return;
     }
 
-    updateAnimation(deltaTime: number): void {
-        if (!this.isAnimating) {
-            return
-        }
+    // Interpolate animation offset
+    this.calculateAnimationOffset();
 
-        this.animElapsed += deltaTime
-        
-        if (this.animElapsed >= this.animDuration) {
-            // Animation complete
-            this.animElapsed = this.animDuration
-            this.isAnimating = false
-        }
-
-        // Interpolate animation offset
-        const progress = this.animElapsed / this.animDuration
-        this.animOffsetX = this.animTargetOffsetX * progress
-        this.animOffsetY = this.animTargetOffsetY * progress
-
-        this.updateX(this.animOffsetX)
-        this.updateY(this.animOffsetY)
+    if (!this.drawSeparately) {
+      this.updateX(this.animOffsetX);
+      this.updateY(this.animOffsetY);
     }
+  }
 
-    get isFinished(): boolean {
-        return !this.isAnimating
+  calculateAnimationOffset(): void {
+    const progress = this.animElapsed / this.animDuration;
+    this.animOffsetX = this.animTargetOffsetX * progress;
+    this.animOffsetY = this.animTargetOffsetY * progress;
+  }
+
+  drawAnimation(): void {
+    if (!this.drawSeparately) {
+      return;
     }
+    for (const asset of this.assets) {
+      if (asset instanceof Asset) {
+        love.graphics.draw(
+          asset.image,
+          asset.x + this.animOffsetX,
+          asset.y + this.animOffsetY
+        );
+      }
+    }
+  }
 }

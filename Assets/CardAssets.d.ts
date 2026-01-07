@@ -8,9 +8,9 @@ export declare const padding = 5;
 export declare const cardWidth = 70;
 export declare const cardHeight = 94;
 interface AssetsForCard {
-    baseAsset: Asset;
-    suitAssets: Asset[];
-    rankAsset: Asset;
+    baseAsset?: Asset;
+    suitAssets: (Asset | undefined)[];
+    rankAsset?: Asset;
 }
 export default class CardAssets {
     gameManager: GameManager;
