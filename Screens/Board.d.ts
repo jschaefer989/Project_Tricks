@@ -1,5 +1,5 @@
 /** @noSelfInFile */
-import { CharacterTypes, Suits } from "../Enums";
+import { CharacterTypes } from "../Enums";
 import Dealer from "../Dealer";
 import Enemy, { EnemyData } from "Enemies/Enemy";
 import type GameManager from "../GameManager";
@@ -10,7 +10,7 @@ interface BoardData {
     playerPoints: number;
     enemyPoints: number;
     enemy: EnemyData;
-    edelSuit: Suits;
+    edelCard?: Card;
     playerPower: number;
     playerValue: number;
     enemyPower: number;
@@ -24,7 +24,7 @@ export default class Board {
     dealer: Dealer;
     playerPoints: number;
     enemyPoints: number;
-    edelSuit: Suits;
+    edelCard?: Card;
     playerPower: number;
     playerValue: number;
     enemyPower: number;
@@ -39,14 +39,19 @@ export default class Board {
     getPlayerPoints(): number;
     getEnemyPoints(): number;
     handleStartFight(): void;
-    buildFightAssets(): void;
     private hideEdelBoard;
     handleAttack(): void;
-    startCutAnimation(card: Card, winner: CharacterTypes): void;
-    startFlickerAnimation(card: Card, winner: CharacterTypes): void;
-    dealNextRound(winner: CharacterTypes): void;
+    getSlainCards(characterType: CharacterTypes): Card[];
+    startCutAnimation(card: Card, winner: CharacterTypes, loser: CharacterTypes): void;
+    startFlickerAnimation(card: Card, winner: CharacterTypes, loser: CharacterTypes): void;
+    wrapUpAttack(winner: CharacterTypes, loser: CharacterTypes): void;
+    private hideSlainCards;
     private addPlayerPoints;
+    getAllCardsInPlay(): Card[];
+    private addPoints;
     private addEnemyPoints;
+    displayEdel(): void;
+    displayFight(): void;
     handleDiscard(): void;
     getRemainingDiscards(): number;
     getWinner(): CharacterTypes;
@@ -58,8 +63,7 @@ export default class Board {
     addPlayerValue(value: number): void;
     addEnemyPower(power: number): void;
     addEnemyValue(value: number): void;
-    buildAssets(): void;
-    private buildCardAssets;
+    start(): void;
     private buildLetsFightButton;
     private buildPrimaryButtons;
     private buildAttackButton;
@@ -73,10 +77,9 @@ export default class Board {
     private getPortraitWidth;
     private buildEnemyPortrait;
     private buildPortrait;
-    private buildPlayerDeck;
-    private buildEnemyDeck;
+    buildPlayerDeck(): void;
+    buildEnemyDeck(): void;
     private buildEdelBoard;
-    private buildBackground;
     private playWinFireSound;
     private buildWinFire;
     private removeWinFire;

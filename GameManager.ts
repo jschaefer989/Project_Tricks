@@ -20,11 +20,11 @@ import PerkScreen from "Screens/PerkScreen";
 import * as push from "Libraries.push";
 import AssetManager from "Assets/AssetManager";
 import Card from "Cards/Card";
-import TextManager from "Assets/TextManager";
 import AnimationManager from "Assets/Animations/AnimationManager";
 import MusicPlayer from "Assets/Music/MusicPlayer";
 import Biome from "Biomes/Biome";
 import Grass from "Biomes/Grass";
+import BackgroundManager from "Screens/BackgroundManager";
 
 interface GameState {
   update: (dt: number) => void;
@@ -35,32 +35,27 @@ interface GameState {
 
 export default class GameManager {
   gameState: GameStates;
-  player: Player;
-  settings: Settings;
+  player = new Player(this);
+  settings = new Settings();
   mainMenu?: MainMenu;
   newGameMenu?: NewGameMenu;
   pauseMenu?: PauseMenu;
   board?: Board;
   winScreen?: WinScreen;
   loseScreen?: LoseScreen;
-  map: Map;
+  map: Map = new Map(this);
   shop?: Shop;
   levelUpScreen?: LevelUpScreen;
   perkScreen?: PerkScreen;
-  assetManager: AssetManager;
-  animationManager: AnimationManager;
-  musicPlayer: MusicPlayer;
+  assetManager = new AssetManager(this);
+  animationManager = new AnimationManager(this);
+  musicPlayer = new MusicPlayer(this);
   biome: Biome
+  backgroundManager = new BackgroundManager(this);
   devMode: boolean = false; // Change if you want to test in dev mode
 
   constructor() {
     this.gameState = GameStates.MAIN_MENU;
-    this.player = new Player(this);
-    this.settings = new Settings();
-    this.map = new Map(this);
-    this.assetManager = new AssetManager(this);
-    this.animationManager = new AnimationManager(this);
-    this.musicPlayer = new MusicPlayer(this);
     this.biome = new Grass(); // TODO: initialize this based on data from the map
   }
 
@@ -75,6 +70,7 @@ export default class GameManager {
 
   switchBasedOnGameState(gameState = this.gameState, enemy = this.board?.enemy): void {
     this.assetManager = new AssetManager(this);
+    this.backgroundManager.updateBackground(gameState);
     if (this.settings.playMusic) {
       this.musicPlayer.play(gameState, this.biome);
     }
@@ -172,35 +168,22 @@ export default class GameManager {
   }
 
   private switchToBoard(enemy?: Enemy): void {
-    // const myShader = love.graphics.newShader("Shaders/Waterfall.glsl");
-    // love.graphics.setDefaultFilter("nearest", "nearest");
-
-    // let elapsedTime = 0;
+    const shadowShader = love.graphics.newShader("Shaders/Shadow.glsl");
+    shadowShader.send("shadow_strength", 0.6);
+    shadowShader.send("shadow_color", [0, 0, 0]); 
 
     const boardState: GameState = {
       update: (dt: number) => {
-        //elapsedTime += dt;
+        
         this.assetManager.handleMouseHover();        
         this.animationManager.updateAnimations(dt);
       },
       draw: () => {
         if (!this.devMode) {
           push.start();
-        //   love.graphics.setShader(myShader);
-        //   myShader.send("uResolution", [
-        //     love.graphics.getWidth(),
-        //     love.graphics.getHeight(),
-        //   ]);
-        //   myShader.send("uTime", elapsedTime);
-        //   love.graphics.rectangle(
-        //     "fill",
-        //     0,
-        //     0,
-        //     love.graphics.getWidth(),
-        //     love.graphics.getHeight()
-        //   );
-        //   love.graphics.setShader();
-          this.assetManager.drawAssets();         
+          //love.graphics.setShader(shadowShader);
+          this.assetManager.drawAssets();
+          love.graphics.setShader();  // Reset shader to default
           push.finish();
         }
       },
@@ -222,16 +205,13 @@ export default class GameManager {
     this.shop = undefined;
     this.levelUpScreen = undefined;
     this.perkScreen = undefined;
-
+    
     if (isEmpty(this.board)) {
       this.board = new Board(this, enemy ?? new Enemy(this));
       this.board.dealer.setup();
     }
 
-    // For reasons I don't understand, we need to reinitialize the AssetManager here
-    // after creating the Board, or else the Board assets don't get created properly
-    this.assetManager = new AssetManager(this);
-    this.board.buildAssets();
+    this.board.start();
 
     GameStateManager.setState(boardState);
   }

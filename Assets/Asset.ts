@@ -18,6 +18,7 @@ export interface ConstructionOptions {
   readonly offsetY?: number;
   readonly quads?: QuadWithPosition[];
   readonly isDisabled?: boolean;
+  readonly useDisabledAnimation?: boolean;
   readonly clickSound?: Source;
   readonly associatedTexts?: FontWithPosition[];
   readonly hoverEffect?: HoverEffects[];
@@ -41,6 +42,7 @@ export default class Asset {
   offsetY: number;
   quads: QuadWithPosition[] = [];
   isDisabled = false;
+  useDisabledAnimation = true;
   isHovered = false;
   isPressed = false;
   color: [number, number, number, number] = [1, 1, 1, 1];
@@ -75,6 +77,7 @@ export default class Asset {
     this.offsetY = constructionOptions?.offsetY ?? 0;
     this.quads = constructionOptions?.quads ?? [];
     this.isDisabled = constructionOptions?.isDisabled ?? false;
+    this.useDisabledAnimation = constructionOptions?.useDisabledAnimation ?? true;
     this.clickSound = constructionOptions?.clickSound;
     this.associatedTexts = constructionOptions?.associatedTexts;
     this.hoverEffect = constructionOptions?.hoverEffect ?? [HoverEffects.NONE];

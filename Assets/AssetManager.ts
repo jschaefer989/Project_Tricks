@@ -9,12 +9,13 @@ import TooltipManager from "./TooltipManager";
 export default class AssetManager {
   gameManager: GameManager;
   assets: Map<string, Asset[]> = new Map<string, Asset[]>();
-  tooltipManager = new TooltipManager();
+  tooltipManager: TooltipManager;
   textManager = new TextManager();
   disabledSound = love.audio.newSource("Assets/Sounds/Disabled.wav", "static");
 
   constructor(gameManager: GameManager) {
     this.gameManager = gameManager;
+    this.tooltipManager = new TooltipManager(gameManager);
   }
 
   addAsset(id: string, asset: Asset): void {
@@ -66,6 +67,18 @@ export default class AssetManager {
     }
   }
 
+  hasAssets(baseId: string): boolean {
+    return this.assets.has(baseId);
+  }
+
+  hasAsset(baseId: string, assetId: string): boolean {
+    const assets = this.getAssets(baseId);
+    if (isEmpty(assets)) {
+      return false;
+    }
+    return assets.some((asset) => asset.id === assetId);
+  }
+
   drawAssets(): void {
     // Draw all assets
     for (const assets of this.assets.values()) {
@@ -94,6 +107,11 @@ export default class AssetManager {
         continue;
       }
       const asset = assets[0]; // Assume click area is the same for all assets with the same ID
+
+      if (asset.isHidden) {
+        continue;
+      }
+
       if (
         gameX >= asset.x &&
         gameX <= asset.x + asset.getWidth() &&
@@ -119,6 +137,11 @@ export default class AssetManager {
         continue;
       }
       const asset = assets[0]; // Assume click area is the same for all assets with the same ID
+
+      if (asset.isHidden) {
+        continue;
+      }
+
       if (
         gameX >= asset.x &&
         gameX <= asset.x + asset.getWidth() &&
@@ -138,11 +161,16 @@ export default class AssetManager {
   }
 
   handleDisabledAssetClick(assets: Asset[]): void {
+    if (!assets[0].useDisabledAnimation) {
+      return;
+    }
+
     if (this.gameManager.animationManager.hasWobbleAnimation()) {
       return;
     }
+
     if (!this.disabledSound.isPlaying()) {
-      this.disabledSound.play();
+      this.disabledSound.play();      
     }
     this.triggerWobbleAnimation(assets);
   }
@@ -153,7 +181,7 @@ export default class AssetManager {
       if (!this.gameManager.animationManager.animations.has(wobbleId)) {
         this.gameManager.animationManager.animations.set(
           wobbleId,
-          new WobbleAnimation(10, [assetToWobble], { animDuration: 0.5 })
+          new WobbleAnimation(0.5, 10, [assetToWobble])
         );
       }
 
@@ -163,7 +191,7 @@ export default class AssetManager {
           if (!this.gameManager.animationManager.animations.has(wobbleTextId)) {
             this.gameManager.animationManager.animations.set(
               wobbleTextId,
-              new WobbleAnimation(10, [text], { animDuration: 0.5 })
+              new WobbleAnimation(0.5, 10, [text])
             );
           }
         }
@@ -191,6 +219,10 @@ export default class AssetManager {
         continue;
       }
       const asset = assets[0]; // Assume hoverable is the same for all assets with the same ID
+
+      if (asset.isDisabled || asset.isHidden) {
+        continue;
+      }
 
       if (
         gameX >= asset.x &&

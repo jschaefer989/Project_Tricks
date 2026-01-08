@@ -116,46 +116,12 @@ export default class Card {
     this.gameManager.board.addPlayerPower(this.power);
     this.gameManager.board.addPlayerValue(this.value);
 
-    const { baseAsset, suitAssets, rankAsset } =
-      this.gameManager.board.cardAssets.getCardAssets(this);
-    const suitAssetNormal = suitAssets[0];
-    const suitAssetFlipped = suitAssets[1];
-
-    const animationAssets: AnimationAssets[] = [];
-
-    const baseId = AnimationIds.CARD_BASE_SELECT + this.id;
-    if (
-      !isEmpty(baseAsset) &&
-      !this.gameManager.animationManager.animations.has(baseId)
-    ) {
-      animationAssets.push(baseAsset);
-    }
-    const suitNormalId = AnimationIds.CARD_SUIT_NORMAL_SELECT + this.id;
-    if (
-      !isEmpty(suitAssetNormal) &&
-      !this.gameManager.animationManager.animations.has(suitNormalId)
-    ) {
-      animationAssets.push(suitAssetNormal);
-    }
-    const suitFlippedId = AnimationIds.CARD_SUIT_FLIPPED_SELECT + this.id;
-    if (
-      !isEmpty(suitAssetFlipped) &&
-      !this.gameManager.animationManager.animations.has(suitFlippedId)
-    ) {
-      animationAssets.push(suitAssetFlipped);
-    }
-    const rankAssetId = AnimationIds.CARD_RANK_SELECT + this.id;
-    if (
-      !isEmpty(rankAsset) &&
-      !this.gameManager.animationManager.animations.has(rankAssetId)
-    ) {
-      animationAssets.push(rankAsset);
-    }
-
-      this.gameManager.animationManager.animations.set(
-        baseId,
-        new SlideAnimation(0, -20, animationAssets)
-      );
+    const slideAssets = this.gameManager.board?.cardAssets.getCardAssetList(this);
+    
+    this.gameManager.animationManager.animations.set(
+      AnimationIds.CARD_SELECT + this.id,
+      new SlideAnimation(0.15, 0, -20, slideAssets)
+    );
 
     this.gameManager.board?.updatePrimaryButtonStates();
   }
@@ -170,45 +136,11 @@ export default class Card {
     this.gameManager.board.addPlayerPower(-this.power);
     this.gameManager.board.addPlayerValue(-this.value);
 
-    const { baseAsset, suitAssets, rankAsset } =
-      this.gameManager.board.cardAssets.getCardAssets(this);
-    const suitAssetNormal = suitAssets[0];
-    const suitAssetFlipped = suitAssets[1];
-
-    const animationAssets: AnimationAssets[] = [];
-
-    const baseId = AnimationIds.CARD_BASE_SELECT + this.id;
-    if (
-      !isEmpty(baseAsset) &&
-      !this.gameManager.animationManager.animations.has(baseId)
-    ) {
-      animationAssets.push(baseAsset);
-    }
-    const suitNormalId = AnimationIds.CARD_SUIT_NORMAL_SELECT + this.id;
-    if (
-      !isEmpty(suitAssetNormal) &&
-      !this.gameManager.animationManager.animations.has(suitNormalId)
-    ) {
-      animationAssets.push(suitAssetNormal);
-    }
-    const suitFlippedId = AnimationIds.CARD_SUIT_FLIPPED_SELECT + this.id;
-    if (
-      !isEmpty(suitAssetFlipped) &&
-      !this.gameManager.animationManager.animations.has(suitFlippedId)
-    ) {
-      animationAssets.push(suitAssetFlipped);
-    }
-    const rankAssetId = AnimationIds.CARD_RANK_SELECT + this.id;
-    if (
-      !isEmpty(rankAsset) &&
-      !this.gameManager.animationManager.animations.has(rankAssetId)
-    ) {
-      animationAssets.push(rankAsset);
-    }
+    const slideAssets = this.gameManager.board?.cardAssets.getCardAssetList(this);
 
     this.gameManager.animationManager.animations.set(
-      baseId,
-      new SlideAnimation(0, 20, animationAssets)
+      AnimationIds.CARD_SELECT + this.id,
+      new SlideAnimation(0.15, 0, 20, slideAssets)
     );
 
     this.gameManager.board?.updatePrimaryButtonStates();

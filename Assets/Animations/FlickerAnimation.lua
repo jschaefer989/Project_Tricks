@@ -18,7 +18,13 @@ function FlickerAnimation.prototype.____constructor(self, animationAssets, const
     self.maxFlickers = 6
 end
 function FlickerAnimation.prototype.updateAnimation(self, deltaTime)
+    Animation.prototype.updateAnimation(self, deltaTime)
     if not self.isAnimating then
+        for ____, asset in ipairs(self.assets) do
+            if __TS__InstanceOf(asset, Asset) then
+                asset.isHidden = false
+            end
+        end
         return
     end
     self.animElapsed = self.animElapsed + deltaTime
@@ -28,15 +34,6 @@ function FlickerAnimation.prototype.updateAnimation(self, deltaTime)
         for ____, asset in ipairs(self.assets) do
             if __TS__InstanceOf(asset, Asset) then
                 asset.isHidden = not asset.isHidden
-            end
-        end
-    end
-    if self.animElapsed >= self.animDuration then
-        self.animElapsed = self.animDuration
-        self.isAnimating = false
-        for ____, asset in ipairs(self.assets) do
-            if __TS__InstanceOf(asset, Asset) then
-                asset.isHidden = false
             end
         end
     end

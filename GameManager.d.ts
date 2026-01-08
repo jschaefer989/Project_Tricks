@@ -19,6 +19,7 @@ import Card from "Cards/Card";
 import AnimationManager from "Assets/Animations/AnimationManager";
 import MusicPlayer from "Assets/Music/MusicPlayer";
 import Biome from "Biomes/Biome";
+import BackgroundManager from "Screens/BackgroundManager";
 export default class GameManager {
     gameState: GameStates;
     player: Player;
@@ -37,6 +38,7 @@ export default class GameManager {
     animationManager: AnimationManager;
     musicPlayer: MusicPlayer;
     biome: Biome;
+    backgroundManager: BackgroundManager;
     devMode: boolean;
     constructor();
     getCharacter(characterType: string): Character | undefined;

@@ -21,8 +21,9 @@ local isEmpty = ____Helpers.isEmpty
 ____exports.default = __TS__Class()
 local TooltipManager = ____exports.default
 TooltipManager.name = "TooltipManager"
-function TooltipManager.prototype.____constructor(self)
+function TooltipManager.prototype.____constructor(self, gameManager)
     self.tooltips = __TS__New(Map)
+    self.gameManager = gameManager
 end
 function TooltipManager.prototype.drawTooltips(self)
     for ____, tooltips in __TS__Iterator(self.tooltips:values()) do

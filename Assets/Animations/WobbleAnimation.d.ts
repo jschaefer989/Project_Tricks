@@ -1,7 +1,8 @@
-import Animation, { AnimationAssets, ConstructionOptions } from "./Animation";
+import Animation, { AnimationAssets, AnimationOptions } from "./Animation";
 export default class WobbleAnimation extends Animation {
     wobbleAmount: number;
     originalX: Map<string, number>;
-    constructor(wobbleAmount: number, assets: AnimationAssets[], constructionOptions?: ConstructionOptions);
+    animDuration: number;
+    constructor(animDuration: number, wobbleAmount: number, assets: AnimationAssets[], constructionOptions?: AnimationOptions);
     updateAnimation(deltaTime: number): void;
 }

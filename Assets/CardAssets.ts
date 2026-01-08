@@ -15,8 +15,8 @@ import Point from "Point";
 import { Image } from "love.graphics";
 
 export const padding = 5;
-export const cardWidth = 70
-export const cardHeight = 94
+export const cardWidth = 70;
+export const cardHeight = 94;
 
 interface AssetsForCard {
   baseAsset?: Asset;
@@ -26,7 +26,7 @@ interface AssetsForCard {
 
 export default class CardAssets {
   gameManager: GameManager;
-  baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png");  
+  baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png");
   cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static");
 
   constructor(gameManager: GameManager) {
@@ -40,15 +40,25 @@ export default class CardAssets {
     includeClickHandler: boolean = true
   ): void {
     const assetId = CardAssets.getBaseAssetId(card);
-    const baseCardAsset = new Asset(assetId, this.baseCard, cardX, cardY, cardWidth, cardHeight, {
-      onClick: includeClickHandler ? () => card.onClick() : undefined,
-      onHover: (asset: Asset) => card.onHover(asset),
-      onUnhover: (asset: Asset) => card.onUnhover(asset),
-      hoverEffect: includeClickHandler
-        ? [HoverEffects.SCALE_UP]
-        : [HoverEffects.NONE],
-      clickSound: includeClickHandler ? this.cardClick : undefined,
-    });
+    const baseCardAsset = new Asset(
+      assetId,
+      this.baseCard,
+      cardX,
+      cardY,
+      cardWidth,
+      cardHeight,
+      {
+        onClick: includeClickHandler ? () => card.onClick() : undefined,
+        onHover: (asset: Asset) => card.onHover(asset),
+        onUnhover: (asset: Asset) => card.onUnhover(asset),
+        hoverEffect: includeClickHandler
+          ? [HoverEffects.SCALE_UP]
+          : [HoverEffects.NONE],
+        clickSound: includeClickHandler ? this.cardClick : undefined,
+        isDisabled: true,
+        useDisabledAnimation: false,
+      }
+    );
     this.gameManager.assetManager.addAsset(assetId, baseCardAsset);
     this.addSuitAsset(card, cardX, cardY, includeClickHandler);
     this.addRankAsset(card, cardX, cardY, includeClickHandler);
@@ -83,6 +93,8 @@ export default class CardAssets {
           ? [HoverEffects.SCALE_UP]
           : [HoverEffects.NONE],
         clickSound: includeClickHandler ? this.cardClick : undefined,
+        isDisabled: true,
+        useDisabledAnimation: false,
       }
     );
     this.gameManager.assetManager.addAsset(
@@ -109,6 +121,8 @@ export default class CardAssets {
         scaleX: -1,
         scaleY: -1,
         clickSound: includeClickHandler ? this.cardClick : undefined,
+        isDisabled: true,
+        useDisabledAnimation: false,
       }
     );
     this.gameManager.assetManager.addAsset(
@@ -150,6 +164,8 @@ export default class CardAssets {
           ? [HoverEffects.SCALE_UP]
           : [HoverEffects.NONE],
         clickSound: includeClickHandler ? this.cardClick : undefined,
+        isDisabled: true,
+        useDisabledAnimation: false,
       }
     );
     this.gameManager.assetManager.addAsset(
@@ -251,49 +267,6 @@ export default class CardAssets {
     }
   }
 
-  centerCards(characterType: CharacterTypes): void {
-    const character = this.gameManager.getCharacter(characterType);
-    if (isEmpty(character)) {
-      return;
-    }
-    const cardCount = character.hand.length;
-    const screenW = push.getWidth();
-    const totalW =
-      cardCount * cardWidth + Math.max(0, cardCount - 1) * padding;
-    const startX = Math.floor((screenW - totalW) / 2);
-    const cardY = this.getCardPosition(characterType);
-
-    for (let i = 0; i < character.hand.length; i++) {
-      const card = character.hand[i];
-      const x = startX + i * (cardWidth + padding);
-
-      this.updateCardPosition(card, x, cardY);
-    }
-  }
-
-  updateCardPosition(card: Card, x: number, y: number): void {
-    const assetManager = this.gameManager.assetManager;
-    const baseAssetId = CardAssets.getBaseAssetId(card);
-    assetManager.getAsset(baseAssetId, baseAssetId)?.updatePosition(x, y);
-    const normalSuitPosition = this.getNormalSuitPosition(x, y);
-    const flippedSuitPosition = this.getFlippedSuitPosition(x, y);
-    assetManager
-      .getAsset(baseAssetId, CardAssets.getSuitAssetId(card, 0))
-      ?.updatePosition(normalSuitPosition.x, normalSuitPosition.y);
-    assetManager
-      .getAsset(baseAssetId, CardAssets.getSuitAssetId(card, 1))
-      ?.updatePosition(flippedSuitPosition.x, flippedSuitPosition.y);
-
-    const rankAsset = this.getRankAsset(card);
-    if (isEmpty(rankAsset)) {
-      return;
-    }
-    const rankPosition = this.getRankPosition(x, y, rankAsset.image);
-    assetManager
-      .getAsset(baseAssetId, CardAssets.getRankAssetId(card, 0))
-      ?.updatePosition(rankPosition.x, rankPosition.y);
-  }
-
   getRankAsset(card: Card): Asset | undefined {
     return this.gameManager.assetManager.getAsset(
       CardAssets.getBaseAssetId(card),
@@ -326,8 +299,7 @@ export default class CardAssets {
     }
     const cardCount = character.hand.length;
     const screenW = push.getWidth();
-    const totalW =
-      cardCount * cardWidth + Math.max(0, cardCount - 1) * padding;
+    const totalW = cardCount * cardWidth + Math.max(0, cardCount - 1) * padding;
     return {
       x: Math.floor((screenW - totalW) / 2),
       y: this.getCardPosition(characterType),
@@ -378,5 +350,27 @@ export default class CardAssets {
       suitAssets: [suitAsset0, suitAsset1],
       rankAsset: rankAsset,
     };
+  }
+
+  getCardAssetList(card: Card): Asset[] {
+    const { baseAsset, suitAssets, rankAsset } = this.getCardAssets(card);
+    const assets: Asset[] = [];
+    if (!isEmpty(baseAsset)) assets.push(baseAsset);
+    if (!isEmpty(rankAsset)) assets.push(rankAsset);
+    if (!isEmpty(suitAssets[0])) assets.push(suitAssets[0]);
+    if (!isEmpty(suitAssets[1])) assets.push(suitAssets[1]);
+    return assets;
+  }
+
+  disableAllCards(disable: boolean): void {
+    if (isEmpty(this.gameManager.board)) {
+      return;
+    }
+
+    for (const card of this.gameManager.board.getAllCardsInPlay()) {
+      for (const asset of this.getCardAssetList(card)) {
+        asset.isDisabled = disable;
+      }
+    }
   }
 }

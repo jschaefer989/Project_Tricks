@@ -1,14 +1,18 @@
-import { AssetIds } from "Enums";
+import { AnimationIds, AssetIds } from "Enums";
 import Asset from "./Asset";
 import FontWithPosition from "./FontWithPosition";
 import Tooltip from "./Tooltip";
 import { isEmpty } from "Helpers";
 import { Image } from "love.graphics";
+import GameManager from "GameManager";
 
 export default class TooltipManager {
+  gameManager: GameManager;
   tooltips: Map<string, Tooltip[]> = new Map<string, Tooltip[]>();
 
-  constructor() {}
+  constructor(gameManager: GameManager) {
+    this.gameManager = gameManager;
+  }
 
   drawTooltips(): void {
     for (const tooltips of this.tooltips.values()) {
@@ -16,7 +20,7 @@ export default class TooltipManager {
         continue;
       }
       for (const tooltip of tooltips) {
-        tooltip.asset.drawAsset();  
+        tooltip.asset.drawAsset();
         for (const text of tooltip.texts) {
           text.printText();
         }
@@ -44,7 +48,7 @@ export default class TooltipManager {
       text.limit = 120;
       text.alignMode = "center";
     }
-    
+
     // Draw background with dynamic sizing
     const tooltipImage = this.getTooltipBackground(texts);
     if (isEmpty(tooltipImage)) {
@@ -58,8 +62,9 @@ export default class TooltipManager {
         tooltipX,
         tooltipY,
         tooltipWidth,
-        this.getTooltipHeight(texts),
-      ), texts
+        this.getTooltipHeight(texts)
+      ),
+      texts
     );
   }
 

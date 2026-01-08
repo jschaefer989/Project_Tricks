@@ -123,6 +123,16 @@ export default class Player extends Character {
     return false;
   }
 
+  getSelectedCards(): Card[] {
+    const selectedCards: Card[] = [];
+    for (const card of this.hand) {
+      if (card.isSelected) {
+        selectedCards.push(card);
+      }
+    }
+    return selectedCards;
+  }
+
   cashout(points: number): void {
     if (points < 0) return;
     this.addMoney(points);

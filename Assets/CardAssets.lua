@@ -44,7 +44,9 @@ function CardAssets.prototype.addAsset(self, card, cardX, cardY, includeClickHan
             onHover = function(____, asset) return card:onHover(asset) end,
             onUnhover = function(____, asset) return card:onUnhover(asset) end,
             hoverEffect = includeClickHandler and ({HoverEffects.SCALE_UP}) or ({HoverEffects.NONE}),
-            clickSound = includeClickHandler and self.cardClick or nil
+            clickSound = includeClickHandler and self.cardClick or nil,
+            isDisabled = true,
+            useDisabledAnimation = false
         }
     )
     self.gameManager.assetManager:addAsset(assetId, baseCardAsset)
@@ -77,7 +79,9 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
             onHover = onHoverCallback,
             onUnhover = function(____, asset) return card:onUnhover(asset) end,
             hoverEffect = includeClickHandler and ({HoverEffects.SCALE_UP}) or ({HoverEffects.NONE}),
-            clickSound = includeClickHandler and self.cardClick or nil
+            clickSound = includeClickHandler and self.cardClick or nil,
+            isDisabled = true,
+            useDisabledAnimation = false
         }
     )
     self.gameManager.assetManager:addAsset(
@@ -102,7 +106,9 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
             hoverEffect = includeClickHandler and ({HoverEffects.SCALE_UP}) or ({HoverEffects.NONE}),
             scaleX = -1,
             scaleY = -1,
-            clickSound = includeClickHandler and self.cardClick or nil
+            clickSound = includeClickHandler and self.cardClick or nil,
+            isDisabled = true,
+            useDisabledAnimation = false
         }
     )
     self.gameManager.assetManager:addAsset(
@@ -137,7 +143,9 @@ function CardAssets.prototype.addRankAsset(self, card, x, y, includeClickHandler
             onHover = function(____, asset) return card:onHover(asset) end,
             onUnhover = function(____, asset) return card:onUnhover(asset) end,
             hoverEffect = includeClickHandler and ({HoverEffects.SCALE_UP}) or ({HoverEffects.NONE}),
-            clickSound = includeClickHandler and self.cardClick or nil
+            clickSound = includeClickHandler and self.cardClick or nil,
+            isDisabled = true,
+            useDisabledAnimation = false
         }
     )
     self.gameManager.assetManager:addAsset(
@@ -274,62 +282,6 @@ function CardAssets.prototype.hideCardAssets(self, card)
         assetsForCard.rankAsset.isHidden = true
     end
 end
-function CardAssets.prototype.centerCards(self, characterType)
-    local character = self.gameManager:getCharacter(characterType)
-    if isEmpty(character) then
-        return
-    end
-    local cardCount = #character.hand
-    local screenW = push:getWidth()
-    local totalW = cardCount * ____exports.cardWidth + math.max(0, cardCount - 1) * ____exports.padding
-    local startX = math.floor((screenW - totalW) / 2)
-    local cardY = self:getCardPosition(characterType)
-    do
-        local i = 0
-        while i < #character.hand do
-            local card = character.hand[i + 1]
-            local x = startX + i * (____exports.cardWidth + ____exports.padding)
-            self:updateCardPosition(card, x, cardY)
-            i = i + 1
-        end
-    end
-end
-function CardAssets.prototype.updateCardPosition(self, card, x, y)
-    local assetManager = self.gameManager.assetManager
-    local baseAssetId = ____exports.default:getBaseAssetId(card)
-    local ____opt_0 = assetManager:getAsset(baseAssetId, baseAssetId)
-    if ____opt_0 ~= nil then
-        ____opt_0:updatePosition(x, y)
-    end
-    local normalSuitPosition = self:getNormalSuitPosition(x, y)
-    local flippedSuitPosition = self:getFlippedSuitPosition(x, y)
-    local ____opt_2 = assetManager:getAsset(
-        baseAssetId,
-        ____exports.default:getSuitAssetId(card, 0)
-    )
-    if ____opt_2 ~= nil then
-        ____opt_2:updatePosition(normalSuitPosition.x, normalSuitPosition.y)
-    end
-    local ____opt_4 = assetManager:getAsset(
-        baseAssetId,
-        ____exports.default:getSuitAssetId(card, 1)
-    )
-    if ____opt_4 ~= nil then
-        ____opt_4:updatePosition(flippedSuitPosition.x, flippedSuitPosition.y)
-    end
-    local rankAsset = self:getRankAsset(card)
-    if isEmpty(rankAsset) then
-        return
-    end
-    local rankPosition = self:getRankPosition(x, y, rankAsset.image)
-    local ____opt_6 = assetManager:getAsset(
-        baseAssetId,
-        ____exports.default:getRankAssetId(card, 0)
-    )
-    if ____opt_6 ~= nil then
-        ____opt_6:updatePosition(rankPosition.x, rankPosition.y)
-    end
-end
 function CardAssets.prototype.getRankAsset(self, card)
     return self.gameManager.assetManager:getAsset(
         ____exports.default:getBaseAssetId(card),
@@ -342,14 +294,14 @@ function CardAssets.prototype.getCardPosition(self, characterType)
 end
 function CardAssets.prototype.getHeightModifier(self, characterType)
     repeat
-        local ____switch43 = characterType
-        local ____cond43 = ____switch43 == CharacterTypes.PLAYER
-        if ____cond43 then
-            local ____opt_8 = self.gameManager.board
-            return not (____opt_8 and ____opt_8.showingEdelView) and -(____exports.cardHeight * 0.25) or ____exports.cardHeight / 2
+        local ____switch37 = characterType
+        local ____cond37 = ____switch37 == CharacterTypes.PLAYER
+        if ____cond37 then
+            local ____opt_0 = self.gameManager.board
+            return not (____opt_0 and ____opt_0.showingEdelView) and -(____exports.cardHeight * 0.25) or ____exports.cardHeight / 2
         end
-        ____cond43 = ____cond43 or ____switch43 == CharacterTypes.ENEMY
-        if ____cond43 then
+        ____cond37 = ____cond37 or ____switch37 == CharacterTypes.ENEMY
+        if ____cond37 then
             return -(____exports.cardHeight * 1.5)
         end
         do
@@ -389,5 +341,35 @@ function CardAssets.prototype.getCardAssets(self, card)
     local suitAsset1 = self.gameManager.assetManager:getAsset(baseAssetId, suitAssetId1)
     local rankAsset = self.gameManager.assetManager:getAsset(baseAssetId, rankAssetId)
     return {baseAsset = baseAsset, suitAssets = {suitAsset0, suitAsset1}, rankAsset = rankAsset}
+end
+function CardAssets.prototype.getCardAssetList(self, card)
+    local ____temp_2 = self:getCardAssets(card)
+    local baseAsset = ____temp_2.baseAsset
+    local suitAssets = ____temp_2.suitAssets
+    local rankAsset = ____temp_2.rankAsset
+    local assets = {}
+    if not isEmpty(baseAsset) then
+        assets[#assets + 1] = baseAsset
+    end
+    if not isEmpty(rankAsset) then
+        assets[#assets + 1] = rankAsset
+    end
+    if not isEmpty(suitAssets[1]) then
+        assets[#assets + 1] = suitAssets[1]
+    end
+    if not isEmpty(suitAssets[2]) then
+        assets[#assets + 1] = suitAssets[2]
+    end
+    return assets
+end
+function CardAssets.prototype.disableAllCards(self, disable)
+    if isEmpty(self.gameManager.board) then
+        return
+    end
+    for ____, card in ipairs(self.gameManager.board:getAllCardsInPlay()) do
+        for ____, asset in ipairs(self:getCardAssetList(card)) do
+            asset.isDisabled = disable
+        end
+    end
 end
 return ____exports

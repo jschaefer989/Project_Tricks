@@ -12,7 +12,7 @@ ____exports.default = __TS__Class()
 local WobbleAnimation = ____exports.default
 WobbleAnimation.name = "WobbleAnimation"
 __TS__ClassExtends(WobbleAnimation, Animation)
-function WobbleAnimation.prototype.____constructor(self, wobbleAmount, assets, constructionOptions)
+function WobbleAnimation.prototype.____constructor(self, animDuration, wobbleAmount, assets, constructionOptions)
     Animation.prototype.____constructor(
         self,
         assets,
@@ -31,6 +31,7 @@ function WobbleAnimation.prototype.____constructor(self, wobbleAmount, assets, c
         )
     )
     self.wobbleAmount = wobbleAmount
+    self.animDuration = animDuration
 end
 function WobbleAnimation.prototype.updateAnimation(self, deltaTime)
     Animation.prototype.updateAnimation(self, deltaTime)

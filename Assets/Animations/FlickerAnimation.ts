@@ -1,5 +1,5 @@
 import Asset from "Assets/Asset";
-import Animation, { AnimationAssets, ConstructionOptions } from "./Animation";
+import Animation, { AnimationAssets, AnimationOptions } from "./Animation";
 
 export default class FlickerAnimation extends Animation {
   flickerInterval = 0.1; // Time between flickers
@@ -8,13 +8,19 @@ export default class FlickerAnimation extends Animation {
 
   constructor(
     animationAssets: AnimationAssets[],
-    constructionOptions?: ConstructionOptions
+    constructionOptions?: AnimationOptions
   ) {
     super(animationAssets, constructionOptions);
   }
 
   updateAnimation(deltaTime: number): void {
+    super.updateAnimation(deltaTime);
     if (!this.isAnimating) {
+      for (const asset of this.assets) {
+        if (asset instanceof Asset) {
+          asset.isHidden = false;
+        }
+      }
       return;
     }
 
@@ -29,17 +35,6 @@ export default class FlickerAnimation extends Animation {
       for (const asset of this.assets) {
         if (asset instanceof Asset) {
           asset.isHidden = !asset.isHidden;
-        }
-      }
-    }
-
-    if (this.animElapsed >= this.animDuration) {
-      // Animation complete - ensure assets are visible
-      this.animElapsed = this.animDuration;
-      this.isAnimating = false;
-      for (const asset of this.assets) {
-        if (asset instanceof Asset) {
-          asset.isHidden = false;
         }
       }
     }

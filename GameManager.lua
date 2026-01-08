@@ -44,18 +44,21 @@ local ____MusicPlayer = require("Assets.Music.MusicPlayer")
 local MusicPlayer = ____MusicPlayer.default
 local ____Grass = require("Biomes.Grass")
 local Grass = ____Grass.default
+local ____BackgroundManager = require("Screens.BackgroundManager")
+local BackgroundManager = ____BackgroundManager.default
 ____exports.default = __TS__Class()
 local GameManager = ____exports.default
 GameManager.name = "GameManager"
 function GameManager.prototype.____constructor(self)
-    self.devMode = false
-    self.gameState = GameStates.MAIN_MENU
     self.player = __TS__New(Player, self)
     self.settings = __TS__New(Settings)
     self.map = __TS__New(Map, self)
     self.assetManager = __TS__New(AssetManager, self)
     self.animationManager = __TS__New(AnimationManager, self)
     self.musicPlayer = __TS__New(MusicPlayer, self)
+    self.backgroundManager = __TS__New(BackgroundManager, self)
+    self.devMode = false
+    self.gameState = GameStates.MAIN_MENU
     self.biome = __TS__New(Grass)
 end
 function GameManager.prototype.getCharacter(self, characterType)
@@ -81,6 +84,7 @@ function GameManager.prototype.switchBasedOnGameState(self, gameState, enemy)
         enemy = ____opt_2 and ____opt_2.enemy
     end
     self.assetManager = __TS__New(AssetManager, self)
+    self.backgroundManager:updateBackground(gameState)
     if self.settings.playMusic then
         self.musicPlayer:play(gameState, self.biome)
     end
@@ -186,6 +190,9 @@ function GameManager.prototype.switchToPauseMenu(self)
     GameStateManager:setState(pauseMenuState)
 end
 function GameManager.prototype.switchToBoard(self, enemy)
+    local shadowShader = love.graphics.newShader("Shaders/Shadow.glsl")
+    shadowShader:send("shadow_strength", 0.6)
+    shadowShader:send("shadow_color", {0, 0, 0})
     local boardState = {
         update = function(____, dt)
             self.assetManager:handleMouseHover()
@@ -195,6 +202,7 @@ function GameManager.prototype.switchToBoard(self, enemy)
             if not self.devMode then
                 push:start()
                 self.assetManager:drawAssets()
+                love.graphics.setShader()
                 push:finish()
             end
         end,
@@ -223,8 +231,7 @@ function GameManager.prototype.switchToBoard(self, enemy)
         )
         self.board.dealer:setup()
     end
-    self.assetManager = __TS__New(AssetManager, self)
-    self.board:buildAssets()
+    self.board:start()
     GameStateManager:setState(boardState)
 end
 function GameManager.prototype.switchToWinScreen(self)

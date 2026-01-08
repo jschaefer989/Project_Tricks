@@ -16,6 +16,8 @@ export default class AssetManager {
     removeAsset(baseId: string, assetId: string): void;
     disableAsset(baseId: string): void;
     enableAsset(baseId: string): void;
+    hasAssets(baseId: string): boolean;
+    hasAsset(baseId: string, assetId: string): boolean;
     drawAssets(): void;
     handleMousePressed(x: number, y: number, button: number): void;
     handleMouseReleased(x: number, y: number, button: number): void;

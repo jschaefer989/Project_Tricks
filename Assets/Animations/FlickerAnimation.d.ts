@@ -1,8 +1,8 @@
-import Animation, { AnimationAssets, ConstructionOptions } from "./Animation";
+import Animation, { AnimationAssets, AnimationOptions } from "./Animation";
 export default class FlickerAnimation extends Animation {
     flickerInterval: number;
     flickerCount: number;
     maxFlickers: number;
-    constructor(animationAssets: AnimationAssets[], constructionOptions?: ConstructionOptions);
+    constructor(animationAssets: AnimationAssets[], constructionOptions?: AnimationOptions);
     updateAnimation(deltaTime: number): void;
 }

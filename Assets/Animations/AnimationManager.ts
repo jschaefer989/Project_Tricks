@@ -1,8 +1,9 @@
 import GameManager from "GameManager";
 import Animation from "./Animation";
 import WobbleAnimation from "./WobbleAnimation";
-import CutAnimation from "./CutAnimation"
+import CutAnimation from "./CutAnimation";
 import FlickerAnimation from "./FlickerAnimation";
+import { isEmpty } from "Helpers";
 
 export default class AnimationManager {
   gameManager: GameManager;
@@ -18,12 +19,28 @@ export default class AnimationManager {
 
   updateAnimations(dt: number): void {
     for (const [id, animation] of this.animations) {
+      if (this.shouldWaitForAnimations(animation)) {
+        continue;
+      }
+
       animation.updateAnimation(dt);
       if (animation.isFinished) {
         this.animations.delete(id);
         animation.onFinish?.();
       }
     }
+  }
+
+  private shouldWaitForAnimations(animation: Animation): boolean {
+    if (animation.waitForAnimationIds.length > 0) {
+      for (const waitId of animation.waitForAnimationIds) {
+        const waitForAnimation = this.animations.get(waitId);
+        if (!isEmpty(waitForAnimation) && !waitForAnimation.isFinished) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   hasWobbleAnimation(): boolean {
@@ -55,5 +72,9 @@ export default class AnimationManager {
 
   hasAnimations(): boolean {
     return this.animations.size > 0;
+  }
+
+  getCardAnimationIds(): string[] {
+      return Array.from(this.animations.keys()).filter((id: string) => id.startsWith('CARD'));
   }
 }

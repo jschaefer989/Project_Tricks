@@ -13,10 +13,10 @@ import {
 import Dealer from "../Dealer";
 import Enemy, { EnemyData } from "Enemies/Enemy";
 import type GameManager from "../GameManager";
-import CardAssets, { cardHeight, cardWidth, padding } from "Assets/CardAssets";
+import CardAssets, { cardHeight, cardWidth } from "Assets/CardAssets";
 import * as push from "Libraries.push";
 import Asset from "Assets/Asset";
-import { isEmpty } from "Helpers";
+import { exhaustiveGuard, isEmpty } from "Helpers";
 import FontWithPosition, {
   Fonts,
   Format,
@@ -29,7 +29,7 @@ import { AnimationAssets } from "Assets/Animations/Animation";
 import CutAnimation from "Assets/Animations/CutAnimation";
 import FlickerAnimation from "Assets/Animations/FlickerAnimation";
 import SlideAnimation from "Assets/Animations/SlideAnimation";
-import * as suit from "Libraries.suit-master.suit";
+import GlowAnimation from "Assets/Animations/GlowAnimation";
 
 const portraitGap = 12;
 
@@ -38,7 +38,7 @@ interface BoardData {
   playerPoints: number;
   enemyPoints: number;
   enemy: EnemyData;
-  edelSuit: Suits;
+  edelCard?: Card;
   playerPower: number;
   playerValue: number;
   enemyPower: number;
@@ -53,7 +53,7 @@ export default class Board {
   dealer: Dealer;
   playerPoints = 0;
   enemyPoints = 0;
-  edelSuit = Suits.ACORNS;
+  edelCard?: Card;
   playerPower = 0;
   playerValue = 0;
   enemyPower = 0;
@@ -74,7 +74,7 @@ export default class Board {
     this.discardUsed = data.discardUsed;
     this.playerPoints = data.playerPoints;
     this.enemyPoints = data.enemyPoints;
-    this.edelSuit = data.edelSuit;
+    this.edelCard = data.edelCard;
     this.playerPower = data.playerPower;
     this.playerValue = data.playerValue;
     this.enemyPower = data.enemyPower;
@@ -91,7 +91,7 @@ export default class Board {
       playerPoints: this.playerPoints,
       enemyPoints: this.enemyPoints,
       enemy: this.enemy.save(),
-      edelSuit: this.edelSuit,
+      edelCard: this.edelCard,
       playerPower: this.playerPower,
       playerValue: this.playerValue,
       enemyPower: this.enemyPower,
@@ -119,17 +119,9 @@ export default class Board {
       TextIds.LETS_FIGHT_BUTTON_CAPTION
     );
 
-    this.dealer.startGame();
-    this.buildFightAssets();
+    this.gameManager.board?.cardAssets.disableAllCards(true);
+    this.dealer.dealHand();
     this.hideEdelBoard();
-  }
-
-  buildFightAssets(): void {
-    this.buildPrimaryButtons();
-    this.buildPointBoard();
-    const portraitHeight = this.getPortraitHeight() ?? 0;
-    this.buildPowerAndValues(CharacterTypes.PLAYER, portraitHeight);
-    this.buildPowerAndValues(CharacterTypes.ENEMY, portraitHeight);
   }
 
   private hideEdelBoard(): void {
@@ -141,6 +133,9 @@ export default class Board {
 
   handleAttack(): void {
     if (!this.gameManager.player.anySelectedCards()) return;
+
+    this.gameManager.board?.cardAssets.disableAllCards(true);
+
     if (this.enemy.deck.length === 0) {
       this.endFight();
       return;
@@ -148,62 +143,70 @@ export default class Board {
 
     if (this.playerPower > this.enemyPower) {
       // Mark all enemy cards as cut and update the assets
-      for (const card of this.enemy.hand) {
-        this.startCutAnimation(card, CharacterTypes.PLAYER);
+      for (const card of this.getSlainCards(CharacterTypes.ENEMY)) {
+        this.startCutAnimation(
+          card,
+          CharacterTypes.PLAYER,
+          CharacterTypes.ENEMY
+        );
       }
       return; // Don't deal cards yet - let the animation play first
     } else {
-      for (const card of this.gameManager.player.hand) {
-        if (card.isSelected) {
-          this.startCutAnimation(card, CharacterTypes.ENEMY);
-        }
+      for (const card of this.getSlainCards(CharacterTypes.PLAYER)) {
+        this.startCutAnimation(
+          card,
+          CharacterTypes.ENEMY,
+          CharacterTypes.PLAYER
+        );
       }
     }
   }
 
-  startCutAnimation(card: Card, winner: CharacterTypes): void {
-    const { baseAsset, suitAssets, rankAsset } = this.cardAssets.getCardAssets(card);
+  getSlainCards(characterType: CharacterTypes): Card[] {
+    switch (characterType) {
+      case CharacterTypes.PLAYER:
+        return this.gameManager.player.hand.filter((card) => card.isSelected);
+      case CharacterTypes.ENEMY:
+        return this.enemy.hand;
+      default:
+        exhaustiveGuard(characterType);
+    }
+  }
+
+  startCutAnimation(
+    card: Card,
+    winner: CharacterTypes,
+    loser: CharacterTypes
+  ): void {
+    const { baseAsset, suitAssets, rankAsset } =
+      this.cardAssets.getCardAssets(card);
     const normalSuitAsset = suitAssets[0];
 
     // Start up the cut animation on the card base and rank
     const cutAnimationAssets: AnimationAssets[] = [];
-    const baseId = AnimationIds.CARD_BASE_CUT + card.id;
-    if (
-      !isEmpty(baseAsset) &&
-      !this.gameManager.animationManager.animations.has(baseId)
-    ) {
+    if (!isEmpty(baseAsset)) {
       cutAnimationAssets.push(baseAsset);
     }
-    const rankAssetId = AnimationIds.CARD_RANK_CUT + card.id;
-    if (
-      !isEmpty(rankAsset) &&
-      !this.gameManager.animationManager.animations.has(rankAssetId)
-    ) {
+    if (!isEmpty(rankAsset)) {
       cutAnimationAssets.push(rankAsset);
     }
 
     this.gameManager.animationManager.animations.set(
-      baseId,
-      new CutAnimation(0, -40, cutAnimationAssets, {
-        onFinish: () => this.startFlickerAnimation(card, winner),
-        animDuration: 0.25,
+      AnimationIds.CARD_CUT + card.id,
+      new CutAnimation(0.15, 0, -40, cutAnimationAssets, {
+        onFinish: () => this.startFlickerAnimation(card, winner, loser),
       })
     );
 
     // Just slide the top suit, don't cut it
     const slideAnimationAssets: AnimationAssets[] = [];
-    const normalSuitAssetId = AnimationIds.CARD_SUIT_NORMAL_CUT + card.id;
-    if (
-      !isEmpty(normalSuitAsset) &&
-      !this.gameManager.animationManager.animations.has(normalSuitAssetId)
-    ) {
+    if (!isEmpty(normalSuitAsset)) {
       slideAnimationAssets.push(normalSuitAsset);
     }
 
     this.gameManager.animationManager.animations.set(
-      normalSuitAssetId,
-      new SlideAnimation(0, -40, slideAnimationAssets, {
-        animDuration: 0.25,
+      AnimationIds.CARD_SUIT_SLIDE + card.id,
+      new SlideAnimation(0.15,0, -40, slideAnimationAssets, {
         drawSeparately: true,
       })
     );
@@ -211,53 +214,35 @@ export default class Board {
     // Leave the bottom suit where it is
   }
 
-  startFlickerAnimation(card: Card, winner: CharacterTypes): void {
-    const { baseAsset, suitAssets, rankAsset } = this.cardAssets.getCardAssets(card);
-    const normalSuitAsset = suitAssets[0];
-    const flippedSuitAsset = suitAssets[1];
-
-    const flickerAssets: AnimationAssets[] = [];
-    
-    if (!isEmpty(baseAsset)) {
-      flickerAssets.push(baseAsset);
-    }
-    if (!isEmpty(rankAsset)) {
-      flickerAssets.push(rankAsset);
-    }
-    if (!isEmpty(normalSuitAsset)) {
-      flickerAssets.push(normalSuitAsset);
-    }
-    if (!isEmpty(flippedSuitAsset)) {
-      flickerAssets.push(flippedSuitAsset);
-    }
-
-    const flickerId = AnimationIds.CARD_BASE_FLICKER + card.id;
+  startFlickerAnimation(
+    card: Card,
+    winner: CharacterTypes,
+    loser: CharacterTypes
+  ): void {
     this.gameManager.animationManager.animations.set(
-      flickerId,
-        new FlickerAnimation(flickerAssets, {
-        onFinish: () => this.dealNextRound(winner),
+      AnimationIds.CARD_FLICKER + card.id,
+      new FlickerAnimation(this.cardAssets.getCardAssetList(card), {
+        onFinish: () => this.wrapUpAttack(winner, loser),
         animDuration: 0.6,
       })
     );
   }
 
-  dealNextRound(winner: CharacterTypes): void {
-    if (this.gameManager.animationManager.hasAnimations() ) {
+  wrapUpAttack(winner: CharacterTypes, loser: CharacterTypes): void {
+    if (this.gameManager.animationManager.hasAnimations()) {
       return; // Wait for all animations to finish
     }
 
-    if (winner === CharacterTypes.PLAYER) {
-      this.addPlayerPoints(this.getPlayerPoints());
-    } else {
-      this.addEnemyPoints(this.getEnemyPoints());
-    }
-
-    this.gameManager.player.removeSelectedCardsFromHand();
-    this.dealer.dealCards(CharacterTypes.PLAYER);
-
-    this.enemy.removeAllCardsFromHand();
+    this.hideSlainCards(loser);
+    this.addPoints(winner);
+    this.dealer.dealNextRound();
     this.clearEnemyStats();
-    this.dealer.dealCards(CharacterTypes.ENEMY);
+  }
+
+  private hideSlainCards(characterType: CharacterTypes): void {
+    for (const card of this.getSlainCards(characterType)) {
+      this.cardAssets.removeCardAssets(card);
+    }
   }
 
   private addPlayerPoints(points: number): void {
@@ -269,6 +254,30 @@ export default class Board {
     );
   }
 
+  getAllCardsInPlay(): Card[] {
+    const cardsInPlay: Card[] = [];
+    for (const card of this.gameManager.player.hand) {
+      cardsInPlay.push(card);
+    }
+    for (const card of this.enemy.hand) {
+      cardsInPlay.push(card);
+    }
+    return cardsInPlay;
+  }
+
+  private addPoints(winner: CharacterTypes): void {
+    switch (winner) {
+      case CharacterTypes.PLAYER:
+        this.addPlayerPoints(this.getPlayerPoints());
+        break;
+      case CharacterTypes.ENEMY:
+        this.addEnemyPoints(this.getEnemyPoints());
+        break;
+      default:
+        exhaustiveGuard(winner);
+    }
+  }
+
   private addEnemyPoints(points: number): void {
     this.enemyPoints += points;
     this.gameManager.assetManager.textManager.updateText(
@@ -277,10 +286,43 @@ export default class Board {
     );
   }
 
+  displayEdel(): void {
+    if (this.gameManager.animationManager.hasAnimations()) {
+      return; // wait for deal animations to finish
+    }
+    
+    this.cardAssets.disableAllCards(false);
+    this.buildLetsFightButton();
+    this.buildEdelBoard();
+
+    if (!isEmpty(this.edelCard)) {
+      this.gameManager.animationManager.startAnimation(
+        AnimationIds.EDEL_CARD,
+        new GlowAnimation(() => !this.gameManager.board?.showingEdelView, [...this.cardAssets.getCardAssetList(this.edelCard)], { glowPeriodSeconds: 3 })
+      );
+    }
+  }
+
+  displayFight(): void {
+    if (this.gameManager.animationManager.hasAnimations()) {
+      return; // wait for deal animations to finish
+    }
+
+    this.cardAssets.disableAllCards(false);
+    this.buildPrimaryButtons();
+    this.buildPointBoard();
+    const portraitHeight = this.getPortraitHeight() ?? 0;
+    this.buildPowerAndValues(CharacterTypes.PLAYER, portraitHeight);
+    this.buildPowerAndValues(CharacterTypes.ENEMY, portraitHeight);
+  }
+
   handleDiscard(): void {
     if (!this.gameManager.player.anySelectedCards()) return;
     if (this.getRemainingDiscards() <= 0) return;
 
+    this.gameManager.board?.cardAssets.disableAllCards(true);
+
+    this.dealer.discardCards(CharacterTypes.PLAYER, this.gameManager.player.getSelectedCards());
     this.gameManager.player.discard();
 
     this.discardUsed = this.discardUsed + 1;
@@ -356,7 +398,6 @@ export default class Board {
       this.playerPower.toString()
     );
     if (this.playerPower > this.enemyPower) {
-      this.playWinFireSound();
       this.buildWinFire();
     } else {
       this.removeWinFire();
@@ -391,45 +432,14 @@ export default class Board {
     );
   }
 
-  buildAssets(): void {
-    this.buildBackground();
-    this.buildCardAssets();
+  start(): void {
+    // TODO: we'll want this to either support loading and rendering after saving and restarting the game,
+    // or we'll want to update saving so that it's only supported in specific places (like between fights, on the map screen).
     this.buildPlayerPortrait();
     this.buildEnemyPortrait();
     this.buildPlayerDeck();
     this.buildEnemyDeck();
-    if (this.showingEdelView) {
-      this.buildLetsFightButton();
-      this.buildEdelBoard();
-    } else {
-      this.buildFightAssets();
-    }
-  }
-
-  private buildCardAssets(): void {
-    const playerCardPosition = this.cardAssets.determineCardStartingPosition(
-      CharacterTypes.PLAYER
-    );
-
-    for (let i = 0; i < this.gameManager.player.hand.length; i++) {
-      const card = this.gameManager.player.hand[i];
-      const x = playerCardPosition.x + i * (cardWidth + padding);
-      this.cardAssets.addAsset(
-        card,
-        x,
-        playerCardPosition.y,
-        !this.showingEdelView
-      );
-    }
-
-    const enemyCardPosition = this.cardAssets.determineCardStartingPosition(
-      CharacterTypes.ENEMY
-    );
-    for (let i = 0; i < this.enemy.hand.length; i++) {
-      const card = this.enemy.hand[i];
-      const x = enemyCardPosition.x + i * (cardWidth + padding);
-      this.cardAssets.addAsset(card, x, enemyCardPosition.y, false);
-    }
+    this.dealer.dealEdel();
   }
 
   private buildLetsFightButton(): void {
@@ -993,29 +1003,30 @@ export default class Board {
     }
   }
 
-  private buildPlayerDeck(): void {
-    const portraitPosition = this.getPortraitPosition(CharacterTypes.PLAYER);
+  buildPlayerDeck(): void {
+    const deckPosition = this.dealer.getDeckPosition(CharacterTypes.PLAYER);
     this.gameManager.assetManager.addAsset(
       AssetIds.PLAYER_DECK,
       new Asset(
         AssetIds.PLAYER_DECK,
         love.graphics.newImage("Assets/Images/BaseCardBack.png"),
-        push.getWidth() - cardWidth - 5,
-        portraitPosition,
+        deckPosition.x,
+        deckPosition.y,
         cardWidth,
         cardHeight
       )
     );
   }
 
-  private buildEnemyDeck(): void {
+  buildEnemyDeck(): void {
+    const deckPosition = this.dealer.getDeckPosition(CharacterTypes.ENEMY);
     this.gameManager.assetManager.addAsset(
       AssetIds.ENEMY_DECK,
       new Asset(
         AssetIds.ENEMY_DECK,
         love.graphics.newImage("Assets/Images/BaseCardBack.png"),
-        push.getWidth() - cardWidth - 5,
-        5,
+        deckPosition.x,
+        deckPosition.y,
         cardWidth,
         cardHeight
       )
@@ -1023,6 +1034,10 @@ export default class Board {
   }
 
   private buildEdelBoard(): void {
+    if (isEmpty(this.edelCard)) {
+      return;
+    }
+
     const boardWidth = 149;
     const boardHeight = 23;
     const screenW = push.getWidth();
@@ -1047,7 +1062,7 @@ export default class Board {
         TextIds.EDEL_LABEL,
         centerX,
         18,
-        Card.getSuitName(this.edelSuit),
+        Card.getSuitName(this.edelCard.suit),
         {
           size: 16,
           format: Format.CENTER,
@@ -1057,7 +1072,7 @@ export default class Board {
     );
 
     const suitImage = love.graphics.newImage(
-      CardAssets.getSuitAssetPath(this.edelSuit)
+      CardAssets.getSuitAssetPath(this.edelCard.suit)
     );
     this.gameManager.assetManager.addAsset(
       AssetIds.EDEL_SUIT_ICON_LEFT,
@@ -1076,20 +1091,6 @@ export default class Board {
     );
   }
 
-  private buildBackground(): void {
-    this.gameManager.assetManager.addAsset(
-      AssetIds.BACKGROUND,
-      new Asset(
-        AssetIds.BACKGROUND,
-        love.graphics.newImage(this.gameManager.biome.boardBackgroundImagePath),
-        0,
-        0,
-        640,
-        360
-      )
-    );
-  }
-
   private playWinFireSound(): void {
     if (!this.winFireSound.isPlaying()) {
       this.winFireSound.play();
@@ -1097,6 +1098,10 @@ export default class Board {
   }
 
   private buildWinFire(): void {
+    if (this.gameManager.assetManager.hasAssets(AssetIds.BASIC_WIN_FIRE)) {
+      return; // Already built
+    }
+
     const fireSprite = this.getWinFireSprite();
     const portraitWidth = this.getPortraitWidth() ?? 0;
     const portraitHeight = this.getPortraitHeight() ?? 0;
@@ -1160,6 +1165,8 @@ export default class Board {
         )
       );
     }
+
+    this.playWinFireSound();
   }
 
   private removeWinFire(): void {

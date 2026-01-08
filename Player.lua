@@ -118,6 +118,15 @@ function Player.prototype.anySelectedCards(self)
     end
     return false
 end
+function Player.prototype.getSelectedCards(self)
+    local selectedCards = {}
+    for ____, card in ipairs(self.hand) do
+        if card.isSelected then
+            selectedCards[#selectedCards + 1] = card
+        end
+    end
+    return selectedCards
+end
 function Player.prototype.cashout(self, points)
     if points < 0 then
         return
@@ -153,21 +162,21 @@ function Player.prototype.gatherExperience(self, exp)
 end
 function Player.prototype.getNextLevelExperience(self)
     repeat
-        local ____switch39 = self.level
-        local ____cond39 = ____switch39 == 1
-        if ____cond39 then
+        local ____switch43 = self.level
+        local ____cond43 = ____switch43 == 1
+        if ____cond43 then
             return 100
         end
-        ____cond39 = ____cond39 or ____switch39 == 2
-        if ____cond39 then
+        ____cond43 = ____cond43 or ____switch43 == 2
+        if ____cond43 then
             return 150
         end
-        ____cond39 = ____cond39 or ____switch39 == 3
-        if ____cond39 then
+        ____cond43 = ____cond43 or ____switch43 == 3
+        if ____cond43 then
             return 250
         end
-        ____cond39 = ____cond39 or ____switch39 == 4
-        if ____cond39 then
+        ____cond43 = ____cond43 or ____switch43 == 4
+        if ____cond43 then
             return 500
         end
         do

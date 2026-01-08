@@ -1,19 +1,23 @@
 import Asset from "../Asset";
 import FontWithPosition from "Assets/FontWithPosition";
-export interface ConstructionOptions {
+export interface AnimationOptions {
     readonly animDuration?: number;
     readonly onFinish?: () => void;
+    readonly waitForAnimationIds?: string[];
+    readonly stopAnimationCondition?: () => boolean;
 }
 export type AnimationAssets = Asset | FontWithPosition;
 export default abstract class Animation {
-    animDuration: number;
+    animDuration?: number;
     animElapsed: number;
     isAnimating: boolean;
     assets: AnimationAssets[];
     originalX: Map<string, number>;
     originalY: Map<string, number>;
     onFinish?: () => void;
-    constructor(assets: AnimationAssets[], constructionOptions?: ConstructionOptions);
+    waitForAnimationIds: string[];
+    stopAnimationCondition?: () => boolean;
+    constructor(assets: AnimationAssets[], constructionOptions?: AnimationOptions);
     updateAnimation(deltaTime: number): void;
     get isFinished(): boolean;
     getAssets(): AnimationAssets[];

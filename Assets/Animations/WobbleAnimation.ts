@@ -1,17 +1,20 @@
-import Animation, { AnimationAssets, ConstructionOptions } from "./Animation";
+import Animation, { AnimationAssets, AnimationOptions } from "./Animation";
 
 export default class WobbleAnimation extends Animation {
   wobbleAmount = 10; // Maximum wobble offset in pixels
   originalX: Map<string, number> = new Map<string, number>();
+  animDuration: number;
 
   constructor(
+    animDuration: number,
     wobbleAmount: number,
     assets: AnimationAssets[],
-    constructionOptions?: ConstructionOptions
+    constructionOptions?: AnimationOptions
   ) {
     super(assets, { onFinish: () => this.updateX(0), ...constructionOptions });
     this.originalX = new Map(assets.map((asset) => [asset.id, asset.x]));
     this.wobbleAmount = wobbleAmount;
+    this.animDuration = animDuration;
   }
 
   updateAnimation(deltaTime: number): void {

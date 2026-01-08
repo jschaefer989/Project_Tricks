@@ -8,6 +8,8 @@ local Suits = ____Enums.Suits
 local Ranks = ____Enums.Ranks
 local CharacterTypes = ____Enums.CharacterTypes
 local EdelRanks = ____Enums.EdelRanks
+local AnimationIds = ____Enums.AnimationIds
+local AssetIds = ____Enums.AssetIds
 local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local getRandomElementFromArray = ____Helpers.getRandomElementFromArray
@@ -41,6 +43,13 @@ local ____Emperor = require("Cards.Emperor")
 local Emperor = ____Emperor.default
 local ____Knight = require("Cards.Knight")
 local Knight = ____Knight.default
+local push = require("Libraries.push")
+local ____CardAssets = require("Assets.CardAssets")
+local cardWidth = ____CardAssets.cardWidth
+local cardHeight = ____CardAssets.cardHeight
+local padding = ____CardAssets.padding
+local ____SlideAnimation = require("Assets.Animations.SlideAnimation")
+local SlideAnimation = ____SlideAnimation.default
 local ____Pope = require("Cards.Pope")
 local Pope = ____Pope.default
 local ____Chosen = require("Cards.Chosen")
@@ -60,22 +69,62 @@ function Dealer.prototype.setup(self)
     end
     self.gameManager.player:deselectAllCards()
     self:initializeEnemyDeck()
+end
+function Dealer.prototype.dealEdel(self)
     self:dealCards(CharacterTypes.PLAYER)
     self:dealCards(CharacterTypes.ENEMY)
     self:determineEdelSuit()
 end
-function Dealer.prototype.startGame(self)
-    self.gameManager.player:putHandBackInDeck()
-    local ____opt_0 = self.gameManager.board
-    if ____opt_0 ~= nil then
-        ____opt_0.enemy:putHandBackInDeck()
+function Dealer.prototype.dealHand(self)
+    for ____, character in ipairs({CharacterTypes.PLAYER, CharacterTypes.ENEMY}) do
+        self:putHandBackInDeck(character)
+        self:convertToEdelSuitForCharacter(character)
+        ____exports.default:shuffle(self.gameManager, character)
+        self:dealCards(character)
     end
-    self:convertToEdelSuitForCharacter(CharacterTypes.PLAYER)
-    self:convertToEdelSuitForCharacter(CharacterTypes.ENEMY)
-    ____exports.default:shuffle(self.gameManager, CharacterTypes.PLAYER)
-    ____exports.default:shuffle(self.gameManager, CharacterTypes.ENEMY)
-    self:dealCards(CharacterTypes.PLAYER)
-    self:dealCards(CharacterTypes.ENEMY)
+end
+function Dealer.prototype.putHandBackInDeck(self, characterType)
+    local handBefore = self:getCharacterHand(characterType)
+    self:putCharacterHandBackInDeck(characterType)
+    self:startReturnToDeckAnimation(characterType, handBefore)
+end
+function Dealer.prototype.getCharacterHand(self, characterType)
+    repeat
+        local ____switch11 = characterType
+        local ____cond11 = ____switch11 == CharacterTypes.PLAYER
+        if ____cond11 then
+            return self.gameManager.player.hand
+        end
+        ____cond11 = ____cond11 or ____switch11 == CharacterTypes.ENEMY
+        if ____cond11 then
+            local ____opt_0 = self.gameManager.board
+            return ____opt_0 and ____opt_0.enemy.hand or ({})
+        end
+        do
+            exhaustiveGuard(characterType)
+        end
+    until true
+end
+function Dealer.prototype.putCharacterHandBackInDeck(self, characterType)
+    repeat
+        local ____switch13 = characterType
+        local ____cond13 = ____switch13 == CharacterTypes.PLAYER
+        if ____cond13 then
+            self.gameManager.player:putHandBackInDeck()
+            break
+        end
+        ____cond13 = ____cond13 or ____switch13 == CharacterTypes.ENEMY
+        if ____cond13 then
+            local ____opt_2 = self.gameManager.board
+            if ____opt_2 ~= nil then
+                ____opt_2.enemy:putHandBackInDeck()
+            end
+            break
+        end
+        do
+            exhaustiveGuard(characterType)
+        end
+    until true
 end
 function Dealer.initializePlayerDeck(self, gameManager)
     for ____, suit in ipairs(__TS__ObjectValues(Suits)) do
@@ -103,73 +152,73 @@ function Dealer.shuffle(self, gameManager, characterType)
 end
 function Dealer.getNewCard(self, gameManager, rank, suit)
     repeat
-        local ____switch16 = rank
-        local ____cond16 = ____switch16 == Ranks.BANNER
-        if ____cond16 then
+        local ____switch24 = rank
+        local ____cond24 = ____switch24 == Ranks.BANNER
+        if ____cond24 then
             return __TS__New(Banner, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == Ranks.BARON
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == Ranks.BARON
+        if ____cond24 then
             return __TS__New(Baron, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == Ranks.DEUCE
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == Ranks.DEUCE
+        if ____cond24 then
             return __TS__New(Deuce, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == Ranks.JESTER
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == Ranks.JESTER
+        if ____cond24 then
             return __TS__New(Jester, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == Ranks.KING
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == Ranks.KING
+        if ____cond24 then
             return __TS__New(King, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == Ranks.OVERLORD
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == Ranks.OVERLORD
+        if ____cond24 then
             return __TS__New(Overlord, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == Ranks.PRIEST
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == Ranks.PRIEST
+        if ____cond24 then
             return __TS__New(Priest, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == Ranks.SERGEANT
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == Ranks.SERGEANT
+        if ____cond24 then
             return __TS__New(Sergeant, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == Ranks.THIEF
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == Ranks.THIEF
+        if ____cond24 then
             return __TS__New(Thief, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == Ranks.SOLDIER
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == Ranks.SOLDIER
+        if ____cond24 then
             return __TS__New(Soldier, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == EdelRanks.BARD
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == EdelRanks.BARD
+        if ____cond24 then
             return __TS__New(Bard, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == EdelRanks.DEVIL
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == EdelRanks.DEVIL
+        if ____cond24 then
             return __TS__New(Devil, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == EdelRanks.DUKE
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == EdelRanks.DUKE
+        if ____cond24 then
             return __TS__New(Duke, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == EdelRanks.EMPEROR
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == EdelRanks.EMPEROR
+        if ____cond24 then
             return __TS__New(Emperor, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == EdelRanks.KNIGHT
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == EdelRanks.KNIGHT
+        if ____cond24 then
             return __TS__New(Knight, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == EdelRanks.POPE
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == EdelRanks.POPE
+        if ____cond24 then
             return __TS__New(Pope, gameManager, suit)
         end
-        ____cond16 = ____cond16 or ____switch16 == EdelRanks.CHOSEN
-        if ____cond16 then
+        ____cond24 = ____cond24 or ____switch24 == EdelRanks.CHOSEN
+        if ____cond24 then
             return __TS__New(Chosen, gameManager, suit)
         end
         do
@@ -188,23 +237,248 @@ function Dealer.prototype.dealCards(self, characterType)
         return
     end
     local cardsToDeal = character.numberOfHeldCards - #character.hand
-    do
-        local i = 0
-        while i < cardsToDeal do
-            local card = table.remove(character.deck)
-            if not isEmpty(card) then
-                character:addToHand(card)
-            end
-            i = i + 1
+    local deckPosition = self:getDeckPosition(characterType)
+    local finalCardCount = #character.hand + cardsToDeal
+    local dealtCount = 0
+    while dealtCount < cardsToDeal do
+        local card = table.remove(character.deck)
+        if isEmpty(card) then
+            break
         end
+        character:addToHand(card)
+        dealtCount = dealtCount + 1
+        local cardIndex = #character.hand - 1
+        local finalPosition = self:getFinalCardPosition(characterType, cardIndex, finalCardCount)
+        local ____opt_4 = self.gameManager.board
+        if ____opt_4 ~= nil then
+            ____opt_4.cardAssets:addAsset(card, deckPosition.x, deckPosition.y, characterType == CharacterTypes.PLAYER and not self.gameManager.board.showingEdelView)
+        end
+        self:startDealAnimation(card, finalPosition.x, finalPosition.y)
     end
-    local ____opt_2 = self.gameManager.board
-    if ____opt_2 ~= nil then
-        ____opt_2.cardAssets:centerCards(characterType)
-    end
+    self:redrawDeck(characterType)
     if characterType == CharacterTypes.ENEMY and not isEmpty(self.gameManager.board) then
         self.gameManager.board:addEnemyPower(self.gameManager.board.enemy:getCardPower())
         self.gameManager.board:addEnemyValue(self.gameManager.board.enemy:getCardValue())
+    end
+end
+function Dealer.prototype.redrawDeck(self, characterType)
+    repeat
+        local ____switch32 = characterType
+        local ____cond32 = ____switch32 == CharacterTypes.PLAYER
+        if ____cond32 then
+            self.gameManager.assetManager:removeAssets(AssetIds.PLAYER_DECK)
+            local ____opt_6 = self.gameManager.board
+            if ____opt_6 ~= nil then
+                ____opt_6:buildPlayerDeck()
+            end
+            break
+        end
+        ____cond32 = ____cond32 or ____switch32 == CharacterTypes.ENEMY
+        if ____cond32 then
+            self.gameManager.assetManager:removeAssets(AssetIds.ENEMY_DECK)
+            local ____opt_8 = self.gameManager.board
+            if ____opt_8 ~= nil then
+                ____opt_8:buildEnemyDeck()
+            end
+            break
+        end
+        do
+            exhaustiveGuard(characterType)
+        end
+    until true
+end
+function Dealer.prototype.discardCards(self, characterType, cards)
+    local character = self.gameManager:getCharacter(characterType)
+    if isEmpty(character) then
+        return
+    end
+    for ____, card in ipairs(cards) do
+        character:removeFromHand(card)
+        character:addToDiscards(card)
+    end
+    self:startDiscardAnimation(characterType, cards)
+end
+function Dealer.prototype.dealNextRound(self)
+    if isEmpty(self.gameManager.board) then
+        return
+    end
+    for ____, card in ipairs(self.gameManager.player:getSelectedCards()) do
+        self.gameManager.board.cardAssets:removeCardAssets(card)
+    end
+    self.gameManager.player:removeSelectedCardsFromHand()
+    self:dealCards(CharacterTypes.PLAYER)
+    for ____, card in ipairs(self.gameManager.board.enemy.hand) do
+        self.gameManager.board.cardAssets:removeCardAssets(card)
+    end
+    local ____opt_10 = self.gameManager.board
+    if ____opt_10 ~= nil then
+        ____opt_10.enemy:removeAllCardsFromHand()
+    end
+    self:dealCards(CharacterTypes.ENEMY)
+end
+function Dealer.prototype.getDeckPosition(self, characterType)
+    local screenW = push:getWidth()
+    local screenH = push:getHeight()
+    local ____opt_12 = self.gameManager.board
+    local portraitPosition = ____opt_12 and ____opt_12:getPortraitPosition(characterType)
+    repeat
+        local ____switch44 = characterType
+        local ____cond44 = ____switch44 == CharacterTypes.PLAYER
+        if ____cond44 then
+            return {x = screenW - 120, y = portraitPosition or screenH - 5}
+        end
+        ____cond44 = ____cond44 or ____switch44 == CharacterTypes.ENEMY
+        if ____cond44 then
+            return {x = screenW - 120, y = portraitPosition or 5}
+        end
+        do
+            exhaustiveGuard(characterType)
+        end
+    until true
+end
+function Dealer.prototype.getFinalCardPosition(self, characterType, cardIndex, totalCardCount)
+    local screenW = push:getWidth()
+    local screenH = push:getHeight()
+    local totalW = totalCardCount * cardWidth + math.max(0, totalCardCount - 1) * padding
+    local startX = math.floor((screenW - totalW) / 2)
+    local ____opt_14 = self.gameManager.board
+    local cardY = ____opt_14 and ____opt_14.cardAssets:getCardPosition(characterType) or (characterType == CharacterTypes.PLAYER and screenH - cardHeight - 20 or 20)
+    return {x = startX + cardIndex * (cardWidth + padding), y = cardY}
+end
+function Dealer.prototype.startDealAnimation(self, card, targetX, targetY)
+    if isEmpty(self.gameManager.board) then
+        return
+    end
+    local ____temp_16 = self.gameManager.board.cardAssets:getCardAssets(card)
+    local baseAsset = ____temp_16.baseAsset
+    local ____opt_17 = self.gameManager.board
+    local slideAssets = ____opt_17 and ____opt_17.cardAssets:getCardAssetList(card)
+    if #slideAssets == 0 then
+        return
+    end
+    local startX = baseAsset and baseAsset.x or 0
+    local startY = baseAsset and baseAsset.y or 0
+    local offsetX = targetX - startX
+    local offsetY = targetY - startY
+    self.gameManager.animationManager.animations:set(
+        AnimationIds.CARD_DEAL .. card.id,
+        __TS__New(
+            SlideAnimation,
+            self.gameManager.settings.dealerSpeed,
+            offsetX,
+            offsetY,
+            slideAssets,
+            {
+                waitForAnimationIds = self.gameManager.animationManager:getCardAnimationIds(),
+                onFinish = self.gameManager.board.showingEdelView and (function()
+                    local ____opt_23 = self.gameManager.board
+                    return ____opt_23 and ____opt_23:displayEdel()
+                end) or (function()
+                    local ____opt_25 = self.gameManager.board
+                    return ____opt_25 and ____opt_25:displayFight()
+                end)
+            }
+        )
+    )
+end
+function Dealer.prototype.startDiscardAnimation(self, characterType, cards)
+    if isEmpty(self.gameManager.board) or #cards == 0 then
+        return
+    end
+    local targetY = self:getDiscardPosition(characterType)
+    for ____, card in ipairs(cards) do
+        do
+            local ____temp_27 = self.gameManager.board.cardAssets:getCardAssets(card)
+            local baseAsset = ____temp_27.baseAsset
+            local ____opt_28 = self.gameManager.board
+            local slideAssets = ____opt_28 and ____opt_28.cardAssets:getCardAssetList(card)
+            if #slideAssets == 0 then
+                goto __continue53
+            end
+            local startY = baseAsset and baseAsset.y or 0
+            local offsetX = 0
+            local offsetY = targetY - startY
+            self.gameManager.animationManager:startAnimation(
+                AnimationIds.CARD_DISCARD .. card.id,
+                __TS__New(
+                    SlideAnimation,
+                    self.gameManager.settings.dealerSpeed,
+                    offsetX,
+                    offsetY,
+                    slideAssets,
+                    {
+                        onFinish = function() return self:finishUpAnimation(card) end,
+                        waitForAnimationIds = self.gameManager.animationManager:getCardAnimationIds()
+                    }
+                )
+            )
+        end
+        ::__continue53::
+    end
+end
+function Dealer.prototype.getDiscardPosition(self, characterType)
+    local screenH = push:getHeight()
+    repeat
+        local ____switch58 = characterType
+        local ____cond58 = ____switch58 == CharacterTypes.PLAYER
+        if ____cond58 then
+            return screenH + cardHeight + 40
+        end
+        ____cond58 = ____cond58 or ____switch58 == CharacterTypes.ENEMY
+        if ____cond58 then
+            return -cardHeight - 40
+        end
+        do
+            exhaustiveGuard(characterType)
+        end
+    until true
+end
+function Dealer.prototype.startReturnToDeckAnimation(self, characterType, cards)
+    if isEmpty(self.gameManager.board) or #cards == 0 then
+        return
+    end
+    local deckPosition = self:getDeckPosition(characterType)
+    for ____, card in ipairs(cards) do
+        do
+            local ____temp_32 = self.gameManager.board.cardAssets:getCardAssets(card)
+            local baseAsset = ____temp_32.baseAsset
+            local ____opt_33 = self.gameManager.board
+            local slideAssets = ____opt_33 and ____opt_33.cardAssets:getCardAssetList(card)
+            if #slideAssets == 0 then
+                goto __continue61
+            end
+            local startX = baseAsset and baseAsset.x or 0
+            local startY = baseAsset and baseAsset.y or 0
+            local offsetX = deckPosition.x - startX
+            local offsetY = deckPosition.y - startY
+            self.gameManager.animationManager:startAnimation(
+                AnimationIds.CARD_RETURN_TO_DECK .. card.id,
+                __TS__New(
+                    SlideAnimation,
+                    self.gameManager.settings.dealerSpeed,
+                    offsetX,
+                    offsetY,
+                    slideAssets,
+                    {
+                        onFinish = function() return self:finishUpAnimation(card) end,
+                        waitForAnimationIds = self.gameManager.animationManager:getCardAnimationIds()
+                    }
+                )
+            )
+        end
+        ::__continue61::
+    end
+end
+function Dealer.prototype.finishUpAnimation(self, card)
+    local ____opt_39 = self.gameManager.board
+    if ____opt_39 ~= nil then
+        ____opt_39.cardAssets:removeCardAssets(card)
+    end
+    if not self.gameManager.animationManager.hasAnimations then
+        local ____opt_41 = self.gameManager.board
+        if ____opt_41 ~= nil then
+            ____opt_41.cardAssets:disableAllCards(false)
+        end
     end
 end
 function Dealer.prototype.initializeEnemyDeck(self)
@@ -225,7 +499,7 @@ function Dealer.prototype.determineEdelSuit(self)
         return
     end
     local player = self.gameManager.player
-    local edelSuit = Suits.HEARTS
+    local edelCard = nil
     local lowestPower = 100
     do
         local index = 0
@@ -233,7 +507,7 @@ function Dealer.prototype.determineEdelSuit(self)
             local card = player.hand[index + 1]
             if index == 0 or card.power < lowestPower then
                 lowestPower = card.power
-                edelSuit = card.suit
+                edelCard = card
             end
             index = index + 1
         end
@@ -241,47 +515,70 @@ function Dealer.prototype.determineEdelSuit(self)
     for ____, card in ipairs(self.gameManager.board.enemy.hand) do
         if card.power < lowestPower then
             lowestPower = card.power
-            edelSuit = card.suit
+            edelCard = card
         end
     end
-    self.gameManager.board.edelSuit = edelSuit
+    self.gameManager.board.edelCard = edelCard
 end
 function Dealer.prototype.convertToEdelSuit(self, card)
     if isEmpty(self.gameManager.board) then
         return card
     end
-    if card.suit ~= self.gameManager.board.edelSuit then
+    local ____card_suit_45 = card.suit
+    local ____opt_43 = self.gameManager.board.edelCard
+    if ____card_suit_45 ~= (____opt_43 and ____opt_43.suit) then
         return card
     end
     repeat
-        local ____switch39 = card.rank
-        local ____cond39 = ____switch39 == Ranks.SOLDIER
-        if ____cond39 then
-            return __TS__New(Knight, self.gameManager, self.gameManager.board.edelSuit)
+        local ____switch82 = card.rank
+        local ____cond82 = ____switch82 == Ranks.SOLDIER
+        if ____cond82 then
+            local ____Knight_49 = Knight
+            local ____self_gameManager_48 = self.gameManager
+            local ____opt_46 = self.gameManager.board.edelCard
+            return __TS__New(____Knight_49, ____self_gameManager_48, ____opt_46 and ____opt_46.suit)
         end
-        ____cond39 = ____cond39 or ____switch39 == Ranks.BARON
-        if ____cond39 then
-            return __TS__New(Duke, self.gameManager, self.gameManager.board.edelSuit)
+        ____cond82 = ____cond82 or ____switch82 == Ranks.BARON
+        if ____cond82 then
+            local ____Duke_53 = Duke
+            local ____self_gameManager_52 = self.gameManager
+            local ____opt_50 = self.gameManager.board.edelCard
+            return __TS__New(____Duke_53, ____self_gameManager_52, ____opt_50 and ____opt_50.suit)
         end
-        ____cond39 = ____cond39 or ____switch39 == Ranks.JESTER
-        if ____cond39 then
-            return __TS__New(Bard, self.gameManager, self.gameManager.board.edelSuit)
+        ____cond82 = ____cond82 or ____switch82 == Ranks.JESTER
+        if ____cond82 then
+            local ____Bard_57 = Bard
+            local ____self_gameManager_56 = self.gameManager
+            local ____opt_54 = self.gameManager.board.edelCard
+            return __TS__New(____Bard_57, ____self_gameManager_56, ____opt_54 and ____opt_54.suit)
         end
-        ____cond39 = ____cond39 or ____switch39 == Ranks.DEUCE
-        if ____cond39 then
-            return __TS__New(Emperor, self.gameManager, self.gameManager.board.edelSuit)
+        ____cond82 = ____cond82 or ____switch82 == Ranks.DEUCE
+        if ____cond82 then
+            local ____Emperor_61 = Emperor
+            local ____self_gameManager_60 = self.gameManager
+            local ____opt_58 = self.gameManager.board.edelCard
+            return __TS__New(____Emperor_61, ____self_gameManager_60, ____opt_58 and ____opt_58.suit)
         end
-        ____cond39 = ____cond39 or ____switch39 == Ranks.PRIEST
-        if ____cond39 then
-            return __TS__New(Pope, self.gameManager, self.gameManager.board.edelSuit)
+        ____cond82 = ____cond82 or ____switch82 == Ranks.PRIEST
+        if ____cond82 then
+            local ____Pope_65 = Pope
+            local ____self_gameManager_64 = self.gameManager
+            local ____opt_62 = self.gameManager.board.edelCard
+            return __TS__New(____Pope_65, ____self_gameManager_64, ____opt_62 and ____opt_62.suit)
         end
-        ____cond39 = ____cond39 or ____switch39 == Ranks.THIEF
-        if ____cond39 then
-            return __TS__New(Devil, self.gameManager, self.gameManager.board.edelSuit)
+        ____cond82 = ____cond82 or ____switch82 == Ranks.THIEF
+        if ____cond82 then
+            local ____Devil_69 = Devil
+            local ____self_gameManager_68 = self.gameManager
+            local ____opt_66 = self.gameManager.board.edelCard
+            return __TS__New(____Devil_69, ____self_gameManager_68, ____opt_66 and ____opt_66.suit)
         end
-        ____cond39 = ____cond39 or ____switch39 == Ranks.SERGEANT
-        if ____cond39 then
-            return __TS__New(Chosen, self.gameManager, self.gameManager.board.edelSuit)
+        ____cond82 = ____cond82 or ____switch82 == Ranks.SERGEANT
+        if ____cond82 then
+            local ____Chosen_73 = Chosen
+            local ____self_gameManager_72 = self.gameManager
+            local ____opt_70 = self.gameManager.board.edelCard
+            return __TS__New(____Chosen_73, ____self_gameManager_72, ____opt_70 and ____opt_70.suit)
         end
         do
             return card
@@ -295,8 +592,10 @@ function Dealer.prototype.convertToEdelSuitForCharacter(self, characterType)
     end
     for ____, card in ipairs(character.deck) do
         do
-            if card.suit ~= self.gameManager.board.edelSuit then
-                goto __continue42
+            local ____card_suit_76 = card.suit
+            local ____opt_74 = self.gameManager.board.edelCard
+            if ____card_suit_76 ~= (____opt_74 and ____opt_74.suit) then
+                goto __continue85
             end
             local edelCard = self:convertToEdelSuit(card)
             if edelCard ~= card then
@@ -304,45 +603,68 @@ function Dealer.prototype.convertToEdelSuitForCharacter(self, characterType)
                 character:addToDeck(edelCard)
             end
         end
-        ::__continue42::
+        ::__continue85::
     end
 end
 function Dealer.prototype.convertBackToOriginalSuit(self, card)
     if isEmpty(self.gameManager.board) then
         return card
     end
-    if card.suit ~= self.gameManager.board.edelSuit then
+    local ____card_suit_79 = card.suit
+    local ____opt_77 = self.gameManager.board.edelCard
+    if ____card_suit_79 ~= (____opt_77 and ____opt_77.suit) then
         return card
     end
     repeat
-        local ____switch49 = card.rank
-        local ____cond49 = ____switch49 == EdelRanks.KNIGHT
-        if ____cond49 then
-            return __TS__New(Soldier, self.gameManager, self.gameManager.board.edelSuit)
+        local ____switch92 = card.rank
+        local ____cond92 = ____switch92 == EdelRanks.KNIGHT
+        if ____cond92 then
+            local ____Soldier_83 = Soldier
+            local ____self_gameManager_82 = self.gameManager
+            local ____opt_80 = self.gameManager.board.edelCard
+            return __TS__New(____Soldier_83, ____self_gameManager_82, ____opt_80 and ____opt_80.suit)
         end
-        ____cond49 = ____cond49 or ____switch49 == EdelRanks.DUKE
-        if ____cond49 then
-            return __TS__New(Baron, self.gameManager, self.gameManager.board.edelSuit)
+        ____cond92 = ____cond92 or ____switch92 == EdelRanks.DUKE
+        if ____cond92 then
+            local ____Baron_87 = Baron
+            local ____self_gameManager_86 = self.gameManager
+            local ____opt_84 = self.gameManager.board.edelCard
+            return __TS__New(____Baron_87, ____self_gameManager_86, ____opt_84 and ____opt_84.suit)
         end
-        ____cond49 = ____cond49 or ____switch49 == EdelRanks.BARD
-        if ____cond49 then
-            return __TS__New(Jester, self.gameManager, self.gameManager.board.edelSuit)
+        ____cond92 = ____cond92 or ____switch92 == EdelRanks.BARD
+        if ____cond92 then
+            local ____Jester_91 = Jester
+            local ____self_gameManager_90 = self.gameManager
+            local ____opt_88 = self.gameManager.board.edelCard
+            return __TS__New(____Jester_91, ____self_gameManager_90, ____opt_88 and ____opt_88.suit)
         end
-        ____cond49 = ____cond49 or ____switch49 == EdelRanks.EMPEROR
-        if ____cond49 then
-            return __TS__New(Deuce, self.gameManager, self.gameManager.board.edelSuit)
+        ____cond92 = ____cond92 or ____switch92 == EdelRanks.EMPEROR
+        if ____cond92 then
+            local ____Deuce_95 = Deuce
+            local ____self_gameManager_94 = self.gameManager
+            local ____opt_92 = self.gameManager.board.edelCard
+            return __TS__New(____Deuce_95, ____self_gameManager_94, ____opt_92 and ____opt_92.suit)
         end
-        ____cond49 = ____cond49 or ____switch49 == EdelRanks.POPE
-        if ____cond49 then
-            return __TS__New(Priest, self.gameManager, self.gameManager.board.edelSuit)
+        ____cond92 = ____cond92 or ____switch92 == EdelRanks.POPE
+        if ____cond92 then
+            local ____Priest_99 = Priest
+            local ____self_gameManager_98 = self.gameManager
+            local ____opt_96 = self.gameManager.board.edelCard
+            return __TS__New(____Priest_99, ____self_gameManager_98, ____opt_96 and ____opt_96.suit)
         end
-        ____cond49 = ____cond49 or ____switch49 == EdelRanks.DEVIL
-        if ____cond49 then
-            return __TS__New(Thief, self.gameManager, self.gameManager.board.edelSuit)
+        ____cond92 = ____cond92 or ____switch92 == EdelRanks.DEVIL
+        if ____cond92 then
+            local ____Thief_103 = Thief
+            local ____self_gameManager_102 = self.gameManager
+            local ____opt_100 = self.gameManager.board.edelCard
+            return __TS__New(____Thief_103, ____self_gameManager_102, ____opt_100 and ____opt_100.suit)
         end
-        ____cond49 = ____cond49 or ____switch49 == EdelRanks.CHOSEN
-        if ____cond49 then
-            return __TS__New(Sergeant, self.gameManager, self.gameManager.board.edelSuit)
+        ____cond92 = ____cond92 or ____switch92 == EdelRanks.CHOSEN
+        if ____cond92 then
+            local ____Sergeant_107 = Sergeant
+            local ____self_gameManager_106 = self.gameManager
+            local ____opt_104 = self.gameManager.board.edelCard
+            return __TS__New(____Sergeant_107, ____self_gameManager_106, ____opt_104 and ____opt_104.suit)
         end
         do
             return card
@@ -356,8 +678,10 @@ function Dealer.prototype.convertBackToOriginalSuitForCharacter(self, characterT
     end
     for ____, edelCard in ipairs(character.deck) do
         do
-            if edelCard.suit ~= self.gameManager.board.edelSuit then
-                goto __continue52
+            local ____edelCard_suit_110 = edelCard.suit
+            local ____opt_108 = self.gameManager.board.edelCard
+            if ____edelCard_suit_110 ~= (____opt_108 and ____opt_108.suit) then
+                goto __continue95
             end
             local originalCard = self:convertBackToOriginalSuit(edelCard)
             if originalCard ~= edelCard then
@@ -365,7 +689,7 @@ function Dealer.prototype.convertBackToOriginalSuitForCharacter(self, characterT
                 character:addToDeck(originalCard)
             end
         end
-        ::__continue52::
+        ::__continue95::
     end
 end
 function Dealer.prototype.getLootCards(self)
@@ -388,8 +712,8 @@ function Dealer.prototype.getLootCards(self)
     return self.lootCards
 end
 function Dealer.prototype.addLootCard(self, card)
-    local ____self_lootCards_4 = self.lootCards
-    ____self_lootCards_4[#____self_lootCards_4 + 1] = card
+    local ____self_lootCards_111 = self.lootCards
+    ____self_lootCards_111[#____self_lootCards_111 + 1] = card
 end
 function Dealer.prototype.hasLootCard(self, card)
     for ____, lootCard in ipairs(self.lootCards) do

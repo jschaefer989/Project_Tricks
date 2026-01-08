@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 import Perk, { PerkData } from "Perk";
+import Card from "Cards/Card";
 import Character from "./Character";
 import { Perks } from "Enums";
 import GameManager from "GameManager";
@@ -41,6 +42,7 @@ export default class Player extends Character {
     removeSelectedCardsFromHand(): void;
     discard(): void;
     anySelectedCards(): boolean;
+    getSelectedCards(): Card[];
     cashout(points: number): void;
     addMoney(amount: number): void;
     hasPerk(perkType: Perks): boolean;

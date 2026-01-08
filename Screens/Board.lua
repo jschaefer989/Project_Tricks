@@ -1,12 +1,12 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
+local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
 local ____Enums = require("Enums")
 local AssetIds = ____Enums.AssetIds
 local CharacterTypes = ____Enums.CharacterTypes
 local TextIds = ____Enums.TextIds
-local Suits = ____Enums.Suits
 local GameStates = ____Enums.GameStates
 local HoverEffects = ____Enums.HoverEffects
 local MousePressEffects = ____Enums.MousePressEffects
@@ -19,11 +19,11 @@ local ____CardAssets = require("Assets.CardAssets")
 local CardAssets = ____CardAssets.default
 local cardHeight = ____CardAssets.cardHeight
 local cardWidth = ____CardAssets.cardWidth
-local padding = ____CardAssets.padding
 local push = require("Libraries.push")
 local ____Asset = require("Assets.Asset")
 local Asset = ____Asset.default
 local ____Helpers = require("Helpers")
+local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
 local ____FontWithPosition = require("Assets.FontWithPosition")
 local FontWithPosition = ____FontWithPosition.default
@@ -40,6 +40,8 @@ local ____FlickerAnimation = require("Assets.Animations.FlickerAnimation")
 local FlickerAnimation = ____FlickerAnimation.default
 local ____SlideAnimation = require("Assets.Animations.SlideAnimation")
 local SlideAnimation = ____SlideAnimation.default
+local ____GlowAnimation = require("Assets.Animations.GlowAnimation")
+local GlowAnimation = ____GlowAnimation.default
 local portraitGap = 12
 ____exports.default = __TS__Class()
 local Board = ____exports.default
@@ -48,7 +50,6 @@ function Board.prototype.____constructor(self, gameManager, enemy)
     self.discardUsed = 0
     self.playerPoints = 0
     self.enemyPoints = 0
-    self.edelSuit = Suits.ACORNS
     self.playerPower = 0
     self.playerValue = 0
     self.enemyPower = 0
@@ -64,7 +65,7 @@ function Board.prototype.load(self, data)
     self.discardUsed = data.discardUsed
     self.playerPoints = data.playerPoints
     self.enemyPoints = data.enemyPoints
-    self.edelSuit = data.edelSuit
+    self.edelCard = data.edelCard
     self.playerPower = data.playerPower
     self.playerValue = data.playerValue
     self.enemyPower = data.enemyPower
@@ -83,7 +84,7 @@ function Board.prototype.save(self)
         playerPoints = self.playerPoints,
         enemyPoints = self.enemyPoints,
         enemy = self.enemy:save(),
-        edelSuit = self.edelSuit,
+        edelCard = self.edelCard,
         playerPower = self.playerPower,
         playerValue = self.playerValue,
         enemyPower = self.enemyPower,
@@ -109,16 +110,12 @@ function Board.prototype.handleStartFight(self)
     self.showingEdelView = false
     self.gameManager.assetManager:removeAssets(AssetIds.LETS_FIGHT_BUTTON)
     self.gameManager.assetManager.textManager:hideText(TextIds.LETS_FIGHT_BUTTON_CAPTION)
-    self.dealer:startGame()
-    self:buildFightAssets()
+    local ____opt_1 = self.gameManager.board
+    if ____opt_1 ~= nil then
+        ____opt_1.cardAssets:disableAllCards(true)
+    end
+    self.dealer:dealHand()
     self:hideEdelBoard()
-end
-function Board.prototype.buildFightAssets(self)
-    self:buildPrimaryButtons()
-    self:buildPointBoard()
-    local portraitHeight = self:getPortraitHeight() or 0
-    self:buildPowerAndValues(CharacterTypes.PLAYER, portraitHeight)
-    self:buildPowerAndValues(CharacterTypes.ENEMY, portraitHeight)
 end
 function Board.prototype.hideEdelBoard(self)
     self.gameManager.assetManager.textManager:hideText(TextIds.EDEL_LABEL)
@@ -130,114 +127,110 @@ function Board.prototype.handleAttack(self)
     if not self.gameManager.player:anySelectedCards() then
         return
     end
+    local ____opt_3 = self.gameManager.board
+    if ____opt_3 ~= nil then
+        ____opt_3.cardAssets:disableAllCards(true)
+    end
     if #self.enemy.deck == 0 then
         self:endFight()
         return
     end
     if self.playerPower > self.enemyPower then
-        for ____, card in ipairs(self.enemy.hand) do
-            self:startCutAnimation(card, CharacterTypes.PLAYER)
+        for ____, card in ipairs(self:getSlainCards(CharacterTypes.ENEMY)) do
+            self:startCutAnimation(card, CharacterTypes.PLAYER, CharacterTypes.ENEMY)
         end
         return
     else
-        for ____, card in ipairs(self.gameManager.player.hand) do
-            if card.isSelected then
-                self:startCutAnimation(card, CharacterTypes.ENEMY)
-            end
+        for ____, card in ipairs(self:getSlainCards(CharacterTypes.PLAYER)) do
+            self:startCutAnimation(card, CharacterTypes.ENEMY, CharacterTypes.PLAYER)
         end
     end
 end
-function Board.prototype.startCutAnimation(self, card, winner)
-    local ____temp_1 = self.cardAssets:getCardAssets(card)
-    local baseAsset = ____temp_1.baseAsset
-    local suitAssets = ____temp_1.suitAssets
-    local rankAsset = ____temp_1.rankAsset
+function Board.prototype.getSlainCards(self, characterType)
+    repeat
+        local ____switch21 = characterType
+        local ____cond21 = ____switch21 == CharacterTypes.PLAYER
+        if ____cond21 then
+            return __TS__ArrayFilter(
+                self.gameManager.player.hand,
+                function(____, card) return card.isSelected end
+            )
+        end
+        ____cond21 = ____cond21 or ____switch21 == CharacterTypes.ENEMY
+        if ____cond21 then
+            return self.enemy.hand
+        end
+        do
+            exhaustiveGuard(characterType)
+        end
+    until true
+end
+function Board.prototype.startCutAnimation(self, card, winner, loser)
+    local ____temp_5 = self.cardAssets:getCardAssets(card)
+    local baseAsset = ____temp_5.baseAsset
+    local suitAssets = ____temp_5.suitAssets
+    local rankAsset = ____temp_5.rankAsset
     local normalSuitAsset = suitAssets[1]
     local cutAnimationAssets = {}
-    local baseId = AnimationIds.CARD_BASE_CUT .. card.id
-    if not isEmpty(baseAsset) and not self.gameManager.animationManager.animations:has(baseId) then
+    if not isEmpty(baseAsset) then
         cutAnimationAssets[#cutAnimationAssets + 1] = baseAsset
     end
-    local rankAssetId = AnimationIds.CARD_RANK_CUT .. card.id
-    if not isEmpty(rankAsset) and not self.gameManager.animationManager.animations:has(rankAssetId) then
+    if not isEmpty(rankAsset) then
         cutAnimationAssets[#cutAnimationAssets + 1] = rankAsset
     end
     self.gameManager.animationManager.animations:set(
-        baseId,
+        AnimationIds.CARD_CUT .. card.id,
         __TS__New(
             CutAnimation,
+            0.15,
             0,
             -40,
             cutAnimationAssets,
-            {
-                onFinish = function() return self:startFlickerAnimation(card, winner) end,
-                animDuration = 0.25
-            }
+            {onFinish = function() return self:startFlickerAnimation(card, winner, loser) end}
         )
     )
     local slideAnimationAssets = {}
-    local normalSuitAssetId = AnimationIds.CARD_SUIT_NORMAL_CUT .. card.id
-    if not isEmpty(normalSuitAsset) and not self.gameManager.animationManager.animations:has(normalSuitAssetId) then
+    if not isEmpty(normalSuitAsset) then
         slideAnimationAssets[#slideAnimationAssets + 1] = normalSuitAsset
     end
     self.gameManager.animationManager.animations:set(
-        normalSuitAssetId,
+        AnimationIds.CARD_SUIT_SLIDE .. card.id,
         __TS__New(
             SlideAnimation,
+            0.15,
             0,
             -40,
             slideAnimationAssets,
-            {animDuration = 0.25, drawSeparately = true}
+            {drawSeparately = true}
         )
     )
 end
-function Board.prototype.startFlickerAnimation(self, card, winner)
-    local ____temp_2 = self.cardAssets:getCardAssets(card)
-    local baseAsset = ____temp_2.baseAsset
-    local suitAssets = ____temp_2.suitAssets
-    local rankAsset = ____temp_2.rankAsset
-    local normalSuitAsset = suitAssets[1]
-    local flippedSuitAsset = suitAssets[2]
-    local flickerAssets = {}
-    if not isEmpty(baseAsset) then
-        flickerAssets[#flickerAssets + 1] = baseAsset
-    end
-    if not isEmpty(rankAsset) then
-        flickerAssets[#flickerAssets + 1] = rankAsset
-    end
-    if not isEmpty(normalSuitAsset) then
-        flickerAssets[#flickerAssets + 1] = normalSuitAsset
-    end
-    if not isEmpty(flippedSuitAsset) then
-        flickerAssets[#flickerAssets + 1] = flippedSuitAsset
-    end
-    local flickerId = AnimationIds.CARD_BASE_FLICKER .. card.id
+function Board.prototype.startFlickerAnimation(self, card, winner, loser)
     self.gameManager.animationManager.animations:set(
-        flickerId,
+        AnimationIds.CARD_FLICKER .. card.id,
         __TS__New(
             FlickerAnimation,
-            flickerAssets,
+            self.cardAssets:getCardAssetList(card),
             {
-                onFinish = function() return self:dealNextRound(winner) end,
+                onFinish = function() return self:wrapUpAttack(winner, loser) end,
                 animDuration = 0.6
             }
         )
     )
 end
-function Board.prototype.dealNextRound(self, winner)
+function Board.prototype.wrapUpAttack(self, winner, loser)
     if self.gameManager.animationManager:hasAnimations() then
         return
     end
-    if winner == CharacterTypes.PLAYER then
-        self:addPlayerPoints(self:getPlayerPoints())
-    else
-        self:addEnemyPoints(self:getEnemyPoints())
-    end
-    self.gameManager.player:removeSelectedCardsFromHand()
-    self.dealer:dealCards(CharacterTypes.PLAYER)
-    self.enemy:removeAllCardsFromHand()
+    self:hideSlainCards(loser)
+    self:addPoints(winner)
+    self.dealer:dealNextRound()
     self:clearEnemyStats()
-    self.dealer:dealCards(CharacterTypes.ENEMY)
+end
+function Board.prototype.hideSlainCards(self, characterType)
+    for ____, card in ipairs(self:getSlainCards(characterType)) do
+        self.cardAssets:removeCardAssets(card)
+    end
 end
 function Board.prototype.addPlayerPoints(self, points)
     self.playerPoints = self.playerPoints + points
@@ -246,12 +239,73 @@ function Board.prototype.addPlayerPoints(self, points)
         (self.gameManager.player.name .. ": ") .. tostring(self.playerPoints)
     )
 end
+function Board.prototype.getAllCardsInPlay(self)
+    local cardsInPlay = {}
+    for ____, card in ipairs(self.gameManager.player.hand) do
+        cardsInPlay[#cardsInPlay + 1] = card
+    end
+    for ____, card in ipairs(self.enemy.hand) do
+        cardsInPlay[#cardsInPlay + 1] = card
+    end
+    return cardsInPlay
+end
+function Board.prototype.addPoints(self, winner)
+    repeat
+        local ____switch42 = winner
+        local ____cond42 = ____switch42 == CharacterTypes.PLAYER
+        if ____cond42 then
+            self:addPlayerPoints(self:getPlayerPoints())
+            break
+        end
+        ____cond42 = ____cond42 or ____switch42 == CharacterTypes.ENEMY
+        if ____cond42 then
+            self:addEnemyPoints(self:getEnemyPoints())
+            break
+        end
+        do
+            exhaustiveGuard(winner)
+        end
+    until true
+end
 function Board.prototype.addEnemyPoints(self, points)
     self.enemyPoints = self.enemyPoints + points
     self.gameManager.assetManager.textManager:updateText(
         TextIds.POINTS_ENEMY,
         (self.enemy.name .. ": ") .. tostring(self.enemyPoints)
     )
+end
+function Board.prototype.displayEdel(self)
+    if self.gameManager.animationManager:hasAnimations() then
+        return
+    end
+    self.cardAssets:disableAllCards(false)
+    self:buildLetsFightButton()
+    self:buildEdelBoard()
+    if not isEmpty(self.edelCard) then
+        self.gameManager.animationManager:startAnimation(
+            AnimationIds.EDEL_CARD,
+            __TS__New(
+                GlowAnimation,
+                function()
+                    local ____opt_6 = self.gameManager.board
+                    return not (____opt_6 and ____opt_6.showingEdelView)
+                end,
+                {unpack(self.cardAssets:getCardAssetList(self.edelCard))},
+                {glowPeriodSeconds = 3}
+            )
+        )
+    end
+end
+function Board.prototype.displayFight(self)
+    if self.gameManager.animationManager:hasAnimations() then
+        return
+    end
+    self.cardAssets:disableAllCards(false)
+    self:buildPrimaryButtons()
+    self:buildPointBoard()
+    local portraitHeight = self:getPortraitHeight() or 0
+    self:buildPowerAndValues(CharacterTypes.PLAYER, portraitHeight)
+    self:buildPowerAndValues(CharacterTypes.ENEMY, portraitHeight)
 end
 function Board.prototype.handleDiscard(self)
     if not self.gameManager.player:anySelectedCards() then
@@ -260,6 +314,14 @@ function Board.prototype.handleDiscard(self)
     if self:getRemainingDiscards() <= 0 then
         return
     end
+    local ____opt_8 = self.gameManager.board
+    if ____opt_8 ~= nil then
+        ____opt_8.cardAssets:disableAllCards(true)
+    end
+    self.dealer:discardCards(
+        CharacterTypes.PLAYER,
+        self.gameManager.player:getSelectedCards()
+    )
     self.gameManager.player:discard()
     self.discardUsed = self.discardUsed + 1
     local remaining = self:getRemainingDiscards()
@@ -272,9 +334,9 @@ function Board.prototype.handleDiscard(self)
         self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_CAPTION)
         self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_COUNTER)
     end
-    local ____opt_3 = self.gameManager.board
-    if ____opt_3 ~= nil then
-        ____opt_3.dealer:dealCards(CharacterTypes.PLAYER)
+    local ____opt_10 = self.gameManager.board
+    if ____opt_10 ~= nil then
+        ____opt_10.dealer:dealCards(CharacterTypes.PLAYER)
     end
 end
 function Board.prototype.getRemainingDiscards(self)
@@ -320,7 +382,6 @@ function Board.prototype.addPlayerPower(self, power)
         tostring(self.playerPower)
     )
     if self.playerPower > self.enemyPower then
-        self:playWinFireSound()
         self:buildWinFire()
     else
         self:removeWinFire()
@@ -351,41 +412,12 @@ function Board.prototype.addEnemyValue(self, value)
         tostring(self.enemyValue)
     )
 end
-function Board.prototype.buildAssets(self)
-    self:buildBackground()
-    self:buildCardAssets()
+function Board.prototype.start(self)
     self:buildPlayerPortrait()
     self:buildEnemyPortrait()
     self:buildPlayerDeck()
     self:buildEnemyDeck()
-    if self.showingEdelView then
-        self:buildLetsFightButton()
-        self:buildEdelBoard()
-    else
-        self:buildFightAssets()
-    end
-end
-function Board.prototype.buildCardAssets(self)
-    local playerCardPosition = self.cardAssets:determineCardStartingPosition(CharacterTypes.PLAYER)
-    do
-        local i = 0
-        while i < #self.gameManager.player.hand do
-            local card = self.gameManager.player.hand[i + 1]
-            local x = playerCardPosition.x + i * (cardWidth + padding)
-            self.cardAssets:addAsset(card, x, playerCardPosition.y, not self.showingEdelView)
-            i = i + 1
-        end
-    end
-    local enemyCardPosition = self.cardAssets:determineCardStartingPosition(CharacterTypes.ENEMY)
-    do
-        local i = 0
-        while i < #self.enemy.hand do
-            local card = self.enemy.hand[i + 1]
-            local x = enemyCardPosition.x + i * (cardWidth + padding)
-            self.cardAssets:addAsset(card, x, enemyCardPosition.y, false)
-            i = i + 1
-        end
-    end
+    self.dealer:dealEdel()
 end
 function Board.prototype.buildLetsFightButton(self)
     local buttonHeight = 87
@@ -620,13 +652,13 @@ function Board.prototype.buildPointBoard(self)
     )
 end
 function Board.prototype.buildPowerAndValues(self, characterType, portraitHeight)
-    local ____temp_5
+    local ____temp_12
     if characterType == CharacterTypes.PLAYER then
-        ____temp_5 = self.gameManager.assetManager.textManager:getText(TextIds.PLAYER_PORTRAIT_LEVEL)
+        ____temp_12 = self.gameManager.assetManager.textManager:getText(TextIds.PLAYER_PORTRAIT_LEVEL)
     else
-        ____temp_5 = self.gameManager.assetManager.textManager:getText(TextIds.ENEMY_PORTRAIT_LEVEL)
+        ____temp_12 = self.gameManager.assetManager.textManager:getText(TextIds.ENEMY_PORTRAIT_LEVEL)
     end
-    local levelText = ____temp_5
+    local levelText = ____temp_12
     if isEmpty(levelText) then
         return
     end
@@ -805,35 +837,39 @@ function Board.prototype.buildPortrait(self, characterType)
     end
 end
 function Board.prototype.buildPlayerDeck(self)
-    local portraitPosition = self:getPortraitPosition(CharacterTypes.PLAYER)
+    local deckPosition = self.dealer:getDeckPosition(CharacterTypes.PLAYER)
     self.gameManager.assetManager:addAsset(
         AssetIds.PLAYER_DECK,
         __TS__New(
             Asset,
             AssetIds.PLAYER_DECK,
             love.graphics.newImage("Assets/Images/BaseCardBack.png"),
-            push:getWidth() - cardWidth - 5,
-            portraitPosition,
+            deckPosition.x,
+            deckPosition.y,
             cardWidth,
             cardHeight
         )
     )
 end
 function Board.prototype.buildEnemyDeck(self)
+    local deckPosition = self.dealer:getDeckPosition(CharacterTypes.ENEMY)
     self.gameManager.assetManager:addAsset(
         AssetIds.ENEMY_DECK,
         __TS__New(
             Asset,
             AssetIds.ENEMY_DECK,
             love.graphics.newImage("Assets/Images/BaseCardBack.png"),
-            push:getWidth() - cardWidth - 5,
-            5,
+            deckPosition.x,
+            deckPosition.y,
             cardWidth,
             cardHeight
         )
     )
 end
 function Board.prototype.buildEdelBoard(self)
+    if isEmpty(self.edelCard) then
+        return
+    end
     local boardWidth = 149
     local boardHeight = 23
     local screenW = push:getWidth()
@@ -858,11 +894,11 @@ function Board.prototype.buildEdelBoard(self)
             TextIds.EDEL_LABEL,
             centerX,
             18,
-            Card:getSuitName(self.edelSuit),
+            Card:getSuitName(self.edelCard.suit),
             {size = 16, format = Format.CENTER, font = Fonts.ELOQUENT}
         )
     )
-    local suitImage = love.graphics.newImage(CardAssets:getSuitAssetPath(self.edelSuit))
+    local suitImage = love.graphics.newImage(CardAssets:getSuitAssetPath(self.edelCard.suit))
     self.gameManager.assetManager:addAsset(
         AssetIds.EDEL_SUIT_ICON_LEFT,
         __TS__New(
@@ -888,26 +924,15 @@ function Board.prototype.buildEdelBoard(self)
         )
     )
 end
-function Board.prototype.buildBackground(self)
-    self.gameManager.assetManager:addAsset(
-        AssetIds.BACKGROUND,
-        __TS__New(
-            Asset,
-            AssetIds.BACKGROUND,
-            love.graphics.newImage(self.gameManager.biome.boardBackgroundImagePath),
-            0,
-            0,
-            640,
-            360
-        )
-    )
-end
 function Board.prototype.playWinFireSound(self)
     if not self.winFireSound:isPlaying() then
         self.winFireSound:play()
     end
 end
 function Board.prototype.buildWinFire(self)
+    if self.gameManager.assetManager:hasAssets(AssetIds.BASIC_WIN_FIRE) then
+        return
+    end
     local fireSprite = self:getWinFireSprite()
     local portraitWidth = self:getPortraitWidth() or 0
     local portraitHeight = self:getPortraitHeight() or 0
@@ -966,6 +991,7 @@ function Board.prototype.buildWinFire(self)
             )
         )
     end
+    self:playWinFireSound()
 end
 function Board.prototype.removeWinFire(self)
     self.gameManager.assetManager:removeAssets(AssetIds.BASIC_WIN_FIRE)

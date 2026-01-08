@@ -91,36 +91,21 @@ function Card.prototype.onSelect(self)
     self.isSelected = true
     self.gameManager.board:addPlayerPower(self.power)
     self.gameManager.board:addPlayerValue(self.value)
-    local ____temp_1 = self.gameManager.board.cardAssets:getCardAssets(self)
-    local baseAsset = ____temp_1.baseAsset
-    local suitAssets = ____temp_1.suitAssets
-    local rankAsset = ____temp_1.rankAsset
-    local suitAssetNormal = suitAssets[1]
-    local suitAssetFlipped = suitAssets[2]
-    local animationAssets = {}
-    local baseId = AnimationIds.CARD_BASE_SELECT .. self.id
-    if not isEmpty(baseAsset) and not self.gameManager.animationManager.animations:has(baseId) then
-        animationAssets[#animationAssets + 1] = baseAsset
-    end
-    local suitNormalId = AnimationIds.CARD_SUIT_NORMAL_SELECT .. self.id
-    if not isEmpty(suitAssetNormal) and not self.gameManager.animationManager.animations:has(suitNormalId) then
-        animationAssets[#animationAssets + 1] = suitAssetNormal
-    end
-    local suitFlippedId = AnimationIds.CARD_SUIT_FLIPPED_SELECT .. self.id
-    if not isEmpty(suitAssetFlipped) and not self.gameManager.animationManager.animations:has(suitFlippedId) then
-        animationAssets[#animationAssets + 1] = suitAssetFlipped
-    end
-    local rankAssetId = AnimationIds.CARD_RANK_SELECT .. self.id
-    if not isEmpty(rankAsset) and not self.gameManager.animationManager.animations:has(rankAssetId) then
-        animationAssets[#animationAssets + 1] = rankAsset
-    end
+    local ____opt_1 = self.gameManager.board
+    local slideAssets = ____opt_1 and ____opt_1.cardAssets:getCardAssetList(self)
     self.gameManager.animationManager.animations:set(
-        baseId,
-        __TS__New(SlideAnimation, 0, -20, animationAssets)
+        AnimationIds.CARD_SELECT .. self.id,
+        __TS__New(
+            SlideAnimation,
+            0.15,
+            0,
+            -20,
+            slideAssets
+        )
     )
-    local ____opt_2 = self.gameManager.board
-    if ____opt_2 ~= nil then
-        ____opt_2:updatePrimaryButtonStates()
+    local ____opt_3 = self.gameManager.board
+    if ____opt_3 ~= nil then
+        ____opt_3:updatePrimaryButtonStates()
     end
 end
 function Card.prototype.onUnselect(self)
@@ -130,36 +115,21 @@ function Card.prototype.onUnselect(self)
     self.isSelected = false
     self.gameManager.board:addPlayerPower(-self.power)
     self.gameManager.board:addPlayerValue(-self.value)
-    local ____temp_4 = self.gameManager.board.cardAssets:getCardAssets(self)
-    local baseAsset = ____temp_4.baseAsset
-    local suitAssets = ____temp_4.suitAssets
-    local rankAsset = ____temp_4.rankAsset
-    local suitAssetNormal = suitAssets[1]
-    local suitAssetFlipped = suitAssets[2]
-    local animationAssets = {}
-    local baseId = AnimationIds.CARD_BASE_SELECT .. self.id
-    if not isEmpty(baseAsset) and not self.gameManager.animationManager.animations:has(baseId) then
-        animationAssets[#animationAssets + 1] = baseAsset
-    end
-    local suitNormalId = AnimationIds.CARD_SUIT_NORMAL_SELECT .. self.id
-    if not isEmpty(suitAssetNormal) and not self.gameManager.animationManager.animations:has(suitNormalId) then
-        animationAssets[#animationAssets + 1] = suitAssetNormal
-    end
-    local suitFlippedId = AnimationIds.CARD_SUIT_FLIPPED_SELECT .. self.id
-    if not isEmpty(suitAssetFlipped) and not self.gameManager.animationManager.animations:has(suitFlippedId) then
-        animationAssets[#animationAssets + 1] = suitAssetFlipped
-    end
-    local rankAssetId = AnimationIds.CARD_RANK_SELECT .. self.id
-    if not isEmpty(rankAsset) and not self.gameManager.animationManager.animations:has(rankAssetId) then
-        animationAssets[#animationAssets + 1] = rankAsset
-    end
-    self.gameManager.animationManager.animations:set(
-        baseId,
-        __TS__New(SlideAnimation, 0, 20, animationAssets)
-    )
     local ____opt_5 = self.gameManager.board
-    if ____opt_5 ~= nil then
-        ____opt_5:updatePrimaryButtonStates()
+    local slideAssets = ____opt_5 and ____opt_5.cardAssets:getCardAssetList(self)
+    self.gameManager.animationManager.animations:set(
+        AnimationIds.CARD_SELECT .. self.id,
+        __TS__New(
+            SlideAnimation,
+            0.15,
+            0,
+            20,
+            slideAssets
+        )
+    )
+    local ____opt_7 = self.gameManager.board
+    if ____opt_7 ~= nil then
+        ____opt_7:updatePrimaryButtonStates()
     end
 end
 function Card.prototype.onHover(self, asset)
@@ -197,21 +167,21 @@ function Card.prototype.onUnhover(self, asset)
 end
 function Card.getSuitName(self, suit)
     repeat
-        local ____switch26 = suit
-        local ____cond26 = ____switch26 == Suits.HEARTS
-        if ____cond26 then
+        local ____switch18 = suit
+        local ____cond18 = ____switch18 == Suits.HEARTS
+        if ____cond18 then
             return "Hearts"
         end
-        ____cond26 = ____cond26 or ____switch26 == Suits.ACORNS
-        if ____cond26 then
+        ____cond18 = ____cond18 or ____switch18 == Suits.ACORNS
+        if ____cond18 then
             return "Acorns"
         end
-        ____cond26 = ____cond26 or ____switch26 == Suits.LEAVES
-        if ____cond26 then
+        ____cond18 = ____cond18 or ____switch18 == Suits.LEAVES
+        if ____cond18 then
             return "Leaves"
         end
-        ____cond26 = ____cond26 or ____switch26 == Suits.BELLS
-        if ____cond26 then
+        ____cond18 = ____cond18 or ____switch18 == Suits.BELLS
+        if ____cond18 then
             return "Bells"
         end
         do

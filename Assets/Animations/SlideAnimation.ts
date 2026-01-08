@@ -1,7 +1,6 @@
-import Asset from "Assets/Asset";
-import Animation, { AnimationAssets } from "./Animation";
+import Animation, { AnimationAssets, AnimationOptions } from "./Animation";
 
-interface ConstructionOptions {
+interface ConstructionOptions extends AnimationOptions {
   readonly animDuration?: number;
   readonly drawSeparately?: boolean;
 }
@@ -11,8 +10,10 @@ export default class SlideAnimation extends Animation {
   animOffsetY: number = 0; // Current animation offset
   animTargetOffsetX: number = 0; // Target animation offset
   animTargetOffsetY: number = 0; // Target animation offset (e.g., -20 for up)
+  animDuration: number;
 
   constructor(
+    animDuration: number,
     offsetX: number,
     offsetY: number,
     assets: AnimationAssets[],
@@ -21,6 +22,7 @@ export default class SlideAnimation extends Animation {
     super(assets, constructionOptions);
     this.animTargetOffsetX = offsetX;
     this.animTargetOffsetY = offsetY;
+    this.animDuration = animDuration;
   }
 
   updateAnimation(deltaTime: number): void {

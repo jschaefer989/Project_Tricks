@@ -1,19 +1,19 @@
 import Asset from "Assets/Asset";
-import { AnimationAssets, ConstructionOptions } from "./Animation";
+import { AnimationAssets, AnimationOptions } from "./Animation";
 import SlideAnimation from "./SlideAnimation";
 import QuadWithPosition from "Assets/QuadWithPosition";
-import { isEmpty } from "Helpers";
 
 export default class CutAnimation extends SlideAnimation {
     topQuads: QuadWithPosition[] = []
 
   constructor(
+    animDuration: number,
     offsetX: number,
     offsetY: number,
     animationAssets: AnimationAssets[],
-    constructionOptions?: ConstructionOptions
+    constructionOptions?: AnimationOptions
   ) {
-    super(offsetX, offsetY, animationAssets, constructionOptions);
+    super(animDuration, offsetX, offsetY, animationAssets, constructionOptions);
 
     for (const asset of this.assets) {
         if (!(asset instanceof Asset)) {

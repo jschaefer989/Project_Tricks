@@ -16,32 +16,33 @@ end
 function Character.prototype.addToHand(self, card)
     local ____self_hand_0 = self.hand
     ____self_hand_0[#____self_hand_0 + 1] = card
-    local ____opt_1 = self.gameManager.board
-    if ____opt_1 ~= nil then
-        ____opt_1.cardAssets:appendAsset(card, self.type)
+end
+function Character.prototype.removeFromHand(self, card)
+    do
+        local index = 0
+        while index < #self.hand do
+            local otherCard = self.hand[index + 1]
+            if card:isEqual(otherCard) then
+                __TS__ArraySplice(self.hand, index, 1)
+                break
+            end
+            index = index + 1
+        end
     end
 end
 function Character.prototype.getCardFromHand(self, position)
     return self.hand[position + 1]
 end
 function Character.prototype.addToDeck(self, card)
-    local ____self_deck_3 = self.deck
-    ____self_deck_3[#____self_deck_3 + 1] = card
-    local ____opt_4 = self.gameManager.board
-    if ____opt_4 ~= nil then
-        ____opt_4.cardAssets:removeCardAssets(card)
-    end
+    local ____self_deck_1 = self.deck
+    ____self_deck_1[#____self_deck_1 + 1] = card
 end
 function Character.prototype.getCardFromDeck(self, position)
     return self.deck[position + 1]
 end
 function Character.prototype.addToDiscards(self, card)
-    local ____self_discardPile_6 = self.discardPile
-    ____self_discardPile_6[#____self_discardPile_6 + 1] = card
-    local ____opt_7 = self.gameManager.board
-    if ____opt_7 ~= nil then
-        ____opt_7.cardAssets:removeCardAssets(card)
-    end
+    local ____self_discardPile_2 = self.discardPile
+    ____self_discardPile_2[#____self_discardPile_2 + 1] = card
 end
 function Character.prototype.getCardFromDiscards(self, position)
     return self.discardPile[position + 1]
@@ -97,11 +98,8 @@ end
 function Character.prototype.putHandBackInDeck(self)
     local board = self.gameManager.board
     for ____, card in ipairs(self.hand) do
-        local ____self_deck_9 = self.deck
-        ____self_deck_9[#____self_deck_9 + 1] = card
-        if board ~= nil then
-            board.cardAssets:removeCardAssets(card)
-        end
+        local ____self_deck_3 = self.deck
+        ____self_deck_3[#____self_deck_3 + 1] = card
     end
     self.hand = {}
 end

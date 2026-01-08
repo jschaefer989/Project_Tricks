@@ -1,5 +1,5 @@
-import Animation, { AnimationAssets } from "./Animation";
-interface ConstructionOptions {
+import Animation, { AnimationAssets, AnimationOptions } from "./Animation";
+interface ConstructionOptions extends AnimationOptions {
     readonly animDuration?: number;
     readonly drawSeparately?: boolean;
 }
@@ -8,7 +8,8 @@ export default class SlideAnimation extends Animation {
     animOffsetY: number;
     animTargetOffsetX: number;
     animTargetOffsetY: number;
-    constructor(offsetX: number, offsetY: number, assets: AnimationAssets[], constructionOptions?: ConstructionOptions);
+    animDuration: number;
+    constructor(animDuration: number, offsetX: number, offsetY: number, assets: AnimationAssets[], constructionOptions?: ConstructionOptions);
     updateAnimation(deltaTime: number): void;
     calculateAnimationOffset(): void;
 }

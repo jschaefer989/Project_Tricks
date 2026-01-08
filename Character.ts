@@ -20,8 +20,17 @@ export default class Character {
     }
 
     addToHand(card: Card): void {
-        this.hand.push(card)
-        this.gameManager.board?.cardAssets.appendAsset(card, this.type)        
+        this.hand.push(card)   
+    }
+
+    removeFromHand(card: Card): void {      
+        for (let index = 0; index < this.hand.length; index++) {
+            const otherCard = this.hand[index]
+            if (card.isEqual(otherCard)) {
+                this.hand.splice(index, 1)
+                break
+            }
+        }
     }
 
     getCardFromHand(position: number): Card | undefined {
@@ -30,7 +39,6 @@ export default class Character {
 
     addToDeck(card: Card): void {
         this.deck.push(card)
-        this.gameManager.board?.cardAssets.removeCardAssets(card)
     }
 
     getCardFromDeck(position: number): Card | undefined {
@@ -38,8 +46,7 @@ export default class Character {
     }
 
     addToDiscards(card: Card): void {
-        this.discardPile.push(card)        
-        this.gameManager.board?.cardAssets.removeCardAssets(card)
+        this.discardPile.push(card)  
     }
 
     getCardFromDiscards(position: number): Card | undefined {
@@ -98,7 +105,6 @@ export default class Character {
         // Hide all card assets first without centering
         for (const card of this.hand) {
             this.deck.push(card)
-            board?.cardAssets.removeCardAssets(card)
         }
         
         this.hand = []

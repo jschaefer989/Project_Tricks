@@ -13,6 +13,7 @@ Asset.name = "Asset"
 function Asset.prototype.____constructor(self, id, image, x, y, width, height, constructionOptions)
     self.quads = {}
     self.isDisabled = false
+    self.useDisabledAnimation = true
     self.isHovered = false
     self.isPressed = false
     self.color = {1, 1, 1, 1}
@@ -37,6 +38,11 @@ function Asset.prototype.____constructor(self, id, image, x, y, width, height, c
         ____temp_20 = false
     end
     self.isDisabled = ____temp_20
+    local ____temp_23 = constructionOptions and constructionOptions.useDisabledAnimation
+    if ____temp_23 == nil then
+        ____temp_23 = true
+    end
+    self.useDisabledAnimation = ____temp_23
     self.clickSound = constructionOptions and constructionOptions.clickSound
     self.associatedTexts = constructionOptions and constructionOptions.associatedTexts
     self.hoverEffect = constructionOptions and constructionOptions.hoverEffect or ({HoverEffects.NONE})

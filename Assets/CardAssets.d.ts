@@ -30,13 +30,13 @@ export default class CardAssets {
     static getRankAssetId(card: Card, orientation: number): string;
     removeCardAssets(card: Card): void;
     hideCardAssets(card: Card): void;
-    centerCards(characterType: CharacterTypes): void;
-    updateCardPosition(card: Card, x: number, y: number): void;
     getRankAsset(card: Card): Asset | undefined;
     getCardPosition(characterType: CharacterTypes): number;
     getHeightModifier(characterType: CharacterTypes): number;
     determineCardStartingPosition(characterType: CharacterTypes): Point;
     appendAsset(card: Card, characterType: CharacterTypes): void;
     getCardAssets(card: Card): AssetsForCard;
+    getCardAssetList(card: Card): Asset[];
+    disableAllCards(disable: boolean): void;
 }
 export {};

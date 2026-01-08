@@ -1,10 +1,11 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
+local Map = ____lualib.Map
 local __TS__ArrayFind = ____lualib.__TS__ArrayFind
 local __TS__ArrayFindIndex = ____lualib.__TS__ArrayFindIndex
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
+local __TS__ArraySome = ____lualib.__TS__ArraySome
 local __TS__Iterator = ____lualib.__TS__Iterator
 local ____exports = {}
 local push = require("Libraries.push")
@@ -21,10 +22,10 @@ local AssetManager = ____exports.default
 AssetManager.name = "AssetManager"
 function AssetManager.prototype.____constructor(self, gameManager)
     self.assets = __TS__New(Map)
-    self.tooltipManager = __TS__New(TooltipManager)
     self.textManager = __TS__New(TextManager)
     self.disabledSound = love.audio.newSource("Assets/Sounds/Disabled.wav", "static")
     self.gameManager = gameManager
+    self.tooltipManager = __TS__New(TooltipManager, gameManager)
 end
 function AssetManager.prototype.addAsset(self, id, asset)
     if self.assets:has(id) then
@@ -78,17 +79,30 @@ function AssetManager.prototype.enableAsset(self, baseId)
         end
     end
 end
+function AssetManager.prototype.hasAssets(self, baseId)
+    return self.assets:has(baseId)
+end
+function AssetManager.prototype.hasAsset(self, baseId, assetId)
+    local assets = self:getAssets(baseId)
+    if isEmpty(assets) then
+        return false
+    end
+    return __TS__ArraySome(
+        assets,
+        function(____, asset) return asset.id == assetId end
+    )
+end
 function AssetManager.prototype.drawAssets(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue22
+                goto __continue26
             end
             for ____, asset in ipairs(assets) do
                 asset:drawAsset()
             end
         end
-        ::__continue22::
+        ::__continue26::
     end
     self.textManager:drawText()
     self.tooltipManager:drawTooltips()
@@ -101,16 +115,19 @@ function AssetManager.prototype.handleMousePressed(self, x, y, button)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue29
+                goto __continue33
             end
             local asset = assets[1]
+            if asset.isHidden then
+                goto __continue33
+            end
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
                 for ____, a in ipairs(assets) do
                     a:setMousePressed(true)
                 end
             end
         end
-        ::__continue29::
+        ::__continue33::
     end
 end
 function AssetManager.prototype.handleMouseReleased(self, x, y, button)
@@ -121,9 +138,12 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue37
+                goto __continue42
             end
             local asset = assets[1]
+            if asset.isHidden then
+                goto __continue42
+            end
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
                 if asset.isDisabled then
                     self:handleDisabledAssetClick(assets)
@@ -135,10 +155,13 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
                 a:setMousePressed(false)
             end
         end
-        ::__continue37::
+        ::__continue42::
     end
 end
 function AssetManager.prototype.handleDisabledAssetClick(self, assets)
+    if not assets[1].useDisabledAnimation then
+        return
+    end
     if self.gameManager.animationManager:hasWobbleAnimation() then
         return
     end
@@ -153,7 +176,7 @@ function AssetManager.prototype.triggerWobbleAnimation(self, assets)
         if not self.gameManager.animationManager.animations:has(wobbleId) then
             self.gameManager.animationManager.animations:set(
                 wobbleId,
-                __TS__New(WobbleAnimation, 10, {assetToWobble}, {animDuration = 0.5})
+                __TS__New(WobbleAnimation, 0.5, 10, {assetToWobble})
             )
         end
         if not isEmpty(assetToWobble.associatedTexts) then
@@ -162,7 +185,7 @@ function AssetManager.prototype.triggerWobbleAnimation(self, assets)
                 if not self.gameManager.animationManager.animations:has(wobbleTextId) then
                     self.gameManager.animationManager.animations:set(
                         wobbleTextId,
-                        __TS__New(WobbleAnimation, 10, {text}, {animDuration = 0.5})
+                        __TS__New(WobbleAnimation, 0.5, 10, {text})
                     )
                 end
             end
@@ -193,9 +216,12 @@ function AssetManager.prototype.handleMouseHover(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue60
+                goto __continue67
             end
             local asset = assets[1]
+            if asset.isDisabled or asset.isHidden then
+                goto __continue67
+            end
             if gameX >= asset.x and gameX <= asset.x + asset:getWidth() and gameY >= asset.y and gameY <= asset.y + asset:getHeight() then
                 if not asset.isHovered then
                     for ____, a in ipairs(assets) do
@@ -216,7 +242,7 @@ function AssetManager.prototype.handleMouseHover(self)
                 end
             end
         end
-        ::__continue60::
+        ::__continue67::
     end
 end
 return ____exports

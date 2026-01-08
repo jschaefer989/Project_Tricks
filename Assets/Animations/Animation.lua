@@ -6,6 +6,8 @@ local __TS__New = ____lualib.__TS__New
 local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
+local ____Helpers = require("Helpers")
+local isEmpty = ____Helpers.isEmpty
 ____exports.default = __TS__Class()
 local Animation = ____exports.default
 Animation.name = "Animation"
@@ -14,7 +16,7 @@ function Animation.prototype.____constructor(self, assets, constructionOptions)
     self.isAnimating = false
     self.originalX = __TS__New(Map)
     self.originalY = __TS__New(Map)
-    self.animDuration = constructionOptions and constructionOptions.animDuration or 0.15
+    self.animDuration = constructionOptions and constructionOptions.animDuration
     self.animElapsed = 0
     self.isAnimating = true
     self.assets = assets
@@ -33,15 +35,23 @@ function Animation.prototype.____constructor(self, assets, constructionOptions)
         )
     )
     self.onFinish = constructionOptions and constructionOptions.onFinish
+    self.waitForAnimationIds = constructionOptions and constructionOptions.waitForAnimationIds or ({})
+    self.stopAnimationCondition = constructionOptions and constructionOptions.stopAnimationCondition
 end
 function Animation.prototype.updateAnimation(self, deltaTime)
     if not self.isAnimating then
         return
     end
-    self.animElapsed = self.animElapsed + deltaTime
-    if self.animElapsed >= self.animDuration then
-        self.animElapsed = self.animDuration
+    if self.stopAnimationCondition and self:stopAnimationCondition() then
         self.isAnimating = false
+        return
+    end
+    self.animElapsed = self.animElapsed + deltaTime
+    if not isEmpty(self.animDuration) then
+        if self.animElapsed >= self.animDuration then
+            self.animElapsed = self.animDuration
+            self.isAnimating = false
+        end
     end
 end
 function Animation.prototype.getAssets(self)

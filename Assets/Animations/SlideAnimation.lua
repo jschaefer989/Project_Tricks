@@ -8,7 +8,7 @@ ____exports.default = __TS__Class()
 local SlideAnimation = ____exports.default
 SlideAnimation.name = "SlideAnimation"
 __TS__ClassExtends(SlideAnimation, Animation)
-function SlideAnimation.prototype.____constructor(self, offsetX, offsetY, assets, constructionOptions)
+function SlideAnimation.prototype.____constructor(self, animDuration, offsetX, offsetY, assets, constructionOptions)
     Animation.prototype.____constructor(self, assets, constructionOptions)
     self.animOffsetX = 0
     self.animOffsetY = 0
@@ -16,6 +16,7 @@ function SlideAnimation.prototype.____constructor(self, offsetX, offsetY, assets
     self.animTargetOffsetY = 0
     self.animTargetOffsetX = offsetX
     self.animTargetOffsetY = offsetY
+    self.animDuration = animDuration
 end
 function SlideAnimation.prototype.updateAnimation(self, deltaTime)
     Animation.prototype.updateAnimation(self, deltaTime)
