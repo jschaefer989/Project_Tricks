@@ -2,7 +2,6 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
 local __TS__ArrayMap = ____lualib.__TS__ArrayMap
-local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local ____Perk = require("Perk")
 local Perk = ____Perk.default
@@ -84,32 +83,6 @@ function Player.prototype.setup(self)
         Dealer:initializePlayerDeck(self.gameManager)
     end
 end
-function Player.prototype.removeSelectedCardsFromHand(self)
-    do
-        local i = #self.hand - 1
-        while i >= 0 do
-            local card = self.hand[i + 1]
-            if card.isSelected then
-                card:onUnselect()
-                self:addToDiscards(card)
-                __TS__ArraySplice(self.hand, i, 1)
-            end
-            i = i - 1
-        end
-    end
-end
-function Player.prototype.discard(self)
-    local newHand = {}
-    for ____, card in ipairs(self.hand) do
-        if card.isSelected then
-            card:onUnselect()
-            self:addToDiscards(card)
-        else
-            newHand[#newHand + 1] = card
-        end
-    end
-    self.hand = newHand
-end
 function Player.prototype.anySelectedCards(self)
     for ____, card in ipairs(self.hand) do
         if card.isSelected then
@@ -162,21 +135,21 @@ function Player.prototype.gatherExperience(self, exp)
 end
 function Player.prototype.getNextLevelExperience(self)
     repeat
-        local ____switch43 = self.level
-        local ____cond43 = ____switch43 == 1
-        if ____cond43 then
+        local ____switch34 = self.level
+        local ____cond34 = ____switch34 == 1
+        if ____cond34 then
             return 100
         end
-        ____cond43 = ____cond43 or ____switch43 == 2
-        if ____cond43 then
+        ____cond34 = ____cond34 or ____switch34 == 2
+        if ____cond34 then
             return 150
         end
-        ____cond43 = ____cond43 or ____switch43 == 3
-        if ____cond43 then
+        ____cond34 = ____cond34 or ____switch34 == 3
+        if ____cond34 then
             return 250
         end
-        ____cond43 = ____cond43 or ____switch43 == 4
-        if ____cond43 then
+        ____cond34 = ____cond34 or ____switch34 == 4
+        if ____cond34 then
             return 500
         end
         do
@@ -200,5 +173,25 @@ function Player.prototype.unselectCards(self)
             card:onUnselect()
         end
     end
+end
+function Player.prototype.discard(self)
+    local newHand = {}
+    local removedIndices = {}
+    do
+        local index = 0
+        while index < #self.hand do
+            local card = self.hand[index + 1]
+            if card.isSelected then
+                card:onUnselect()
+                self:addToDiscards(card)
+                removedIndices[#removedIndices + 1] = index
+            else
+                newHand[#newHand + 1] = card
+            end
+            index = index + 1
+        end
+    end
+    self.hand = newHand
+    return removedIndices
 end
 return ____exports

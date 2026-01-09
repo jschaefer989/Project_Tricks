@@ -66,6 +66,7 @@ function TooltipManager.prototype.addTooltip(self, texts, associatedAsset)
         AssetIds.TOOLTIP_BACKGROUND,
         __TS__New(
             Asset,
+            self.gameManager,
             AssetIds.TOOLTIP_BACKGROUND,
             tooltipImage,
             tooltipX,

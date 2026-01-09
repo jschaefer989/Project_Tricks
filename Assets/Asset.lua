@@ -1,16 +1,20 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____Enums = require("Enums")
+local AnimationIds = ____Enums.AnimationIds
 local HoverEffects = ____Enums.HoverEffects
 local MousePressEffects = ____Enums.MousePressEffects
 local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
+local ____ShimmerAnimation = require("Assets.Animations.ShimmerAnimation")
+local ShimmerAnimation = ____ShimmerAnimation.default
 ____exports.default = __TS__Class()
 local Asset = ____exports.default
 Asset.name = "Asset"
-function Asset.prototype.____constructor(self, id, image, x, y, width, height, constructionOptions)
+function Asset.prototype.____constructor(self, gameManager, id, image, x, y, width, height, constructionOptions)
     self.quads = {}
     self.isDisabled = false
     self.useDisabledAnimation = true
@@ -18,6 +22,7 @@ function Asset.prototype.____constructor(self, id, image, x, y, width, height, c
     self.isPressed = false
     self.color = {1, 1, 1, 1}
     self.isHidden = false
+    self.gameManager = gameManager
     self.id = id
     self.image = image
     self.x = x
@@ -105,6 +110,16 @@ function Asset.prototype.handleHoverEffects(self, hovered)
             ____cond13 = ____cond13 or ____switch13 == HoverEffects.SCALE_UP
             if ____cond13 then
                 self:scaleUp(hovered)
+                break
+            end
+            ____cond13 = ____cond13 or ____switch13 == HoverEffects.SHIFT_UP
+            if ____cond13 then
+                self:shiftUp(hovered)
+                break
+            end
+            ____cond13 = ____cond13 or ____switch13 == HoverEffects.SHIMMER
+            if ____cond13 then
+                self:shimmer(hovered)
                 break
             end
             do
@@ -218,5 +233,40 @@ function Asset.prototype.shiftDown(self, pressed, wasPressed)
             end
         end
     end
+end
+function Asset.prototype.shiftUp(self, hovered)
+    if hovered then
+        self.offsetY = self.offsetY + 3
+        if not isEmpty(self.associatedTexts) then
+            for ____, text in ipairs(self.associatedTexts) do
+                text.y = text.y - 3
+            end
+        end
+    elseif not hovered then
+        self.offsetY = self.offsetY - 3
+        if not isEmpty(self.associatedTexts) then
+            for ____, text in ipairs(self.associatedTexts) do
+                text.y = text.y + 3
+            end
+        end
+    end
+end
+function Asset.prototype.shimmer(self, hovered)
+    if not hovered then
+        return
+    end
+    if self.gameManager.animationManager.animations:has(AnimationIds.SHIMMER_CARD) then
+        return
+    end
+    local assets = self.gameManager.assetManager:getAssets(self.id)
+    if isEmpty(assets) then
+        return
+    end
+    local shimmerAnim = __TS__New(
+        ShimmerAnimation,
+        function() return not self.isHovered end,
+        assets
+    )
+    self.gameManager.animationManager:startAnimation(AnimationIds.SHIMMER_CARD, shimmerAnim)
 end
 return ____exports

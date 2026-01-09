@@ -12,7 +12,7 @@ export default class Settings {
     playMusic: boolean = true
     playSoundEffects: boolean = true
     windowSetting: WindowOptions = WindowOptions.WINDOWED
-    dealerSpeed: number = 0.25;
+    dealerSpeed: number = 0.1;
 
     constructor() {}
 

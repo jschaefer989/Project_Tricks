@@ -21,6 +21,7 @@ export default class BackgroundManager {
     this.gameManager.assetManager.addAsset(
       AssetIds.BACKGROUND,
       new Asset(
+        this.gameManager,
         AssetIds.BACKGROUND,
         backgroundImage,
         0,

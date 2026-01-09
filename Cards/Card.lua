@@ -148,7 +148,7 @@ function Card.prototype.onHover(self, asset)
                 5,
                 20,
                 tostring(self.power),
-                {icon = IconAsset:getPowerIconAsset(AssetIds.TOOLTIP_POWER_ICON)}
+                {icon = IconAsset:getPowerIconAsset(self.gameManager, AssetIds.TOOLTIP_POWER_ICON)}
             ),
             __TS__New(
                 FontWithPosition,
@@ -156,7 +156,7 @@ function Card.prototype.onHover(self, asset)
                 5,
                 30,
                 tostring(self.value),
-                {icon = IconAsset:getValueIconAsset(AssetIds.TOOLTIP_VALUE_ICON)}
+                {icon = IconAsset:getValueIconAsset(self.gameManager, AssetIds.TOOLTIP_VALUE_ICON)}
             )
         },
         asset

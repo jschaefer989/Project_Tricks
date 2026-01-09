@@ -53,6 +53,7 @@ export default class Board {
     displayEdel(): void;
     displayFight(): void;
     handleDiscard(): void;
+    updateDiscardCounter(remainingNumberOfDiscards: number): void;
     getRemainingDiscards(): number;
     getWinner(): CharacterTypes;
     endFight(): void;
@@ -70,6 +71,12 @@ export default class Board {
     private buildDiscardButton;
     private buildDeselectButton;
     updatePrimaryButtonStates(): void;
+    enableAttackButton(): void;
+    enableDiscardButton(): void;
+    enableDeselectButton(): void;
+    disableAttackButton(): void;
+    disableDiscardButton(): void;
+    disableDeselectButton(): void;
     private buildPointBoard;
     private buildPowerAndValues;
     private buildPlayerPortrait;
@@ -85,5 +92,6 @@ export default class Board {
     private removeWinFire;
     private getWinFireSprite;
     getPortraitPosition(characterType: CharacterTypes): number;
+    tallyEnemyPowerAndValue(): void;
 }
 export {};

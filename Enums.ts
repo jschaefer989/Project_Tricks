@@ -138,12 +138,15 @@ export enum AnimationIds {
     CARD_DISCARD = "CARD_DISCARD",
     CARD_RETURN_TO_DECK = "CARD_RETURN_TO_DECK",
     EDEL_CARD = "EDEL_CARD",
+    SHIMMER_CARD = "SHIMMER_CARD",
 }
 
 export enum HoverEffects {
     NONE = "NONE",
     SCALE_UP = "SCALE_UP",
     CHANGE_COLOR = "CHANGE_COLOR",
+    SHIFT_UP = "SHIFT_UP",
+    SHIMMER = "SHIMMER",
 }
 
 export enum MousePressEffects {

@@ -15,8 +15,8 @@ import Point from "Point";
 import { Image } from "love.graphics";
 
 export const padding = 5;
-export const cardWidth = 71;
-export const cardHeight = 97;
+export const cardWidth = 70;
+export const cardHeight = 96;
 
 interface AssetsForCard {
   baseAsset?: Asset;
@@ -41,6 +41,7 @@ export default class CardAssets {
   ): void {
     const assetId = CardAssets.getBaseAssetId(card);
     const baseCardAsset = new Asset(
+      this.gameManager,
       assetId,
       this.baseCard,
       cardX,
@@ -52,14 +53,14 @@ export default class CardAssets {
         onHover: (asset: Asset) => card.onHover(asset),
         onUnhover: (asset: Asset) => card.onUnhover(asset),
         hoverEffect: includeClickHandler
-          ? [HoverEffects.SCALE_UP]
+          ? [HoverEffects.SHIMMER]
           : [HoverEffects.NONE],
         clickSound: includeClickHandler ? this.cardClick : undefined,
         isDisabled: true,
         useDisabledAnimation: false,
       }
     );
-    this.gameManager.assetManager.addAsset(assetId, baseCardAsset);
+    this.gameManager.assetManager.addAsset(assetId, baseCardAsset, true);
     this.addSuitAsset(card, cardX, cardY, includeClickHandler);
     this.addRankAsset(card, cardX, cardY, includeClickHandler);
   }
@@ -79,6 +80,7 @@ export default class CardAssets {
     const normalAssetId = CardAssets.getSuitAssetId(card, 0);
     const normalPosition = this.getNormalSuitPosition(x, y);
     const normalAsset = new Asset(
+      this.gameManager,
       normalAssetId,
       love.graphics.newImage(suitImagePath),
       normalPosition.x,
@@ -90,7 +92,7 @@ export default class CardAssets {
         onHover: onHoverCallback,
         onUnhover: (asset: Asset) => card.onUnhover(asset),
         hoverEffect: includeClickHandler
-          ? [HoverEffects.SCALE_UP]
+          ? [HoverEffects.SHIMMER]
           : [HoverEffects.NONE],
         clickSound: includeClickHandler ? this.cardClick : undefined,
         isDisabled: true,
@@ -104,6 +106,7 @@ export default class CardAssets {
     const flippedPosition = this.getFlippedSuitPosition(x, y);
     const flippedAssetId = CardAssets.getSuitAssetId(card, 1);
     const flippedAsset = new Asset(
+      this.gameManager,
       flippedAssetId,
       love.graphics.newImage(suitImagePath),
       flippedPosition.x,
@@ -116,7 +119,7 @@ export default class CardAssets {
         onUnhover: (asset: Asset) => card.onUnhover(asset),
         orientation: 0,
         hoverEffect: includeClickHandler
-          ? [HoverEffects.SCALE_UP]
+          ? [HoverEffects.SHIMMER]
           : [HoverEffects.NONE],
         scaleX: -1,
         scaleY: -1,
@@ -150,6 +153,7 @@ export default class CardAssets {
     const assetId = CardAssets.getRankAssetId(card, 0);
     const rankPosition = this.getRankPosition(x, y, rankImage);
     const asset = new Asset(
+      this.gameManager,
       assetId,
       rankImage,
       rankPosition.x,
@@ -161,7 +165,7 @@ export default class CardAssets {
         onHover: (asset: Asset) => card.onHover(asset),
         onUnhover: (asset: Asset) => card.onUnhover(asset),
         hoverEffect: includeClickHandler
-          ? [HoverEffects.SCALE_UP]
+          ? [HoverEffects.SHIMMER]
           : [HoverEffects.NONE],
         clickSound: includeClickHandler ? this.cardClick : undefined,
         isDisabled: true,
@@ -274,10 +278,10 @@ export default class CardAssets {
     );
   }
 
-  getCardPosition(characterType: CharacterTypes): number {
+  getHandYCoordinate(characterType: CharacterTypes): number {
     const screenH = push.getHeight();
     return screenH / 2 + this.getHeightModifier(characterType);
-  }
+  } 
 
   getHeightModifier(characterType: CharacterTypes): number {
     switch (characterType) {
@@ -302,7 +306,7 @@ export default class CardAssets {
     const totalW = cardCount * cardWidth + Math.max(0, cardCount - 1) * padding;
     return {
       x: Math.floor((screenW - totalW) / 2),
-      y: this.getCardPosition(characterType),
+      y: this.getHandYCoordinate(characterType),
     };
   }
 

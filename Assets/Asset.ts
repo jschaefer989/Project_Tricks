@@ -1,9 +1,11 @@
 import { Source } from "love.audio";
 import { Image } from "love.graphics";
 import FontWithPosition from "./FontWithPosition";
-import { HoverEffects, MousePressEffects } from "Enums";
+import { AnimationIds, HoverEffects, MousePressEffects } from "Enums";
 import { exhaustiveGuard, isEmpty } from "Helpers";
 import QuadWithPosition from "./QuadWithPosition";
+import ShimmerAnimation from "./Animations/ShimmerAnimation";
+import GameManager from "GameManager";
 
 export type AssetCallback = (asset: Asset) => void;
 
@@ -26,6 +28,7 @@ export interface ConstructionOptions {
 }
 
 export default class Asset {
+  gameManager: GameManager;
   id: string;
   image: Image;
   x: number;
@@ -53,6 +56,7 @@ export default class Asset {
   isHidden = false;
 
   constructor(
+    gameManager: GameManager,
     id: string,
     image: Image,
     x: number,
@@ -61,6 +65,7 @@ export default class Asset {
     height: number,
     constructionOptions?: ConstructionOptions
   ) {
+    this.gameManager = gameManager;
     this.id = id;
     this.image = image;
     this.x = x;
@@ -77,7 +82,8 @@ export default class Asset {
     this.offsetY = constructionOptions?.offsetY ?? 0;
     this.quads = constructionOptions?.quads ?? [];
     this.isDisabled = constructionOptions?.isDisabled ?? false;
-    this.useDisabledAnimation = constructionOptions?.useDisabledAnimation ?? true;
+    this.useDisabledAnimation =
+      constructionOptions?.useDisabledAnimation ?? true;
     this.clickSound = constructionOptions?.clickSound;
     this.associatedTexts = constructionOptions?.associatedTexts;
     this.hoverEffect = constructionOptions?.hoverEffect ?? [HoverEffects.NONE];
@@ -142,7 +148,14 @@ export default class Asset {
           this.setColor();
           break;
         case HoverEffects.SCALE_UP:
+          // Warning, this can cause pixel distortion
           this.scaleUp(hovered);
+          break;
+        case HoverEffects.SHIFT_UP:
+          this.shiftUp(hovered);
+          break;
+        case HoverEffects.SHIMMER:
+          this.shimmer(hovered);
           break;
         default:
           exhaustiveGuard(effect);
@@ -165,6 +178,7 @@ export default class Asset {
           this.setColor();
           break;
         case MousePressEffects.SCALE_DOWN:
+          // Warning, this can cause pixel distortion
           this.scaleDown(pressed);
           break;
         case MousePressEffects.SHIFT_DOWN:
@@ -261,5 +275,45 @@ export default class Asset {
         }
       }
     }
+  }
+
+  private shiftUp(hovered: boolean): void {
+    if (hovered) {
+      this.offsetY += 3;
+      if (!isEmpty(this.associatedTexts)) {
+        for (const text of this.associatedTexts) {
+          text.y -= 3;
+        }
+      }
+    } else if (!hovered) {
+      this.offsetY -= 3;
+      if (!isEmpty(this.associatedTexts)) {
+        for (const text of this.associatedTexts) {
+          text.y += 3;
+        }
+      }
+    }
+  }
+
+  private shimmer(hovered: boolean): void {
+    if (!hovered) {
+      return;
+    }
+    if (
+      this.gameManager.animationManager.animations.has(
+        AnimationIds.SHIMMER_CARD
+      )
+    ) {
+      return;
+    }
+    const assets = this.gameManager.assetManager.getAssets(this.id);
+    if (isEmpty(assets)) {
+      return;
+    }
+    const shimmerAnim = new ShimmerAnimation(() => !this.isHovered, assets);
+    this.gameManager.animationManager.startAnimation(
+      AnimationIds.SHIMMER_CARD,
+      shimmerAnim
+    );
   }
 }

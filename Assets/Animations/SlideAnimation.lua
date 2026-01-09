@@ -21,6 +21,8 @@ end
 function SlideAnimation.prototype.updateAnimation(self, deltaTime)
     Animation.prototype.updateAnimation(self, deltaTime)
     if not self.isAnimating then
+        self:updateX(self.animTargetOffsetX)
+        self:updateY(self.animTargetOffsetY)
         return
     end
     self:calculateAnimationOffset()

@@ -88,32 +88,6 @@ export default class Player extends Character {
     }
   }
 
-  removeSelectedCardsFromHand(): void {
-    for (let i = this.hand.length - 1; i >= 0; i--) {
-      const card = this.hand[i];
-      if (card.isSelected) {
-        card.onUnselect();
-        this.addToDiscards(card);
-        this.hand.splice(i, 1);
-      }
-    }
-  }
-
-  discard(): void {
-    const newHand: Card[] = [];
-
-    for (const card of this.hand) {
-      if (card.isSelected) {
-        card.onUnselect();
-        this.addToDiscards(card);
-      } else {
-        newHand.push(card);
-      }
-    }
-
-    this.hand = newHand;
-  }
-
   anySelectedCards(): boolean {
     for (const card of this.hand) {
       if (card.isSelected) {
@@ -140,7 +114,10 @@ export default class Player extends Character {
 
   addMoney(amount: number): void {
     this.money += amount;
-    this.gameManager.assetManager.textManager.updateText(TextIds.PLAYER_PORTRAIT_MONEY, `${this.money} Mark`);
+    this.gameManager.assetManager.textManager.updateText(
+      TextIds.PLAYER_PORTRAIT_MONEY,
+      `${this.money} Mark`
+    );
   }
 
   hasPerk(perkType: Perks): boolean {
@@ -187,7 +164,10 @@ export default class Player extends Character {
 
   addExperience(exp: number): void {
     this.experience += exp;
-    this.gameManager.assetManager.textManager.updateText(TextIds.PLAYER_PORTRAIT_EXPERIENCE, `${this.experience} XP`);
+    this.gameManager.assetManager.textManager.updateText(
+      TextIds.PLAYER_PORTRAIT_EXPERIENCE,
+      `${this.experience} XP`
+    );
   }
 
   unselectCards(): void {
@@ -196,5 +176,22 @@ export default class Player extends Character {
         card.onUnselect();
       }
     }
+  }
+
+  discard(): number[] {
+    const newHand: Card[] = [];
+    const removedIndices: number[] = [];
+    for (let index = 0; index < this.hand.length; index++) {
+      const card = this.hand[index];
+      if (card.isSelected) {
+        card.onUnselect();
+        this.addToDiscards(card);
+        removedIndices.push(index);
+      } else {
+        newHand.push(card);
+      }
+    }
+    this.hand = newHand;
+    return removedIndices;
   }
 }

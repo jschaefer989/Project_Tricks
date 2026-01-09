@@ -2,6 +2,8 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
+local ____Helpers = require("Helpers")
+local isEmpty = ____Helpers.isEmpty
 ____exports.default = __TS__Class()
 local Character = ____exports.default
 Character.name = "Character"
@@ -13,9 +15,13 @@ function Character.prototype.____constructor(self, gameManager, ____type)
     self.discardPile = {}
     self.numberOfHeldCards = 5
 end
-function Character.prototype.addToHand(self, card)
-    local ____self_hand_0 = self.hand
-    ____self_hand_0[#____self_hand_0 + 1] = card
+function Character.prototype.addToHand(self, card, index)
+    if not isEmpty(index) and index >= 0 and index < #self.hand then
+        __TS__ArraySplice(self.hand, index, 0, card)
+    else
+        local ____self_hand_0 = self.hand
+        ____self_hand_0[#____self_hand_0 + 1] = card
+    end
 end
 function Character.prototype.removeFromHand(self, card)
     do
@@ -96,10 +102,11 @@ function Character.prototype.removeFromDeck(self, card)
     end
 end
 function Character.prototype.putHandBackInDeck(self)
-    local board = self.gameManager.board
     for ____, card in ipairs(self.hand) do
-        local ____self_deck_3 = self.deck
-        ____self_deck_3[#____self_deck_3 + 1] = card
+        self:addToDeck(card)
+        if card.isSelected then
+            card:onUnselect()
+        end
     end
     self.hand = {}
 end

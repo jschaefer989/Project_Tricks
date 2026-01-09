@@ -16,7 +16,7 @@ function Settings.prototype.____constructor(self)
     self.playMusic = true
     self.playSoundEffects = true
     self.windowSetting = WindowOptions.WINDOWED
-    self.dealerSpeed = 0.25
+    self.dealerSpeed = 0.1
 end
 function Settings.prototype.apply(self)
     repeat

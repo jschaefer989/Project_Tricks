@@ -47,11 +47,9 @@ function Animation.prototype.updateAnimation(self, deltaTime)
         return
     end
     self.animElapsed = self.animElapsed + deltaTime
-    if not isEmpty(self.animDuration) then
-        if self.animElapsed >= self.animDuration then
-            self.animElapsed = self.animDuration
-            self.isAnimating = false
-        end
+    if not isEmpty(self.animDuration) and self.animElapsed >= self.animDuration then
+        self.animElapsed = self.animDuration
+        self.isAnimating = false
     end
 end
 function Animation.prototype.getAssets(self)

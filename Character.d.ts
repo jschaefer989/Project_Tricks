@@ -9,7 +9,7 @@ export default class Character {
     numberOfHeldCards: number;
     type: CharacterTypes;
     constructor(gameManager: GameManager, type: CharacterTypes);
-    addToHand(card: Card): void;
+    addToHand(card: Card, index?: number): void;
     removeFromHand(card: Card): void;
     getCardFromHand(position: number): Card | undefined;
     addToDeck(card: Card): void;

@@ -114,7 +114,7 @@ function Board.prototype.handleStartFight(self)
     if ____opt_1 ~= nil then
         ____opt_1.cardAssets:disableAllCards(true)
     end
-    self.dealer:dealHand()
+    self.dealer:dealHandAtStartOfFight()
     self:hideEdelBoard()
 end
 function Board.prototype.hideEdelBoard(self)
@@ -224,7 +224,7 @@ function Board.prototype.wrapUpAttack(self, winner, loser)
     end
     self:hideSlainCards(loser)
     self:addPoints(winner)
-    self.dealer:dealNextRound()
+    self.dealer:dealNextHand()
     self:clearEnemyStats()
 end
 function Board.prototype.hideSlainCards(self, characterType)
@@ -318,26 +318,26 @@ function Board.prototype.handleDiscard(self)
     if ____opt_8 ~= nil then
         ____opt_8.cardAssets:disableAllCards(true)
     end
-    self.dealer:discardCards(
+    local removedIndices = self.dealer:discardCards(
         CharacterTypes.PLAYER,
         self.gameManager.player:getSelectedCards()
     )
-    self.gameManager.player:discard()
     self.discardUsed = self.discardUsed + 1
     local remaining = self:getRemainingDiscards()
-    self.gameManager.assetManager.textManager:updateText(
-        TextIds.DISCARD_BUTTON_COUNTER,
-        (tostring(remaining) .. "/") .. tostring(self.gameManager.player.discards)
-    )
+    self:updateDiscardCounter(remaining)
     if remaining <= 0 then
-        self.gameManager.assetManager:disableAsset(AssetIds.DISCARD_BUTTON)
-        self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_CAPTION)
-        self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_COUNTER)
+        self:disableDiscardButton()
     end
     local ____opt_10 = self.gameManager.board
     if ____opt_10 ~= nil then
-        ____opt_10.dealer:dealCards(CharacterTypes.PLAYER)
+        ____opt_10.dealer:dealCards(CharacterTypes.PLAYER, removedIndices)
     end
+end
+function Board.prototype.updateDiscardCounter(self, remainingNumberOfDiscards)
+    self.gameManager.assetManager.textManager:updateText(
+        TextIds.DISCARD_BUTTON_COUNTER,
+        (tostring(remainingNumberOfDiscards) .. "/") .. tostring(self.gameManager.player.discards)
+    )
 end
 function Board.prototype.getRemainingDiscards(self)
     return self.gameManager.player.discards - self.discardUsed
@@ -441,6 +441,7 @@ function Board.prototype.buildLetsFightButton(self)
         AssetIds.LETS_FIGHT_BUTTON,
         __TS__New(
             Asset,
+            self.gameManager,
             AssetIds.LETS_FIGHT_BUTTON,
             love.graphics.newImage("Assets/Images/LetsFightButton.png"),
             buttonX,
@@ -461,7 +462,7 @@ function Board.prototype.buildPrimaryButtons(self)
     local btnW = 90
     local btnH = 70
     local totalW = btnW * 3 + gap * 2
-    local buttonY = self.cardAssets:getCardPosition(CharacterTypes.PLAYER) + cardHeight + gap
+    local buttonY = self.cardAssets:getHandYCoordinate(CharacterTypes.PLAYER) + cardHeight + gap
     local buttonX = math.floor((push:getWidth() - totalW) / 2)
     self:buildAttackButton(buttonX, buttonY, btnW, btnH)
     local discardX = self:buildDiscardButton(
@@ -496,6 +497,7 @@ function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW, btnH)
         AssetIds.ATTACK_BUTTON,
         __TS__New(
             Asset,
+            self.gameManager,
             AssetIds.ATTACK_BUTTON,
             love.graphics.newImage("Assets/Images/AttackButton.png"),
             buttonX,
@@ -539,6 +541,7 @@ function Board.prototype.buildDiscardButton(self, buttonX, buttonY, btnW, btnH, 
         AssetIds.DISCARD_BUTTON,
         __TS__New(
             Asset,
+            self.gameManager,
             AssetIds.DISCARD_BUTTON,
             love.graphics.newImage("Assets/Images/DiscardButton.png"),
             discardX,
@@ -572,6 +575,7 @@ function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, btnH
         AssetIds.DESELECT_BUTTON,
         __TS__New(
             Asset,
+            self.gameManager,
             AssetIds.DESELECT_BUTTON,
             love.graphics.newImage("Assets/Images/DeselectButton.png"),
             deselectX,
@@ -590,22 +594,43 @@ end
 function Board.prototype.updatePrimaryButtonStates(self)
     local hasSelectedCards = self.gameManager.player:anySelectedCards()
     if hasSelectedCards then
-        self.gameManager.assetManager:enableAsset(AssetIds.ATTACK_BUTTON)
-        self.gameManager.assetManager.textManager:enableText(TextIds.ATTACK_BUTTON_CAPTION)
-        self.gameManager.assetManager:enableAsset(AssetIds.DISCARD_BUTTON)
-        self.gameManager.assetManager.textManager:enableText(TextIds.DISCARD_BUTTON_CAPTION)
-        self.gameManager.assetManager.textManager:enableText(TextIds.DISCARD_BUTTON_COUNTER)
-        self.gameManager.assetManager:enableAsset(AssetIds.DESELECT_BUTTON)
-        self.gameManager.assetManager.textManager:enableText(TextIds.DESELECT_BUTTON_CAPTION)
+        self:enableAttackButton()
+        self:enableDiscardButton()
+        self:enableDeselectButton()
     else
-        self.gameManager.assetManager:disableAsset(AssetIds.ATTACK_BUTTON)
-        self.gameManager.assetManager.textManager:disableText(TextIds.ATTACK_BUTTON_CAPTION)
-        self.gameManager.assetManager:disableAsset(AssetIds.DISCARD_BUTTON)
-        self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_CAPTION)
-        self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_COUNTER)
-        self.gameManager.assetManager:disableAsset(AssetIds.DESELECT_BUTTON)
-        self.gameManager.assetManager.textManager:disableText(TextIds.DESELECT_BUTTON_CAPTION)
+        self:disableAttackButton()
+        self:disableDiscardButton()
+        self:disableDeselectButton()
     end
+end
+function Board.prototype.enableAttackButton(self)
+    self.gameManager.assetManager:enableAsset(AssetIds.ATTACK_BUTTON)
+    self.gameManager.assetManager.textManager:enableText(TextIds.ATTACK_BUTTON_CAPTION)
+end
+function Board.prototype.enableDiscardButton(self)
+    if self:getRemainingDiscards() <= 0 then
+        return
+    end
+    self.gameManager.assetManager:enableAsset(AssetIds.DISCARD_BUTTON)
+    self.gameManager.assetManager.textManager:enableText(TextIds.DISCARD_BUTTON_CAPTION)
+    self.gameManager.assetManager.textManager:enableText(TextIds.DISCARD_BUTTON_COUNTER)
+end
+function Board.prototype.enableDeselectButton(self)
+    self.gameManager.assetManager:enableAsset(AssetIds.DESELECT_BUTTON)
+    self.gameManager.assetManager.textManager:enableText(TextIds.DESELECT_BUTTON_CAPTION)
+end
+function Board.prototype.disableAttackButton(self)
+    self.gameManager.assetManager:disableAsset(AssetIds.ATTACK_BUTTON)
+    self.gameManager.assetManager.textManager:disableText(TextIds.ATTACK_BUTTON_CAPTION)
+end
+function Board.prototype.disableDiscardButton(self)
+    self.gameManager.assetManager:disableAsset(AssetIds.DISCARD_BUTTON)
+    self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_CAPTION)
+    self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_COUNTER)
+end
+function Board.prototype.disableDeselectButton(self)
+    self.gameManager.assetManager:disableAsset(AssetIds.DESELECT_BUTTON)
+    self.gameManager.assetManager.textManager:disableText(TextIds.DESELECT_BUTTON_CAPTION)
 end
 function Board.prototype.buildPointBoard(self)
     local boardWidth = 250
@@ -616,6 +641,7 @@ function Board.prototype.buildPointBoard(self)
         AssetIds.POINT_DISPLAY,
         __TS__New(
             Asset,
+            self.gameManager,
             AssetIds.POINT_DISPLAY,
             love.graphics.newImage("Assets/Images/PointBoard.png"),
             buttonX,
@@ -674,7 +700,7 @@ function Board.prototype.buildPowerAndValues(self, characterType, portraitHeight
             20,
             powerY,
             tostring(powerValue),
-            {icon = IconAsset:getPowerIconAsset(attackPowerAssetId)}
+            {icon = IconAsset:getPowerIconAsset(self.gameManager, attackPowerAssetId)}
         )
     )
     local valueAssetId = characterType == CharacterTypes.PLAYER and AssetIds.PLAYER_VALUE_ICON or AssetIds.ENEMY_VALUE_ICON
@@ -688,7 +714,7 @@ function Board.prototype.buildPowerAndValues(self, characterType, portraitHeight
             20,
             powerY + portraitGap,
             tostring(valueValue),
-            {icon = IconAsset:getValueIconAsset(valueAssetId)}
+            {icon = IconAsset:getValueIconAsset(self.gameManager, valueAssetId)}
         )
     )
 end
@@ -715,10 +741,14 @@ function Board.prototype.getPortraitWidth(self)
 end
 function Board.prototype.buildEnemyPortrait(self)
     self:buildPortrait(CharacterTypes.ENEMY)
+    self:buildPowerAndValues(
+        CharacterTypes.ENEMY,
+        self:getPortraitHeight() or 0
+    )
 end
 function Board.prototype.buildPortrait(self, characterType)
     if self.portraitPosition == nil and characterType == CharacterTypes.PLAYER then
-        self.portraitPosition = self.cardAssets:getCardPosition(characterType)
+        self.portraitPosition = self.cardAssets:getHandYCoordinate(characterType)
     end
     local portraitPosition = self:getPortraitPosition(characterType)
     local portraitBackgroundW = 99
@@ -728,6 +758,7 @@ function Board.prototype.buildPortrait(self, characterType)
         portraitBackgroundAssetId,
         __TS__New(
             Asset,
+            self.gameManager,
             portraitBackgroundAssetId,
             love.graphics.newImage("Assets/Images/PortraitBackground.png"),
             5,
@@ -743,6 +774,7 @@ function Board.prototype.buildPortrait(self, characterType)
         portraitAssetId,
         __TS__New(
             Asset,
+            self.gameManager,
             portraitAssetId,
             love.graphics.newImage("Assets/Images/Portrait.png"),
             5,
@@ -793,6 +825,7 @@ function Board.prototype.buildPortrait(self, characterType)
             AssetIds.PERKS_BUTTON,
             __TS__New(
                 Asset,
+                self.gameManager,
                 AssetIds.PERKS_BUTTON,
                 love.graphics.newImage("Assets/Images/PerksButton.png"),
                 portraitW + 8,
@@ -825,6 +858,7 @@ function Board.prototype.buildPortrait(self, characterType)
                     size = 9,
                     icon = __TS__New(
                         IconAsset,
+                        self.gameManager,
                         AssetIds.MONEY_ICON,
                         love.graphics.newImage("Assets/Images/Mark.png"),
                         9,
@@ -842,6 +876,7 @@ function Board.prototype.buildPlayerDeck(self)
         AssetIds.PLAYER_DECK,
         __TS__New(
             Asset,
+            self.gameManager,
             AssetIds.PLAYER_DECK,
             love.graphics.newImage("Assets/Images/BaseCardBack.png"),
             deckPosition.x,
@@ -857,6 +892,7 @@ function Board.prototype.buildEnemyDeck(self)
         AssetIds.ENEMY_DECK,
         __TS__New(
             Asset,
+            self.gameManager,
             AssetIds.ENEMY_DECK,
             love.graphics.newImage("Assets/Images/BaseCardBack.png"),
             deckPosition.x,
@@ -878,6 +914,7 @@ function Board.prototype.buildEdelBoard(self)
         AssetIds.EDEL_BOARD,
         __TS__New(
             Asset,
+            self.gameManager,
             AssetIds.EDEL_BOARD,
             love.graphics.newImage("Assets/Images/EdelBoard.png"),
             boardX,
@@ -903,6 +940,7 @@ function Board.prototype.buildEdelBoard(self)
         AssetIds.EDEL_SUIT_ICON_LEFT,
         __TS__New(
             Asset,
+            self.gameManager,
             AssetIds.EDEL_SUIT_ICON_LEFT,
             suitImage,
             boardX + 5,
@@ -915,6 +953,7 @@ function Board.prototype.buildEdelBoard(self)
         AssetIds.EDEL_SUIT_ICON_RIGHT,
         __TS__New(
             Asset,
+            self.gameManager,
             AssetIds.EDEL_SUIT_ICON_RIGHT,
             suitImage,
             boardX + boardWidth - suitImage:getWidth() - 5,
@@ -946,6 +985,7 @@ function Board.prototype.buildWinFire(self)
         AssetIds.BASIC_WIN_FIRE,
         __TS__New(
             Asset,
+            self.gameManager,
             AssetIds.BASIC_WIN_FIRE,
             fireSprite,
             portraitCenterX - fireSprite:getWidth() / 4,
@@ -1002,6 +1042,10 @@ function Board.prototype.getWinFireSprite(self)
     return love.graphics.newImage("Assets/Images/BasicWinFire.png")
 end
 function Board.prototype.getPortraitPosition(self, characterType)
-    return characterType == CharacterTypes.PLAYER and (self.portraitPosition or self.cardAssets:getCardPosition(characterType)) or 5
+    return characterType == CharacterTypes.PLAYER and (self.portraitPosition or self.cardAssets:getHandYCoordinate(characterType)) or 5
+end
+function Board.prototype.tallyEnemyPowerAndValue(self)
+    self:addEnemyPower(self.enemy:getCardPower())
+    self:addEnemyValue(self.enemy:getCardValue())
 end
 return ____exports

@@ -19,7 +19,7 @@ function love.load()
     math.randomseed(os.time() + os.clock())
 
     gameManager.settings:apply()
-    gameManager:switchToMainMenu()
+    gameManager:switchBasedOnGameState("BOARD") -- Start directly in the game for faster testing
 end
 
 function love.mousepressed(x, y, button)

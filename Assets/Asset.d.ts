@@ -3,6 +3,7 @@ import { Image } from "love.graphics";
 import FontWithPosition from "./FontWithPosition";
 import { HoverEffects, MousePressEffects } from "Enums";
 import QuadWithPosition from "./QuadWithPosition";
+import GameManager from "GameManager";
 export type AssetCallback = (asset: Asset) => void;
 export interface ConstructionOptions {
     readonly onClick?: () => void;
@@ -22,6 +23,7 @@ export interface ConstructionOptions {
     readonly mousePressEffect?: MousePressEffects[];
 }
 export default class Asset {
+    gameManager: GameManager;
     id: string;
     image: Image;
     x: number;
@@ -47,7 +49,7 @@ export default class Asset {
     hoverEffect: HoverEffects[];
     mousePressEffect: MousePressEffects[];
     isHidden: boolean;
-    constructor(id: string, image: Image, x: number, y: number, width: number, height: number, constructionOptions?: ConstructionOptions);
+    constructor(gameManager: GameManager, id: string, image: Image, x: number, y: number, width: number, height: number, constructionOptions?: ConstructionOptions);
     drawAsset(): void;
     updatePosition(x: number, y: number): void;
     setHovered(hovered: boolean): void;
@@ -61,4 +63,6 @@ export default class Asset {
     private scaleDown;
     private scaleUp;
     private shiftDown;
+    private shiftUp;
+    private shimmer;
 }

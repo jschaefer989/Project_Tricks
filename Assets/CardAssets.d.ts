@@ -5,8 +5,8 @@ import GameManager from "GameManager";
 import Point from "Point";
 import { Image } from "love.graphics";
 export declare const padding = 5;
-export declare const cardWidth = 71;
-export declare const cardHeight = 97;
+export declare const cardWidth = 70;
+export declare const cardHeight = 96;
 interface AssetsForCard {
     baseAsset?: Asset;
     suitAssets: (Asset | undefined)[];
@@ -31,7 +31,7 @@ export default class CardAssets {
     removeCardAssets(card: Card): void;
     hideCardAssets(card: Card): void;
     getRankAsset(card: Card): Asset | undefined;
-    getCardPosition(characterType: CharacterTypes): number;
+    getHandYCoordinate(characterType: CharacterTypes): number;
     getHeightModifier(characterType: CharacterTypes): number;
     determineCardStartingPosition(characterType: CharacterTypes): Point;
     appendAsset(card: Card, characterType: CharacterTypes): void;

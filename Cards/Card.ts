@@ -5,7 +5,6 @@ import { AnimationIds, Ranks, Suits, EdelRanks, AssetIds, TextIds } from "../Enu
 import { exhaustiveGuard, isEmpty } from "Helpers";
 import Asset from "Assets/Asset";
 import SlideAnimation from "Assets/Animations/SlideAnimation";
-import { AnimationAssets } from "Assets/Animations/Animation";
 import FontWithPosition, { Fonts } from "Assets/FontWithPosition";
 import IconAsset from "Assets/IconAsset";
 
@@ -160,14 +159,14 @@ export default class Card {
           5,
           20,
           this.power.toString(),
-          { icon: IconAsset.getPowerIconAsset(AssetIds.TOOLTIP_POWER_ICON) }
+          { icon: IconAsset.getPowerIconAsset(this.gameManager, AssetIds.TOOLTIP_POWER_ICON) }
         ),
         new FontWithPosition(
           TextIds.TOOLTIP_CARD_VALUE,
           5,
           30,
           this.value.toString(),
-          { icon: IconAsset.getValueIconAsset(AssetIds.TOOLTIP_VALUE_ICON) }
+          { icon: IconAsset.getValueIconAsset(this.gameManager, AssetIds.TOOLTIP_VALUE_ICON) }
         )
       ],
       asset

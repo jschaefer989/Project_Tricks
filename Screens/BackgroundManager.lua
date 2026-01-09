@@ -26,6 +26,7 @@ function BackgroundManager.prototype.updateBackground(self, gameState)
         AssetIds.BACKGROUND,
         __TS__New(
             Asset,
+            self.gameManager,
             AssetIds.BACKGROUND,
             backgroundImage,
             0,

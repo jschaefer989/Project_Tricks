@@ -64,4 +64,18 @@ function Enemy.prototype.save(self)
         experience = self.experience
     }
 end
+function Enemy.prototype.discard(self)
+    local removedIndices = {}
+    do
+        local index = 0
+        while index < #self.hand do
+            local card = self.hand[index + 1]
+            self:addToDiscards(card)
+            removedIndices[#removedIndices + 1] = index
+            index = index + 1
+        end
+    end
+    self.hand = {}
+    return removedIndices
+end
 return ____exports

@@ -1,6 +1,6 @@
 import Animation, { AnimationAssets, AnimationOptions } from "./Animation";
 
-interface ConstructionOptions extends AnimationOptions {
+export interface SlideOptions extends AnimationOptions {
   readonly animDuration?: number;
   readonly drawSeparately?: boolean;
 }
@@ -17,7 +17,7 @@ export default class SlideAnimation extends Animation {
     offsetX: number,
     offsetY: number,
     assets: AnimationAssets[],
-    constructionOptions?: ConstructionOptions
+    constructionOptions?: SlideOptions
   ) {
     super(assets, constructionOptions);
     this.animTargetOffsetX = offsetX;
@@ -28,6 +28,9 @@ export default class SlideAnimation extends Animation {
   updateAnimation(deltaTime: number): void {
     super.updateAnimation(deltaTime);
     if (!this.isAnimating) {
+      // finish sending the assets to their target positions
+      this.updateX(this.animTargetOffsetX);
+      this.updateY(this.animTargetOffsetY);
       return;
     }
 

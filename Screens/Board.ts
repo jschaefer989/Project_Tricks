@@ -120,7 +120,7 @@ export default class Board {
     );
 
     this.gameManager.board?.cardAssets.disableAllCards(true);
-    this.dealer.dealHand();
+    this.dealer.dealHandAtStartOfFight();
     this.hideEdelBoard();
   }
 
@@ -206,7 +206,7 @@ export default class Board {
 
     this.gameManager.animationManager.animations.set(
       AnimationIds.CARD_SUIT_SLIDE + card.id,
-      new SlideAnimation(0.15,0, -40, slideAnimationAssets, {
+      new SlideAnimation(0.15, 0, -40, slideAnimationAssets, {
         drawSeparately: true,
       })
     );
@@ -235,7 +235,7 @@ export default class Board {
 
     this.hideSlainCards(loser);
     this.addPoints(winner);
-    this.dealer.dealNextRound();
+    this.dealer.dealNextHand();
     this.clearEnemyStats();
   }
 
@@ -290,7 +290,7 @@ export default class Board {
     if (this.gameManager.animationManager.hasAnimations()) {
       return; // wait for deal animations to finish
     }
-    
+
     this.cardAssets.disableAllCards(false);
     this.buildLetsFightButton();
     this.buildEdelBoard();
@@ -298,7 +298,11 @@ export default class Board {
     if (!isEmpty(this.edelCard)) {
       this.gameManager.animationManager.startAnimation(
         AnimationIds.EDEL_CARD,
-        new GlowAnimation(() => !this.gameManager.board?.showingEdelView, [...this.cardAssets.getCardAssetList(this.edelCard)], { glowPeriodSeconds: 3 })
+        new GlowAnimation(
+          () => !this.gameManager.board?.showingEdelView,
+          [...this.cardAssets.getCardAssetList(this.edelCard)],
+          { glowPeriodSeconds: 3 }
+        )
       );
     }
   }
@@ -322,31 +326,28 @@ export default class Board {
 
     this.gameManager.board?.cardAssets.disableAllCards(true);
 
-    this.dealer.discardCards(CharacterTypes.PLAYER, this.gameManager.player.getSelectedCards());
-    this.gameManager.player.discard();
-
-    this.discardUsed = this.discardUsed + 1;
-
-    // Update the discard counter
-    const remaining = this.getRemainingDiscards();
-    this.gameManager.assetManager.textManager.updateText(
-      TextIds.DISCARD_BUTTON_COUNTER,
-      `${remaining}/${this.gameManager.player.discards}`
+     const removedIndices = this.dealer.discardCards(
+      CharacterTypes.PLAYER,
+      this.gameManager.player.getSelectedCards()
     );
 
+    this.discardUsed = this.discardUsed + 1;
+    const remaining = this.getRemainingDiscards();
+    this.updateDiscardCounter(remaining);
+
     if (remaining <= 0) {
-      // Disable the discard button
-      this.gameManager.assetManager.disableAsset(AssetIds.DISCARD_BUTTON);
-      this.gameManager.assetManager.textManager.disableText(
-        TextIds.DISCARD_BUTTON_CAPTION
-      );
-      this.gameManager.assetManager.textManager.disableText(
-        TextIds.DISCARD_BUTTON_COUNTER
-      );
+      this.disableDiscardButton();
     }
 
-    // Refill the player's hand after discarding!isEmpty(asset.onClick)
-    this.gameManager.board?.dealer.dealCards(CharacterTypes.PLAYER);
+    // Refill the player's hand after discarding
+    this.gameManager.board?.dealer.dealCards(CharacterTypes.PLAYER, removedIndices);
+  }
+
+  updateDiscardCounter(remainingNumberOfDiscards: number): void {
+    this.gameManager.assetManager.textManager.updateText(
+      TextIds.DISCARD_BUTTON_COUNTER,
+      `${remainingNumberOfDiscards}/${this.gameManager.player.discards}`
+    );
   }
 
   getRemainingDiscards(): number {
@@ -472,6 +473,7 @@ export default class Board {
     this.gameManager.assetManager.addAsset(
       AssetIds.LETS_FIGHT_BUTTON,
       new Asset(
+        this.gameManager,
         AssetIds.LETS_FIGHT_BUTTON,
         love.graphics.newImage("Assets/Images/LetsFightButton.png"),
         buttonX,
@@ -497,7 +499,9 @@ export default class Board {
     const btnH = 70;
     const totalW = btnW * 3 + gap * 2;
     const buttonY =
-      this.cardAssets.getCardPosition(CharacterTypes.PLAYER) + cardHeight + gap;
+      this.cardAssets.getHandYCoordinate(CharacterTypes.PLAYER) +
+      cardHeight +
+      gap;
     const buttonX = Math.floor((push.getWidth() - totalW) / 2);
     this.buildAttackButton(buttonX, buttonY, btnW, btnH);
     const discardX = this.buildDiscardButton(buttonX, buttonY, btnW, btnH, gap);
@@ -533,6 +537,7 @@ export default class Board {
     this.gameManager.assetManager.addAsset(
       AssetIds.ATTACK_BUTTON,
       new Asset(
+        this.gameManager,
         AssetIds.ATTACK_BUTTON,
         love.graphics.newImage("Assets/Images/AttackButton.png"),
         buttonX,
@@ -601,6 +606,7 @@ export default class Board {
     this.gameManager.assetManager.addAsset(
       AssetIds.DISCARD_BUTTON,
       new Asset(
+        this.gameManager,
         AssetIds.DISCARD_BUTTON,
         love.graphics.newImage("Assets/Images/DiscardButton.png"),
         discardX,
@@ -651,6 +657,7 @@ export default class Board {
     this.gameManager.assetManager.addAsset(
       AssetIds.DESELECT_BUTTON,
       new Asset(
+        this.gameManager,
         AssetIds.DESELECT_BUTTON,
         love.graphics.newImage("Assets/Images/DeselectButton.png"),
         deselectX,
@@ -674,42 +681,66 @@ export default class Board {
     const hasSelectedCards = this.gameManager.player.anySelectedCards();
 
     if (hasSelectedCards) {
-      this.gameManager.assetManager.enableAsset(AssetIds.ATTACK_BUTTON);
-      this.gameManager.assetManager.textManager.enableText(
-        TextIds.ATTACK_BUTTON_CAPTION
-      );
-
-      this.gameManager.assetManager.enableAsset(AssetIds.DISCARD_BUTTON);
-      this.gameManager.assetManager.textManager.enableText(
-        TextIds.DISCARD_BUTTON_CAPTION
-      );
-      this.gameManager.assetManager.textManager.enableText(
-        TextIds.DISCARD_BUTTON_COUNTER
-      );
-
-      this.gameManager.assetManager.enableAsset(AssetIds.DESELECT_BUTTON);
-      this.gameManager.assetManager.textManager.enableText(
-        TextIds.DESELECT_BUTTON_CAPTION
-      );
+      this.enableAttackButton();
+      this.enableDiscardButton();
+      this.enableDeselectButton();
     } else {
-      this.gameManager.assetManager.disableAsset(AssetIds.ATTACK_BUTTON);
-      this.gameManager.assetManager.textManager.disableText(
-        TextIds.ATTACK_BUTTON_CAPTION
-      );
-
-      this.gameManager.assetManager.disableAsset(AssetIds.DISCARD_BUTTON);
-      this.gameManager.assetManager.textManager.disableText(
-        TextIds.DISCARD_BUTTON_CAPTION
-      );
-      this.gameManager.assetManager.textManager.disableText(
-        TextIds.DISCARD_BUTTON_COUNTER
-      );
-
-      this.gameManager.assetManager.disableAsset(AssetIds.DESELECT_BUTTON);
-      this.gameManager.assetManager.textManager.disableText(
-        TextIds.DESELECT_BUTTON_CAPTION
-      );
+      this.disableAttackButton();
+      this.disableDiscardButton();
+      this.disableDeselectButton();
     }
+  }
+
+  enableAttackButton(): void {
+    this.gameManager.assetManager.enableAsset(AssetIds.ATTACK_BUTTON);
+    this.gameManager.assetManager.textManager.enableText(
+      TextIds.ATTACK_BUTTON_CAPTION
+    );
+  }
+
+  enableDiscardButton(): void {
+    if (this.getRemainingDiscards() <= 0) {
+      return; // Never enable the button if the player is out of discards
+    }
+
+    this.gameManager.assetManager.enableAsset(AssetIds.DISCARD_BUTTON);
+    this.gameManager.assetManager.textManager.enableText(
+      TextIds.DISCARD_BUTTON_CAPTION
+    );
+    this.gameManager.assetManager.textManager.enableText(
+      TextIds.DISCARD_BUTTON_COUNTER
+    );
+  }
+
+  enableDeselectButton(): void {
+    this.gameManager.assetManager.enableAsset(AssetIds.DESELECT_BUTTON);
+    this.gameManager.assetManager.textManager.enableText(
+      TextIds.DESELECT_BUTTON_CAPTION
+    );
+  }
+
+  disableAttackButton(): void {
+    this.gameManager.assetManager.disableAsset(AssetIds.ATTACK_BUTTON);
+    this.gameManager.assetManager.textManager.disableText(
+      TextIds.ATTACK_BUTTON_CAPTION
+    );
+  }
+
+  disableDiscardButton(): void {
+    this.gameManager.assetManager.disableAsset(AssetIds.DISCARD_BUTTON);
+    this.gameManager.assetManager.textManager.disableText(
+      TextIds.DISCARD_BUTTON_CAPTION
+    );
+    this.gameManager.assetManager.textManager.disableText(
+      TextIds.DISCARD_BUTTON_COUNTER
+    );
+  }
+
+  disableDeselectButton(): void {
+    this.gameManager.assetManager.disableAsset(AssetIds.DESELECT_BUTTON);
+    this.gameManager.assetManager.textManager.disableText(
+      TextIds.DESELECT_BUTTON_CAPTION
+    );
   }
 
   private buildPointBoard(): void {
@@ -720,6 +751,7 @@ export default class Board {
     this.gameManager.assetManager.addAsset(
       AssetIds.POINT_DISPLAY,
       new Asset(
+        this.gameManager,
         AssetIds.POINT_DISPLAY,
         love.graphics.newImage("Assets/Images/PointBoard.png"),
         buttonX,
@@ -797,7 +829,7 @@ export default class Board {
     this.gameManager.assetManager.textManager.addText(
       powerId,
       new FontWithPosition(powerId, 20, powerY, powerValue.toString(), {
-        icon: IconAsset.getPowerIconAsset(attackPowerAssetId),
+        icon: IconAsset.getPowerIconAsset(this.gameManager, attackPowerAssetId),
       })
     );
 
@@ -820,7 +852,7 @@ export default class Board {
         20,
         powerY + portraitGap,
         valueValue.toString(),
-        { icon: IconAsset.getValueIconAsset(valueAssetId) }
+        { icon: IconAsset.getValueIconAsset(this.gameManager, valueAssetId) }
       )
     );
   }
@@ -857,6 +889,10 @@ export default class Board {
 
   private buildEnemyPortrait(): void {
     this.buildPortrait(CharacterTypes.ENEMY);
+    this.buildPowerAndValues(
+      CharacterTypes.ENEMY,
+      this.getPortraitHeight() ?? 0
+    );
   }
 
   private buildPortrait(characterType: CharacterTypes): void {
@@ -864,7 +900,7 @@ export default class Board {
       this.portraitPosition === undefined &&
       characterType === CharacterTypes.PLAYER
     ) {
-      this.portraitPosition = this.cardAssets.getCardPosition(characterType);
+      this.portraitPosition = this.cardAssets.getHandYCoordinate(characterType);
     }
     const portraitPosition = this.getPortraitPosition(characterType);
 
@@ -877,6 +913,7 @@ export default class Board {
     this.gameManager.assetManager.addAsset(
       portraitBackgroundAssetId,
       new Asset(
+        this.gameManager,
         portraitBackgroundAssetId,
         love.graphics.newImage("Assets/Images/PortraitBackground.png"),
         5,
@@ -895,6 +932,7 @@ export default class Board {
     this.gameManager.assetManager.addAsset(
       portraitAssetId,
       new Asset(
+        this.gameManager,
         portraitAssetId,
         love.graphics.newImage("Assets/Images/Portrait.png"),
         5,
@@ -957,6 +995,7 @@ export default class Board {
       this.gameManager.assetManager.addAsset(
         AssetIds.PERKS_BUTTON,
         new Asset(
+          this.gameManager,
           AssetIds.PERKS_BUTTON,
           love.graphics.newImage("Assets/Images/PerksButton.png"),
           portraitW + 8,
@@ -991,6 +1030,7 @@ export default class Board {
           {
             size: 9,
             icon: new IconAsset(
+              this.gameManager,
               AssetIds.MONEY_ICON,
               love.graphics.newImage("Assets/Images/Mark.png"),
               9,
@@ -1008,6 +1048,7 @@ export default class Board {
     this.gameManager.assetManager.addAsset(
       AssetIds.PLAYER_DECK,
       new Asset(
+        this.gameManager,
         AssetIds.PLAYER_DECK,
         love.graphics.newImage("Assets/Images/BaseCardBack.png"),
         deckPosition.x,
@@ -1023,6 +1064,7 @@ export default class Board {
     this.gameManager.assetManager.addAsset(
       AssetIds.ENEMY_DECK,
       new Asset(
+        this.gameManager,
         AssetIds.ENEMY_DECK,
         love.graphics.newImage("Assets/Images/BaseCardBack.png"),
         deckPosition.x,
@@ -1045,6 +1087,7 @@ export default class Board {
     this.gameManager.assetManager.addAsset(
       AssetIds.EDEL_BOARD,
       new Asset(
+        this.gameManager,
         AssetIds.EDEL_BOARD,
         love.graphics.newImage("Assets/Images/EdelBoard.png"),
         boardX,
@@ -1076,11 +1119,20 @@ export default class Board {
     );
     this.gameManager.assetManager.addAsset(
       AssetIds.EDEL_SUIT_ICON_LEFT,
-      new Asset(AssetIds.EDEL_SUIT_ICON_LEFT, suitImage, boardX + 5, 8, 16, 16)
+      new Asset(
+        this.gameManager,
+        AssetIds.EDEL_SUIT_ICON_LEFT,
+        suitImage,
+        boardX + 5,
+        8,
+        16,
+        16
+      )
     );
     this.gameManager.assetManager.addAsset(
       AssetIds.EDEL_SUIT_ICON_RIGHT,
       new Asset(
+        this.gameManager,
         AssetIds.EDEL_SUIT_ICON_RIGHT,
         suitImage,
         boardX + boardWidth - suitImage.getWidth() - 5,
@@ -1117,6 +1169,7 @@ export default class Board {
     this.gameManager.assetManager.addAsset(
       AssetIds.BASIC_WIN_FIRE,
       new Asset(
+        this.gameManager,
         AssetIds.BASIC_WIN_FIRE,
         fireSprite,
         portraitCenterX - fireSprite.getWidth() / 4,
@@ -1182,7 +1235,13 @@ export default class Board {
 
   getPortraitPosition(characterType: CharacterTypes): number {
     return characterType === CharacterTypes.PLAYER
-      ? this.portraitPosition ?? this.cardAssets.getCardPosition(characterType)
+      ? this.portraitPosition ??
+          this.cardAssets.getHandYCoordinate(characterType)
       : 5;
+  }
+
+  tallyEnemyPowerAndValue(): void {
+    this.addEnemyPower(this.enemy.getCardPower());
+    this.addEnemyValue(this.enemy.getCardValue());
   }
 }

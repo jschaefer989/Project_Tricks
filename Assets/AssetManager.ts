@@ -18,11 +18,15 @@ export default class AssetManager {
     this.tooltipManager = new TooltipManager(gameManager);
   }
 
-  addAsset(id: string, asset: Asset): void {
+  addAsset(id: string, asset: Asset, throwError?: boolean): void {
     if (this.assets.has(id)) {
       const assets = this.assets.get(id);
       assets?.push(asset);
-      return;
+      if (throwError) {
+        throw new Error(`Asset with ID ${id} already exists. Added to existing assets.`);
+      } else {
+        return;
+      }
     }
     this.assets.set(id, [asset]);
   }

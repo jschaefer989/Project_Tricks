@@ -48,13 +48,11 @@ export default abstract class Animation {
     }
 
     this.animElapsed += deltaTime;
-
-    if (!isEmpty(this.animDuration)) {
-      if (this.animElapsed >= this.animDuration) {
-        // Animation complete
-        this.animElapsed = this.animDuration;
-        this.isAnimating = false;
-      }
+    
+    if (!isEmpty(this.animDuration) &&this.animElapsed >= this.animDuration) {
+      // Animation complete
+      this.animElapsed = this.animDuration;
+      this.isAnimating = false;
     }
   }
 

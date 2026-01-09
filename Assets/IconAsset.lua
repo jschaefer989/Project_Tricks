@@ -9,9 +9,10 @@ ____exports.default = __TS__Class()
 local IconAsset = ____exports.default
 IconAsset.name = "IconAsset"
 __TS__ClassExtends(IconAsset, Asset)
-function IconAsset.prototype.____constructor(self, id, image, width, height, constructionOptions)
+function IconAsset.prototype.____constructor(self, gameManager, id, image, width, height, constructionOptions)
     Asset.prototype.____constructor(
         self,
+        gameManager,
         id,
         image,
         0,
@@ -21,18 +22,20 @@ function IconAsset.prototype.____constructor(self, id, image, width, height, con
         constructionOptions
     )
 end
-function IconAsset.getPowerIconAsset(self, id)
+function IconAsset.getPowerIconAsset(self, gameManager, id)
     return __TS__New(
         ____exports.default,
+        gameManager,
         id,
         love.graphics.newImage("Assets/Images/AttackPower.png"),
         9,
         9
     )
 end
-function IconAsset.getValueIconAsset(self, id)
+function IconAsset.getValueIconAsset(self, gameManager, id)
     return __TS__New(
         ____exports.default,
+        gameManager,
         id,
         love.graphics.newImage("Assets/Images/Value.png"),
         9,

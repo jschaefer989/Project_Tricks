@@ -16,8 +16,8 @@ local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
 local push = require("Libraries.push")
 ____exports.padding = 5
-____exports.cardWidth = 71
-____exports.cardHeight = 97
+____exports.cardWidth = 70
+____exports.cardHeight = 96
 ____exports.default = __TS__Class()
 local CardAssets = ____exports.default
 CardAssets.name = "CardAssets"
@@ -33,6 +33,7 @@ function CardAssets.prototype.addAsset(self, card, cardX, cardY, includeClickHan
     local assetId = ____exports.default:getBaseAssetId(card)
     local baseCardAsset = __TS__New(
         Asset,
+        self.gameManager,
         assetId,
         self.baseCard,
         cardX,
@@ -43,13 +44,13 @@ function CardAssets.prototype.addAsset(self, card, cardX, cardY, includeClickHan
             onClick = includeClickHandler and (function() return card:onClick() end) or nil,
             onHover = function(____, asset) return card:onHover(asset) end,
             onUnhover = function(____, asset) return card:onUnhover(asset) end,
-            hoverEffect = includeClickHandler and ({HoverEffects.SCALE_UP}) or ({HoverEffects.NONE}),
+            hoverEffect = includeClickHandler and ({HoverEffects.SHIMMER}) or ({HoverEffects.NONE}),
             clickSound = includeClickHandler and self.cardClick or nil,
             isDisabled = true,
             useDisabledAnimation = false
         }
     )
-    self.gameManager.assetManager:addAsset(assetId, baseCardAsset)
+    self.gameManager.assetManager:addAsset(assetId, baseCardAsset, true)
     self:addSuitAsset(card, cardX, cardY, includeClickHandler)
     self:addRankAsset(card, cardX, cardY, includeClickHandler)
 end
@@ -68,6 +69,7 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
     local normalPosition = self:getNormalSuitPosition(x, y)
     local normalAsset = __TS__New(
         Asset,
+        self.gameManager,
         normalAssetId,
         love.graphics.newImage(suitImagePath),
         normalPosition.x,
@@ -78,7 +80,7 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
             onClick = includeClickHandler and (function() return card:onClick() end) or nil,
             onHover = onHoverCallback,
             onUnhover = function(____, asset) return card:onUnhover(asset) end,
-            hoverEffect = includeClickHandler and ({HoverEffects.SCALE_UP}) or ({HoverEffects.NONE}),
+            hoverEffect = includeClickHandler and ({HoverEffects.SHIMMER}) or ({HoverEffects.NONE}),
             clickSound = includeClickHandler and self.cardClick or nil,
             isDisabled = true,
             useDisabledAnimation = false
@@ -92,6 +94,7 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
     local flippedAssetId = ____exports.default:getSuitAssetId(card, 1)
     local flippedAsset = __TS__New(
         Asset,
+        self.gameManager,
         flippedAssetId,
         love.graphics.newImage(suitImagePath),
         flippedPosition.x,
@@ -103,7 +106,7 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
             onHover = onHoverCallback,
             onUnhover = function(____, asset) return card:onUnhover(asset) end,
             orientation = 0,
-            hoverEffect = includeClickHandler and ({HoverEffects.SCALE_UP}) or ({HoverEffects.NONE}),
+            hoverEffect = includeClickHandler and ({HoverEffects.SHIMMER}) or ({HoverEffects.NONE}),
             scaleX = -1,
             scaleY = -1,
             clickSound = includeClickHandler and self.cardClick or nil,
@@ -132,6 +135,7 @@ function CardAssets.prototype.addRankAsset(self, card, x, y, includeClickHandler
     local rankPosition = self:getRankPosition(x, y, rankImage)
     local asset = __TS__New(
         Asset,
+        self.gameManager,
         assetId,
         rankImage,
         rankPosition.x,
@@ -142,7 +146,7 @@ function CardAssets.prototype.addRankAsset(self, card, x, y, includeClickHandler
             onClick = includeClickHandler and (function() return card:onClick() end) or nil,
             onHover = function(____, asset) return card:onHover(asset) end,
             onUnhover = function(____, asset) return card:onUnhover(asset) end,
-            hoverEffect = includeClickHandler and ({HoverEffects.SCALE_UP}) or ({HoverEffects.NONE}),
+            hoverEffect = includeClickHandler and ({HoverEffects.SHIMMER}) or ({HoverEffects.NONE}),
             clickSound = includeClickHandler and self.cardClick or nil,
             isDisabled = true,
             useDisabledAnimation = false
@@ -288,7 +292,7 @@ function CardAssets.prototype.getRankAsset(self, card)
         ____exports.default:getRankAssetId(card, 0)
     )
 end
-function CardAssets.prototype.getCardPosition(self, characterType)
+function CardAssets.prototype.getHandYCoordinate(self, characterType)
     local screenH = push:getHeight()
     return screenH / 2 + self:getHeightModifier(characterType)
 end
@@ -319,7 +323,7 @@ function CardAssets.prototype.determineCardStartingPosition(self, characterType)
     local totalW = cardCount * ____exports.cardWidth + math.max(0, cardCount - 1) * ____exports.padding
     return {
         x = math.floor((screenW - totalW) / 2),
-        y = self:getCardPosition(characterType)
+        y = self:getHandYCoordinate(characterType)
     }
 end
 function CardAssets.prototype.appendAsset(self, card, characterType)

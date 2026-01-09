@@ -39,8 +39,6 @@ export default class Player extends Character {
     load(data: PlayerData): void;
     save(): PlayerData;
     setup(): void;
-    removeSelectedCardsFromHand(): void;
-    discard(): void;
     anySelectedCards(): boolean;
     getSelectedCards(): Card[];
     cashout(points: number): void;
@@ -52,5 +50,6 @@ export default class Player extends Character {
     levelUp(): void;
     addExperience(exp: number): void;
     unselectCards(): void;
+    discard(): number[];
 }
 export {};

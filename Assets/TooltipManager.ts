@@ -57,6 +57,7 @@ export default class TooltipManager {
     this.addAsset(
       AssetIds.TOOLTIP_BACKGROUND,
       new Asset(
+        this.gameManager,
         AssetIds.TOOLTIP_BACKGROUND,
         tooltipImage,
         tooltipX,
