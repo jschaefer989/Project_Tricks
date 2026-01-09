@@ -18,7 +18,7 @@ export default class CardAssets {
     board: Board;
     baseCard: Image;
     cardClick: import("love.audio").Source;
-    cardAssetConstructionOptions: (includeClickHandler: boolean, card: Card, orientation?: number, scaleX?: number, scaleY?: number) => ConstructionOptions;
+    cardAssetConstructionOptions: (includeClickHandler: boolean, card: Card) => ConstructionOptions;
     constructor(gameManager: GameManager, board: Board);
     addAsset(card: Card, cardX: number, cardY: number, includeClickHandler?: boolean): void;
     static getBaseAssetId(card: Card): string;

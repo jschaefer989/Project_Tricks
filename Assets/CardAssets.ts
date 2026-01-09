@@ -32,29 +32,14 @@ export default class CardAssets {
   cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static");
   cardAssetConstructionOptions: (
     includeClickHandler: boolean,
-    card: Card,
-    orientation?: number,
-    scaleX?: number,
-    scaleY?: number
-  ) => ConstructionOptions = (
-    includeClickHandler,
-    card,
-    orientation,
-    scaleX,
-    scaleY
-  ) => ({
+    card: Card
+  ) => ConstructionOptions = (includeClickHandler, card) => ({
     onClick: includeClickHandler ? () => card.onClick() : undefined,
     onHover: (asset: Asset) => card.onHover(asset),
     onUnhover: (asset: Asset) => card.onUnhover(asset),
-    hoverEffect: includeClickHandler
-      ? [HoverEffects.SHIMMER]
-      : [HoverEffects.NONE],
     clickSound: includeClickHandler ? this.cardClick : undefined,
     isDisabled: true, // Disabled by default, enabled after animations complete
     useDisabledAnimation: false,
-    orientation: orientation,
-    scaleX: scaleX,
-    scaleY: scaleY,
   });
 
   constructor(gameManager: GameManager, board: Board) {
@@ -77,7 +62,12 @@ export default class CardAssets {
       cardY,
       cardWidth,
       cardHeight,
-      this.cardAssetConstructionOptions(includeClickHandler, card)
+      {
+        hoverEffect: includeClickHandler
+          ? [HoverEffects.SHIMMER, HoverEffects.WOBBLE]
+          : [HoverEffects.NONE],
+        ...this.cardAssetConstructionOptions(includeClickHandler, card),
+      }
     );
     this.gameManager.assetManager.addAsset(assetId, baseCardAsset);
     this.addSuitAsset(card, cardX, cardY, includeClickHandler);
@@ -106,7 +96,12 @@ export default class CardAssets {
       normalPosition.y,
       16,
       16,
-      this.cardAssetConstructionOptions(includeClickHandler, card)
+      {
+        hoverEffect: includeClickHandler
+          ? [HoverEffects.WOBBLE]
+          : [HoverEffects.NONE],
+        ...this.cardAssetConstructionOptions(includeClickHandler, card),
+      }
     );
     this.gameManager.assetManager.addAsset(
       CardAssets.getBaseAssetId(card),
@@ -122,7 +117,15 @@ export default class CardAssets {
       flippedPosition.y,
       16,
       16,
-      this.cardAssetConstructionOptions(includeClickHandler, card, 0, -1, -1)
+      {
+        hoverEffect: includeClickHandler
+          ? [HoverEffects.WOBBLE]
+          : [HoverEffects.NONE],
+        orientation: 0,
+        scaleX: -1,
+        scaleY: -1,
+        ...this.cardAssetConstructionOptions(includeClickHandler, card),
+      }
     );
     this.gameManager.assetManager.addAsset(
       CardAssets.getBaseAssetId(card),
@@ -156,7 +159,12 @@ export default class CardAssets {
       rankPosition.y,
       64,
       64,
-      this.cardAssetConstructionOptions(includeClickHandler, card)
+      {
+        hoverEffect: includeClickHandler
+          ? [HoverEffects.WOBBLE]
+          : [HoverEffects.NONE],
+        ...this.cardAssetConstructionOptions(includeClickHandler, card),
+      }
     );
     this.gameManager.assetManager.addAsset(
       CardAssets.getBaseAssetId(card),

@@ -25,6 +25,7 @@ import MusicPlayer from "Assets/Music/MusicPlayer";
 import Biome from "Biomes/Biome";
 import Grass from "Biomes/Grass";
 import BackgroundManager from "Screens/BackgroundManager";
+import ShaderManager from "Shaders/ShaderManager";
 
 interface GameState {
   update: (dt: number) => void;
@@ -52,6 +53,7 @@ export default class GameManager {
   musicPlayer = new MusicPlayer(this);
   biome: Biome
   backgroundManager = new BackgroundManager(this);
+  shaderManager = new ShaderManager(this);
   devMode: boolean = false; // Change if you want to test in dev mode
 
   constructor() {
@@ -173,10 +175,10 @@ export default class GameManager {
     shadowShader.send("shadow_color", [0, 0, 0]); 
 
     const boardState: GameState = {
-      update: (dt: number) => {
-        
+      update: (dt: number) => {        
         this.assetManager.handleMouseHover();        
         this.animationManager.updateAnimations(dt);
+        this.shaderManager.updateShaders(dt);
       },
       draw: () => {
         if (!this.devMode) {

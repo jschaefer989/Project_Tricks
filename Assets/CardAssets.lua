@@ -1,5 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____Asset = require("Assets.Asset")
@@ -24,17 +25,13 @@ CardAssets.name = "CardAssets"
 function CardAssets.prototype.____constructor(self, gameManager, board)
     self.baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png")
     self.cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static")
-    self.cardAssetConstructionOptions = function(____, includeClickHandler, card, orientation, scaleX, scaleY) return {
+    self.cardAssetConstructionOptions = function(____, includeClickHandler, card) return {
         onClick = includeClickHandler and (function() return card:onClick() end) or nil,
         onHover = function(____, asset) return card:onHover(asset) end,
         onUnhover = function(____, asset) return card:onUnhover(asset) end,
-        hoverEffect = includeClickHandler and ({HoverEffects.SHIMMER}) or ({HoverEffects.NONE}),
         clickSound = includeClickHandler and self.cardClick or nil,
         isDisabled = true,
-        useDisabledAnimation = false,
-        orientation = orientation,
-        scaleX = scaleX,
-        scaleY = scaleY
+        useDisabledAnimation = false
     } end
     self.gameManager = gameManager
     self.board = board
@@ -53,7 +50,10 @@ function CardAssets.prototype.addAsset(self, card, cardX, cardY, includeClickHan
         cardY,
         ____exports.cardWidth,
         ____exports.cardHeight,
-        self:cardAssetConstructionOptions(includeClickHandler, card)
+        __TS__ObjectAssign(
+            {hoverEffect = includeClickHandler and ({HoverEffects.SHIMMER, HoverEffects.WOBBLE}) or ({HoverEffects.NONE})},
+            self:cardAssetConstructionOptions(includeClickHandler, card)
+        )
     )
     self.gameManager.assetManager:addAsset(assetId, baseCardAsset)
     self:addSuitAsset(card, cardX, cardY, includeClickHandler)
@@ -78,7 +78,10 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
         normalPosition.y,
         16,
         16,
-        self:cardAssetConstructionOptions(includeClickHandler, card)
+        __TS__ObjectAssign(
+            {hoverEffect = includeClickHandler and ({HoverEffects.WOBBLE}) or ({HoverEffects.NONE})},
+            self:cardAssetConstructionOptions(includeClickHandler, card)
+        )
     )
     self.gameManager.assetManager:addAsset(
         ____exports.default:getBaseAssetId(card),
@@ -95,12 +98,9 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
         flippedPosition.y,
         16,
         16,
-        self:cardAssetConstructionOptions(
-            includeClickHandler,
-            card,
-            0,
-            -1,
-            -1
+        __TS__ObjectAssign(
+            {hoverEffect = includeClickHandler and ({HoverEffects.WOBBLE}) or ({HoverEffects.NONE}), orientation = 0, scaleX = -1, scaleY = -1},
+            self:cardAssetConstructionOptions(includeClickHandler, card)
         )
     )
     self.gameManager.assetManager:addAsset(
@@ -131,7 +131,10 @@ function CardAssets.prototype.addRankAsset(self, card, x, y, includeClickHandler
         rankPosition.y,
         64,
         64,
-        self:cardAssetConstructionOptions(includeClickHandler, card)
+        __TS__ObjectAssign(
+            {hoverEffect = includeClickHandler and ({HoverEffects.WOBBLE}) or ({HoverEffects.NONE})},
+            self:cardAssetConstructionOptions(includeClickHandler, card)
+        )
     )
     self.gameManager.assetManager:addAsset(
         ____exports.default:getBaseAssetId(card),

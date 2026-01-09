@@ -147,6 +147,7 @@ export enum HoverEffects {
     CHANGE_COLOR = "CHANGE_COLOR",
     SHIFT_UP = "SHIFT_UP",
     SHIMMER = "SHIMMER",
+    WOBBLE = "WOBBLE",
 }
 
 export enum MousePressEffects {

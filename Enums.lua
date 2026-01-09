@@ -121,6 +121,7 @@ ____exports.HoverEffects.SCALE_UP = "SCALE_UP"
 ____exports.HoverEffects.CHANGE_COLOR = "CHANGE_COLOR"
 ____exports.HoverEffects.SHIFT_UP = "SHIFT_UP"
 ____exports.HoverEffects.SHIMMER = "SHIMMER"
+____exports.HoverEffects.WOBBLE = "WOBBLE"
 ____exports.MousePressEffects = MousePressEffects or ({})
 ____exports.MousePressEffects.NONE = "NONE"
 ____exports.MousePressEffects.SCALE_DOWN = "SCALE_DOWN"

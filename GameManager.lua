@@ -46,6 +46,8 @@ local ____Grass = require("Biomes.Grass")
 local Grass = ____Grass.default
 local ____BackgroundManager = require("Screens.BackgroundManager")
 local BackgroundManager = ____BackgroundManager.default
+local ____ShaderManager = require("Shaders.ShaderManager")
+local ShaderManager = ____ShaderManager.default
 ____exports.default = __TS__Class()
 local GameManager = ____exports.default
 GameManager.name = "GameManager"
@@ -57,6 +59,7 @@ function GameManager.prototype.____constructor(self)
     self.animationManager = __TS__New(AnimationManager, self)
     self.musicPlayer = __TS__New(MusicPlayer, self)
     self.backgroundManager = __TS__New(BackgroundManager, self)
+    self.shaderManager = __TS__New(ShaderManager, self)
     self.devMode = false
     self.gameState = GameStates.MAIN_MENU
     self.biome = __TS__New(Grass)
@@ -197,6 +200,7 @@ function GameManager.prototype.switchToBoard(self, enemy)
         update = function(____, dt)
             self.assetManager:handleMouseHover()
             self.animationManager:updateAnimations(dt)
+            self.shaderManager:updateShaders(dt)
         end,
         draw = function()
             if not self.devMode then

@@ -3,14 +3,15 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____Enums = require("Enums")
-local AnimationIds = ____Enums.AnimationIds
 local HoverEffects = ____Enums.HoverEffects
 local MousePressEffects = ____Enums.MousePressEffects
 local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
-local ____ShimmerAnimation = require("Assets.Animations.ShimmerAnimation")
-local ShimmerAnimation = ____ShimmerAnimation.default
+local ____ShimmerShader = require("Shaders.ShimmerShader")
+local ShimmerShader = ____ShimmerShader.default
+local ____WobbleAnimation = require("Assets.Animations.WobbleAnimation")
+local WobbleAnimation = ____WobbleAnimation.default
 ____exports.default = __TS__Class()
 local Asset = ____exports.default
 Asset.name = "Asset"
@@ -58,6 +59,7 @@ function Asset.prototype.drawAsset(self)
         return
     end
     love.graphics.setColor(self.color)
+    self.gameManager.shaderManager:applyShaders(self)
     if #self.quads > 0 then
         for ____, quad in ipairs(self.quads) do
             love.graphics.draw(
@@ -84,6 +86,7 @@ function Asset.prototype.drawAsset(self)
             self.offsetY
         )
     end
+    self.gameManager.shaderManager:removeShaders()
     love.graphics.setColor(1, 1, 1, 1)
 end
 function Asset.prototype.updatePosition(self, x, y)
@@ -120,6 +123,11 @@ function Asset.prototype.handleHoverEffects(self, hovered)
             ____cond13 = ____cond13 or ____switch13 == HoverEffects.SHIMMER
             if ____cond13 then
                 self:shimmer(hovered)
+                break
+            end
+            ____cond13 = ____cond13 or ____switch13 == HoverEffects.WOBBLE
+            if ____cond13 then
+                self:wobble(hovered)
                 break
             end
             do
@@ -255,18 +263,26 @@ function Asset.prototype.shimmer(self, hovered)
     if not hovered then
         return
     end
-    if self.gameManager.animationManager.animations:has(AnimationIds.SHIMMER_CARD) then
-        return
-    end
-    local assets = self.gameManager.assetManager:getAssets(self.id)
-    if isEmpty(assets) then
-        return
-    end
-    local shimmerAnim = __TS__New(
-        ShimmerAnimation,
-        function() return not self.isHovered end,
-        assets
+    self.gameManager.shaderManager:addShader(
+        self.id,
+        __TS__New(
+            ShimmerShader,
+            self.gameManager,
+            function() return not self.isHovered end,
+            {self}
+        )
     )
-    self.gameManager.animationManager:startAnimation(AnimationIds.SHIMMER_CARD, shimmerAnim)
+end
+function Asset.prototype.wobble(self, hovered)
+    if not hovered then
+        return
+    end
+    local wobbleId = "wobble-hover-" .. self.id
+    if not self.gameManager.animationManager.animations:has(wobbleId) then
+        self.gameManager.animationManager.animations:set(
+            wobbleId,
+            __TS__New(WobbleAnimation, 0.2, 2, {self})
+        )
+    end
 end
 return ____exports

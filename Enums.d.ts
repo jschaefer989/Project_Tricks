@@ -129,7 +129,8 @@ export declare enum HoverEffects {
     SCALE_UP = "SCALE_UP",
     CHANGE_COLOR = "CHANGE_COLOR",
     SHIFT_UP = "SHIFT_UP",
-    SHIMMER = "SHIMMER"
+    SHIMMER = "SHIMMER",
+    WOBBLE = "WOBBLE"
 }
 export declare enum MousePressEffects {
     NONE = "NONE",

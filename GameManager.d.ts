@@ -20,6 +20,7 @@ import AnimationManager from "Assets/Animations/AnimationManager";
 import MusicPlayer from "Assets/Music/MusicPlayer";
 import Biome from "Biomes/Biome";
 import BackgroundManager from "Screens/BackgroundManager";
+import ShaderManager from "Shaders/ShaderManager";
 export default class GameManager {
     gameState: GameStates;
     player: Player;
@@ -39,6 +40,7 @@ export default class GameManager {
     musicPlayer: MusicPlayer;
     biome: Biome;
     backgroundManager: BackgroundManager;
+    shaderManager: ShaderManager;
     devMode: boolean;
     constructor();
     getCharacter(characterType: string): Character | undefined;

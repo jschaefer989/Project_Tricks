@@ -1,11 +1,12 @@
 import { Source } from "love.audio";
 import { Image } from "love.graphics";
 import FontWithPosition from "./FontWithPosition";
-import { AnimationIds, HoverEffects, MousePressEffects } from "Enums";
+import { HoverEffects, MousePressEffects } from "Enums";
 import { exhaustiveGuard, isEmpty } from "Helpers";
 import QuadWithPosition from "./QuadWithPosition";
-import ShimmerAnimation from "./Animations/ShimmerAnimation";
 import GameManager from "GameManager";
+import ShimmerShader from "Shaders/ShimmerShader";
+import WobbleAnimation from "./Animations/WobbleAnimation";
 
 export type AssetCallback = (asset: Asset) => void;
 
@@ -98,6 +99,7 @@ export default class Asset {
     }
 
     love.graphics.setColor(this.color);
+    this.gameManager.shaderManager.applyShaders(this);
 
     if (this.quads.length > 0) {
       for (const quad of this.quads) {
@@ -126,6 +128,7 @@ export default class Asset {
       );
     }
 
+    this.gameManager.shaderManager.removeShaders();
     love.graphics.setColor(1, 1, 1, 1);
   }
 
@@ -156,6 +159,9 @@ export default class Asset {
           break;
         case HoverEffects.SHIMMER:
           this.shimmer(hovered);
+          break;
+        case HoverEffects.WOBBLE:
+          this.wobble(hovered);
           break;
         default:
           exhaustiveGuard(effect);
@@ -298,22 +304,24 @@ export default class Asset {
   private shimmer(hovered: boolean): void {
     if (!hovered) {
       return;
-    }
-    if (
-      this.gameManager.animationManager.animations.has(
-        AnimationIds.SHIMMER_CARD
-      )
-    ) {
-      return;
-    }
-    const assets = this.gameManager.assetManager.getAssets(this.id);
-    if (isEmpty(assets)) {
-      return;
-    }
-    const shimmerAnim = new ShimmerAnimation(() => !this.isHovered, assets);
-    this.gameManager.animationManager.startAnimation(
-      AnimationIds.SHIMMER_CARD,
-      shimmerAnim
+    }    
+    this.gameManager.shaderManager.addShader(
+      this.id,
+      new ShimmerShader(this.gameManager, () => !this.isHovered, [this])
     );
+  }
+
+  private wobble(hovered: boolean): void {
+    if (!hovered) {
+      return;
+    }
+    
+    const wobbleId = `wobble-hover-${this.id}`;
+    if (!this.gameManager.animationManager.animations.has(wobbleId)) {
+      this.gameManager.animationManager.animations.set(
+        wobbleId,
+        new WobbleAnimation(0.2, 2, [this])
+      );
+    }
   }
 }

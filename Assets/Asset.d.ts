@@ -65,4 +65,5 @@ export default class Asset {
     private shiftDown;
     private shiftUp;
     private shimmer;
+    private wobble;
 }
