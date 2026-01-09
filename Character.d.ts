@@ -11,11 +11,8 @@ export default class Character {
     constructor(gameManager: GameManager, type: CharacterTypes);
     addToHand(card: Card, index?: number): void;
     removeFromHand(card: Card): void;
-    getCardFromHand(position: number): Card | undefined;
     addToDeck(card: Card): void;
-    getCardFromDeck(position: number): Card | undefined;
     addToDiscards(card: Card): void;
-    getCardFromDiscards(position: number): Card | undefined;
     addDiscardsToDeck(): void;
     deselectAllCards(): void;
     getCardPower(): number;

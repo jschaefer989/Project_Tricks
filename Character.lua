@@ -36,22 +36,13 @@ function Character.prototype.removeFromHand(self, card)
         end
     end
 end
-function Character.prototype.getCardFromHand(self, position)
-    return self.hand[position + 1]
-end
 function Character.prototype.addToDeck(self, card)
     local ____self_deck_1 = self.deck
     ____self_deck_1[#____self_deck_1 + 1] = card
 end
-function Character.prototype.getCardFromDeck(self, position)
-    return self.deck[position + 1]
-end
 function Character.prototype.addToDiscards(self, card)
     local ____self_discardPile_2 = self.discardPile
     ____self_discardPile_2[#____self_discardPile_2 + 1] = card
-end
-function Character.prototype.getCardFromDiscards(self, position)
-    return self.discardPile[position + 1]
 end
 function Character.prototype.addDiscardsToDeck(self)
     for ____, card in ipairs(self.discardPile) do

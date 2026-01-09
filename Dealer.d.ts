@@ -3,10 +3,12 @@ import { Suits, Ranks, CharacterTypes, EdelRanks } from "./Enums";
 import Card from "Cards/Card";
 import GameManager from "./GameManager";
 import Point from "./Point";
+import Board from "Screens/Board";
 export default class Dealer {
     gameManager: GameManager;
     lootCards: Card[];
-    constructor(gameManager: GameManager);
+    board: Board;
+    constructor(gameManager: GameManager, board: Board);
     setup(): void;
     dealEdel(): void;
     dealHandAtStartOfFight(): void;

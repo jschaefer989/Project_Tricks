@@ -4,6 +4,7 @@ import { Suits, Ranks, EdelRanks, CharacterTypes } from "Enums";
 import GameManager from "GameManager";
 import Point from "Point";
 import { Image } from "love.graphics";
+import Board from "Screens/Board";
 export declare const padding = 5;
 export declare const cardWidth = 70;
 export declare const cardHeight = 96;
@@ -14,10 +15,11 @@ interface AssetsForCard {
 }
 export default class CardAssets {
     gameManager: GameManager;
+    board: Board;
     baseCard: Image;
     cardClick: import("love.audio").Source;
-    cardAssetConstructionOptions: (includeClickHandler: boolean, card: Card, orientation?: number) => ConstructionOptions;
-    constructor(gameManager: GameManager);
+    cardAssetConstructionOptions: (includeClickHandler: boolean, card: Card, orientation?: number, scaleX?: number, scaleY?: number) => ConstructionOptions;
+    constructor(gameManager: GameManager, board: Board);
     addAsset(card: Card, cardX: number, cardY: number, includeClickHandler?: boolean): void;
     static getBaseAssetId(card: Card): string;
     addSuitAsset(card: Card, x: number, y: number, includeClickHandler?: boolean): void;
@@ -39,5 +41,6 @@ export default class CardAssets {
     getCardAssets(card: Card): AssetsForCard;
     getCardAssetList(card: Card): Asset[];
     disableAllCards(disable: boolean): void;
+    redrawCard(card: Card): void;
 }
 export {};

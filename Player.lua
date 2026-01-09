@@ -110,7 +110,7 @@ function Player.prototype.addMoney(self, amount)
     self.money = self.money + amount
     self.gameManager.assetManager.textManager:updateText(
         TextIds.PLAYER_PORTRAIT_MONEY,
-        tostring(self.money) .. " Mark"
+        tostring(self.money)
     )
 end
 function Player.prototype.hasPerk(self, perkType)

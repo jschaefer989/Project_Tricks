@@ -30,17 +30,32 @@ export default class CardAssets {
   board: Board;
   baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png");
   cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static");
-  cardAssetConstructionOptions: (includeClickHandler: boolean, card: Card, orientation?: number) => ConstructionOptions = (includeClickHandler, card) => ({
-        onClick: includeClickHandler ? () => card.onClick() : undefined,
-        onHover: (asset: Asset) => card.onHover(asset),
-        onUnhover: (asset: Asset) => card.onUnhover(asset),
-        hoverEffect: includeClickHandler
-          ? [HoverEffects.SHIMMER]
-          : [HoverEffects.NONE],
-        clickSound: includeClickHandler ? this.cardClick : undefined,
-        isDisabled: true, // Disabled by default, enabled after animations complete
-        useDisabledAnimation: false,
-      });
+  cardAssetConstructionOptions: (
+    includeClickHandler: boolean,
+    card: Card,
+    orientation?: number,
+    scaleX?: number,
+    scaleY?: number
+  ) => ConstructionOptions = (
+    includeClickHandler,
+    card,
+    orientation,
+    scaleX,
+    scaleY
+  ) => ({
+    onClick: includeClickHandler ? () => card.onClick() : undefined,
+    onHover: (asset: Asset) => card.onHover(asset),
+    onUnhover: (asset: Asset) => card.onUnhover(asset),
+    hoverEffect: includeClickHandler
+      ? [HoverEffects.SHIMMER]
+      : [HoverEffects.NONE],
+    clickSound: includeClickHandler ? this.cardClick : undefined,
+    isDisabled: true, // Disabled by default, enabled after animations complete
+    useDisabledAnimation: false,
+    orientation: orientation,
+    scaleX: scaleX,
+    scaleY: scaleY,
+  });
 
   constructor(gameManager: GameManager, board: Board) {
     this.gameManager = gameManager;
@@ -107,7 +122,7 @@ export default class CardAssets {
       flippedPosition.y,
       16,
       16,
-      this.cardAssetConstructionOptions(includeClickHandler, card, 0)
+      this.cardAssetConstructionOptions(includeClickHandler, card, 0, -1, -1)
     );
     this.gameManager.assetManager.addAsset(
       CardAssets.getBaseAssetId(card),
@@ -252,7 +267,7 @@ export default class CardAssets {
   getHandYCoordinate(characterType: CharacterTypes): number {
     const screenH = push.getHeight();
     return screenH / 2 + this.getHeightModifier(characterType);
-  } 
+  }
 
   getHeightModifier(characterType: CharacterTypes): number {
     switch (characterType) {
@@ -347,5 +362,14 @@ export default class CardAssets {
         asset.isDisabled = disable;
       }
     }
+  }
+
+  redrawCard(card: Card): void {
+    const { baseAsset } = this.getCardAssets(card);
+    if (isEmpty(baseAsset)) {
+      return;
+    }
+    this.gameManager.assetManager.removeAssets(CardAssets.getBaseAssetId(card));
+    this.addAsset(card, baseAsset.x, baseAsset.y);
   }
 }

@@ -21,19 +21,23 @@ ____exports.cardHeight = 96
 ____exports.default = __TS__Class()
 local CardAssets = ____exports.default
 CardAssets.name = "CardAssets"
-function CardAssets.prototype.____constructor(self, gameManager)
+function CardAssets.prototype.____constructor(self, gameManager, board)
     self.baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png")
     self.cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static")
-    self.cardAssetConstructionOptions = function(____, includeClickHandler, card) return {
+    self.cardAssetConstructionOptions = function(____, includeClickHandler, card, orientation, scaleX, scaleY) return {
         onClick = includeClickHandler and (function() return card:onClick() end) or nil,
         onHover = function(____, asset) return card:onHover(asset) end,
         onUnhover = function(____, asset) return card:onUnhover(asset) end,
         hoverEffect = includeClickHandler and ({HoverEffects.SHIMMER}) or ({HoverEffects.NONE}),
         clickSound = includeClickHandler and self.cardClick or nil,
         isDisabled = true,
-        useDisabledAnimation = false
+        useDisabledAnimation = false,
+        orientation = orientation,
+        scaleX = scaleX,
+        scaleY = scaleY
     } end
     self.gameManager = gameManager
+    self.board = board
 end
 function CardAssets.prototype.addAsset(self, card, cardX, cardY, includeClickHandler)
     if includeClickHandler == nil then
@@ -91,7 +95,13 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
         flippedPosition.y,
         16,
         16,
-        self:cardAssetConstructionOptions(includeClickHandler, card, 0)
+        self:cardAssetConstructionOptions(
+            includeClickHandler,
+            card,
+            0,
+            -1,
+            -1
+        )
     )
     self.gameManager.assetManager:addAsset(
         ____exports.default:getBaseAssetId(card),
@@ -272,8 +282,7 @@ function CardAssets.prototype.getHeightModifier(self, characterType)
         local ____switch30 = characterType
         local ____cond30 = ____switch30 == CharacterTypes.PLAYER
         if ____cond30 then
-            local ____opt_0 = self.gameManager.board
-            return not (____opt_0 and ____opt_0.showingEdelView) and -(____exports.cardHeight * 0.25) or ____exports.cardHeight / 2
+            return not self.board.showingEdelView and -(____exports.cardHeight * 0.25) or ____exports.cardHeight / 2
         end
         ____cond30 = ____cond30 or ____switch30 == CharacterTypes.ENEMY
         if ____cond30 then
@@ -318,10 +327,10 @@ function CardAssets.prototype.getCardAssets(self, card)
     return {baseAsset = baseAsset, suitAssets = {suitAsset0, suitAsset1}, rankAsset = rankAsset}
 end
 function CardAssets.prototype.getCardAssetList(self, card)
-    local ____temp_2 = self:getCardAssets(card)
-    local baseAsset = ____temp_2.baseAsset
-    local suitAssets = ____temp_2.suitAssets
-    local rankAsset = ____temp_2.rankAsset
+    local ____temp_0 = self:getCardAssets(card)
+    local baseAsset = ____temp_0.baseAsset
+    local suitAssets = ____temp_0.suitAssets
+    local rankAsset = ____temp_0.rankAsset
     local assets = {}
     if not isEmpty(baseAsset) then
         assets[#assets + 1] = baseAsset
@@ -346,5 +355,14 @@ function CardAssets.prototype.disableAllCards(self, disable)
             asset.isDisabled = disable
         end
     end
+end
+function CardAssets.prototype.redrawCard(self, card)
+    local ____temp_1 = self:getCardAssets(card)
+    local baseAsset = ____temp_1.baseAsset
+    if isEmpty(baseAsset) then
+        return
+    end
+    self.gameManager.assetManager:removeAssets(____exports.default:getBaseAssetId(card))
+    self:addAsset(card, baseAsset.x, baseAsset.y)
 end
 return ____exports

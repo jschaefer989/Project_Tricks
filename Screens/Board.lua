@@ -58,8 +58,8 @@ function Board.prototype.____constructor(self, gameManager, enemy)
     self.winFireSound = love.audio.newSource("Assets/Sounds/Dominating.wav", "static")
     self.gameManager = gameManager
     self.enemy = enemy or __TS__New(Enemy, gameManager)
-    self.dealer = __TS__New(Dealer, gameManager)
-    self.cardAssets = __TS__New(CardAssets, gameManager)
+    self.dealer = __TS__New(Dealer, gameManager, self)
+    self.cardAssets = __TS__New(CardAssets, gameManager, self)
 end
 function Board.prototype.load(self, data)
     self.discardUsed = data.discardUsed
@@ -137,11 +137,13 @@ function Board.prototype.handleAttack(self)
     end
     if self.playerPower > self.enemyPower then
         for ____, card in ipairs(self:getSlainCards(CharacterTypes.ENEMY)) do
+            self.cardAssets:redrawCard(card)
             self:startCutAnimation(card, CharacterTypes.PLAYER, CharacterTypes.ENEMY)
         end
         return
     else
         for ____, card in ipairs(self:getSlainCards(CharacterTypes.PLAYER)) do
+            self.cardAssets:redrawCard(card)
             self:startCutAnimation(card, CharacterTypes.ENEMY, CharacterTypes.PLAYER)
         end
     end

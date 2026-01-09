@@ -80,7 +80,6 @@ export default class Board {
     this.enemyPower = data.enemyPower;
     this.enemyValue = data.enemyValue;
     this.showingEdelView = data.showingInitialView ?? true;
-
     this.enemy = new Enemy(this.gameManager);
     this.enemy.load(this.gameManager, data.enemy);
   }
@@ -144,6 +143,7 @@ export default class Board {
     if (this.playerPower > this.enemyPower) {
       // Mark all enemy cards as cut and update the assets
       for (const card of this.getSlainCards(CharacterTypes.ENEMY)) {
+        this.cardAssets.redrawCard(card);
         this.startCutAnimation(
           card,
           CharacterTypes.PLAYER,
@@ -153,6 +153,7 @@ export default class Board {
       return; // Don't deal cards yet - let the animation play first
     } else {
       for (const card of this.getSlainCards(CharacterTypes.PLAYER)) {
+        this.cardAssets.redrawCard(card);
         this.startCutAnimation(
           card,
           CharacterTypes.ENEMY,
