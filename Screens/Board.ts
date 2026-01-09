@@ -66,8 +66,8 @@ export default class Board {
   constructor(gameManager: GameManager, enemy?: Enemy) {
     this.gameManager = gameManager;
     this.enemy = enemy ?? new Enemy(gameManager);
-    this.dealer = new Dealer(gameManager);
-    this.cardAssets = new CardAssets(gameManager);
+    this.dealer = new Dealer(gameManager, this);
+    this.cardAssets = new CardAssets(gameManager, this);
   }
 
   load(data: BoardData): void {

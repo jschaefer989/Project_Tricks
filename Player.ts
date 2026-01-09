@@ -116,7 +116,7 @@ export default class Player extends Character {
     this.money += amount;
     this.gameManager.assetManager.textManager.updateText(
       TextIds.PLAYER_PORTRAIT_MONEY,
-      `${this.money} Mark`
+      `${this.money}`
     );
   }
 

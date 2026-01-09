@@ -1,5 +1,5 @@
 import Card from "../Cards/Card";
-import Asset from "./Asset";
+import Asset, { ConstructionOptions } from "./Asset";
 import {
   Suits,
   AssetIds,
@@ -13,6 +13,7 @@ import GameManager from "GameManager";
 import * as push from "Libraries.push";
 import Point from "Point";
 import { Image } from "love.graphics";
+import Board from "Screens/Board";
 
 export const padding = 5;
 export const cardWidth = 70;
@@ -26,11 +27,24 @@ interface AssetsForCard {
 
 export default class CardAssets {
   gameManager: GameManager;
+  board: Board;
   baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png");
   cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static");
+  cardAssetConstructionOptions: (includeClickHandler: boolean, card: Card, orientation?: number) => ConstructionOptions = (includeClickHandler, card) => ({
+        onClick: includeClickHandler ? () => card.onClick() : undefined,
+        onHover: (asset: Asset) => card.onHover(asset),
+        onUnhover: (asset: Asset) => card.onUnhover(asset),
+        hoverEffect: includeClickHandler
+          ? [HoverEffects.SHIMMER]
+          : [HoverEffects.NONE],
+        clickSound: includeClickHandler ? this.cardClick : undefined,
+        isDisabled: true, // Disabled by default, enabled after animations complete
+        useDisabledAnimation: false,
+      });
 
-  constructor(gameManager: GameManager) {
+  constructor(gameManager: GameManager, board: Board) {
     this.gameManager = gameManager;
+    this.board = board;
   }
 
   addAsset(
@@ -48,19 +62,9 @@ export default class CardAssets {
       cardY,
       cardWidth,
       cardHeight,
-      {
-        onClick: includeClickHandler ? () => card.onClick() : undefined,
-        onHover: (asset: Asset) => card.onHover(asset),
-        onUnhover: (asset: Asset) => card.onUnhover(asset),
-        hoverEffect: includeClickHandler
-          ? [HoverEffects.SHIMMER]
-          : [HoverEffects.NONE],
-        clickSound: includeClickHandler ? this.cardClick : undefined,
-        isDisabled: true,
-        useDisabledAnimation: false,
-      }
+      this.cardAssetConstructionOptions(includeClickHandler, card)
     );
-    this.gameManager.assetManager.addAsset(assetId, baseCardAsset, true);
+    this.gameManager.assetManager.addAsset(assetId, baseCardAsset);
     this.addSuitAsset(card, cardX, cardY, includeClickHandler);
     this.addRankAsset(card, cardX, cardY, includeClickHandler);
   }
@@ -76,7 +80,7 @@ export default class CardAssets {
     includeClickHandler: boolean = true
   ): void {
     const suitImagePath = CardAssets.getSuitAssetPath(card.suit);
-    const onHoverCallback = (asset: Asset) => card.onHover(asset);
+
     const normalAssetId = CardAssets.getSuitAssetId(card, 0);
     const normalPosition = this.getNormalSuitPosition(x, y);
     const normalAsset = new Asset(
@@ -87,17 +91,7 @@ export default class CardAssets {
       normalPosition.y,
       16,
       16,
-      {
-        onClick: includeClickHandler ? () => card.onClick() : undefined,
-        onHover: onHoverCallback,
-        onUnhover: (asset: Asset) => card.onUnhover(asset),
-        hoverEffect: includeClickHandler
-          ? [HoverEffects.SHIMMER]
-          : [HoverEffects.NONE],
-        clickSound: includeClickHandler ? this.cardClick : undefined,
-        isDisabled: true,
-        useDisabledAnimation: false,
-      }
+      this.cardAssetConstructionOptions(includeClickHandler, card)
     );
     this.gameManager.assetManager.addAsset(
       CardAssets.getBaseAssetId(card),
@@ -113,20 +107,7 @@ export default class CardAssets {
       flippedPosition.y,
       16,
       16,
-      {
-        onClick: includeClickHandler ? () => card.onClick() : undefined,
-        onHover: onHoverCallback,
-        onUnhover: (asset: Asset) => card.onUnhover(asset),
-        orientation: 0,
-        hoverEffect: includeClickHandler
-          ? [HoverEffects.SHIMMER]
-          : [HoverEffects.NONE],
-        scaleX: -1,
-        scaleY: -1,
-        clickSound: includeClickHandler ? this.cardClick : undefined,
-        isDisabled: true,
-        useDisabledAnimation: false,
-      }
+      this.cardAssetConstructionOptions(includeClickHandler, card, 0)
     );
     this.gameManager.assetManager.addAsset(
       CardAssets.getBaseAssetId(card),
@@ -160,17 +141,7 @@ export default class CardAssets {
       rankPosition.y,
       64,
       64,
-      {
-        onClick: includeClickHandler ? () => card.onClick() : undefined,
-        onHover: (asset: Asset) => card.onHover(asset),
-        onUnhover: (asset: Asset) => card.onUnhover(asset),
-        hoverEffect: includeClickHandler
-          ? [HoverEffects.SHIMMER]
-          : [HoverEffects.NONE],
-        clickSound: includeClickHandler ? this.cardClick : undefined,
-        isDisabled: true,
-        useDisabledAnimation: false,
-      }
+      this.cardAssetConstructionOptions(includeClickHandler, card)
     );
     this.gameManager.assetManager.addAsset(
       CardAssets.getBaseAssetId(card),
@@ -286,7 +257,7 @@ export default class CardAssets {
   getHeightModifier(characterType: CharacterTypes): number {
     switch (characterType) {
       case CharacterTypes.PLAYER:
-        return !this.gameManager.board?.showingEdelView
+        return !this.board.showingEdelView
           ? -(cardHeight * 0.25)
           : cardHeight / 2;
       case CharacterTypes.ENEMY:

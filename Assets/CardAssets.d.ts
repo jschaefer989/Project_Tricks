@@ -1,5 +1,5 @@
 import Card from "../Cards/Card";
-import Asset from "./Asset";
+import Asset, { ConstructionOptions } from "./Asset";
 import { Suits, Ranks, EdelRanks, CharacterTypes } from "Enums";
 import GameManager from "GameManager";
 import Point from "Point";
@@ -16,6 +16,7 @@ export default class CardAssets {
     gameManager: GameManager;
     baseCard: Image;
     cardClick: import("love.audio").Source;
+    cardAssetConstructionOptions: (includeClickHandler: boolean, card: Card, orientation?: number) => ConstructionOptions;
     constructor(gameManager: GameManager);
     addAsset(card: Card, cardX: number, cardY: number, includeClickHandler?: boolean): void;
     static getBaseAssetId(card: Card): string;

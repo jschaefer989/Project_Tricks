@@ -37,13 +37,16 @@ import SlideAnimation from "Assets/Animations/SlideAnimation";
 import Pope from "Cards/Pope";
 import Chosen from "Cards/Chosen";
 import Baron from "Cards/Baron";
+import Board from "Screens/Board";
 
 export default class Dealer {
   gameManager: GameManager;
   lootCards: Card[];
+  board: Board;
 
-  constructor(gameManager: GameManager) {
+  constructor(gameManager: GameManager, board: Board) {
     this.gameManager = gameManager;
+    this.board = board;
     this.lootCards = [];
   }
 
@@ -72,13 +75,13 @@ export default class Dealer {
   }
 
   dealAtStartOfFightForCharacter(character: CharacterTypes): void {
-    this.gameManager.board?.cardAssets.disableAllCards(true);
+    this.board.cardAssets.disableAllCards(true);
     this.convertToEdelSuitForCharacter(character);
     Dealer.shuffle(this.gameManager, character);
     this.dealCards(character);
 
     if (character === CharacterTypes.ENEMY) {
-      this.gameManager.board?.tallyEnemyPowerAndValue();
+      this.board.tallyEnemyPowerAndValue();
     }
   }
 
@@ -102,7 +105,7 @@ export default class Dealer {
       case CharacterTypes.PLAYER:
         return this.gameManager.player.hand;
       case CharacterTypes.ENEMY:
-        return this.gameManager.board?.enemy.hand ?? [];
+        return this.board.enemy.hand ?? [];
       default:
         exhaustiveGuard(characterType);
     }
@@ -114,7 +117,7 @@ export default class Dealer {
         this.gameManager.player.putHandBackInDeck();
         break;
       case CharacterTypes.ENEMY:
-        this.gameManager.board?.enemy.putHandBackInDeck();
+        this.board.enemy.putHandBackInDeck();
         break;
       default:
         exhaustiveGuard(characterType);
@@ -215,25 +218,22 @@ export default class Dealer {
     // Calculate the final total card count after all cards are dealt
     const finalCardCount = character.hand.length + cardsToDeal;
 
-    let dealCount = 0;
     for (let index = 0; index < cardsToDeal; index++) {
       const card = character.deck.pop();
       if (isEmpty(card)) {
-        throw new Error(
-          `Not enough cards in deck to deal for ${characterType}`
-        );
+        continue
       }
 
       const indexToUse = removedIndices ? removedIndices[index] : index;
       character.addToHand(card, indexToUse);
 
       // Add card asset at deck position first
-      this.gameManager.board?.cardAssets.addAsset(
+      this.board.cardAssets.addAsset(
         card,
         deckPosition.x,
         deckPosition.y,
         characterType === CharacterTypes.PLAYER &&
-          !this.gameManager.board.showingEdelView
+          !this.board.showingEdelView
       );
 
       // Calculate final position for this card using the final card count
@@ -245,12 +245,6 @@ export default class Dealer {
 
       // Start slide animation from deck to final position
       this.startDealAnimation(characterType, card, handPosition.x, handPosition.y);
-      dealCount++;
-    }
-    if (dealCount < cardsToDeal) {
-      throw new Error(
-        `Dealt fewer cards (${dealCount}) than expected (${cardsToDeal}) for ${characterType}`
-      );
     }
 
     // Redraw the deck so that the cards aren't visible
@@ -261,11 +255,11 @@ export default class Dealer {
     switch (characterType) {
       case CharacterTypes.PLAYER:
         this.gameManager.assetManager.removeAssets(AssetIds.PLAYER_DECK);
-        this.gameManager.board?.buildPlayerDeck();
+        this.board.buildPlayerDeck();
         break;
       case CharacterTypes.ENEMY:
         this.gameManager.assetManager.removeAssets(AssetIds.ENEMY_DECK);
-        this.gameManager.board?.buildEnemyDeck();
+        this.board.buildEnemyDeck();
         break;
       default:
         exhaustiveGuard(characterType);
@@ -287,21 +281,17 @@ export default class Dealer {
         case CharacterTypes.PLAYER:
             return this.gameManager.player.discard();
         case CharacterTypes.ENEMY:
-            return this.gameManager.board?.enemy.discard() ?? [];
+            return this.board.enemy.discard() ?? [];
         default:
             exhaustiveGuard(characterType);
     }
   }
 
   dealNextHand(): void {
-    if (isEmpty(this.gameManager.board)) {
-      return;
-    }
-
     const playerIndices = this.discardCards(CharacterTypes.PLAYER, this.gameManager.player.getSelectedCards());
     this.dealCards(CharacterTypes.PLAYER, playerIndices);
 
-    const enemyIndices = this.discardCards(CharacterTypes.ENEMY, this.gameManager.board.enemy.hand ?? []);
+    const enemyIndices = this.discardCards(CharacterTypes.ENEMY, this.board.enemy.hand ?? []);
     this.dealCards(CharacterTypes.ENEMY, enemyIndices);
   }
 
@@ -309,7 +299,7 @@ export default class Dealer {
     const screenW = push.getWidth();
     const screenH = push.getHeight();
     const portraitPosition =
-      this.gameManager.board?.getPortraitPosition(characterType);
+      this.board.getPortraitPosition(characterType);
 
     // Position decks on the sides of the screen
     switch (characterType) {
@@ -336,7 +326,7 @@ export default class Dealer {
     const totalW = individualCardWidth * totalCardCount - padding;
     const startX = Math.floor((screenW - totalW) / 2);
     const cardY =
-      this.gameManager.board?.cardAssets.getHandYCoordinate(characterType) ??
+      this.board.cardAssets.getHandYCoordinate(characterType) ??
       (characterType === CharacterTypes.PLAYER
         ? screenH - cardHeight - 20
         : 20);
@@ -347,26 +337,15 @@ export default class Dealer {
     };
   }
 
-  startDealAnimation(characterType: CharacterTypes, card: Card, targetX: number, targetY: number): void {
-    if (isEmpty(this.gameManager.board)) {
-      throw new Error("Board is not initialized");
-    }
-    const { baseAsset } = this.gameManager.board.cardAssets.getCardAssets(card);
+  startDealAnimation(characterType: CharacterTypes, card: Card, targetX: number, targetY: number): void { 
+    const { baseAsset } = this.board.cardAssets.getCardAssets(card);
     const slideAssets =
-      this.gameManager.board?.cardAssets.getCardAssetList(card);
-
-    if (slideAssets.length === 0) {
-      throw new Error("No assets found for card animation");
-    }
+      this.board.cardAssets.getCardAssetList(card);
 
     const startX = baseAsset?.x ?? 0;
     const startY = baseAsset?.y ?? 0;
     const offsetX = targetX - startX;
     const offsetY = targetY - startY;
-
-    if (offsetX === 0 && offsetY === 0) {
-      throw new Error("Card is already at target position");
-    }
 
     this.gameManager.animationManager.animations.set(
       AnimationIds.CARD_DEAL + card.id,
@@ -386,14 +365,14 @@ export default class Dealer {
 
   getDealFinishMethod(characterType: CharacterTypes): (() => void) | undefined {
     // If the edel view is showing, display it after dealing
-    if (this.gameManager.board?.showingEdelView) {
-      return () => this.gameManager.board?.displayEdel();
+    if (this.board.showingEdelView) {
+      return () => this.board.displayEdel();
     // If both sides have zero points, start a fresh fight
     } else if (
-      this.gameManager.board?.playerPoints === 0 &&
-      this.gameManager.board?.enemyPoints === 0
+      this.board.playerPoints === 0 &&
+      this.board.enemyPoints === 0
     ) {
-      return () => this.gameManager.board?.displayFight();
+      return () => this.board.displayFight();
     // Otherwise, the deal happened as part of normal gameplay
     } else {
         return () => this.finishDeal(characterType);
@@ -404,28 +383,20 @@ export default class Dealer {
     if (this.gameManager.animationManager.hasAnimations()) {
       return;
     }
-    this.gameManager.board?.cardAssets.disableAllCards(false);
+    this.board.cardAssets.disableAllCards(false);
     if (characterType === CharacterTypes.ENEMY) {
-        this.gameManager.board?.tallyEnemyPowerAndValue();
+        this.board.tallyEnemyPowerAndValue();
     }    
   }
 
   startDiscardAnimation(characterType: CharacterTypes, cards: Card[]): void {
-    if (isEmpty(this.gameManager.board) || cards.length === 0) {
-      return;
-    }
-
     const targetY = this.getDiscardPosition(characterType);
 
     for (const card of cards) {
       const { baseAsset } =
-        this.gameManager.board.cardAssets.getCardAssets(card);
+        this.board.cardAssets.getCardAssets(card);
       const slideAssets =
-        this.gameManager.board?.cardAssets.getCardAssetList(card);
-
-      if (slideAssets.length === 0) {
-        continue;
-      }
+        this.board.cardAssets.getCardAssetList(card);
 
       const startY = baseAsset?.y ?? 0;
       const offsetX = 0;
@@ -465,21 +436,13 @@ export default class Dealer {
     cards: Card[],
     onFinish?: () => void
   ): void {
-    if (isEmpty(this.gameManager.board) || cards.length === 0) {
-      return;
-    }
-
     const deckPosition = this.getDeckPosition(characterType);
 
     for (const card of cards) {
       const { baseAsset } =
-        this.gameManager.board.cardAssets.getCardAssets(card);
+        this.board.cardAssets.getCardAssets(card);
       const slideAssets =
-        this.gameManager.board?.cardAssets.getCardAssetList(card);
-
-      if (slideAssets.length === 0) {
-        continue;
-      }
+        this.board.cardAssets.getCardAssetList(card);
 
       const startX = baseAsset?.x ?? 0;
       const startY = baseAsset?.y ?? 0;
@@ -504,21 +467,17 @@ export default class Dealer {
   }
 
   finishUpAnimation(card: Card, onFinish?: () => void): void {
-    this.gameManager.board?.cardAssets.removeCardAssets(card);
+    this.board.cardAssets.removeCardAssets(card);
 
     if (!this.gameManager.animationManager.hasAnimations()) {
-      this.gameManager.board?.cardAssets.disableAllCards(false);
+      this.board.cardAssets.disableAllCards(false);
       onFinish?.();
     }
   }
 
   initializeEnemyDeck(): void {
-    if (!this.gameManager.board || !this.gameManager.board.enemy) {
-      return;
-    }
-
-    for (let i = 0; i < this.gameManager.board.enemy.numberOfCardsInDeck; i++) {
-      this.gameManager.board.enemy.addToDeck(
+    for (let i = 0; i < this.board.enemy.numberOfCardsInDeck; i++) {
+      this.board.enemy.addToDeck(
         Dealer.getRandomCard(this.gameManager)
       );
     }
@@ -526,10 +485,6 @@ export default class Dealer {
   }
 
   determineEdelSuit(): void {
-    if (isEmpty(this.gameManager.board)) {
-      return;
-    }
-
     const player = this.gameManager.player;
     let edelCard: Card | undefined = undefined;
     let lowestPower: number = 100;
@@ -541,21 +496,17 @@ export default class Dealer {
       }
     }
 
-    for (const card of this.gameManager.board.enemy.hand) {
+    for (const card of this.board.enemy.hand) {
       if (card.power < lowestPower) {
         lowestPower = card.power;
         edelCard = card;
       }
     }
-    this.gameManager.board.edelCard = edelCard;
+    this.board.edelCard = edelCard;
   }
 
   convertToEdelSuit(card: Card): Card {
-    if (isEmpty(this.gameManager.board)) {
-      return card;
-    }
-
-    if (card.suit !== this.gameManager.board.edelCard?.suit) {
+    if (card.suit !== this.board.edelCard?.suit) {
       return card;
     }
 
@@ -563,37 +514,37 @@ export default class Dealer {
       case Ranks.SOLDIER:
         return new Knight(
           this.gameManager,
-          this.gameManager.board.edelCard?.suit
+          this.board.edelCard?.suit
         );
       case Ranks.BARON:
         return new Duke(
           this.gameManager,
-          this.gameManager.board.edelCard?.suit
+          this.board.edelCard?.suit
         );
       case Ranks.JESTER:
         return new Bard(
           this.gameManager,
-          this.gameManager.board.edelCard?.suit
+          this.board.edelCard?.suit
         );
       case Ranks.DEUCE:
         return new Emperor(
           this.gameManager,
-          this.gameManager.board.edelCard?.suit
+          this.board.edelCard?.suit
         );
       case Ranks.PRIEST:
         return new Pope(
           this.gameManager,
-          this.gameManager.board.edelCard?.suit
+          this.board.edelCard?.suit
         );
       case Ranks.THIEF:
         return new Devil(
           this.gameManager,
-          this.gameManager.board.edelCard?.suit
+          this.board.edelCard?.suit
         );
       case Ranks.SERGEANT:
         return new Chosen(
           this.gameManager,
-          this.gameManager.board.edelCard?.suit
+          this.board.edelCard?.suit
         );
       default:
         return card;
@@ -603,12 +554,12 @@ export default class Dealer {
   convertToEdelSuitForCharacter(characterType: string): void {
     const character = this.gameManager.getCharacter(characterType);
 
-    if (isEmpty(character) || isEmpty(this.gameManager.board)) {
+    if (isEmpty(character)) {
       return;
     }
 
     for (const card of character.deck) {
-      if (card.suit !== this.gameManager.board.edelCard?.suit) {
+      if (card.suit !== this.board.edelCard?.suit) {
         continue;
       }
       const edelCard = this.convertToEdelSuit(card);
@@ -620,11 +571,7 @@ export default class Dealer {
   }
 
   convertBackToOriginalSuit(card: Card): Card {
-    if (isEmpty(this.gameManager.board)) {
-      return card;
-    }
-
-    if (card.suit !== this.gameManager.board.edelCard?.suit) {
+    if (card.suit !== this.board.edelCard?.suit) {
       return card;
     }
 
@@ -632,37 +579,37 @@ export default class Dealer {
       case EdelRanks.KNIGHT:
         return new Soldier(
           this.gameManager,
-          this.gameManager.board.edelCard?.suit
+          this.board.edelCard?.suit
         );
       case EdelRanks.DUKE:
         return new Baron(
           this.gameManager,
-          this.gameManager.board.edelCard?.suit
+          this.board.edelCard?.suit
         );
       case EdelRanks.BARD:
         return new Jester(
           this.gameManager,
-          this.gameManager.board.edelCard?.suit
+          this.board.edelCard?.suit
         );
       case EdelRanks.EMPEROR:
         return new Deuce(
           this.gameManager,
-          this.gameManager.board.edelCard?.suit
+          this.board.edelCard?.suit
         );
       case EdelRanks.POPE:
         return new Priest(
           this.gameManager,
-          this.gameManager.board.edelCard?.suit
+          this.board.edelCard?.suit
         );
       case EdelRanks.DEVIL:
         return new Thief(
           this.gameManager,
-          this.gameManager.board.edelCard?.suit
+          this.board.edelCard?.suit
         );
       case EdelRanks.CHOSEN:
         return new Sergeant(
           this.gameManager,
-          this.gameManager.board.edelCard?.suit
+          this.board.edelCard?.suit
         );
       default:
         return card;
@@ -672,12 +619,12 @@ export default class Dealer {
   convertBackToOriginalSuitForCharacter(characterType: string): void {
     const character = this.gameManager.getCharacter(characterType);
 
-    if (isEmpty(character) || isEmpty(this.gameManager.board)) {
+    if (isEmpty(character)) {
       return;
     }
 
     for (const edelCard of character.deck) {
-      if (edelCard.suit !== this.gameManager.board.edelCard?.suit) {
+      if (edelCard.suit !== this.board.edelCard?.suit) {
         continue;
       }
       const originalCard = this.convertBackToOriginalSuit(edelCard);
@@ -689,14 +636,10 @@ export default class Dealer {
   }
 
   getLootCards(): Card[] {
-    if (!this.gameManager.board || !this.gameManager.board.enemy) {
-      return [];
-    }
-
     this.lootCards = [];
     for (let i = 0; i < this.gameManager.player.numberOfLootCards; i++) {
       const card = getRandomElementFromArray(
-        this.gameManager.board.enemy.discardPile
+        this.board.enemy.discardPile
       ) as Card | undefined;
       if (card && !this.hasLootCard(card)) {
         this.addLootCard(card);

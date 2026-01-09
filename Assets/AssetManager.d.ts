@@ -9,7 +9,7 @@ export default class AssetManager {
     textManager: TextManager;
     disabledSound: import("love.audio").Source;
     constructor(gameManager: GameManager);
-    addAsset(id: string, asset: Asset, throwError?: boolean): void;
+    addAsset(id: string, asset: Asset): void;
     getAssets(baseId: string): Asset[] | undefined;
     getAsset(baseId: string, assetId: string): Asset | undefined;
     removeAssets(id: string): void;

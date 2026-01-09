@@ -38,24 +38,12 @@ export default class Character {
     }
   }
 
-  getCardFromHand(position: number): Card | undefined {
-    return this.hand[position];
-  }
-
   addToDeck(card: Card): void {
     this.deck.push(card);
   }
 
-  getCardFromDeck(position: number): Card | undefined {
-    return this.deck[position];
-  }
-
   addToDiscards(card: Card): void {
     this.discardPile.push(card);
-  }
-
-  getCardFromDiscards(position: number): Card | undefined {
-    return this.discardPile[position];
   }
 
   addDiscardsToDeck(): void {

@@ -18,17 +18,13 @@ export default class AssetManager {
     this.tooltipManager = new TooltipManager(gameManager);
   }
 
-  addAsset(id: string, asset: Asset, throwError?: boolean): void {
+  addAsset(id: string, asset: Asset): void {
     if (this.assets.has(id)) {
       const assets = this.assets.get(id);
       assets?.push(asset);
-      if (throwError) {
-        throw new Error(`Asset with ID ${id} already exists. Added to existing assets.`);
-      } else {
-        return;
-      }
+    } else {
+      this.assets.set(id, [asset]);
     }
-    this.assets.set(id, [asset]);
   }
 
   getAssets(baseId: string): Asset[] | undefined {
@@ -174,7 +170,7 @@ export default class AssetManager {
     }
 
     if (!this.disabledSound.isPlaying()) {
-      this.disabledSound.play();      
+      this.disabledSound.play();
     }
     this.triggerWobbleAnimation(assets);
   }

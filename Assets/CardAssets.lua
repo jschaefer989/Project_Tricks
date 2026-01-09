@@ -24,6 +24,15 @@ CardAssets.name = "CardAssets"
 function CardAssets.prototype.____constructor(self, gameManager)
     self.baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png")
     self.cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static")
+    self.cardAssetConstructionOptions = function(____, includeClickHandler, card) return {
+        onClick = includeClickHandler and (function() return card:onClick() end) or nil,
+        onHover = function(____, asset) return card:onHover(asset) end,
+        onUnhover = function(____, asset) return card:onUnhover(asset) end,
+        hoverEffect = includeClickHandler and ({HoverEffects.SHIMMER}) or ({HoverEffects.NONE}),
+        clickSound = includeClickHandler and self.cardClick or nil,
+        isDisabled = true,
+        useDisabledAnimation = false
+    } end
     self.gameManager = gameManager
 end
 function CardAssets.prototype.addAsset(self, card, cardX, cardY, includeClickHandler)
@@ -40,17 +49,9 @@ function CardAssets.prototype.addAsset(self, card, cardX, cardY, includeClickHan
         cardY,
         ____exports.cardWidth,
         ____exports.cardHeight,
-        {
-            onClick = includeClickHandler and (function() return card:onClick() end) or nil,
-            onHover = function(____, asset) return card:onHover(asset) end,
-            onUnhover = function(____, asset) return card:onUnhover(asset) end,
-            hoverEffect = includeClickHandler and ({HoverEffects.SHIMMER}) or ({HoverEffects.NONE}),
-            clickSound = includeClickHandler and self.cardClick or nil,
-            isDisabled = true,
-            useDisabledAnimation = false
-        }
+        self:cardAssetConstructionOptions(includeClickHandler, card)
     )
-    self.gameManager.assetManager:addAsset(assetId, baseCardAsset, true)
+    self.gameManager.assetManager:addAsset(assetId, baseCardAsset)
     self:addSuitAsset(card, cardX, cardY, includeClickHandler)
     self:addRankAsset(card, cardX, cardY, includeClickHandler)
 end
@@ -62,9 +63,6 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
         includeClickHandler = true
     end
     local suitImagePath = ____exports.default:getSuitAssetPath(card.suit)
-    local function onHoverCallback(____, asset)
-        return card:onHover(asset)
-    end
     local normalAssetId = ____exports.default:getSuitAssetId(card, 0)
     local normalPosition = self:getNormalSuitPosition(x, y)
     local normalAsset = __TS__New(
@@ -76,15 +74,7 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
         normalPosition.y,
         16,
         16,
-        {
-            onClick = includeClickHandler and (function() return card:onClick() end) or nil,
-            onHover = onHoverCallback,
-            onUnhover = function(____, asset) return card:onUnhover(asset) end,
-            hoverEffect = includeClickHandler and ({HoverEffects.SHIMMER}) or ({HoverEffects.NONE}),
-            clickSound = includeClickHandler and self.cardClick or nil,
-            isDisabled = true,
-            useDisabledAnimation = false
-        }
+        self:cardAssetConstructionOptions(includeClickHandler, card)
     )
     self.gameManager.assetManager:addAsset(
         ____exports.default:getBaseAssetId(card),
@@ -101,18 +91,7 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
         flippedPosition.y,
         16,
         16,
-        {
-            onClick = includeClickHandler and (function() return card:onClick() end) or nil,
-            onHover = onHoverCallback,
-            onUnhover = function(____, asset) return card:onUnhover(asset) end,
-            orientation = 0,
-            hoverEffect = includeClickHandler and ({HoverEffects.SHIMMER}) or ({HoverEffects.NONE}),
-            scaleX = -1,
-            scaleY = -1,
-            clickSound = includeClickHandler and self.cardClick or nil,
-            isDisabled = true,
-            useDisabledAnimation = false
-        }
+        self:cardAssetConstructionOptions(includeClickHandler, card, 0)
     )
     self.gameManager.assetManager:addAsset(
         ____exports.default:getBaseAssetId(card),
@@ -142,15 +121,7 @@ function CardAssets.prototype.addRankAsset(self, card, x, y, includeClickHandler
         rankPosition.y,
         64,
         64,
-        {
-            onClick = includeClickHandler and (function() return card:onClick() end) or nil,
-            onHover = function(____, asset) return card:onHover(asset) end,
-            onUnhover = function(____, asset) return card:onUnhover(asset) end,
-            hoverEffect = includeClickHandler and ({HoverEffects.SHIMMER}) or ({HoverEffects.NONE}),
-            clickSound = includeClickHandler and self.cardClick or nil,
-            isDisabled = true,
-            useDisabledAnimation = false
-        }
+        self:cardAssetConstructionOptions(includeClickHandler, card)
     )
     self.gameManager.assetManager:addAsset(
         ____exports.default:getBaseAssetId(card),
@@ -164,21 +135,21 @@ function CardAssets.prototype.getRankPosition(self, x, y, rankImage)
 end
 function CardAssets.getSuitAssetPath(self, suit)
     repeat
-        local ____switch22 = suit
-        local ____cond22 = ____switch22 == Suits.HEARTS
-        if ____cond22 then
+        local ____switch15 = suit
+        local ____cond15 = ____switch15 == Suits.HEARTS
+        if ____cond15 then
             return "Assets/Images/HeartSuit.png"
         end
-        ____cond22 = ____cond22 or ____switch22 == Suits.BELLS
-        if ____cond22 then
+        ____cond15 = ____cond15 or ____switch15 == Suits.BELLS
+        if ____cond15 then
             return "Assets/Images/BellSuit.png"
         end
-        ____cond22 = ____cond22 or ____switch22 == Suits.ACORNS
-        if ____cond22 then
+        ____cond15 = ____cond15 or ____switch15 == Suits.ACORNS
+        if ____cond15 then
             return "Assets/Images/AcornSuit.png"
         end
-        ____cond22 = ____cond22 or ____switch22 == Suits.LEAVES
-        if ____cond22 then
+        ____cond15 = ____cond15 or ____switch15 == Suits.LEAVES
+        if ____cond15 then
             return "Assets/Images/LeafSuit.png"
         end
         do
@@ -191,73 +162,73 @@ function CardAssets.getSuitAssetId(self, card, orientation)
 end
 function CardAssets.getRankAssetPath(self, rank)
     repeat
-        local ____switch25 = rank
-        local ____cond25 = ____switch25 == Ranks.BANNER
-        if ____cond25 then
+        local ____switch18 = rank
+        local ____cond18 = ____switch18 == Ranks.BANNER
+        if ____cond18 then
             return "Assets/Images/BannerRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == Ranks.BARON
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == Ranks.BARON
+        if ____cond18 then
             return "Assets/Images/BaronRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == Ranks.DEUCE
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == Ranks.DEUCE
+        if ____cond18 then
             return "Assets/Images/DeuceRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == Ranks.JESTER
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == Ranks.JESTER
+        if ____cond18 then
             return "Assets/Images/JesterRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == Ranks.KING
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == Ranks.KING
+        if ____cond18 then
             return "Assets/Images/KingRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == Ranks.OVERLORD
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == Ranks.OVERLORD
+        if ____cond18 then
             return "Assets/Images/OverlordRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == Ranks.PRIEST
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == Ranks.PRIEST
+        if ____cond18 then
             return "Assets/Images/PriestRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == Ranks.SERGEANT
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == Ranks.SERGEANT
+        if ____cond18 then
             return "Assets/Images/SergeantRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == Ranks.SOLDIER
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == Ranks.SOLDIER
+        if ____cond18 then
             return "Assets/Images/SoldierRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == Ranks.THIEF
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == Ranks.THIEF
+        if ____cond18 then
             return "Assets/Images/ThiefRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == EdelRanks.BARD
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == EdelRanks.BARD
+        if ____cond18 then
             return "Assets/Images/BardRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == EdelRanks.CHOSEN
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == EdelRanks.CHOSEN
+        if ____cond18 then
             return "Assets/Images/ChosenRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == EdelRanks.DEVIL
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == EdelRanks.DEVIL
+        if ____cond18 then
             return "Assets/Images/DevilRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == EdelRanks.DUKE
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == EdelRanks.DUKE
+        if ____cond18 then
             return "Assets/Images/DukeRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == EdelRanks.EMPEROR
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == EdelRanks.EMPEROR
+        if ____cond18 then
             return "Assets/Images/EmperorRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == EdelRanks.POPE
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == EdelRanks.POPE
+        if ____cond18 then
             return "Assets/Images/PopeRank.png"
         end
-        ____cond25 = ____cond25 or ____switch25 == EdelRanks.KNIGHT
-        if ____cond25 then
+        ____cond18 = ____cond18 or ____switch18 == EdelRanks.KNIGHT
+        if ____cond18 then
             return "Assets/Images/KnightRank.png"
         end
         do
@@ -298,14 +269,14 @@ function CardAssets.prototype.getHandYCoordinate(self, characterType)
 end
 function CardAssets.prototype.getHeightModifier(self, characterType)
     repeat
-        local ____switch37 = characterType
-        local ____cond37 = ____switch37 == CharacterTypes.PLAYER
-        if ____cond37 then
+        local ____switch30 = characterType
+        local ____cond30 = ____switch30 == CharacterTypes.PLAYER
+        if ____cond30 then
             local ____opt_0 = self.gameManager.board
             return not (____opt_0 and ____opt_0.showingEdelView) and -(____exports.cardHeight * 0.25) or ____exports.cardHeight / 2
         end
-        ____cond37 = ____cond37 or ____switch37 == CharacterTypes.ENEMY
-        if ____cond37 then
+        ____cond30 = ____cond30 or ____switch30 == CharacterTypes.ENEMY
+        if ____cond30 then
             return -(____exports.cardHeight * 1.5)
         end
         do
