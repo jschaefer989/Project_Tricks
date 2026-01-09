@@ -15,8 +15,8 @@ import Point from "Point";
 import { Image } from "love.graphics";
 
 export const padding = 5;
-export const cardWidth = 70;
-export const cardHeight = 94;
+export const cardWidth = 71;
+export const cardHeight = 97;
 
 interface AssetsForCard {
   baseAsset?: Asset;

@@ -5,8 +5,8 @@ import GameManager from "GameManager";
 import Point from "Point";
 import { Image } from "love.graphics";
 export declare const padding = 5;
-export declare const cardWidth = 70;
-export declare const cardHeight = 94;
+export declare const cardWidth = 71;
+export declare const cardHeight = 97;
 interface AssetsForCard {
     baseAsset?: Asset;
     suitAssets: (Asset | undefined)[];
