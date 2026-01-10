@@ -30,6 +30,7 @@ import CutAnimation from "Assets/Animations/CutAnimation";
 import FlickerAnimation from "Assets/Animations/FlickerAnimation";
 import SlideAnimation from "Assets/Animations/SlideAnimation";
 import GlowAnimation from "Assets/Animations/GlowAnimation";
+import ShimmerShader from "Shaders/ShimmerShader";
 
 const portraitGap = 12;
 
@@ -305,6 +306,16 @@ export default class Board {
           { glowPeriodSeconds: 3 }
         )
       );
+
+      const { baseAsset } = this.cardAssets.getCardAssets(this.edelCard);
+      if (!isEmpty(baseAsset)) {
+        this.gameManager.shaderManager.addShader(
+          baseAsset.id,
+          new ShimmerShader(this.gameManager, () => !this.showingEdelView, [
+            baseAsset,
+          ])
+        );
+      }
     }
   }
 
@@ -327,7 +338,7 @@ export default class Board {
 
     this.gameManager.board?.cardAssets.disableAllCards(true);
 
-     const removedIndices = this.dealer.discardCards(
+    const removedIndices = this.dealer.discardCards(
       CharacterTypes.PLAYER,
       this.gameManager.player.getSelectedCards()
     );
@@ -341,7 +352,10 @@ export default class Board {
     }
 
     // Refill the player's hand after discarding
-    this.gameManager.board?.dealer.dealCards(CharacterTypes.PLAYER, removedIndices);
+    this.gameManager.board?.dealer.dealCards(
+      CharacterTypes.PLAYER,
+      removedIndices
+    );
   }
 
   updateDiscardCounter(remainingNumberOfDiscards: number): void {

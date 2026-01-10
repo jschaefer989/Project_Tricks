@@ -42,6 +42,8 @@ local ____SlideAnimation = require("Assets.Animations.SlideAnimation")
 local SlideAnimation = ____SlideAnimation.default
 local ____GlowAnimation = require("Assets.Animations.GlowAnimation")
 local GlowAnimation = ____GlowAnimation.default
+local ____ShimmerShader = require("Shaders.ShimmerShader")
+local ShimmerShader = ____ShimmerShader.default
 local portraitGap = 12
 ____exports.default = __TS__Class()
 local Board = ____exports.default
@@ -296,6 +298,19 @@ function Board.prototype.displayEdel(self)
                 {glowPeriodSeconds = 3}
             )
         )
+        local ____temp_8 = self.cardAssets:getCardAssets(self.edelCard)
+        local baseAsset = ____temp_8.baseAsset
+        if not isEmpty(baseAsset) then
+            self.gameManager.shaderManager:addShader(
+                baseAsset.id,
+                __TS__New(
+                    ShimmerShader,
+                    self.gameManager,
+                    function() return not self.showingEdelView end,
+                    {baseAsset}
+                )
+            )
+        end
     end
 end
 function Board.prototype.displayFight(self)
@@ -316,9 +331,9 @@ function Board.prototype.handleDiscard(self)
     if self:getRemainingDiscards() <= 0 then
         return
     end
-    local ____opt_8 = self.gameManager.board
-    if ____opt_8 ~= nil then
-        ____opt_8.cardAssets:disableAllCards(true)
+    local ____opt_9 = self.gameManager.board
+    if ____opt_9 ~= nil then
+        ____opt_9.cardAssets:disableAllCards(true)
     end
     local removedIndices = self.dealer:discardCards(
         CharacterTypes.PLAYER,
@@ -330,9 +345,9 @@ function Board.prototype.handleDiscard(self)
     if remaining <= 0 then
         self:disableDiscardButton()
     end
-    local ____opt_10 = self.gameManager.board
-    if ____opt_10 ~= nil then
-        ____opt_10.dealer:dealCards(CharacterTypes.PLAYER, removedIndices)
+    local ____opt_11 = self.gameManager.board
+    if ____opt_11 ~= nil then
+        ____opt_11.dealer:dealCards(CharacterTypes.PLAYER, removedIndices)
     end
 end
 function Board.prototype.updateDiscardCounter(self, remainingNumberOfDiscards)
@@ -680,13 +695,13 @@ function Board.prototype.buildPointBoard(self)
     )
 end
 function Board.prototype.buildPowerAndValues(self, characterType, portraitHeight)
-    local ____temp_12
+    local ____temp_13
     if characterType == CharacterTypes.PLAYER then
-        ____temp_12 = self.gameManager.assetManager.textManager:getText(TextIds.PLAYER_PORTRAIT_LEVEL)
+        ____temp_13 = self.gameManager.assetManager.textManager:getText(TextIds.PLAYER_PORTRAIT_LEVEL)
     else
-        ____temp_12 = self.gameManager.assetManager.textManager:getText(TextIds.ENEMY_PORTRAIT_LEVEL)
+        ____temp_13 = self.gameManager.assetManager.textManager:getText(TextIds.ENEMY_PORTRAIT_LEVEL)
     end
-    local levelText = ____temp_12
+    local levelText = ____temp_13
     if isEmpty(levelText) then
         return
     end
