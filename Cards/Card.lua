@@ -2,40 +2,42 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____Enums = require("Enums")
-local AnimationIds = ____Enums.AnimationIds
-local Suits = ____Enums.Suits
-local AssetIds = ____Enums.AssetIds
-local TextIds = ____Enums.TextIds
-local ____Helpers = require("Helpers")
-local exhaustiveGuard = ____Helpers.exhaustiveGuard
-local isEmpty = ____Helpers.isEmpty
 local ____SlideAnimation = require("Assets.Animations.SlideAnimation")
 local SlideAnimation = ____SlideAnimation.default
 local ____FontWithPosition = require("Assets.FontWithPosition")
 local FontWithPosition = ____FontWithPosition.default
 local ____IconAsset = require("Assets.IconAsset")
 local IconAsset = ____IconAsset.default
+local ____Helpers = require("Helpers")
+local exhaustiveGuard = ____Helpers.exhaustiveGuard
+local isEmpty = ____Helpers.isEmpty
+local ____Enums = require("Enums")
+local AnimationIds = ____Enums.AnimationIds
+local AssetIds = ____Enums.AssetIds
+local Suits = ____Enums.Suits
+local TextIds = ____Enums.TextIds
 ____exports.default = __TS__Class()
 local Card = ____exports.default
 Card.name = "Card"
-function Card.prototype.____constructor(self, gameManager, suit, rank, power, value, name, isEdel)
+function Card.prototype.____constructor(self, gameManager, suit, rank, power, value, name, rankAssetPath, edelConstructionOptions)
     self.isSelected = false
     self.isEdel = false
-    local id = (((suit .. "_") .. rank) .. "_") .. tostring(love.math.random(1000))
+    self.id = (((suit .. "_") .. rank) .. "_") .. tostring(love.math.random(1000))
     self.gameManager = gameManager
     self.suit = suit
     self.rank = rank
     self.power = power
     self.value = value
     self.cost = self:getCost()
-    local ____isEdel_0 = isEdel
-    if ____isEdel_0 == nil then
-        ____isEdel_0 = false
-    end
-    self.isEdel = ____isEdel_0
+    self.rankAssetPath = rankAssetPath
     self.name = name
-    self.id = id
+    self.isEdel = not isEmpty(edelConstructionOptions)
+    if edelConstructionOptions then
+        self.edelName = edelConstructionOptions.edelName
+        self.edelPower = edelConstructionOptions.edelPower
+        self.edelValue = edelConstructionOptions.edelValue
+        self.edelRankAssetPath = edelConstructionOptions.edelRankAssetPath
+    end
 end
 function Card.prototype.isEqual(self, otherCard)
     return self.id == otherCard.id
@@ -62,16 +64,8 @@ function Card.prototype.save(self)
     }
 end
 function Card.load(self, gameManager, data)
-    local card = __TS__New(
-        ____exports.default,
-        gameManager,
-        data.suit,
-        data.rank,
-        data.power,
-        data.value,
-        data.name,
-        data.isEdel
-    )
+    local CardGenerator = require("Cards.CardGenerator").default
+    local card = CardGenerator:getNewCard(gameManager, data.rank, data.suit)
     card.id = data.id
     card.isSelected = data.isSelected
     card.cost = data.cost
@@ -91,8 +85,8 @@ function Card.prototype.onSelect(self)
     self.isSelected = true
     self.gameManager.board:addPlayerPower(self.power)
     self.gameManager.board:addPlayerValue(self.value)
-    local ____opt_1 = self.gameManager.board
-    local slideAssets = ____opt_1 and ____opt_1.cardAssets:getCardAssetList(self)
+    local ____opt_0 = self.gameManager.board
+    local slideAssets = ____opt_0 and ____opt_0.cardAssets:getCardAssetList(self)
     self.gameManager.animationManager.animations:set(
         AnimationIds.CARD_SELECT .. self.id,
         __TS__New(
@@ -103,9 +97,9 @@ function Card.prototype.onSelect(self)
             slideAssets
         )
     )
-    local ____opt_3 = self.gameManager.board
-    if ____opt_3 ~= nil then
-        ____opt_3:updatePrimaryButtonStates()
+    local ____opt_2 = self.gameManager.board
+    if ____opt_2 ~= nil then
+        ____opt_2:updatePrimaryButtonStates()
     end
 end
 function Card.prototype.onUnselect(self)
@@ -115,8 +109,8 @@ function Card.prototype.onUnselect(self)
     self.isSelected = false
     self.gameManager.board:addPlayerPower(-self.power)
     self.gameManager.board:addPlayerValue(-self.value)
-    local ____opt_5 = self.gameManager.board
-    local slideAssets = ____opt_5 and ____opt_5.cardAssets:getCardAssetList(self)
+    local ____opt_4 = self.gameManager.board
+    local slideAssets = ____opt_4 and ____opt_4.cardAssets:getCardAssetList(self)
     self.gameManager.animationManager.animations:set(
         AnimationIds.CARD_SELECT .. self.id,
         __TS__New(
@@ -127,9 +121,9 @@ function Card.prototype.onUnselect(self)
             slideAssets
         )
     )
-    local ____opt_7 = self.gameManager.board
-    if ____opt_7 ~= nil then
-        ____opt_7:updatePrimaryButtonStates()
+    local ____opt_6 = self.gameManager.board
+    if ____opt_6 ~= nil then
+        ____opt_6:updatePrimaryButtonStates()
     end
 end
 function Card.prototype.onHover(self, asset)
@@ -167,26 +161,38 @@ function Card.prototype.onUnhover(self, asset)
 end
 function Card.getSuitName(self, suit)
     repeat
-        local ____switch18 = suit
-        local ____cond18 = ____switch18 == Suits.HEARTS
-        if ____cond18 then
+        local ____switch19 = suit
+        local ____cond19 = ____switch19 == Suits.HEARTS
+        if ____cond19 then
             return "Hearts"
         end
-        ____cond18 = ____cond18 or ____switch18 == Suits.ACORNS
-        if ____cond18 then
+        ____cond19 = ____cond19 or ____switch19 == Suits.ACORNS
+        if ____cond19 then
             return "Acorns"
         end
-        ____cond18 = ____cond18 or ____switch18 == Suits.LEAVES
-        if ____cond18 then
+        ____cond19 = ____cond19 or ____switch19 == Suits.LEAVES
+        if ____cond19 then
             return "Leaves"
         end
-        ____cond18 = ____cond18 or ____switch18 == Suits.BELLS
-        if ____cond18 then
+        ____cond19 = ____cond19 or ____switch19 == Suits.BELLS
+        if ____cond19 then
             return "Bells"
         end
         do
             exhaustiveGuard(suit)
         end
     until true
+end
+function Card.prototype.getPower(self)
+    return self.isEdel and not isEmpty(self.edelPower) and self.edelPower or self.power
+end
+function Card.prototype.getValue(self)
+    return self.isEdel and not isEmpty(self.edelValue) and self.edelValue or self.value
+end
+function Card.prototype.getName(self)
+    return self.isEdel and not isEmpty(self.edelName) and self.edelName or self.name
+end
+function Card.prototype.getRankAssetPath(self)
+    return self.isEdel and not isEmpty(self.edelRankAssetPath) and self.edelRankAssetPath or self.rankAssetPath
 end
 return ____exports

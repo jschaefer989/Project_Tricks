@@ -25,7 +25,7 @@ interface PlayerDeckOptions {
 export default class Draw {
     static card( card: Card, btnW: number, btnH: number, options?: CardOptions): void {
         const isSelected = card.isSelected
-        let btnText = card.rank + " " + card.suit + " (Val: " + card.value + ", Pow: " + card.power + ")"
+        let btnText = card.rank + " " + card.suit + " (Val: " + card.getValue() + ", Pow: " + card.getPower() + ")"
         
         if (options?.multiSelect) {
             if (isSelected) {

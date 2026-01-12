@@ -1,11 +1,11 @@
 /** @noSelfInFile */
-import GameManager from "GameManager";
-import { Ranks, Suits, EdelRanks } from "../Enums";
 import Asset from "Assets/Asset";
+import GameManager from "GameManager";
+import { Ranks, Suits } from "../Enums";
 export interface CardData {
     id: string;
     suit: Suits;
-    rank: Ranks | EdelRanks;
+    rank: Ranks;
     power: number;
     value: number;
     isSelected: boolean;
@@ -13,18 +13,29 @@ export interface CardData {
     isEdel: boolean;
     name: string;
 }
-export default class Card {
+interface EdelConstructionOptions {
+    edelName: string;
+    edelPower: number;
+    edelValue: number;
+    edelRankAssetPath: string;
+}
+export default abstract class Card {
     gameManager: GameManager;
     id: string;
     suit: Suits;
-    rank: Ranks | EdelRanks;
-    power: number;
-    value: number;
+    rank: Ranks;
+    private rankAssetPath;
+    private power;
+    private value;
     isSelected: boolean;
     cost: number;
     isEdel: boolean;
-    name: string;
-    constructor(gameManager: GameManager, suit: Suits, rank: Ranks | EdelRanks, power: number, value: number, name: string, isEdel?: boolean);
+    private name;
+    private edelName?;
+    private edelPower?;
+    private edelValue?;
+    private edelRankAssetPath?;
+    constructor(gameManager: GameManager, suit: Suits, rank: Ranks, power: number, value: number, name: string, rankAssetPath: string, edelConstructionOptions?: EdelConstructionOptions);
     isEqual(otherCard: Card): boolean;
     getCost(): number;
     getBaseCost(): number;
@@ -36,4 +47,9 @@ export default class Card {
     onHover(asset: Asset): void;
     onUnhover(asset: Asset): void;
     static getSuitName(suit: Suits): string;
+    getPower(): number;
+    getValue(): number;
+    getName(): string;
+    getRankAssetPath(): string;
 }
+export {};

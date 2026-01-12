@@ -18,7 +18,9 @@ function Thief.prototype.____constructor(self, gameManager, suit)
         Ranks.THIEF,
         5,
         4,
-        "Thief"
+        "Thief",
+        "Assets/Images/ThiefRank.png",
+        {edelName = "Devil", edelPower = 15, edelValue = 4, edelRankAssetPath = "Assets/Images/DevilRank.png"}
     )
 end
 return ____exports

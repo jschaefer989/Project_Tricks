@@ -18,7 +18,9 @@ function Soldier.prototype.____constructor(self, gameManager, suit)
         Ranks.SOLDIER,
         3,
         0,
-        "Soldier"
+        "Soldier",
+        "Assets/Images/SoldierRank.png",
+        {edelName = "Knight", edelPower = 7, edelValue = 0, edelRankAssetPath = "Assets/Images/KnightRank.png"}
     )
 end
 return ____exports

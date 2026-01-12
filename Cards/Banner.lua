@@ -18,7 +18,8 @@ function Banner.prototype.____constructor(self, gameManager, suit)
         Ranks.BANNER,
         6,
         3,
-        "Banner"
+        "Banner",
+        "Assets/Images/BannerRank.png"
     )
 end
 return ____exports

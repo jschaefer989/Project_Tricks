@@ -18,7 +18,8 @@ function Sergeant.prototype.____constructor(self, gameManager, suit)
         Ranks.SERGEANT,
         8,
         11,
-        "Sergeant"
+        "Sergeant",
+        "Assets/Images/SergeantRank.png"
     )
 end
 return ____exports

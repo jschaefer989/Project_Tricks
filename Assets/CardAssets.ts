@@ -1,19 +1,12 @@
+import { AssetIds, CharacterTypes, HoverEffects, Suits } from "Enums";
+import GameManager from "GameManager";
+import { exhaustiveGuard, isEmpty } from "Helpers";
+import * as push from "Libraries.push";
+import { Image } from "love.graphics";
+import Point from "Point";
+import Board from "Screens/Board";
 import Card from "../Cards/Card";
 import Asset, { ConstructionOptions } from "./Asset";
-import {
-  Suits,
-  AssetIds,
-  Ranks,
-  EdelRanks,
-  CharacterTypes,
-  HoverEffects,
-} from "Enums";
-import { exhaustiveGuard, isEmpty } from "Helpers";
-import GameManager from "GameManager";
-import * as push from "Libraries.push";
-import Point from "Point";
-import { Image } from "love.graphics";
-import Board from "Screens/Board";
 
 export const padding = 5;
 export const cardWidth = 70;
@@ -147,8 +140,7 @@ export default class CardAssets {
     y: number,
     includeClickHandler: boolean = true
   ): void {
-    const rankImagePath = CardAssets.getRankAssetPath(card.rank);
-    const rankImage = love.graphics.newImage(rankImagePath);
+    const rankImage = love.graphics.newImage(card.getRankAssetPath());
     const assetId = CardAssets.getRankAssetId(card, 0);
     const rankPosition = this.getRankPosition(x, y, rankImage);
     const asset = new Asset(
@@ -198,47 +190,6 @@ export default class CardAssets {
 
   static getSuitAssetId(card: Card, orientation: number): string {
     return `${AssetIds.SUIT}-${card.id}-${orientation}`;
-  }
-
-  static getRankAssetPath(rank: Ranks | EdelRanks): string {
-    switch (rank) {
-      case Ranks.BANNER:
-        return "Assets/Images/BannerRank.png";
-      case Ranks.BARON:
-        return "Assets/Images/BaronRank.png";
-      case Ranks.DEUCE:
-        return "Assets/Images/DeuceRank.png";
-      case Ranks.JESTER:
-        return "Assets/Images/JesterRank.png";
-      case Ranks.KING:
-        return "Assets/Images/KingRank.png";
-      case Ranks.OVERLORD:
-        return "Assets/Images/OverlordRank.png";
-      case Ranks.PRIEST:
-        return "Assets/Images/PriestRank.png";
-      case Ranks.SERGEANT:
-        return "Assets/Images/SergeantRank.png";
-      case Ranks.SOLDIER:
-        return "Assets/Images/SoldierRank.png";
-      case Ranks.THIEF:
-        return "Assets/Images/ThiefRank.png";
-      case EdelRanks.BARD:
-        return "Assets/Images/BardRank.png";
-      case EdelRanks.CHOSEN:
-        return "Assets/Images/ChosenRank.png";
-      case EdelRanks.DEVIL:
-        return "Assets/Images/DevilRank.png";
-      case EdelRanks.DUKE:
-        return "Assets/Images/DukeRank.png";
-      case EdelRanks.EMPEROR:
-        return "Assets/Images/EmperorRank.png";
-      case EdelRanks.POPE:
-        return "Assets/Images/PopeRank.png";
-      case EdelRanks.KNIGHT:
-        return "Assets/Images/KnightRank.png";
-      default:
-        exhaustiveGuard(rank);
-    }
   }
 
   static getRankAssetId(card: Card, orientation: number): string {

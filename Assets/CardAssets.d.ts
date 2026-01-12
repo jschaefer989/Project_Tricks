@@ -1,10 +1,10 @@
+import { CharacterTypes, Suits } from "Enums";
+import GameManager from "GameManager";
+import { Image } from "love.graphics";
+import Point from "Point";
+import Board from "Screens/Board";
 import Card from "../Cards/Card";
 import Asset, { ConstructionOptions } from "./Asset";
-import { Suits, Ranks, EdelRanks, CharacterTypes } from "Enums";
-import GameManager from "GameManager";
-import Point from "Point";
-import { Image } from "love.graphics";
-import Board from "Screens/Board";
 export declare const padding = 5;
 export declare const cardWidth = 70;
 export declare const cardHeight = 96;
@@ -29,7 +29,6 @@ export default class CardAssets {
     getRankPosition(x: number, y: number, rankImage: Image): Point;
     static getSuitAssetPath(suit: Suits): string;
     static getSuitAssetId(card: Card, orientation: number): string;
-    static getRankAssetPath(rank: Ranks | EdelRanks): string;
     static getRankAssetId(card: Card, orientation: number): string;
     removeCardAssets(card: Card): void;
     hideCardAssets(card: Card): void;

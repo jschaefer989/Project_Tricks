@@ -18,7 +18,9 @@ function Jester.prototype.____constructor(self, gameManager, suit)
         Ranks.JESTER,
         1,
         0,
-        "Jester"
+        "Jester",
+        "Assets/Images/JesterRank.png",
+        {edelName = "Bard", edelPower = 11, edelValue = 0, edelRankAssetPath = "Assets/Images/BardRank.png"}
     )
 end
 return ____exports

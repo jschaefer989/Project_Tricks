@@ -18,7 +18,8 @@ function Overlord.prototype.____constructor(self, gameManager, suit)
         Ranks.OVERLORD,
         10,
         2,
-        "Overlord"
+        "Overlord",
+        "Assets/Images/OverlordRank.png"
     )
 end
 return ____exports

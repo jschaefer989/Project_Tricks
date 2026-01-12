@@ -3,19 +3,17 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____Asset = require("Assets.Asset")
-local Asset = ____Asset.default
 local ____Enums = require("Enums")
-local Suits = ____Enums.Suits
 local AssetIds = ____Enums.AssetIds
-local Ranks = ____Enums.Ranks
-local EdelRanks = ____Enums.EdelRanks
 local CharacterTypes = ____Enums.CharacterTypes
 local HoverEffects = ____Enums.HoverEffects
+local Suits = ____Enums.Suits
 local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
 local push = require("Libraries.push")
+local ____Asset = require("Assets.Asset")
+local Asset = ____Asset.default
 ____exports.padding = 5
 ____exports.cardWidth = 70
 ____exports.cardHeight = 96
@@ -118,8 +116,7 @@ function CardAssets.prototype.addRankAsset(self, card, x, y, includeClickHandler
     if includeClickHandler == nil then
         includeClickHandler = true
     end
-    local rankImagePath = ____exports.default:getRankAssetPath(card.rank)
-    local rankImage = love.graphics.newImage(rankImagePath)
+    local rankImage = love.graphics.newImage(card:getRankAssetPath())
     local assetId = ____exports.default:getRankAssetId(card, 0)
     local rankPosition = self:getRankPosition(x, y, rankImage)
     local asset = __TS__New(
@@ -173,82 +170,6 @@ end
 function CardAssets.getSuitAssetId(self, card, orientation)
     return (((AssetIds.SUIT .. "-") .. card.id) .. "-") .. tostring(orientation)
 end
-function CardAssets.getRankAssetPath(self, rank)
-    repeat
-        local ____switch18 = rank
-        local ____cond18 = ____switch18 == Ranks.BANNER
-        if ____cond18 then
-            return "Assets/Images/BannerRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == Ranks.BARON
-        if ____cond18 then
-            return "Assets/Images/BaronRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == Ranks.DEUCE
-        if ____cond18 then
-            return "Assets/Images/DeuceRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == Ranks.JESTER
-        if ____cond18 then
-            return "Assets/Images/JesterRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == Ranks.KING
-        if ____cond18 then
-            return "Assets/Images/KingRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == Ranks.OVERLORD
-        if ____cond18 then
-            return "Assets/Images/OverlordRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == Ranks.PRIEST
-        if ____cond18 then
-            return "Assets/Images/PriestRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == Ranks.SERGEANT
-        if ____cond18 then
-            return "Assets/Images/SergeantRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == Ranks.SOLDIER
-        if ____cond18 then
-            return "Assets/Images/SoldierRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == Ranks.THIEF
-        if ____cond18 then
-            return "Assets/Images/ThiefRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == EdelRanks.BARD
-        if ____cond18 then
-            return "Assets/Images/BardRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == EdelRanks.CHOSEN
-        if ____cond18 then
-            return "Assets/Images/ChosenRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == EdelRanks.DEVIL
-        if ____cond18 then
-            return "Assets/Images/DevilRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == EdelRanks.DUKE
-        if ____cond18 then
-            return "Assets/Images/DukeRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == EdelRanks.EMPEROR
-        if ____cond18 then
-            return "Assets/Images/EmperorRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == EdelRanks.POPE
-        if ____cond18 then
-            return "Assets/Images/PopeRank.png"
-        end
-        ____cond18 = ____cond18 or ____switch18 == EdelRanks.KNIGHT
-        if ____cond18 then
-            return "Assets/Images/KnightRank.png"
-        end
-        do
-            exhaustiveGuard(rank)
-        end
-    until true
-end
 function CardAssets.getRankAssetId(self, card, orientation)
     return (((AssetIds.RANK .. "-") .. card.id) .. "-") .. tostring(orientation)
 end
@@ -282,13 +203,13 @@ function CardAssets.prototype.getHandYCoordinate(self, characterType)
 end
 function CardAssets.prototype.getHeightModifier(self, characterType)
     repeat
-        local ____switch30 = characterType
-        local ____cond30 = ____switch30 == CharacterTypes.PLAYER
-        if ____cond30 then
+        local ____switch28 = characterType
+        local ____cond28 = ____switch28 == CharacterTypes.PLAYER
+        if ____cond28 then
             return not self.board.showingEdelView and -(____exports.cardHeight * 0.25) or ____exports.cardHeight / 2
         end
-        ____cond30 = ____cond30 or ____switch30 == CharacterTypes.ENEMY
-        if ____cond30 then
+        ____cond28 = ____cond28 or ____switch28 == CharacterTypes.ENEMY
+        if ____cond28 then
             return -(____exports.cardHeight * 1.5)
         end
         do

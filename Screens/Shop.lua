@@ -2,8 +2,8 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
-local ____Dealer = require("Dealer")
-local Dealer = ____Dealer.default
+local ____CardGenerator = require("Cards.CardGenerator")
+local CardGenerator = ____CardGenerator.default
 local ____Draw = require("Draw")
 local Draw = ____Draw.default
 local ____Enums = require("Enums")
@@ -79,7 +79,7 @@ function Shop.prototype.generateCardsForSale(self)
         local i = 0
         while i < 3 do
             local ____self_cardsForSale_2 = self.cardsForSale
-            ____self_cardsForSale_2[#____self_cardsForSale_2 + 1] = Dealer:getRandomCard(self.gameManager)
+            ____self_cardsForSale_2[#____self_cardsForSale_2 + 1] = CardGenerator:getRandomCard(self.gameManager)
             i = i + 1
         end
     end

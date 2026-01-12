@@ -1,17 +1,17 @@
 /** @noSelfInFile */
 
-import GameManager from "GameManager";
-import { AnimationIds, Ranks, Suits, EdelRanks, AssetIds, TextIds } from "../Enums";
-import { exhaustiveGuard, isEmpty } from "Helpers";
-import Asset from "Assets/Asset";
 import SlideAnimation from "Assets/Animations/SlideAnimation";
-import FontWithPosition, { Fonts } from "Assets/FontWithPosition";
+import Asset from "Assets/Asset";
+import FontWithPosition from "Assets/FontWithPosition";
 import IconAsset from "Assets/IconAsset";
+import GameManager from "GameManager";
+import { exhaustiveGuard, isEmpty } from "Helpers";
+import { AnimationIds, AssetIds, Ranks, Suits, TextIds } from "../Enums";
 
 export interface CardData {
   id: string;
   suit: Suits;
-  rank: Ranks | EdelRanks;
+  rank: Ranks;
   power: number;
   value: number;
   isSelected: boolean;
@@ -20,37 +20,56 @@ export interface CardData {
   name: string;
 }
 
-export default class Card {
+interface EdelConstructionOptions {
+  edelName: string;
+  edelPower: number;
+  edelValue: number;
+  edelRankAssetPath: string;
+}
+
+export default abstract class Card {
   gameManager: GameManager;
   id: string;
   suit: Suits;
-  rank: Ranks | EdelRanks;
-  power: number;
-  value: number;
+  rank: Ranks;
+  private rankAssetPath: string;
+  private power: number;
+  private value: number;
   isSelected: boolean = false;
   cost: number;
   isEdel: boolean = false;
-  name: string;
+  private name: string;
+  private edelName?: string;
+  private edelPower?: number;
+  private edelValue?: number;
+  private edelRankAssetPath?: string;
 
   constructor(
     gameManager: GameManager,
     suit: Suits,
-    rank: Ranks | EdelRanks,
+    rank: Ranks,
     power: number,
     value: number,
     name: string,
-    isEdel?: boolean
+    rankAssetPath: string,
+    edelConstructionOptions?: EdelConstructionOptions
   ) {
-    const id = `${suit}_${rank}_${love.math.random(1000)}`;
+    this.id = `${suit}_${rank}_${love.math.random(1000)}`;
     this.gameManager = gameManager;
     this.suit = suit;
     this.rank = rank;
     this.power = power;
     this.value = value;
     this.cost = this.getCost();
-    this.isEdel = isEdel ?? false;
+    this.rankAssetPath = rankAssetPath;
     this.name = name;
-    this.id = id;
+    this.isEdel = !isEmpty(edelConstructionOptions);
+    if (edelConstructionOptions) {
+      this.edelName = edelConstructionOptions.edelName;
+      this.edelPower = edelConstructionOptions.edelPower;
+      this.edelValue = edelConstructionOptions.edelValue;
+      this.edelRankAssetPath = edelConstructionOptions.edelRankAssetPath;
+    }
   }
 
   isEqual(otherCard: Card): boolean {
@@ -82,15 +101,9 @@ export default class Card {
   }
 
   static load(gameManager: GameManager, data: CardData): Card {
-    const card = new Card(
-      gameManager,
-      data.suit,
-      data.rank,
-      data.power,
-      data.value,
-      data.name,
-      data.isEdel
-    );
+    // Use dynamic require to avoid circular dependency
+    const CardGenerator = require("./CardGenerator").default;
+    const card = CardGenerator.getNewCard(gameManager, data.rank, data.suit);
     card.id = data.id;
     card.isSelected = data.isSelected;
     card.cost = data.cost;
@@ -115,8 +128,9 @@ export default class Card {
     this.gameManager.board.addPlayerPower(this.power);
     this.gameManager.board.addPlayerValue(this.value);
 
-    const slideAssets = this.gameManager.board?.cardAssets.getCardAssetList(this);
-    
+    const slideAssets =
+      this.gameManager.board?.cardAssets.getCardAssetList(this);
+
     this.gameManager.animationManager.animations.set(
       AnimationIds.CARD_SELECT + this.id,
       new SlideAnimation(0.15, 0, -20, slideAssets)
@@ -135,7 +149,8 @@ export default class Card {
     this.gameManager.board.addPlayerPower(-this.power);
     this.gameManager.board.addPlayerValue(-this.value);
 
-    const slideAssets = this.gameManager.board?.cardAssets.getCardAssetList(this);
+    const slideAssets =
+      this.gameManager.board?.cardAssets.getCardAssetList(this);
 
     this.gameManager.animationManager.animations.set(
       AnimationIds.CARD_SELECT + this.id,
@@ -159,18 +174,28 @@ export default class Card {
           5,
           20,
           this.power.toString(),
-          { icon: IconAsset.getPowerIconAsset(this.gameManager, AssetIds.TOOLTIP_POWER_ICON) }
+          {
+            icon: IconAsset.getPowerIconAsset(
+              this.gameManager,
+              AssetIds.TOOLTIP_POWER_ICON
+            ),
+          }
         ),
         new FontWithPosition(
           TextIds.TOOLTIP_CARD_VALUE,
           5,
           30,
           this.value.toString(),
-          { icon: IconAsset.getValueIconAsset(this.gameManager, AssetIds.TOOLTIP_VALUE_ICON) }
-        )
+          {
+            icon: IconAsset.getValueIconAsset(
+              this.gameManager,
+              AssetIds.TOOLTIP_VALUE_ICON
+            ),
+          }
+        ),
       ],
       asset
-    )
+    );
   }
 
   onUnhover(asset: Asset): void {
@@ -190,5 +215,27 @@ export default class Card {
       default:
         exhaustiveGuard(suit);
     }
+  }
+
+  getPower(): number {
+    return this.isEdel && !isEmpty(this.edelPower)
+      ? this.edelPower
+      : this.power;
+  }
+
+  getValue(): number {
+    return this.isEdel && !isEmpty(this.edelValue)
+      ? this.edelValue
+      : this.value;
+  }
+
+  getName(): string {
+    return this.isEdel && !isEmpty(this.edelName) ? this.edelName : this.name;
+  }
+
+  getRankAssetPath(): string {
+    return this.isEdel && !isEmpty(this.edelRankAssetPath)
+      ? this.edelRankAssetPath
+      : this.rankAssetPath;
   }
 }

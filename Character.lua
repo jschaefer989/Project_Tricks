@@ -58,14 +58,14 @@ end
 function Character.prototype.getCardPower(self)
     local power = 0
     for ____, card in ipairs(self.hand) do
-        power = power + card.power
+        power = power + card:getPower()
     end
     return power
 end
 function Character.prototype.getCardValue(self)
     local value = 0
     for ____, card in ipairs(self.hand) do
-        value = value + card.value
+        value = value + card:getValue()
     end
     return value
 end

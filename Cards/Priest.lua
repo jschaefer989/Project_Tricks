@@ -18,7 +18,9 @@ function Priest.prototype.____constructor(self, gameManager, suit)
         Ranks.PRIEST,
         4,
         4,
-        "Priest"
+        "Priest",
+        "Assets/Images/PriestRank.png",
+        {edelName = "Pope", edelPower = 14, edelValue = 4, edelRankAssetPath = "Assets/Images/PopeRank.png"}
     )
 end
 return ____exports

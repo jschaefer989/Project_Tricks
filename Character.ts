@@ -62,7 +62,7 @@ export default class Character {
   getCardPower(): number {
     let power = 0;
     for (const card of this.hand) {
-      power += card.power;
+      power += card.getPower();
     }
     return power;
   }
@@ -70,7 +70,7 @@ export default class Character {
   getCardValue(): number {
     let value = 0;
     for (const card of this.hand) {
-      value += card.value;
+      value += card.getValue();
     }
     return value;
   }

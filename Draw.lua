@@ -13,7 +13,7 @@ function Draw.prototype.____constructor(self)
 end
 function Draw.card(self, card, btnW, btnH, options)
     local isSelected = card.isSelected
-    local btnText = ((((((card.rank .. " ") .. card.suit) .. " (Val: ") .. tostring(card.value)) .. ", Pow: ") .. tostring(card.power)) .. ")"
+    local btnText = ((((((card.rank .. " ") .. card.suit) .. " (Val: ") .. tostring(card:getValue())) .. ", Pow: ") .. tostring(card:getPower())) .. ")"
     if options and options.multiSelect then
         if isSelected then
             btnText = "[X] " .. btnText

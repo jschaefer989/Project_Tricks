@@ -18,7 +18,9 @@ function Baron.prototype.____constructor(self, gameManager, suit)
         Ranks.BARON,
         2,
         5,
-        "Baron"
+        "Baron",
+        "Assets/Images/BaronRank.png",
+        {edelName = "Duke", edelPower = 9, edelValue = 5, edelRankAssetPath = "Assets/Images/DukeRank.png"}
     )
 end
 return ____exports

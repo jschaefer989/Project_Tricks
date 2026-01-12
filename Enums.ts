@@ -30,16 +30,6 @@ export enum Ranks {
     DEUCE = "DEUCE"
 }
 
-export enum EdelRanks {
-    CHOSEN = "CHOSEN",
-    DEVIL = "DEVIL",
-    POPE = "POPE",
-    EMPEROR = "EMPEROR",
-    BARD = "BARD",
-    DUKE = "DUKE",
-    KNIGHT = "KNIGHT",
-}
-
 export enum CharacterTypes {
     PLAYER = "PLAYER",
     ENEMY = "ENEMY",
