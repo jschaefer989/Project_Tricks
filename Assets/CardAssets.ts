@@ -22,6 +22,7 @@ export default class CardAssets {
   gameManager: GameManager;
   board: Board;
   baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png");
+  edelCard = love.graphics.newImage("Assets/Images/EdelCard.png");
   cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static");
   cardAssetConstructionOptions: (
     includeClickHandler: boolean,
@@ -50,7 +51,7 @@ export default class CardAssets {
     const baseCardAsset = new Asset(
       this.gameManager,
       assetId,
-      this.baseCard,
+      card.isEdel ? this.edelCard : this.baseCard,
       cardX,
       cardY,
       cardWidth,

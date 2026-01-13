@@ -22,6 +22,7 @@ local CardAssets = ____exports.default
 CardAssets.name = "CardAssets"
 function CardAssets.prototype.____constructor(self, gameManager, board)
     self.baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png")
+    self.edelCard = love.graphics.newImage("Assets/Images/EdelCard.png")
     self.cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static")
     self.cardAssetConstructionOptions = function(____, includeClickHandler, card) return {
         onClick = includeClickHandler and (function() return card:onClick() end) or nil,
@@ -43,7 +44,7 @@ function CardAssets.prototype.addAsset(self, card, cardX, cardY, includeClickHan
         Asset,
         self.gameManager,
         assetId,
-        self.baseCard,
+        card.isEdel and self.edelCard or self.baseCard,
         cardX,
         cardY,
         ____exports.cardWidth,

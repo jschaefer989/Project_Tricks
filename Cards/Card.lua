@@ -1,6 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
 local ____SlideAnimation = require("Assets.Animations.SlideAnimation")
 local SlideAnimation = ____SlideAnimation.default
@@ -21,7 +22,6 @@ local Card = ____exports.default
 Card.name = "Card"
 function Card.prototype.____constructor(self, gameManager, suit, rank, power, value, name, rankAssetPath, edelConstructionOptions)
     self.isSelected = false
-    self.isEdel = false
     self.id = (((suit .. "_") .. rank) .. "_") .. tostring(love.math.random(1000))
     self.gameManager = gameManager
     self.suit = suit
@@ -31,7 +31,6 @@ function Card.prototype.____constructor(self, gameManager, suit, rank, power, va
     self.cost = self:getCost()
     self.rankAssetPath = rankAssetPath
     self.name = name
-    self.isEdel = not isEmpty(edelConstructionOptions)
     if edelConstructionOptions then
         self.edelName = edelConstructionOptions.edelName
         self.edelPower = edelConstructionOptions.edelPower
@@ -48,7 +47,7 @@ function Card.prototype.getCost(self)
     return cost
 end
 function Card.prototype.getBaseCost(self)
-    return self.power * 10 + self.value * 5
+    return self:getPower() * 10 + self:getValue() * 5
 end
 function Card.prototype.save(self)
     return {
@@ -59,7 +58,6 @@ function Card.prototype.save(self)
         value = self.value,
         isSelected = self.isSelected,
         cost = self.cost,
-        isEdel = self.isEdel,
         name = self.name
     }
 end
@@ -83,8 +81,8 @@ function Card.prototype.onSelect(self)
         return
     end
     self.isSelected = true
-    self.gameManager.board:addPlayerPower(self.power)
-    self.gameManager.board:addPlayerValue(self.value)
+    self.gameManager.board:addPlayerPower(self:getPower())
+    self.gameManager.board:addPlayerValue(self:getValue())
     local ____opt_0 = self.gameManager.board
     local slideAssets = ____opt_0 and ____opt_0.cardAssets:getCardAssetList(self)
     self.gameManager.animationManager.animations:set(
@@ -107,8 +105,8 @@ function Card.prototype.onUnselect(self)
         return
     end
     self.isSelected = false
-    self.gameManager.board:addPlayerPower(-self.power)
-    self.gameManager.board:addPlayerValue(-self.value)
+    self.gameManager.board:addPlayerPower(-self:getPower())
+    self.gameManager.board:addPlayerValue(-self:getValue())
     local ____opt_4 = self.gameManager.board
     local slideAssets = ____opt_4 and ____opt_4.cardAssets:getCardAssetList(self)
     self.gameManager.animationManager.animations:set(
@@ -134,14 +132,14 @@ function Card.prototype.onHover(self, asset)
                 TextIds.TOOLTIP_CARD_NAME,
                 5,
                 10,
-                (self.name .. " of ") .. ____exports.default:getSuitName(self.suit)
+                (self:getName() .. " of ") .. ____exports.default:getSuitName(self.suit)
             ),
             __TS__New(
                 FontWithPosition,
                 TextIds.TOOLTIP_CARD_POWER,
                 5,
                 20,
-                tostring(self.power),
+                tostring(self:getPower()),
                 {icon = IconAsset:getPowerIconAsset(self.gameManager, AssetIds.TOOLTIP_POWER_ICON)}
             ),
             __TS__New(
@@ -149,7 +147,7 @@ function Card.prototype.onHover(self, asset)
                 TextIds.TOOLTIP_CARD_VALUE,
                 5,
                 30,
-                tostring(self.value),
+                tostring(self:getValue()),
                 {icon = IconAsset:getValueIconAsset(self.gameManager, AssetIds.TOOLTIP_VALUE_ICON)}
             )
         },
@@ -195,4 +193,19 @@ end
 function Card.prototype.getRankAssetPath(self)
     return self.isEdel and not isEmpty(self.edelRankAssetPath) and self.edelRankAssetPath or self.rankAssetPath
 end
+__TS__SetDescriptor(
+    Card.prototype,
+    "isEdel",
+    {get = function(self)
+        local ____opt_8 = self.gameManager.board
+        local ____temp_14 = not (____opt_8 and ____opt_8.showingEdelView)
+        if ____temp_14 then
+            local ____opt_12 = self.gameManager.board
+            local ____opt_10 = ____opt_12 and ____opt_12.edelCard
+            ____temp_14 = (____opt_10 and ____opt_10.suit) == self.suit
+        end
+        return ____temp_14 and self.edelName ~= self.name
+    end},
+    true
+)
 return ____exports

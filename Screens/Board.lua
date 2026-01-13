@@ -693,6 +693,22 @@ function Board.prototype.buildPointBoard(self)
             {size = 9, format = Format.RIGHT}
         )
     )
+    if not isEmpty(self.edelCard) then
+        local suitImage = love.graphics.newImage(CardAssets:getSuitAssetPath(self.edelCard.suit))
+        self.gameManager.assetManager:addAsset(
+            AssetIds.EDEL_ICON,
+            __TS__New(
+                Asset,
+                self.gameManager,
+                AssetIds.EDEL_ICON,
+                suitImage,
+                centerX - suitImage:getWidth() / 2,
+                5 + boardHeight / 2 - suitImage:getHeight() / 2,
+                16,
+                16
+            )
+        )
+    end
 end
 function Board.prototype.buildPowerAndValues(self, characterType, portraitHeight)
     local ____temp_13

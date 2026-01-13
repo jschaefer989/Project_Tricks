@@ -31,6 +31,7 @@ import FlickerAnimation from "Assets/Animations/FlickerAnimation";
 import SlideAnimation from "Assets/Animations/SlideAnimation";
 import GlowAnimation from "Assets/Animations/GlowAnimation";
 import ShimmerShader from "Shaders/ShimmerShader";
+import * as suit from "Libraries.suit-master.suit";
 
 const portraitGap = 12;
 
@@ -810,6 +811,24 @@ export default class Board {
         }
       )
     );
+
+    if (!isEmpty(this.edelCard)) {
+      const suitImage = love.graphics.newImage(
+        CardAssets.getSuitAssetPath(this.edelCard.suit)
+      );
+      this.gameManager.assetManager.addAsset(
+        AssetIds.EDEL_ICON,
+        new Asset(
+          this.gameManager,
+          AssetIds.EDEL_ICON,
+          suitImage,
+          centerX - suitImage.getWidth() / 2,
+          5 + boardHeight / 2 - suitImage.getHeight() / 2,
+          16,
+          16
+        )
+      );
+    }
   }
 
   private buildPowerAndValues(

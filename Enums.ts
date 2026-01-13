@@ -89,6 +89,8 @@ export enum AssetIds {
     MONEY_ICON = "MONEY_ICON",
     TOOLTIP_POWER_ICON = "TOOLTIP_POWER_ICON",
     TOOLTIP_VALUE_ICON = "TOOLTIP_VALUE_ICON",
+    EDEL_DISPLAY = "EDEL_DISPLAY",
+    EDEL_ICON = "EDEL_ICON",
 }
 
 export enum TextIds {

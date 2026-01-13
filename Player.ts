@@ -1,24 +1,11 @@
 /** @noSelfInFile */
 
 import Perk, { PerkData } from "Perk";
-import Card from "Cards/Card";
+import Card, { CardData } from "Cards/Card";
 import Character from "./Character";
 import { CharacterTypes, TextIds, Perks } from "Enums";
 import Dealer from "Dealer";
 import GameManager from "GameManager";
-import { isEmpty } from "Helpers";
-
-interface CardData {
-  id: string;
-  suit: any;
-  rank: any;
-  power: number;
-  value: number;
-  isSelected: boolean;
-  cost: number;
-  isEdel: boolean;
-  name: string;
-}
 
 interface PlayerData {
   name: string;

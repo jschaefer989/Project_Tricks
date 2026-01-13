@@ -16,7 +16,6 @@ export interface CardData {
   value: number;
   isSelected: boolean;
   cost: number;
-  isEdel: boolean;
   name: string;
 }
 
@@ -37,7 +36,6 @@ export default abstract class Card {
   private value: number;
   isSelected: boolean = false;
   cost: number;
-  isEdel: boolean = false;
   private name: string;
   private edelName?: string;
   private edelPower?: number;
@@ -63,7 +61,6 @@ export default abstract class Card {
     this.cost = this.getCost();
     this.rankAssetPath = rankAssetPath;
     this.name = name;
-    this.isEdel = !isEmpty(edelConstructionOptions);
     if (edelConstructionOptions) {
       this.edelName = edelConstructionOptions.edelName;
       this.edelPower = edelConstructionOptions.edelPower;
@@ -83,7 +80,7 @@ export default abstract class Card {
   }
 
   getBaseCost(): number {
-    return this.power * 10 + this.value * 5;
+    return this.getPower() * 10 + this.getValue() * 5;
   }
 
   save(): CardData {
@@ -95,7 +92,6 @@ export default abstract class Card {
       value: this.value,
       isSelected: this.isSelected,
       cost: this.cost,
-      isEdel: this.isEdel,
       name: this.name,
     };
   }
@@ -125,8 +121,8 @@ export default abstract class Card {
 
     this.isSelected = true;
 
-    this.gameManager.board.addPlayerPower(this.power);
-    this.gameManager.board.addPlayerValue(this.value);
+    this.gameManager.board.addPlayerPower(this.getPower());
+    this.gameManager.board.addPlayerValue(this.getValue());
 
     const slideAssets =
       this.gameManager.board?.cardAssets.getCardAssetList(this);
@@ -146,8 +142,8 @@ export default abstract class Card {
 
     this.isSelected = false;
 
-    this.gameManager.board.addPlayerPower(-this.power);
-    this.gameManager.board.addPlayerValue(-this.value);
+    this.gameManager.board.addPlayerPower(-this.getPower());
+    this.gameManager.board.addPlayerValue(-this.getValue());
 
     const slideAssets =
       this.gameManager.board?.cardAssets.getCardAssetList(this);
@@ -167,13 +163,13 @@ export default abstract class Card {
           TextIds.TOOLTIP_CARD_NAME,
           5,
           10,
-          `${this.name} of ${Card.getSuitName(this.suit)}`
+          `${this.getName()} of ${Card.getSuitName(this.suit)}`
         ),
         new FontWithPosition(
           TextIds.TOOLTIP_CARD_POWER,
           5,
           20,
-          this.power.toString(),
+          this.getPower().toString(),
           {
             icon: IconAsset.getPowerIconAsset(
               this.gameManager,
@@ -185,7 +181,7 @@ export default abstract class Card {
           TextIds.TOOLTIP_CARD_VALUE,
           5,
           30,
-          this.value.toString(),
+          this.getValue().toString(),
           {
             icon: IconAsset.getValueIconAsset(
               this.gameManager,
@@ -215,6 +211,14 @@ export default abstract class Card {
       default:
         exhaustiveGuard(suit);
     }
+  }
+
+  get isEdel(): boolean {
+    return (
+      !this.gameManager.board?.showingEdelView &&
+      this.gameManager.board?.edelCard?.suit === this.suit &&
+      this.edelName !== this.name
+    );
   }
 
   getPower(): number {

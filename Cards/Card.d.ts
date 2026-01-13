@@ -10,7 +10,6 @@ export interface CardData {
     value: number;
     isSelected: boolean;
     cost: number;
-    isEdel: boolean;
     name: string;
 }
 interface EdelConstructionOptions {
@@ -29,7 +28,6 @@ export default abstract class Card {
     private value;
     isSelected: boolean;
     cost: number;
-    isEdel: boolean;
     private name;
     private edelName?;
     private edelPower?;
@@ -47,6 +45,7 @@ export default abstract class Card {
     onHover(asset: Asset): void;
     onUnhover(asset: Asset): void;
     static getSuitName(suit: Suits): string;
+    get isEdel(): boolean;
     getPower(): number;
     getValue(): number;
     getName(): string;
