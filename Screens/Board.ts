@@ -520,7 +520,9 @@ export default class Board {
     const buttonX = Math.floor((push.getWidth() - totalW) / 2);
     this.buildAttackButton(buttonX, buttonY, btnW, btnH);
     const discardX = this.buildDiscardButton(buttonX, buttonY, btnW, btnH, gap);
-    this.buildDeselectButton(discardX, buttonY, btnW, btnH, gap);
+    const deselectX = this.buildDeselectButton(discardX, buttonY, btnW, btnH, gap);
+    this.buildSortButton(deselectX, buttonY, btnW, btnH);
+
 
     // Disable buttons initially since no cards are selected
     this.updatePrimaryButtonStates();
@@ -647,18 +649,18 @@ export default class Board {
     btnW: number,
     btnH: number,
     gap: number
-  ): void {
+  ): number {
     const deselectX = discardX + btnW + gap;
 
     const centerX = deselectX + btnW / 2;
-    const centerY = buttonY + btnH / 2;
+    const centerY = buttonY + btnH / 4;
     const deselectButtonCaptionText = new FontWithPosition(
       TextIds.DESELECT_BUTTON_CAPTION,
-      centerX + 2,
+      centerX,
       centerY,
       "Deselect",
       {
-        size: 18,
+        size: 9,
         format: Format.CENTER,
       }
     );
@@ -675,11 +677,59 @@ export default class Board {
         love.graphics.newImage("Assets/Images/DeselectButton.png"),
         deselectX,
         buttonY,
-        btnW + 2,
-        btnH,
+        btnW,
+        btnH / 2,
         {
           onClick: () => this.gameManager.player.unselectCards(),
           associatedTexts: [deselectButtonCaptionText],
+          hoverEffect: [HoverEffects.CHANGE_COLOR],
+          mousePressEffect: [
+            MousePressEffects.DARKEN,
+            MousePressEffects.SHIFT_DOWN,
+          ],
+          clickSound: this.gameManager.assetManager.buttonClickSound,
+        }
+      )
+    );
+    return deselectX;
+  }
+
+  private buildSortButton(
+    deselectX: number,
+    buttonY: number,
+    btnW: number,
+    btnH: number,
+  ): void {
+    const centerX = deselectX + btnW / 2;
+    const centerY = buttonY + btnH / 4 + (btnH / 2) + 1;
+    const sortButtonCaptionText = new FontWithPosition(
+      TextIds.SORT_BUTTON_CAPTION,
+      centerX,
+      centerY,
+      "Sort",
+      {
+        size: 9,
+        format: Format.CENTER,
+      }
+    );
+    this.gameManager.assetManager.textManager.addText(
+      TextIds.SORT_BUTTON_CAPTION,
+      sortButtonCaptionText
+    );
+
+    this.gameManager.assetManager.addAsset(
+      AssetIds.SORT_BUTTON,
+      new Asset(
+        this.gameManager,
+        AssetIds.SORT_BUTTON,
+        love.graphics.newImage("Assets/Images/SortButton.png"),
+        deselectX,
+        buttonY + btnH / 2 + 1,
+        btnW,
+        btnH / 2,
+        {
+          onClick: () => { this.gameManager.player.sortCards(); this.enemy.sortCards(); },
+          associatedTexts: [sortButtonCaptionText],
           hoverEffect: [HoverEffects.CHANGE_COLOR],
           mousePressEffect: [
             MousePressEffects.DARKEN,

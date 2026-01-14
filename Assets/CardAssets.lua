@@ -292,4 +292,19 @@ function CardAssets.prototype.redrawCard(self, card)
     self.gameManager.assetManager:removeAssets(____exports.default:getBaseAssetId(card))
     self:addAsset(card, baseAsset.x, baseAsset.y)
 end
+function CardAssets.prototype.repositionCard(self, card, x, y)
+    local ____temp_2 = self:getCardAssets(card)
+    local baseAsset = ____temp_2.baseAsset
+    if isEmpty(baseAsset) then
+        return
+    end
+    local assets = self:getCardAssetList(card)
+    if isEmpty(assets) then
+        return
+    end
+    for ____, asset in ipairs(assets) do
+        local offsetFromBase = asset.x - baseAsset.x
+        asset.x = x + offsetFromBase
+    end
+end
 return ____exports

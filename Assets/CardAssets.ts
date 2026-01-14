@@ -334,4 +334,18 @@ export default class CardAssets {
     this.gameManager.assetManager.removeAssets(CardAssets.getBaseAssetId(card));
     this.addAsset(card, baseAsset.x, baseAsset.y);
   }
+
+  repositionCard(card: Card, x: number, y: number): void {
+    const { baseAsset } = this.getCardAssets(card);
+    if (isEmpty(baseAsset)) return;
+
+    const assets = this.getCardAssetList(card);
+    if (isEmpty(assets)) return;
+
+    // Calculate offset from base asset for each asset and apply to new position
+    for (const asset of assets) {
+      const offsetFromBase = asset.x - baseAsset.x;
+      asset.x = x + offsetFromBase;
+    }
+  }
 }

@@ -48,6 +48,9 @@ local ____BackgroundManager = require("Screens.BackgroundManager")
 local BackgroundManager = ____BackgroundManager.default
 local ____ShaderManager = require("Shaders.ShaderManager")
 local ShaderManager = ____ShaderManager.default
+local ____FontWithPosition = require("Assets.Fonts.FontWithPosition")
+local Fonts = ____FontWithPosition.Fonts
+local lovelyToasts = require("Libraries.Lovely-Toasts-main.lovelyToasts")
 ____exports.default = __TS__Class()
 local GameManager = ____exports.default
 GameManager.name = "GameManager"
@@ -63,6 +66,8 @@ function GameManager.prototype.____constructor(self)
     self.devMode = false
     self.gameState = GameStates.MAIN_MENU
     self.biome = __TS__New(Grass)
+    lovelyToasts.style.font = love.graphics.newFont(Fonts.STANDARD, 32)
+    lovelyToasts.style.backgroundColor = {0.25, 0.35, 0.45, 0.95}
 end
 function GameManager.prototype.getCharacter(self, characterType)
     repeat

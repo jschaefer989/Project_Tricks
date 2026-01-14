@@ -43,5 +43,6 @@ export default class CardAssets {
     getCardAssetList(card: Card): Asset[];
     disableAllCards(disable: boolean): void;
     redrawCard(card: Card): void;
+    repositionCard(card: Card, x: number, y: number): void;
 }
 export {};

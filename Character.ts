@@ -4,6 +4,7 @@ import Card from "Cards/Card";
 import { CharacterTypes, TextIds } from "Enums";
 import GameManager from "GameManager";
 import { isEmpty } from "Helpers";
+import * as lovelyToasts from "Libraries.Lovely-Toasts-main.lovelyToasts";
 
 export default class Character {
   gameManager: GameManager;
@@ -12,6 +13,8 @@ export default class Character {
   discardPile: Card[];
   numberOfHeldCards: number;
   type: CharacterTypes;
+  private lastSortTime = 0;
+  private sortMode: SortMode = SortMode.POWER;
 
   constructor(gameManager: GameManager, type: CharacterTypes) {
     this.gameManager = gameManager;
@@ -111,20 +114,109 @@ export default class Character {
           TextIds.TOOLTIP_DECK_OVERVIEW_CARDS,
           5,
           10,
-          `Deck: ${this.deck.length}/${this.deck.length + this.discardPile.length + this.hand.length}`,
+          `Deck: ${this.deck.length}/${
+            this.deck.length + this.discardPile.length + this.hand.length
+          }`
         ),
         new FontWithPosition(
           TextIds.TOOLTIP_DECK_OVERVIEW_DISCARDS,
           5,
           20,
-          `Discards: ${this.discardPile.length}`,
+          `Discards: ${this.discardPile.length}`
         ),
       ],
       asset
     );
   }
 
-  showDeckContents(): void {
+  showDeckContents(): void {}
 
+  sortCards(): void {
+    const now = os.time() * 1000; // Convert to milliseconds
+    const timeSinceLastSort = now - this.lastSortTime;
+    const threshold = 3000; // 3 seconds
+
+    this.getSortMode(timeSinceLastSort, threshold);
+
+    this.lastSortTime = now;
+    this.applySort();
+    this.redrawHand();
   }
+
+  private getSortMode(timeSinceLastSort: number, threshold: number): void {
+    // Determine if this is a quick successive click
+    if (timeSinceLastSort < threshold) {
+      // Cycle to next sort mode
+      switch (this.sortMode) {
+        case SortMode.POWER:
+          this.sortMode = SortMode.VALUE;
+          break;
+        case SortMode.VALUE:
+          this.sortMode = SortMode.SUIT;
+          break;
+        case SortMode.SUIT:
+          this.sortMode = SortMode.POWER;
+          break;
+      }
+    } else {
+      // Reset to power sort if enough time has passed
+      this.sortMode = SortMode.POWER;
+    }
+  }
+
+  private applySort(): void {
+    switch (this.sortMode) {
+      case SortMode.POWER:
+        this.sortByPower();
+        break;
+      case SortMode.VALUE:
+        this.sortByValue();
+        break;
+      case SortMode.SUIT:
+        this.sortBySuit();
+        break;
+    }
+  }
+
+  sortByPower(): void {
+    this.hand = this.hand.sort((a, b) => b.getPower() - a.getPower());
+    lovelyToasts.show("Sorted by Power", 2, "bottom");
+  }
+
+  sortByValue(): void {
+    this.hand = this.hand.sort((a, b) => b.getValue() - a.getValue());
+    lovelyToasts.show("Sorted by Value", 2, "bottom");
+  }
+
+  sortBySuit(): void {
+    this.hand = this.hand.sort((a, b) =>
+      a.suit === b.suit ? 0 : a.suit < b.suit ? -1 : 1
+    );
+    lovelyToasts.show("Sorted by Suit", 2, "bottom");
+  }
+
+  redrawHand(): void {
+    if (isEmpty(this.gameManager.board)) return;
+
+    const cardAssets = this.gameManager.board.cardAssets;
+    const y = cardAssets.getHandYCoordinate(CharacterTypes.PLAYER);
+
+    for (let index = 0; index < this.hand.length; index++) {
+      const card = this.hand[index];
+      const { x: targetX } = this.gameManager.board.dealer.getCardPointInHand(
+        CharacterTypes.PLAYER,
+        index,
+        this.hand.length
+      );
+      cardAssets.repositionCard(card, targetX, y);
+      cardAssets.redrawCard(card);
+    }
+    cardAssets.disableAllCards(false);
+  }
+}
+
+enum SortMode {
+  POWER = "POWER",
+  VALUE = "VALUE",
+  SUIT = "SUIT",
 }

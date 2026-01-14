@@ -490,13 +490,14 @@ function Board.prototype.buildPrimaryButtons(self)
         btnH,
         gap
     )
-    self:buildDeselectButton(
+    local deselectX = self:buildDeselectButton(
         discardX,
         buttonY,
         btnW,
         btnH,
         gap
     )
+    self:buildSortButton(deselectX, buttonY, btnW, btnH)
     self:updatePrimaryButtonStates()
 end
 function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW, btnH)
@@ -580,14 +581,14 @@ end
 function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, btnH, gap)
     local deselectX = discardX + btnW + gap
     local centerX = deselectX + btnW / 2
-    local centerY = buttonY + btnH / 2
+    local centerY = buttonY + btnH / 4
     local deselectButtonCaptionText = __TS__New(
         FontWithPosition,
         TextIds.DESELECT_BUTTON_CAPTION,
-        centerX + 2,
+        centerX,
         centerY,
         "Deselect",
-        {size = 18, format = Format.CENTER}
+        {size = 9, format = Format.CENTER}
     )
     self.gameManager.assetManager.textManager:addText(TextIds.DESELECT_BUTTON_CAPTION, deselectButtonCaptionText)
     self.gameManager.assetManager:addAsset(
@@ -599,11 +600,48 @@ function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, btnH
             love.graphics.newImage("Assets/Images/DeselectButton.png"),
             deselectX,
             buttonY,
-            btnW + 2,
-            btnH,
+            btnW,
+            btnH / 2,
             {
                 onClick = function() return self.gameManager.player:unselectCards() end,
                 associatedTexts = {deselectButtonCaptionText},
+                hoverEffect = {HoverEffects.CHANGE_COLOR},
+                mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN},
+                clickSound = self.gameManager.assetManager.buttonClickSound
+            }
+        )
+    )
+    return deselectX
+end
+function Board.prototype.buildSortButton(self, deselectX, buttonY, btnW, btnH)
+    local centerX = deselectX + btnW / 2
+    local centerY = buttonY + btnH / 4 + btnH / 2 + 1
+    local sortButtonCaptionText = __TS__New(
+        FontWithPosition,
+        TextIds.SORT_BUTTON_CAPTION,
+        centerX,
+        centerY,
+        "Sort",
+        {size = 9, format = Format.CENTER}
+    )
+    self.gameManager.assetManager.textManager:addText(TextIds.SORT_BUTTON_CAPTION, sortButtonCaptionText)
+    self.gameManager.assetManager:addAsset(
+        AssetIds.SORT_BUTTON,
+        __TS__New(
+            Asset,
+            self.gameManager,
+            AssetIds.SORT_BUTTON,
+            love.graphics.newImage("Assets/Images/SortButton.png"),
+            deselectX,
+            buttonY + btnH / 2 + 1,
+            btnW,
+            btnH / 2,
+            {
+                onClick = function()
+                    self.gameManager.player:sortCards()
+                    self.enemy:sortCards()
+                end,
+                associatedTexts = {sortButtonCaptionText},
                 hoverEffect = {HoverEffects.CHANGE_COLOR},
                 mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN},
                 clickSound = self.gameManager.assetManager.buttonClickSound

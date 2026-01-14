@@ -1,11 +1,11 @@
 /** @noSelfInFile */
 
-import Perk, { PerkData } from "Perk";
 import Card, { CardData } from "Cards/Card";
-import Character from "./Character";
-import { CharacterTypes, TextIds, Perks } from "Enums";
 import Dealer from "Dealer";
+import { CharacterTypes, Perks, TextIds } from "Enums";
 import GameManager from "GameManager";
+import Perk, { PerkData } from "Perk";
+import Character from "./Character";
 
 interface PlayerData {
   name: string;

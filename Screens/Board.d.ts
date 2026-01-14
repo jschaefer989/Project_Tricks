@@ -70,6 +70,7 @@ export default class Board {
     private buildAttackButton;
     private buildDiscardButton;
     private buildDeselectButton;
+    private buildSortButton;
     updatePrimaryButtonStates(): void;
     enableAttackButton(): void;
     enableDiscardButton(): void;

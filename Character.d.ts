@@ -9,6 +9,8 @@ export default class Character {
     discardPile: Card[];
     numberOfHeldCards: number;
     type: CharacterTypes;
+    private lastSortTime;
+    private sortMode;
     constructor(gameManager: GameManager, type: CharacterTypes);
     addToHand(card: Card, index?: number): void;
     removeFromHand(card: Card): void;
@@ -23,4 +25,11 @@ export default class Character {
     putHandBackInDeck(): void;
     showDeckOverview(asset: Asset): void;
     showDeckContents(): void;
+    sortCards(): void;
+    private getSortMode;
+    private applySort;
+    sortByPower(): void;
+    sortByValue(): void;
+    sortBySuit(): void;
+    redrawHand(): void;
 }

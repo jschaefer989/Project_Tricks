@@ -26,6 +26,8 @@ import Biome from "Biomes/Biome";
 import Grass from "Biomes/Grass";
 import BackgroundManager from "Screens/BackgroundManager";
 import ShaderManager from "Shaders/ShaderManager";
+import { Fonts } from "Assets/Fonts/FontWithPosition";
+import * as lovelyToasts from "Libraries.Lovely-Toasts-main.lovelyToasts";
 
 interface GameState {
   update: (dt: number) => void;
@@ -51,7 +53,7 @@ export default class GameManager {
   assetManager = new AssetManager(this);
   animationManager = new AnimationManager(this);
   musicPlayer = new MusicPlayer(this);
-  biome: Biome
+  biome: Biome;
   backgroundManager = new BackgroundManager(this);
   shaderManager = new ShaderManager(this);
   devMode: boolean = false; // Change if you want to test in dev mode
@@ -59,6 +61,9 @@ export default class GameManager {
   constructor() {
     this.gameState = GameStates.MAIN_MENU;
     this.biome = new Grass(); // TODO: initialize this based on data from the map
+
+    lovelyToasts.style.font = love.graphics.newFont(Fonts.STANDARD, 32);
+    lovelyToasts.style.backgroundColor = [0.25, 0.35, 0.45, 0.95];
   }
 
   getCharacter(characterType: string): Character | undefined {
@@ -70,7 +75,10 @@ export default class GameManager {
     }
   }
 
-  switchBasedOnGameState(gameState = this.gameState, enemy = this.board?.enemy): void {
+  switchBasedOnGameState(
+    gameState = this.gameState,
+    enemy = this.board?.enemy
+  ): void {
     this.assetManager = new AssetManager(this);
     this.backgroundManager.updateBackground(gameState);
     if (this.settings.playMusic) {
@@ -161,7 +169,6 @@ export default class GameManager {
     // Game state needs to be the previous state in the pause menu so we save correctly
     // this.gameState = GameStates.PAUSE_MENU
 
-
     if (isEmpty(this.pauseMenu)) {
       this.pauseMenu = new PauseMenu(this);
     }
@@ -172,11 +179,11 @@ export default class GameManager {
   private switchToBoard(enemy?: Enemy): void {
     const shadowShader = love.graphics.newShader("Shaders/Shadow.glsl");
     shadowShader.send("shadow_strength", 0.6);
-    shadowShader.send("shadow_color", [0, 0, 0]); 
+    shadowShader.send("shadow_color", [0, 0, 0]);
 
     const boardState: GameState = {
-      update: (dt: number) => {        
-        this.assetManager.handleMouseHover();        
+      update: (dt: number) => {
+        this.assetManager.handleMouseHover();
         this.animationManager.updateAnimations(dt);
         this.shaderManager.updateShaders(dt);
       },
@@ -185,7 +192,7 @@ export default class GameManager {
           push.start();
           //love.graphics.setShader(shadowShader);
           this.assetManager.drawAssets();
-          love.graphics.setShader();  // Reset shader to default
+          love.graphics.setShader(); // Reset shader to default
           push.finish();
         }
       },
@@ -207,7 +214,7 @@ export default class GameManager {
     this.shop = undefined;
     this.levelUpScreen = undefined;
     this.perkScreen = undefined;
-    
+
     if (isEmpty(this.board)) {
       this.board = new Board(this, enemy ?? new Enemy(this));
       this.board.dealer.setup();
