@@ -1,8 +1,8 @@
 /** @noSelfInFile */
 
-import { AlignMode, Font, Image } from "love.graphics";
+import { AlignMode, Font } from "love.graphics";
 import { isEmpty } from "Helpers";
-import IconAsset from "./IconAsset";
+import IconAsset from "../IconAsset";
 
 export enum Format {
   LEFT,

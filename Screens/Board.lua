@@ -25,7 +25,7 @@ local Asset = ____Asset.default
 local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
-local ____FontWithPosition = require("Assets.FontWithPosition")
+local ____FontWithPosition = require("Assets.Fonts.FontWithPosition")
 local FontWithPosition = ____FontWithPosition.default
 local Fonts = ____FontWithPosition.Fonts
 local Format = ____FontWithPosition.Format
@@ -432,8 +432,8 @@ end
 function Board.prototype.start(self)
     self:buildPlayerPortrait()
     self:buildEnemyPortrait()
-    self:buildPlayerDeck()
-    self:buildEnemyDeck()
+    self:buildDeck(CharacterTypes.PLAYER)
+    self:buildDeck(CharacterTypes.ENEMY)
     self.dealer:dealEdel()
 end
 function Board.prototype.buildLetsFightButton(self)
@@ -523,7 +523,7 @@ function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW, btnH)
             btnH,
             {
                 onClick = function() return self:handleAttack() end,
-                clickSound = love.audio.newSource("Assets/Sounds/AttackClicked.flac", "static"),
+                clickSound = self.gameManager.assetManager.buttonClickSound,
                 associatedTexts = {attackButtonText},
                 hoverEffect = {HoverEffects.CHANGE_COLOR},
                 mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
@@ -569,7 +569,8 @@ function Board.prototype.buildDiscardButton(self, buttonX, buttonY, btnW, btnH, 
                 onClick = function() return self:handleDiscard() end,
                 associatedTexts = {discardButtonCaptionText, discardButtonCounterText},
                 hoverEffect = {HoverEffects.CHANGE_COLOR},
-                mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
+                mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN},
+                clickSound = self.gameManager.assetManager.buttonClickSound
             }
         )
     )
@@ -603,7 +604,8 @@ function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, btnH
                 onClick = function() return self.gameManager.player:unselectCards() end,
                 associatedTexts = {deselectButtonCaptionText},
                 hoverEffect = {HoverEffects.CHANGE_COLOR},
-                mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
+                mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN},
+                clickSound = self.gameManager.assetManager.buttonClickSound
             }
         )
     )
@@ -854,6 +856,15 @@ function Board.prototype.buildPortrait(self, characterType)
                 {size = 9, format = Format.RIGHT}
             )
         )
+        local perksText = __TS__New(
+            FontWithPosition,
+            TextIds.PLAYER_PERKS,
+            portraitW + 13,
+            portraitPosition + 20,
+            "Perks",
+            {size = 9}
+        )
+        self.gameManager.assetManager.textManager:addText(TextIds.PLAYER_PERKS, perksText)
         self.gameManager.assetManager:addAsset(
             AssetIds.PERKS_BUTTON,
             __TS__New(
@@ -865,18 +876,13 @@ function Board.prototype.buildPortrait(self, characterType)
                 portraitPosition + 10,
                 39,
                 18,
-                {onClick = function() return self.gameManager:switchBasedOnGameState(GameStates.PERKS) end}
-            )
-        )
-        self.gameManager.assetManager.textManager:addText(
-            TextIds.PLAYER_PERKS,
-            __TS__New(
-                FontWithPosition,
-                TextIds.PLAYER_PERKS,
-                portraitW + 13,
-                portraitPosition + 20,
-                "Perks",
-                {size = 9}
+                {
+                    onClick = function() return self.gameManager:switchBasedOnGameState(GameStates.PERKS) end,
+                    clickSound = self.gameManager.assetManager.buttonClickSound,
+                    associatedTexts = {perksText},
+                    hoverEffect = {HoverEffects.CHANGE_COLOR},
+                    mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
+                }
             )
         )
         self.gameManager.assetManager.textManager:addText(
@@ -903,35 +909,29 @@ function Board.prototype.buildPortrait(self, characterType)
         )
     end
 end
-function Board.prototype.buildPlayerDeck(self)
-    local deckPosition = self.dealer:getDeckPosition(CharacterTypes.PLAYER)
+function Board.prototype.buildDeck(self, characterType)
+    local character = self.gameManager:getCharacter(characterType)
+    if isEmpty(character) then
+        return
+    end
+    local deckPosition = self.dealer:getDeckPosition(characterType)
     self.gameManager.assetManager:addAsset(
-        AssetIds.PLAYER_DECK,
+        characterType == CharacterTypes.PLAYER and AssetIds.PLAYER_DECK or AssetIds.ENEMY_DECK,
         __TS__New(
             Asset,
             self.gameManager,
-            AssetIds.PLAYER_DECK,
+            characterType == CharacterTypes.PLAYER and AssetIds.PLAYER_DECK or AssetIds.ENEMY_DECK,
             love.graphics.newImage("Assets/Images/BaseCardBack.png"),
             deckPosition.x,
             deckPosition.y,
             cardWidth,
-            cardHeight
-        )
-    )
-end
-function Board.prototype.buildEnemyDeck(self)
-    local deckPosition = self.dealer:getDeckPosition(CharacterTypes.ENEMY)
-    self.gameManager.assetManager:addAsset(
-        AssetIds.ENEMY_DECK,
-        __TS__New(
-            Asset,
-            self.gameManager,
-            AssetIds.ENEMY_DECK,
-            love.graphics.newImage("Assets/Images/BaseCardBack.png"),
-            deckPosition.x,
-            deckPosition.y,
-            cardWidth,
-            cardHeight
+            cardHeight,
+            {
+                onHover = function(____, asset) return character:showDeckOverview(asset) end,
+                onUnhover = function() return self.gameManager.assetManager.tooltipManager:hideTooltip() end,
+                onClick = function() return character:showDeckContents() end,
+                hoverEffect = {HoverEffects.WOBBLE, HoverEffects.SHIMMER}
+            }
         )
     )
 end

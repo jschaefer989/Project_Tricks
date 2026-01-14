@@ -1,5 +1,5 @@
 import Asset from "./Asset";
-import FontWithPosition from "./FontWithPosition";
+import FontWithPosition from "./Fonts/FontWithPosition";
 import Tooltip from "./Tooltip";
 import GameManager from "GameManager";
 export default class TooltipManager {

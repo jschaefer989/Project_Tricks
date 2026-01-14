@@ -163,13 +163,13 @@ function Dealer.prototype.redrawDeck(self, characterType)
         local ____cond31 = ____switch31 == CharacterTypes.PLAYER
         if ____cond31 then
             self.gameManager.assetManager:removeAssets(AssetIds.PLAYER_DECK)
-            self.board:buildPlayerDeck()
+            self.board:buildDeck(CharacterTypes.PLAYER)
             break
         end
         ____cond31 = ____cond31 or ____switch31 == CharacterTypes.ENEMY
         if ____cond31 then
             self.gameManager.assetManager:removeAssets(AssetIds.ENEMY_DECK)
-            self.board:buildEnemyDeck()
+            self.board:buildDeck(CharacterTypes.ENEMY)
             break
         end
         do

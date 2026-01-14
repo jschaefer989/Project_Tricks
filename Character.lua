@@ -1,7 +1,12 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
+local ____FontWithPosition = require("Assets.Fonts.FontWithPosition")
+local FontWithPosition = ____FontWithPosition.default
+local ____Enums = require("Enums")
+local TextIds = ____Enums.TextIds
 local ____Helpers = require("Helpers")
 local isEmpty = ____Helpers.isEmpty
 ____exports.default = __TS__Class()
@@ -100,5 +105,28 @@ function Character.prototype.putHandBackInDeck(self)
         end
     end
     self.hand = {}
+end
+function Character.prototype.showDeckOverview(self, asset)
+    self.gameManager.assetManager.tooltipManager:addTooltip(
+        {
+            __TS__New(
+                FontWithPosition,
+                TextIds.TOOLTIP_DECK_OVERVIEW_CARDS,
+                5,
+                10,
+                (("Deck: " .. tostring(#self.deck)) .. "/") .. tostring(#self.deck + #self.discardPile + #self.hand)
+            ),
+            __TS__New(
+                FontWithPosition,
+                TextIds.TOOLTIP_DECK_OVERVIEW_DISCARDS,
+                5,
+                20,
+                (("Discards: " .. tostring(#self.discardPile)) .. "/") .. tostring(#self.deck + #self.discardPile + #self.hand)
+            )
+        },
+        asset
+    )
+end
+function Character.prototype.showDeckContents(self)
 end
 return ____exports

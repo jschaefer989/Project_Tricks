@@ -2,7 +2,7 @@ import * as push from "Libraries.push";
 import Asset from "./Asset";
 import { isEmpty } from "Helpers";
 import GameManager from "GameManager";
-import TextManager from "Assets/TextManager";
+import TextManager from "Assets/Fonts/TextManager";
 import WobbleAnimation from "./Animations/WobbleAnimation";
 import TooltipManager from "./TooltipManager";
 
@@ -12,6 +12,7 @@ export default class AssetManager {
   tooltipManager: TooltipManager;
   textManager = new TextManager();
   disabledSound = love.audio.newSource("Assets/Sounds/Disabled.wav", "static");
+  buttonClickSound = love.audio.newSource("Assets/Sounds/ButtonClick.mp3", "static");
 
   constructor(gameManager: GameManager) {
     this.gameManager = gameManager;

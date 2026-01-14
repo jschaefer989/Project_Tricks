@@ -1,3 +1,4 @@
+import Asset from "Assets/Asset";
 import Card from "Cards/Card";
 import { CharacterTypes } from "Enums";
 import GameManager from "GameManager";
@@ -20,4 +21,6 @@ export default class Character {
     removeAllCardsFromHand(): void;
     removeFromDeck(card: Card): void;
     putHandBackInDeck(): void;
+    showDeckOverview(asset: Asset): void;
+    showDeckContents(): void;
 }

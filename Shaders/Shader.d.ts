@@ -1,5 +1,5 @@
 import Asset from "Assets/Asset";
-import FontWithPosition from "Assets/FontWithPosition";
+import FontWithPosition from "Assets/Fonts/FontWithPosition";
 import GameManager from "GameManager";
 import { Shader as LoveShader } from "love.graphics";
 export type ShaderAssets = Asset | FontWithPosition;

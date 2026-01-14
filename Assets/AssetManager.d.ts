@@ -1,6 +1,6 @@
 import Asset from "./Asset";
 import GameManager from "GameManager";
-import TextManager from "Assets/TextManager";
+import TextManager from "Assets/Fonts/TextManager";
 import TooltipManager from "./TooltipManager";
 export default class AssetManager {
     gameManager: GameManager;
@@ -8,6 +8,7 @@ export default class AssetManager {
     tooltipManager: TooltipManager;
     textManager: TextManager;
     disabledSound: import("love.audio").Source;
+    buttonClickSound: import("love.audio").Source;
     constructor(gameManager: GameManager);
     addAsset(id: string, asset: Asset): void;
     getAssets(baseId: string): Asset[] | undefined;

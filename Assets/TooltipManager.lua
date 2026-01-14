@@ -18,6 +18,7 @@ local ____Tooltip = require("Assets.Tooltip")
 local Tooltip = ____Tooltip.default
 local ____Helpers = require("Helpers")
 local isEmpty = ____Helpers.isEmpty
+local push = require("Libraries.push")
 ____exports.default = __TS__Class()
 local TooltipManager = ____exports.default
 TooltipManager.name = "TooltipManager"
@@ -44,7 +45,7 @@ end
 function TooltipManager.prototype.addTooltip(self, texts, associatedAsset)
     local padding = 10
     local tooltipWidth = 128
-    local screenW = love.graphics.getWidth()
+    local screenW = push:getWidth()
     local defaultX = associatedAsset.x + associatedAsset:getWidth() + padding
     local placeRight = defaultX + tooltipWidth <= screenW
     local tooltipX = placeRight and defaultX or math.max(padding, associatedAsset.x - padding - tooltipWidth)
@@ -78,6 +79,9 @@ function TooltipManager.prototype.addTooltip(self, texts, associatedAsset)
     )
 end
 function TooltipManager.prototype.getTooltipBackground(self, texts)
+    if #texts == 2 then
+        return love.graphics.newImage("Assets/Images/TooltipTwo.png")
+    end
     if #texts == 3 then
         return love.graphics.newImage("Assets/Images/TooltipThree.png")
     end

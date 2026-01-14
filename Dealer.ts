@@ -179,11 +179,11 @@ export default class Dealer {
     switch (characterType) {
       case CharacterTypes.PLAYER:
         this.gameManager.assetManager.removeAssets(AssetIds.PLAYER_DECK);
-        this.board.buildPlayerDeck();
+        this.board.buildDeck(CharacterTypes.PLAYER);
         break;
       case CharacterTypes.ENEMY:
         this.gameManager.assetManager.removeAssets(AssetIds.ENEMY_DECK);
-        this.board.buildEnemyDeck();
+        this.board.buildDeck(CharacterTypes.ENEMY);
         break;
       default:
         exhaustiveGuard(characterType);

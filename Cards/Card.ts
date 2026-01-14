@@ -2,7 +2,7 @@
 
 import SlideAnimation from "Assets/Animations/SlideAnimation";
 import Asset from "Assets/Asset";
-import FontWithPosition from "Assets/FontWithPosition";
+import FontWithPosition from "Assets/Fonts/FontWithPosition";
 import IconAsset from "Assets/IconAsset";
 import GameManager from "GameManager";
 import { exhaustiveGuard, isEmpty } from "Helpers";

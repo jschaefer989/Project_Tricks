@@ -1,5 +1,5 @@
 import Asset from "../Asset";
-import FontWithPosition from "Assets/FontWithPosition";
+import FontWithPosition from "Assets/Fonts/FontWithPosition";
 export interface AnimationOptions {
     readonly animDuration?: number;
     readonly onFinish?: () => void;

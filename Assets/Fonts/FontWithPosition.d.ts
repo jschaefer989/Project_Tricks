@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 import { AlignMode, Font } from "love.graphics";
-import IconAsset from "./IconAsset";
+import IconAsset from "../IconAsset";
 export declare enum Format {
     LEFT = 0,
     CENTER = 1,

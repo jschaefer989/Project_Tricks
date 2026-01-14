@@ -11,7 +11,7 @@ local ____exports = {}
 local push = require("Libraries.push")
 local ____Helpers = require("Helpers")
 local isEmpty = ____Helpers.isEmpty
-local ____TextManager = require("Assets.TextManager")
+local ____TextManager = require("Assets.Fonts.TextManager")
 local TextManager = ____TextManager.default
 local ____WobbleAnimation = require("Assets.Animations.WobbleAnimation")
 local WobbleAnimation = ____WobbleAnimation.default
@@ -24,6 +24,7 @@ function AssetManager.prototype.____constructor(self, gameManager)
     self.assets = __TS__New(Map)
     self.textManager = __TS__New(TextManager)
     self.disabledSound = love.audio.newSource("Assets/Sounds/Disabled.wav", "static")
+    self.buttonClickSound = love.audio.newSource("Assets/Sounds/ButtonClick.mp3", "static")
     self.gameManager = gameManager
     self.tooltipManager = __TS__New(TooltipManager, gameManager)
 end

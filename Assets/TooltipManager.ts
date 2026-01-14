@@ -1,10 +1,11 @@
 import { AnimationIds, AssetIds } from "Enums";
 import Asset from "./Asset";
-import FontWithPosition from "./FontWithPosition";
+import FontWithPosition from "./Fonts/FontWithPosition";
 import Tooltip from "./Tooltip";
 import { isEmpty } from "Helpers";
 import { Image } from "love.graphics";
 import GameManager from "GameManager";
+import * as push from "Libraries.push";
 
 export default class TooltipManager {
   gameManager: GameManager;
@@ -32,7 +33,7 @@ export default class TooltipManager {
     const padding = 10;
     const tooltipWidth = 128;
 
-    const screenW = love.graphics.getWidth();
+    const screenW = push.getWidth();
     const defaultX = associatedAsset.x + associatedAsset.getWidth() + padding;
     const placeRight = defaultX + tooltipWidth <= screenW;
     const tooltipX = placeRight
@@ -70,6 +71,9 @@ export default class TooltipManager {
   }
 
   private getTooltipBackground(texts: FontWithPosition[]): Image | undefined {
+    if (texts.length === 2) {
+      return love.graphics.newImage("Assets/Images/TooltipTwo.png");
+    }
     if (texts.length === 3) {
       return love.graphics.newImage("Assets/Images/TooltipThree.png");
     }

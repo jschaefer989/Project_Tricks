@@ -84,8 +84,7 @@ export default class Board {
     private getPortraitWidth;
     private buildEnemyPortrait;
     private buildPortrait;
-    buildPlayerDeck(): void;
-    buildEnemyDeck(): void;
+    buildDeck(characterType: CharacterTypes): void;
     private buildEdelBoard;
     private playWinFireSound;
     private buildWinFire;

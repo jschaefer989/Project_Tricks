@@ -4,7 +4,6 @@ import {
   AssetIds,
   CharacterTypes,
   TextIds as TextIds,
-  Suits,
   GameStates,
   HoverEffects,
   MousePressEffects,
@@ -21,7 +20,7 @@ import FontWithPosition, {
   Fonts,
   Format,
   OutlineThickness,
-} from "Assets/FontWithPosition";
+} from "Assets/Fonts/FontWithPosition";
 import Card from "Cards/Card";
 import { Image } from "love.graphics";
 import IconAsset from "Assets/IconAsset";
@@ -31,7 +30,6 @@ import FlickerAnimation from "Assets/Animations/FlickerAnimation";
 import SlideAnimation from "Assets/Animations/SlideAnimation";
 import GlowAnimation from "Assets/Animations/GlowAnimation";
 import ShimmerShader from "Shaders/ShimmerShader";
-import * as suit from "Libraries.suit-master.suit";
 
 const portraitGap = 12;
 
@@ -454,8 +452,8 @@ export default class Board {
     // or we'll want to update saving so that it's only supported in specific places (like between fights, on the map screen).
     this.buildPlayerPortrait();
     this.buildEnemyPortrait();
-    this.buildPlayerDeck();
-    this.buildEnemyDeck();
+    this.buildDeck(CharacterTypes.PLAYER);
+    this.buildDeck(CharacterTypes.ENEMY);
     this.dealer.dealEdel();
   }
 
@@ -562,10 +560,7 @@ export default class Board {
         btnH,
         {
           onClick: () => this.handleAttack(),
-          clickSound: love.audio.newSource(
-            "Assets/Sounds/AttackClicked.flac",
-            "static"
-          ),
+          clickSound: this.gameManager.assetManager.buttonClickSound,
           associatedTexts: [attackButtonText],
           hoverEffect: [HoverEffects.CHANGE_COLOR],
           mousePressEffect: [
@@ -637,6 +632,7 @@ export default class Board {
             MousePressEffects.DARKEN,
             MousePressEffects.SHIFT_DOWN,
           ],
+          clickSound: this.gameManager.assetManager.buttonClickSound,
         }
       )
     );
@@ -688,6 +684,7 @@ export default class Board {
             MousePressEffects.DARKEN,
             MousePressEffects.SHIFT_DOWN,
           ],
+          clickSound: this.gameManager.assetManager.buttonClickSound,
         }
       )
     );
@@ -1026,6 +1023,18 @@ export default class Board {
         )
       );
 
+      const perksText = new FontWithPosition(
+        TextIds.PLAYER_PERKS,
+        portraitW + 13,
+        portraitPosition + 20,
+        "Perks",
+        { size: 9 }
+      );
+      this.gameManager.assetManager.textManager.addText(
+        TextIds.PLAYER_PERKS,
+        perksText
+      );
+
       this.gameManager.assetManager.addAsset(
         AssetIds.PERKS_BUTTON,
         new Asset(
@@ -1039,18 +1048,14 @@ export default class Board {
           {
             onClick: () =>
               this.gameManager.switchBasedOnGameState(GameStates.PERKS),
+            clickSound: this.gameManager.assetManager.buttonClickSound,
+            associatedTexts: [perksText],
+            hoverEffect: [HoverEffects.CHANGE_COLOR],
+            mousePressEffect: [
+              MousePressEffects.DARKEN,
+              MousePressEffects.SHIFT_DOWN,
+            ],
           }
-        )
-      );
-
-      this.gameManager.assetManager.textManager.addText(
-        TextIds.PLAYER_PERKS,
-        new FontWithPosition(
-          TextIds.PLAYER_PERKS,
-          portraitW + 13,
-          portraitPosition + 20,
-          "Perks",
-          { size: 9 }
         )
       );
 
@@ -1077,34 +1082,29 @@ export default class Board {
     }
   }
 
-  buildPlayerDeck(): void {
-    const deckPosition = this.dealer.getDeckPosition(CharacterTypes.PLAYER);
-    this.gameManager.assetManager.addAsset(
-      AssetIds.PLAYER_DECK,
-      new Asset(
-        this.gameManager,
-        AssetIds.PLAYER_DECK,
-        love.graphics.newImage("Assets/Images/BaseCardBack.png"),
-        deckPosition.x,
-        deckPosition.y,
-        cardWidth,
-        cardHeight
-      )
-    );
-  }
+  buildDeck(characterType: CharacterTypes): void {
+    const character = this.gameManager.getCharacter(characterType);
+    if (isEmpty(character)) {
+      return;
+    }
 
-  buildEnemyDeck(): void {
-    const deckPosition = this.dealer.getDeckPosition(CharacterTypes.ENEMY);
+    const deckPosition = this.dealer.getDeckPosition(characterType);
     this.gameManager.assetManager.addAsset(
-      AssetIds.ENEMY_DECK,
+      characterType === CharacterTypes.PLAYER ? AssetIds.PLAYER_DECK : AssetIds.ENEMY_DECK,
       new Asset(
         this.gameManager,
-        AssetIds.ENEMY_DECK,
+        characterType === CharacterTypes.PLAYER ? AssetIds.PLAYER_DECK : AssetIds.ENEMY_DECK,
         love.graphics.newImage("Assets/Images/BaseCardBack.png"),
         deckPosition.x,
         deckPosition.y,
         cardWidth,
-        cardHeight
+        cardHeight,
+        {
+          onHover: (asset) => character.showDeckOverview(asset),
+          onUnhover: () => this.gameManager.assetManager.tooltipManager.hideTooltip(),
+          onClick: () => character.showDeckContents(),
+          hoverEffect: [HoverEffects.WOBBLE, HoverEffects.SHIMMER],
+        }
       )
     );
   }

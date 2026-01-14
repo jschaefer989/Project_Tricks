@@ -1,6 +1,6 @@
 import { Source } from "love.audio";
 import { Image } from "love.graphics";
-import FontWithPosition from "./FontWithPosition";
+import FontWithPosition from "./Fonts/FontWithPosition";
 import { HoverEffects, MousePressEffects } from "Enums";
 import { exhaustiveGuard, isEmpty } from "Helpers";
 import QuadWithPosition from "./QuadWithPosition";

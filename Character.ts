@@ -1,5 +1,7 @@
+import Asset from "Assets/Asset";
+import FontWithPosition from "Assets/Fonts/FontWithPosition";
 import Card from "Cards/Card";
-import { CharacterTypes } from "Enums";
+import { CharacterTypes, TextIds } from "Enums";
 import GameManager from "GameManager";
 import { isEmpty } from "Helpers";
 
@@ -92,7 +94,7 @@ export default class Character {
     }
   }
 
-  putHandBackInDeck(): void {    
+  putHandBackInDeck(): void {
     for (const card of this.hand) {
       this.addToDeck(card);
       if (card.isSelected) {
@@ -100,5 +102,29 @@ export default class Character {
       }
     }
     this.hand = [];
+  }
+
+  showDeckOverview(asset: Asset): void {
+    this.gameManager.assetManager.tooltipManager.addTooltip(
+      [
+        new FontWithPosition(
+          TextIds.TOOLTIP_DECK_OVERVIEW_CARDS,
+          5,
+          10,
+          `Deck: ${this.deck.length}/${this.deck.length + this.discardPile.length + this.hand.length}`,
+        ),
+        new FontWithPosition(
+          TextIds.TOOLTIP_DECK_OVERVIEW_DISCARDS,
+          5,
+          20,
+          `Discards: ${this.discardPile.length}`,
+        ),
+      ],
+      asset
+    );
+  }
+
+  showDeckContents(): void {
+
   }
 }
