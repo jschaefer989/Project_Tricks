@@ -1,12 +1,12 @@
+import { HoverEffects, MousePressEffects } from "Enums";
+import GameManager from "GameManager";
+import { exhaustiveGuard, isEmpty } from "Helpers";
 import { Source } from "love.audio";
 import { Image } from "love.graphics";
-import FontWithPosition from "./Fonts/FontWithPosition";
-import { HoverEffects, MousePressEffects } from "Enums";
-import { exhaustiveGuard, isEmpty } from "Helpers";
-import QuadWithPosition from "./QuadWithPosition";
-import GameManager from "GameManager";
 import ShimmerShader from "Shaders/ShimmerShader";
 import WobbleAnimation from "./Animations/WobbleAnimation";
+import FontWithPosition from "./Fonts/FontWithPosition";
+import QuadWithPosition from "./QuadWithPosition";
 
 export type AssetCallback = (asset: Asset) => void;
 
@@ -23,6 +23,7 @@ export interface ConstructionOptions {
   readonly isDisabled?: boolean;
   readonly useDisabledAnimation?: boolean;
   readonly clickSound?: Source;
+  readonly hoverSound?: Source;
   readonly associatedTexts?: FontWithPosition[];
   readonly hoverEffect?: HoverEffects[];
   readonly mousePressEffect?: MousePressEffects[];
@@ -51,6 +52,7 @@ export default class Asset {
   isPressed = false;
   color: [number, number, number, number] = [1, 1, 1, 1];
   clickSound?: Source;
+  hoverSound?: Source;
   associatedTexts?: FontWithPosition[];
   hoverEffect: HoverEffects[];
   mousePressEffect: MousePressEffects[];
@@ -86,6 +88,7 @@ export default class Asset {
     this.useDisabledAnimation =
       constructionOptions?.useDisabledAnimation ?? true;
     this.clickSound = constructionOptions?.clickSound;
+    this.hoverSound = constructionOptions?.hoverSound;
     this.associatedTexts = constructionOptions?.associatedTexts;
     this.hoverEffect = constructionOptions?.hoverEffect ?? [HoverEffects.NONE];
     this.mousePressEffect = constructionOptions?.mousePressEffect ?? [
@@ -318,7 +321,7 @@ export default class Asset {
     
     const wobbleId = `wobble-hover-${this.id}`;
     if (!this.gameManager.animationManager.animations.has(wobbleId)) {
-      this.gameManager.animationManager.animations.set(
+      this.gameManager.animationManager.startAnimation(
         wobbleId,
         new WobbleAnimation(0.2, 2, [this])
       );

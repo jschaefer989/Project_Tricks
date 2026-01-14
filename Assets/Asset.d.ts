@@ -1,9 +1,9 @@
+import { HoverEffects, MousePressEffects } from "Enums";
+import GameManager from "GameManager";
 import { Source } from "love.audio";
 import { Image } from "love.graphics";
 import FontWithPosition from "./Fonts/FontWithPosition";
-import { HoverEffects, MousePressEffects } from "Enums";
 import QuadWithPosition from "./QuadWithPosition";
-import GameManager from "GameManager";
 export type AssetCallback = (asset: Asset) => void;
 export interface ConstructionOptions {
     readonly onClick?: () => void;
@@ -18,6 +18,7 @@ export interface ConstructionOptions {
     readonly isDisabled?: boolean;
     readonly useDisabledAnimation?: boolean;
     readonly clickSound?: Source;
+    readonly hoverSound?: Source;
     readonly associatedTexts?: FontWithPosition[];
     readonly hoverEffect?: HoverEffects[];
     readonly mousePressEffect?: MousePressEffects[];
@@ -45,6 +46,7 @@ export default class Asset {
     isPressed: boolean;
     color: [number, number, number, number];
     clickSound?: Source;
+    hoverSound?: Source;
     associatedTexts?: FontWithPosition[];
     hoverEffect: HoverEffects[];
     mousePressEffect: MousePressEffects[];

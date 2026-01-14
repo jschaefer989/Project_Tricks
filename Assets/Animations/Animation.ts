@@ -1,12 +1,14 @@
 import { isEmpty } from "Helpers";
 import Asset from "../Asset";
 import FontWithPosition from "Assets/Fonts/FontWithPosition";
+import { Source } from "love.audio";
 
 export interface AnimationOptions {
   readonly animDuration?: number;
   readonly onFinish?: () => void;
   readonly waitForAnimationIds?: string[];
   readonly stopAnimationCondition?: () => boolean;
+  readonly soundToPlay?: Source;
 }
 
 export type AnimationAssets = Asset | FontWithPosition;
@@ -21,6 +23,8 @@ export default abstract class Animation {
   onFinish?: () => void;
   waitForAnimationIds: string[];
   stopAnimationCondition?: () => boolean;
+  soundToPlay?: Source;
+  playedSound: boolean = false;
 
   constructor(
     assets: AnimationAssets[],
@@ -35,6 +39,7 @@ export default abstract class Animation {
     this.onFinish = constructionOptions?.onFinish;
     this.waitForAnimationIds = constructionOptions?.waitForAnimationIds ?? [];
     this.stopAnimationCondition = constructionOptions?.stopAnimationCondition;
+    this.soundToPlay = constructionOptions?.soundToPlay;
   }
 
   updateAnimation(deltaTime: number): void {
@@ -48,7 +53,7 @@ export default abstract class Animation {
     }
 
     this.animElapsed += deltaTime;
-    
+
     if (!isEmpty(this.animDuration) &&this.animElapsed >= this.animDuration) {
       // Animation complete
       this.animElapsed = this.animDuration;

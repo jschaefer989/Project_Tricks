@@ -4,10 +4,12 @@ import Board from "Screens/Board";
 import { CharacterTypes } from "./Enums";
 import GameManager from "./GameManager";
 import Point from "./Point";
+import { Source } from "love.audio";
 export default class Dealer {
     gameManager: GameManager;
     lootCards: Card[];
     board: Board;
+    dealSound: Source;
     constructor(gameManager: GameManager, board: Board);
     setup(): void;
     dealEdel(): void;

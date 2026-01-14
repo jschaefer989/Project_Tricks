@@ -16,6 +16,7 @@ function Animation.prototype.____constructor(self, assets, constructionOptions)
     self.isAnimating = false
     self.originalX = __TS__New(Map)
     self.originalY = __TS__New(Map)
+    self.playedSound = false
     self.animDuration = constructionOptions and constructionOptions.animDuration
     self.animElapsed = 0
     self.isAnimating = true
@@ -37,6 +38,7 @@ function Animation.prototype.____constructor(self, assets, constructionOptions)
     self.onFinish = constructionOptions and constructionOptions.onFinish
     self.waitForAnimationIds = constructionOptions and constructionOptions.waitForAnimationIds or ({})
     self.stopAnimationCondition = constructionOptions and constructionOptions.stopAnimationCondition
+    self.soundToPlay = constructionOptions and constructionOptions.soundToPlay
 end
 function Animation.prototype.updateAnimation(self, deltaTime)
     if not self.isAnimating then

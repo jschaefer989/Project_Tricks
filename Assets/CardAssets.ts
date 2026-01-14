@@ -24,6 +24,7 @@ export default class CardAssets {
   baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png");
   edelCard = love.graphics.newImage("Assets/Images/EdelCard.png");
   cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static");
+  hoverSound = love.audio.newSource("Assets/Sounds/CardHover.wav", "static");
   cardAssetConstructionOptions: (
     includeClickHandler: boolean,
     card: Card
@@ -32,6 +33,7 @@ export default class CardAssets {
     onHover: (asset: Asset) => card.onHover(asset),
     onUnhover: (asset: Asset) => card.onUnhover(asset),
     clickSound: includeClickHandler ? this.cardClick : undefined,
+    hoverSound: includeClickHandler ? this.hoverSound : undefined,
     isDisabled: true, // Disabled by default, enabled after animations complete
     useDisabledAnimation: false,
   });

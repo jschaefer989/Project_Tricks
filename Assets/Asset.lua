@@ -50,6 +50,7 @@ function Asset.prototype.____constructor(self, gameManager, id, image, x, y, wid
     end
     self.useDisabledAnimation = ____temp_23
     self.clickSound = constructionOptions and constructionOptions.clickSound
+    self.hoverSound = constructionOptions and constructionOptions.hoverSound
     self.associatedTexts = constructionOptions and constructionOptions.associatedTexts
     self.hoverEffect = constructionOptions and constructionOptions.hoverEffect or ({HoverEffects.NONE})
     self.mousePressEffect = constructionOptions and constructionOptions.mousePressEffect or ({MousePressEffects.NONE})
@@ -279,7 +280,7 @@ function Asset.prototype.wobble(self, hovered)
     end
     local wobbleId = "wobble-hover-" .. self.id
     if not self.gameManager.animationManager.animations:has(wobbleId) then
-        self.gameManager.animationManager.animations:set(
+        self.gameManager.animationManager:startAnimation(
             wobbleId,
             __TS__New(WobbleAnimation, 0.2, 2, {self})
         )

@@ -1,35 +1,35 @@
 /** @noSelfInFile */
 
-import {
-  AssetIds,
-  CharacterTypes,
-  TextIds as TextIds,
-  GameStates,
-  HoverEffects,
-  MousePressEffects,
-  AnimationIds,
-} from "../Enums";
-import Dealer from "../Dealer";
-import Enemy, { EnemyData } from "Enemies/Enemy";
-import type GameManager from "../GameManager";
-import CardAssets, { cardHeight, cardWidth } from "Assets/CardAssets";
-import * as push from "Libraries.push";
+import { AnimationAssets } from "Assets/Animations/Animation";
+import CutAnimation from "Assets/Animations/CutAnimation";
+import FlickerAnimation from "Assets/Animations/FlickerAnimation";
+import GlowAnimation from "Assets/Animations/GlowAnimation";
+import SlideAnimation from "Assets/Animations/SlideAnimation";
 import Asset from "Assets/Asset";
-import { exhaustiveGuard, isEmpty } from "Helpers";
+import CardAssets, { cardHeight, cardWidth } from "Assets/CardAssets";
 import FontWithPosition, {
   Fonts,
   Format,
   OutlineThickness,
 } from "Assets/Fonts/FontWithPosition";
-import Card from "Cards/Card";
-import { Image } from "love.graphics";
 import IconAsset from "Assets/IconAsset";
-import { AnimationAssets } from "Assets/Animations/Animation";
-import CutAnimation from "Assets/Animations/CutAnimation";
-import FlickerAnimation from "Assets/Animations/FlickerAnimation";
-import SlideAnimation from "Assets/Animations/SlideAnimation";
-import GlowAnimation from "Assets/Animations/GlowAnimation";
+import Card from "Cards/Card";
+import Enemy, { EnemyData } from "Enemies/Enemy";
+import { exhaustiveGuard, isEmpty } from "Helpers";
+import * as push from "Libraries.push";
+import { Image } from "love.graphics";
 import ShimmerShader from "Shaders/ShimmerShader";
+import Dealer from "../Dealer";
+import {
+  AnimationIds,
+  AssetIds,
+  CharacterTypes,
+  GameStates,
+  HoverEffects,
+  MousePressEffects,
+  TextIds,
+} from "../Enums";
+import type GameManager from "../GameManager";
 
 const portraitGap = 12;
 
@@ -192,7 +192,7 @@ export default class Board {
       cutAnimationAssets.push(rankAsset);
     }
 
-    this.gameManager.animationManager.animations.set(
+    this.gameManager.animationManager.startAnimation(
       AnimationIds.CARD_CUT + card.id,
       new CutAnimation(0.15, 0, -40, cutAnimationAssets, {
         onFinish: () => this.startFlickerAnimation(card, winner, loser),
@@ -205,7 +205,7 @@ export default class Board {
       slideAnimationAssets.push(normalSuitAsset);
     }
 
-    this.gameManager.animationManager.animations.set(
+    this.gameManager.animationManager.startAnimation(
       AnimationIds.CARD_SUIT_SLIDE + card.id,
       new SlideAnimation(0.15, 0, -40, slideAnimationAssets, {
         drawSeparately: true,
@@ -220,7 +220,7 @@ export default class Board {
     winner: CharacterTypes,
     loser: CharacterTypes
   ): void {
-    this.gameManager.animationManager.animations.set(
+    this.gameManager.animationManager.startAnimation(
       AnimationIds.CARD_FLICKER + card.id,
       new FlickerAnimation(this.cardAssets.getCardAssetList(card), {
         onFinish: () => this.wrapUpAttack(winner, loser),
@@ -502,6 +502,7 @@ export default class Board {
             MousePressEffects.SHIFT_DOWN,
           ],
           associatedTexts: [letsFightButtonText],
+          clickSound: this.gameManager.assetManager.buttonClickSound,
         }
       )
     );
@@ -1090,10 +1091,14 @@ export default class Board {
 
     const deckPosition = this.dealer.getDeckPosition(characterType);
     this.gameManager.assetManager.addAsset(
-      characterType === CharacterTypes.PLAYER ? AssetIds.PLAYER_DECK : AssetIds.ENEMY_DECK,
+      characterType === CharacterTypes.PLAYER
+        ? AssetIds.PLAYER_DECK
+        : AssetIds.ENEMY_DECK,
       new Asset(
         this.gameManager,
-        characterType === CharacterTypes.PLAYER ? AssetIds.PLAYER_DECK : AssetIds.ENEMY_DECK,
+        characterType === CharacterTypes.PLAYER
+          ? AssetIds.PLAYER_DECK
+          : AssetIds.ENEMY_DECK,
         love.graphics.newImage("Assets/Images/BaseCardBack.png"),
         deckPosition.x,
         deckPosition.y,
@@ -1101,9 +1106,13 @@ export default class Board {
         cardHeight,
         {
           onHover: (asset) => character.showDeckOverview(asset),
-          onUnhover: () => this.gameManager.assetManager.tooltipManager.hideTooltip(),
+          onUnhover: () =>
+            this.gameManager.assetManager.tooltipManager.hideTooltip(),
           onClick: () => character.showDeckContents(),
           hoverEffect: [HoverEffects.WOBBLE, HoverEffects.SHIMMER],
+          mousePressEffect: [MousePressEffects.SHIFT_DOWN],
+          clickSound: this.cardAssets.cardClick,
+          hoverSound: this.cardAssets.hoverSound,
         }
       )
     );

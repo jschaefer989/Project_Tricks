@@ -26,6 +26,7 @@ ____exports.default = __TS__Class()
 local Dealer = ____exports.default
 Dealer.name = "Dealer"
 function Dealer.prototype.____constructor(self, gameManager, board)
+    self.dealSound = love.audio.newSource("Assets/Sounds/Deal.wav", "static")
     self.gameManager = gameManager
     self.board = board
     self.lootCards = {}
@@ -247,7 +248,7 @@ function Dealer.prototype.startDealAnimation(self, characterType, card, targetX,
     local startY = baseAsset and baseAsset.y or 0
     local offsetX = targetX - startX
     local offsetY = targetY - startY
-    self.gameManager.animationManager.animations:set(
+    self.gameManager.animationManager:startAnimation(
         AnimationIds.CARD_DEAL .. card.id,
         __TS__New(
             SlideAnimation,
@@ -257,7 +258,8 @@ function Dealer.prototype.startDealAnimation(self, characterType, card, targetX,
             slideAssets,
             {
                 waitForAnimationIds = self.gameManager.animationManager:getCardAnimationIds(),
-                onFinish = self:getDealFinishMethod(characterType)
+                onFinish = self:getDealFinishMethod(characterType),
+                soundToPlay = self.dealSound
             }
         )
     )
@@ -342,7 +344,8 @@ function Dealer.prototype.startReturnToDeckAnimation(self, characterType, cards,
                 slideAssets,
                 {
                     onFinish = function() return self:finishUpAnimation(card, onFinish) end,
-                    waitForAnimationIds = self.gameManager.animationManager:getCardAnimationIds()
+                    waitForAnimationIds = self.gameManager.animationManager:getCardAnimationIds(),
+                    soundToPlay = self.dealSound
                 }
             )
         )

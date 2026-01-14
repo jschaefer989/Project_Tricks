@@ -127,7 +127,7 @@ export default abstract class Card {
     const slideAssets =
       this.gameManager.board?.cardAssets.getCardAssetList(this);
 
-    this.gameManager.animationManager.animations.set(
+    this.gameManager.animationManager.startAnimation(
       AnimationIds.CARD_SELECT + this.id,
       new SlideAnimation(0.15, 0, -20, slideAssets)
     );
@@ -148,7 +148,7 @@ export default abstract class Card {
     const slideAssets =
       this.gameManager.board?.cardAssets.getCardAssetList(this);
 
-    this.gameManager.animationManager.animations.set(
+    this.gameManager.animationManager.startAnimation(
       AnimationIds.CARD_SELECT + this.id,
       new SlideAnimation(0.15, 0, 20, slideAssets)
     );

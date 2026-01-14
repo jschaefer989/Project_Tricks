@@ -9,3 +9,4 @@ This project contains Typescript declaration files for the following Lua librari
 * Push
 * GameStateManager
 * loaded_dice
+* SLAM

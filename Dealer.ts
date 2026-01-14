@@ -10,11 +10,13 @@ import { AnimationIds, AssetIds, CharacterTypes, Ranks, Suits } from "./Enums";
 import GameManager from "./GameManager";
 import { exhaustiveGuard, getRandomElementFromArray, isEmpty } from "./Helpers";
 import Point from "./Point";
+import { Source } from "love.audio";
 
 export default class Dealer {
   gameManager: GameManager;
   lootCards: Card[];
   board: Board;
+  dealSound: Source = love.audio.newSource("Assets/Sounds/Deal.wav", "static");
 
   constructor(gameManager: GameManager, board: Board) {
     this.gameManager = gameManager;
@@ -280,7 +282,7 @@ export default class Dealer {
     const offsetX = targetX - startX;
     const offsetY = targetY - startY;
 
-    this.gameManager.animationManager.animations.set(
+    this.gameManager.animationManager.startAnimation(
       AnimationIds.CARD_DEAL + card.id,
       new SlideAnimation(
         this.gameManager.settings.dealerSpeed,
@@ -291,6 +293,7 @@ export default class Dealer {
           waitForAnimationIds:
             this.gameManager.animationManager.getCardAnimationIds(),
           onFinish: this.getDealFinishMethod(characterType),
+          soundToPlay: this.dealSound,
         }
       )
     );
@@ -386,6 +389,7 @@ export default class Dealer {
             onFinish: () => this.finishUpAnimation(card, onFinish),
             waitForAnimationIds:
               this.gameManager.animationManager.getCardAnimationIds(),
+              soundToPlay: this.dealSound,
           }
         )
       );

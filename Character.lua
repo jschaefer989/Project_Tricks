@@ -121,7 +121,7 @@ function Character.prototype.showDeckOverview(self, asset)
                 TextIds.TOOLTIP_DECK_OVERVIEW_DISCARDS,
                 5,
                 20,
-                (("Discards: " .. tostring(#self.discardPile)) .. "/") .. tostring(#self.deck + #self.discardPile + #self.hand)
+                "Discards: " .. tostring(#self.discardPile)
             )
         },
         asset

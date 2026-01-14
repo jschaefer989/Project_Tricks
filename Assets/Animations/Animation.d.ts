@@ -1,10 +1,12 @@
 import Asset from "../Asset";
 import FontWithPosition from "Assets/Fonts/FontWithPosition";
+import { Source } from "love.audio";
 export interface AnimationOptions {
     readonly animDuration?: number;
     readonly onFinish?: () => void;
     readonly waitForAnimationIds?: string[];
     readonly stopAnimationCondition?: () => boolean;
+    readonly soundToPlay?: Source;
 }
 export type AnimationAssets = Asset | FontWithPosition;
 export default abstract class Animation {
@@ -17,6 +19,8 @@ export default abstract class Animation {
     onFinish?: () => void;
     waitForAnimationIds: string[];
     stopAnimationCondition?: () => boolean;
+    soundToPlay?: Source;
+    playedSound: boolean;
     constructor(assets: AnimationAssets[], constructionOptions?: AnimationOptions);
     updateAnimation(deltaTime: number): void;
     get isFinished(): boolean;

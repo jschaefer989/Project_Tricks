@@ -34,6 +34,10 @@ function AnimationManager.prototype.updateAnimations(self, dt)
             if self:shouldWaitForAnimations(animation) then
                 goto __continue5
             end
+            if not isEmpty(animation.soundToPlay) and not animation.playedSound then
+                animation.soundToPlay:play()
+                animation.playedSound = true
+            end
             animation:updateAnimation(dt)
             if animation.isFinished then
                 self.animations:delete(id)

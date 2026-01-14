@@ -8,11 +8,11 @@ local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__ArraySome = ____lualib.__TS__ArraySome
 local __TS__Iterator = ____lualib.__TS__Iterator
 local ____exports = {}
-local push = require("Libraries.push")
-local ____Helpers = require("Helpers")
-local isEmpty = ____Helpers.isEmpty
 local ____TextManager = require("Assets.Fonts.TextManager")
 local TextManager = ____TextManager.default
+local ____Helpers = require("Helpers")
+local isEmpty = ____Helpers.isEmpty
+local push = require("Libraries.push")
 local ____WobbleAnimation = require("Assets.Animations.WobbleAnimation")
 local WobbleAnimation = ____WobbleAnimation.default
 local ____TooltipManager = require("Assets.TooltipManager")
@@ -175,7 +175,7 @@ function AssetManager.prototype.triggerWobbleAnimation(self, assets)
     for ____, assetToWobble in ipairs(assets) do
         local wobbleId = "wobble-" .. assetToWobble.id
         if not self.gameManager.animationManager.animations:has(wobbleId) then
-            self.gameManager.animationManager.animations:set(
+            self.gameManager.animationManager:startAnimation(
                 wobbleId,
                 __TS__New(WobbleAnimation, 0.5, 10, {assetToWobble})
             )
@@ -184,7 +184,7 @@ function AssetManager.prototype.triggerWobbleAnimation(self, assets)
             for ____, text in ipairs(assetToWobble.associatedTexts) do
                 local wobbleTextId = "wobble-" .. tostring(text)
                 if not self.gameManager.animationManager.animations:has(wobbleTextId) then
-                    self.gameManager.animationManager.animations:set(
+                    self.gameManager.animationManager:startAnimation(
                         wobbleTextId,
                         __TS__New(WobbleAnimation, 0.5, 10, {text})
                     )
@@ -232,14 +232,21 @@ function AssetManager.prototype.handleMouseHover(self)
                     if ____opt_10 ~= nil then
                         ____opt_10(asset, asset)
                     end
+                    local ____opt_12 = asset.hoverSound
+                    if not (____opt_12 and ____opt_12:isPlaying()) then
+                        local ____opt_14 = asset.hoverSound
+                        if ____opt_14 ~= nil then
+                            ____opt_14:play()
+                        end
+                    end
                 end
             elseif asset.isHovered then
                 for ____, a in ipairs(assets) do
                     a:setHovered(false)
                 end
-                local ____opt_12 = asset.onUnhover
-                if ____opt_12 ~= nil then
-                    ____opt_12(asset, asset)
+                local ____opt_16 = asset.onUnhover
+                if ____opt_16 ~= nil then
+                    ____opt_16(asset, asset)
                 end
             end
         end

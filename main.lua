@@ -7,6 +7,7 @@ local GameStateManager = require("Libraries.GameStateManager-main.gamestateManag
 local lovelyToasts = require("Libraries.Lovely-Toasts-main.lovelyToasts")
 local Text = require("Libraries.SYSL-Text-master.example.library.slog-text")
 local push = require("Libraries.push")
+require("Libraries.slam-master.slam")
 _G.SYSLText = Text -- Make it globally available for TypeScript
 local GameManager = require("GameManager").default
 local gameManager = tsNew(GameManager)

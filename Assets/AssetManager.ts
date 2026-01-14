@@ -1,9 +1,9 @@
-import * as push from "Libraries.push";
-import Asset from "./Asset";
-import { isEmpty } from "Helpers";
-import GameManager from "GameManager";
 import TextManager from "Assets/Fonts/TextManager";
+import GameManager from "GameManager";
+import { isEmpty } from "Helpers";
+import * as push from "Libraries.push";
 import WobbleAnimation from "./Animations/WobbleAnimation";
+import Asset from "./Asset";
 import TooltipManager from "./TooltipManager";
 
 export default class AssetManager {
@@ -11,8 +11,14 @@ export default class AssetManager {
   assets: Map<string, Asset[]> = new Map<string, Asset[]>();
   tooltipManager: TooltipManager;
   textManager = new TextManager();
-  disabledSound = love.audio.newSource("Assets/Sounds/Disabled.wav", "static");
-  buttonClickSound = love.audio.newSource("Assets/Sounds/ButtonClick.mp3", "static");
+  disabledSound = love.audio.newSource(
+    "Assets/Sounds/Disabled.wav",
+    "static"
+  );
+  buttonClickSound = love.audio.newSource(
+    "Assets/Sounds/ButtonClick.mp3",
+    "static"
+  );
 
   constructor(gameManager: GameManager) {
     this.gameManager = gameManager;
@@ -180,7 +186,7 @@ export default class AssetManager {
     for (const assetToWobble of assets) {
       const wobbleId = `wobble-${assetToWobble.id}`;
       if (!this.gameManager.animationManager.animations.has(wobbleId)) {
-        this.gameManager.animationManager.animations.set(
+        this.gameManager.animationManager.startAnimation(
           wobbleId,
           new WobbleAnimation(0.5, 10, [assetToWobble])
         );
@@ -190,7 +196,7 @@ export default class AssetManager {
         for (const text of assetToWobble.associatedTexts) {
           const wobbleTextId = `wobble-${text}`;
           if (!this.gameManager.animationManager.animations.has(wobbleTextId)) {
-            this.gameManager.animationManager.animations.set(
+            this.gameManager.animationManager.startAnimation(
               wobbleTextId,
               new WobbleAnimation(0.5, 10, [text])
             );
@@ -236,6 +242,9 @@ export default class AssetManager {
             a.setHovered(true);
           }
           asset.onHover?.(asset);
+          if (!asset.hoverSound?.isPlaying()) {
+            asset.hoverSound?.play();
+          }
         }
       } else if (asset.isHovered) {
         for (const a of assets) {

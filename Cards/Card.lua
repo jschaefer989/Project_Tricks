@@ -85,7 +85,7 @@ function Card.prototype.onSelect(self)
     self.gameManager.board:addPlayerValue(self:getValue())
     local ____opt_0 = self.gameManager.board
     local slideAssets = ____opt_0 and ____opt_0.cardAssets:getCardAssetList(self)
-    self.gameManager.animationManager.animations:set(
+    self.gameManager.animationManager:startAnimation(
         AnimationIds.CARD_SELECT .. self.id,
         __TS__New(
             SlideAnimation,
@@ -109,7 +109,7 @@ function Card.prototype.onUnselect(self)
     self.gameManager.board:addPlayerValue(-self:getValue())
     local ____opt_4 = self.gameManager.board
     local slideAssets = ____opt_4 and ____opt_4.cardAssets:getCardAssetList(self)
-    self.gameManager.animationManager.animations:set(
+    self.gameManager.animationManager:startAnimation(
         AnimationIds.CARD_SELECT .. self.id,
         __TS__New(
             SlideAnimation,

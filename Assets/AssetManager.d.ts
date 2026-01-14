@@ -1,6 +1,6 @@
-import Asset from "./Asset";
-import GameManager from "GameManager";
 import TextManager from "Assets/Fonts/TextManager";
+import GameManager from "GameManager";
+import Asset from "./Asset";
 import TooltipManager from "./TooltipManager";
 export default class AssetManager {
     gameManager: GameManager;

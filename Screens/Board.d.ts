@@ -1,10 +1,10 @@
 /** @noSelfInFile */
-import { CharacterTypes } from "../Enums";
-import Dealer from "../Dealer";
-import Enemy, { EnemyData } from "Enemies/Enemy";
-import type GameManager from "../GameManager";
 import CardAssets from "Assets/CardAssets";
 import Card from "Cards/Card";
+import Enemy, { EnemyData } from "Enemies/Enemy";
+import Dealer from "../Dealer";
+import { CharacterTypes } from "../Enums";
+import type GameManager from "../GameManager";
 interface BoardData {
     discardUsed: number;
     playerPoints: number;

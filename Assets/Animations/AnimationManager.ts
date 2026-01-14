@@ -22,6 +22,11 @@ export default class AnimationManager {
       if (this.shouldWaitForAnimations(animation)) {
         continue;
       }
+      if (!isEmpty(animation.soundToPlay) && !animation.playedSound) {
+        animation.soundToPlay.play();
+        animation.playedSound = true;
+      }
+    
 
       animation.updateAnimation(dt);
       if (animation.isFinished) {

@@ -24,11 +24,13 @@ function CardAssets.prototype.____constructor(self, gameManager, board)
     self.baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png")
     self.edelCard = love.graphics.newImage("Assets/Images/EdelCard.png")
     self.cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static")
+    self.hoverSound = love.audio.newSource("Assets/Sounds/CardHover.wav", "static")
     self.cardAssetConstructionOptions = function(____, includeClickHandler, card) return {
         onClick = includeClickHandler and (function() return card:onClick() end) or nil,
         onHover = function(____, asset) return card:onHover(asset) end,
         onUnhover = function(____, asset) return card:onUnhover(asset) end,
         clickSound = includeClickHandler and self.cardClick or nil,
+        hoverSound = includeClickHandler and self.hoverSound or nil,
         isDisabled = true,
         useDisabledAnimation = false
     } end

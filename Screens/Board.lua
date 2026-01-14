@@ -3,47 +3,47 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
-local ____Enums = require("Enums")
-local AssetIds = ____Enums.AssetIds
-local CharacterTypes = ____Enums.CharacterTypes
-local TextIds = ____Enums.TextIds
-local GameStates = ____Enums.GameStates
-local HoverEffects = ____Enums.HoverEffects
-local MousePressEffects = ____Enums.MousePressEffects
-local AnimationIds = ____Enums.AnimationIds
-local ____Dealer = require("Dealer")
-local Dealer = ____Dealer.default
-local ____Enemy = require("Enemies.Enemy")
-local Enemy = ____Enemy.default
+local ____CutAnimation = require("Assets.Animations.CutAnimation")
+local CutAnimation = ____CutAnimation.default
+local ____FlickerAnimation = require("Assets.Animations.FlickerAnimation")
+local FlickerAnimation = ____FlickerAnimation.default
+local ____GlowAnimation = require("Assets.Animations.GlowAnimation")
+local GlowAnimation = ____GlowAnimation.default
+local ____SlideAnimation = require("Assets.Animations.SlideAnimation")
+local SlideAnimation = ____SlideAnimation.default
+local ____Asset = require("Assets.Asset")
+local Asset = ____Asset.default
 local ____CardAssets = require("Assets.CardAssets")
 local CardAssets = ____CardAssets.default
 local cardHeight = ____CardAssets.cardHeight
 local cardWidth = ____CardAssets.cardWidth
-local push = require("Libraries.push")
-local ____Asset = require("Assets.Asset")
-local Asset = ____Asset.default
-local ____Helpers = require("Helpers")
-local exhaustiveGuard = ____Helpers.exhaustiveGuard
-local isEmpty = ____Helpers.isEmpty
 local ____FontWithPosition = require("Assets.Fonts.FontWithPosition")
 local FontWithPosition = ____FontWithPosition.default
 local Fonts = ____FontWithPosition.Fonts
 local Format = ____FontWithPosition.Format
 local OutlineThickness = ____FontWithPosition.OutlineThickness
-local ____Card = require("Cards.Card")
-local Card = ____Card.default
 local ____IconAsset = require("Assets.IconAsset")
 local IconAsset = ____IconAsset.default
-local ____CutAnimation = require("Assets.Animations.CutAnimation")
-local CutAnimation = ____CutAnimation.default
-local ____FlickerAnimation = require("Assets.Animations.FlickerAnimation")
-local FlickerAnimation = ____FlickerAnimation.default
-local ____SlideAnimation = require("Assets.Animations.SlideAnimation")
-local SlideAnimation = ____SlideAnimation.default
-local ____GlowAnimation = require("Assets.Animations.GlowAnimation")
-local GlowAnimation = ____GlowAnimation.default
+local ____Card = require("Cards.Card")
+local Card = ____Card.default
+local ____Enemy = require("Enemies.Enemy")
+local Enemy = ____Enemy.default
+local ____Helpers = require("Helpers")
+local exhaustiveGuard = ____Helpers.exhaustiveGuard
+local isEmpty = ____Helpers.isEmpty
+local push = require("Libraries.push")
 local ____ShimmerShader = require("Shaders.ShimmerShader")
 local ShimmerShader = ____ShimmerShader.default
+local ____Dealer = require("Dealer")
+local Dealer = ____Dealer.default
+local ____Enums = require("Enums")
+local AnimationIds = ____Enums.AnimationIds
+local AssetIds = ____Enums.AssetIds
+local CharacterTypes = ____Enums.CharacterTypes
+local GameStates = ____Enums.GameStates
+local HoverEffects = ____Enums.HoverEffects
+local MousePressEffects = ____Enums.MousePressEffects
+local TextIds = ____Enums.TextIds
 local portraitGap = 12
 ____exports.default = __TS__Class()
 local Board = ____exports.default
@@ -182,7 +182,7 @@ function Board.prototype.startCutAnimation(self, card, winner, loser)
     if not isEmpty(rankAsset) then
         cutAnimationAssets[#cutAnimationAssets + 1] = rankAsset
     end
-    self.gameManager.animationManager.animations:set(
+    self.gameManager.animationManager:startAnimation(
         AnimationIds.CARD_CUT .. card.id,
         __TS__New(
             CutAnimation,
@@ -197,7 +197,7 @@ function Board.prototype.startCutAnimation(self, card, winner, loser)
     if not isEmpty(normalSuitAsset) then
         slideAnimationAssets[#slideAnimationAssets + 1] = normalSuitAsset
     end
-    self.gameManager.animationManager.animations:set(
+    self.gameManager.animationManager:startAnimation(
         AnimationIds.CARD_SUIT_SLIDE .. card.id,
         __TS__New(
             SlideAnimation,
@@ -210,7 +210,7 @@ function Board.prototype.startCutAnimation(self, card, winner, loser)
     )
 end
 function Board.prototype.startFlickerAnimation(self, card, winner, loser)
-    self.gameManager.animationManager.animations:set(
+    self.gameManager.animationManager:startAnimation(
         AnimationIds.CARD_FLICKER .. card.id,
         __TS__New(
             FlickerAnimation,
@@ -469,7 +469,8 @@ function Board.prototype.buildLetsFightButton(self)
                 onClick = function() return self:handleStartFight() end,
                 hoverEffect = {HoverEffects.CHANGE_COLOR},
                 mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN},
-                associatedTexts = {letsFightButtonText}
+                associatedTexts = {letsFightButtonText},
+                clickSound = self.gameManager.assetManager.buttonClickSound
             }
         )
     )
@@ -930,7 +931,10 @@ function Board.prototype.buildDeck(self, characterType)
                 onHover = function(____, asset) return character:showDeckOverview(asset) end,
                 onUnhover = function() return self.gameManager.assetManager.tooltipManager:hideTooltip() end,
                 onClick = function() return character:showDeckContents() end,
-                hoverEffect = {HoverEffects.WOBBLE, HoverEffects.SHIMMER}
+                hoverEffect = {HoverEffects.WOBBLE, HoverEffects.SHIMMER},
+                mousePressEffect = {MousePressEffects.SHIFT_DOWN},
+                clickSound = self.cardAssets.cardClick,
+                hoverSound = self.cardAssets.hoverSound
             }
         )
     )

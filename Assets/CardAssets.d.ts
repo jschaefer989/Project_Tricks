@@ -19,6 +19,7 @@ export default class CardAssets {
     baseCard: Image;
     edelCard: Image;
     cardClick: import("love.audio").Source;
+    hoverSound: import("love.audio").Source;
     cardAssetConstructionOptions: (includeClickHandler: boolean, card: Card) => ConstructionOptions;
     constructor(gameManager: GameManager, board: Board);
     addAsset(card: Card, cardX: number, cardY: number, includeClickHandler?: boolean): void;
