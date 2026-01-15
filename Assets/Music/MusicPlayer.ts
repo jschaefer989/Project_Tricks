@@ -22,11 +22,6 @@ export default class MusicPlayer {
         this.gameState = gameState
         this.biome = biome
 
-        if (gameState === GameStates.PAUSE_MENU) {
-            this.currentlyPlaying?.setVolume(0.2);
-            return; // Just lower the volume when pausing
-        }
-
         if (this.currentlyPlaying?.isPlaying()) {            
             this.currentlyPlaying.stop();
         }

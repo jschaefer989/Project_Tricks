@@ -42,7 +42,7 @@ end
 function Settings.prototype.setupWindowedMode(self)
     local windowWidth, windowHeight = love.window.getDesktopDimensions()
     windowWidth = windowWidth - 25
-    windowHeight = windowHeight - 80
+    windowHeight = windowHeight - 100
     push:setupScreen(
         ____exports.gameWidth,
         ____exports.gameHeight,

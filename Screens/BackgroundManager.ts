@@ -41,9 +41,6 @@ export default class BackgroundManager {
         return love.graphics.newImage(
           this.gameManager.biome.boardBackgroundImagePath
         );
-      case GameStates.PAUSE_MENU:
-        return;
-      //return this.gameManager.assetManager.getImage("background_pause_menu");
       case GameStates.WIN_SCREEN:
         return;
       //return this.gameManager.assetManager.getImage("background_win_screen");

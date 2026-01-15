@@ -32,4 +32,5 @@ export default class Character {
     sortByValue(): void;
     sortBySuit(): void;
     redrawHand(): void;
+    getCharacterName(): string;
 }

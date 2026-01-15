@@ -38,7 +38,7 @@ export default class Settings {
     setupWindowedMode(): void {
         let [windowWidth, windowHeight] = love.window.getDesktopDimensions()
         windowWidth = windowWidth - 25
-        windowHeight = windowHeight - 80 // make the window a bit smaller than the screen itself
+        windowHeight = windowHeight - 100 // make the window a bit smaller than the screen itself
         push.setupScreen(gameWidth, gameHeight, windowWidth, windowHeight, { fullscreen: false })
     }
 

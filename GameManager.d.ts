@@ -15,20 +15,19 @@ import Shop from "Screens/Shop";
 import LevelUpScreen from "Screens/LevelUpScreen";
 import PerkScreen from "Screens/PerkScreen";
 import AssetManager from "Assets/AssetManager";
-import Card from "Cards/Card";
 import AnimationManager from "Assets/Animations/AnimationManager";
 import MusicPlayer from "Assets/Music/MusicPlayer";
 import Biome from "Biomes/Biome";
 import BackgroundManager from "Screens/BackgroundManager";
 import ShaderManager from "Shaders/ShaderManager";
-import Popup from "Screens/Popup";
+import PopupManager from "Screens/Popup/PopupManager";
 export default class GameManager {
     gameState: GameStates;
     player: Player;
     settings: Settings;
     mainMenu?: MainMenu;
     newGameMenu?: NewGameMenu;
-    pauseMenu?: PauseMenu;
+    pauseMenu: PauseMenu;
     board?: Board;
     winScreen?: WinScreen;
     loseScreen?: LoseScreen;
@@ -42,14 +41,13 @@ export default class GameManager {
     biome: Biome;
     backgroundManager: BackgroundManager;
     shaderManager: ShaderManager;
-    popup: Popup;
+    popupManager: PopupManager;
     devMode: boolean;
     constructor();
     getCharacter(characterType: string): Character | undefined;
     switchBasedOnGameState(gameState?: GameStates, enemy?: Enemy | undefined): void;
     private switchToMainMenu;
     private switchToNewGameMenu;
-    private switchToPauseMenu;
     private switchToBoard;
     private switchToWinScreen;
     private switchToLoseScreen;
@@ -57,5 +55,4 @@ export default class GameManager {
     private switchToShop;
     private switchToLevelUpScreen;
     private switchToPerkScreen;
-    getCard(id: string): Card | undefined;
 }

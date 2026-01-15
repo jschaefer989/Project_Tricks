@@ -28,13 +28,14 @@ import BackgroundManager from "Screens/BackgroundManager";
 import ShaderManager from "Shaders/ShaderManager";
 import { Fonts } from "Assets/Fonts/FontWithPosition";
 import * as lovelyToasts from "Libraries.Lovely-Toasts-main.lovelyToasts";
-import Popup from "Screens/Popup";
+import PopupManager from "Screens/Popup/PopupManager";
 
 interface GameState {
   update: (dt: number) => void;
   draw?: () => void;
   mousepressed?: (x: number, y: number, button: number) => void;
   mousereleased?: (x: number, y: number, button: number) => void;
+  keypressed?: (key: string, scancode: string, isrepeat: boolean) => void;
 }
 
 export default class GameManager {
@@ -43,7 +44,7 @@ export default class GameManager {
   settings = new Settings();
   mainMenu?: MainMenu;
   newGameMenu?: NewGameMenu;
-  pauseMenu?: PauseMenu;
+  pauseMenu = new PauseMenu(this);
   board?: Board;
   winScreen?: WinScreen;
   loseScreen?: LoseScreen;
@@ -57,7 +58,7 @@ export default class GameManager {
   biome: Biome;
   backgroundManager = new BackgroundManager(this);
   shaderManager = new ShaderManager(this);
-  popup: Popup = new Popup(this);
+  popupManager = new PopupManager(this);
   devMode: boolean = false; // Change if you want to test in dev mode
 
   constructor() {
@@ -96,9 +97,6 @@ export default class GameManager {
         break;
       case GameStates.BOARD:
         this.switchToBoard(enemy);
-        break;
-      case GameStates.PAUSE_MENU:
-        this.switchToPauseMenu();
         break;
       case GameStates.WIN_SCREEN:
         this.switchToWinScreen();
@@ -161,23 +159,6 @@ export default class GameManager {
     GameStateManager.setState(newGameMenuState);
   }
 
-  private switchToPauseMenu(): void {
-    const pauseMenuState: GameState = {
-      update: (dt: number) => {
-        this.pauseMenu?.drawScreen();
-      },
-    };
-
-    // Game state needs to be the previous state in the pause menu so we save correctly
-    // this.gameState = GameStates.PAUSE_MENU
-
-    if (isEmpty(this.pauseMenu)) {
-      this.pauseMenu = new PauseMenu(this);
-    }
-
-    GameStateManager.setState(pauseMenuState);
-  }
-
   private switchToBoard(enemy?: Enemy): void {
     const shadowShader = love.graphics.newShader("Shaders/Shadow.glsl");
     shadowShader.send("shadow_strength", 0.6);
@@ -195,12 +176,21 @@ export default class GameManager {
         push.finish();
       },
       mousepressed: (x: number, y: number, button: number) => {
-        if (this.popup.handleMousePressed(x, y, button)) return;
+        if (this.popupManager.handleMousePressed(x, y, button)) return;
         this.assetManager.handleMousePressed(x, y, button);
       },
       mousereleased: (x: number, y: number, button: number) => {
-        if (this.popup.handleMouseReleased(x, y, button)) return;
+        if (this.popupManager.handleMouseReleased(x, y, button)) return;
         this.assetManager.handleMouseReleased(x, y, button);
+      },
+      keypressed: (key: string, scancode: string, isrepeat: boolean) => {
+        if (key === "escape") {
+          if (!this.pauseMenu.isOpen) {
+            this.pauseMenu.showPauseMenu();
+          } else {
+            this.popupManager.close();
+          }
+        }
       },
     };
 
@@ -352,49 +342,5 @@ export default class GameManager {
     }
 
     GameStateManager.setState(perkState);
-  }
-
-  // TODO: this is, of course, an extended search that we could optimize if necessary
-  getCard(id: string): Card | undefined {
-    for (const card of this.player.hand) {
-      if (card.id === id) {
-        return card;
-      }
-    }
-
-    for (const card of this.player.deck) {
-      if (card.id === id) {
-        return card;
-      }
-    }
-
-    for (const card of this.player.discardPile) {
-      if (card.id === id) {
-        return card;
-      }
-    }
-
-    const enemy = this.board?.enemy;
-    if (isEmpty(enemy)) {
-      return;
-    }
-
-    for (const card of enemy.hand) {
-      if (card.id === id) {
-        return card;
-      }
-    }
-
-    for (const card of enemy.deck) {
-      if (card.id === id) {
-        return card;
-      }
-    }
-
-    for (const card of enemy.discardPile) {
-      if (card.id === id) {
-        return card;
-      }
-    }
   }
 }

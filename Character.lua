@@ -9,10 +9,14 @@ local ____FontWithPosition = require("Assets.Fonts.FontWithPosition")
 local FontWithPosition = ____FontWithPosition.default
 local ____Enums = require("Enums")
 local CharacterTypes = ____Enums.CharacterTypes
+local PopupIds = ____Enums.PopupIds
 local TextIds = ____Enums.TextIds
 local ____Helpers = require("Helpers")
+local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
 local lovelyToasts = require("Libraries.Lovely-Toasts-main.lovelyToasts")
+local ____Popup = require("Screens.Popup.Popup")
+local PopupSizes = ____Popup.PopupSizes
 ____exports.default = __TS__Class()
 local Character = ____exports.default
 Character.name = "Character"
@@ -134,7 +138,11 @@ function Character.prototype.showDeckOverview(self, asset)
     )
 end
 function Character.prototype.showDeckContents(self)
-    self.gameManager.popup:open({})
+    self.gameManager.popupManager:open(
+        PopupIds.DECK_CONTENTS,
+        self:getCharacterName() .. " Deck",
+        PopupSizes.MENU
+    )
 end
 function Character.prototype.sortCards(self)
     local now = os.time() * 1000
@@ -228,6 +236,24 @@ function Character.prototype.redrawHand(self)
         end
     end
     self.gameManager.board.cardAssets:disableAllCards(false)
+end
+function Character.prototype.getCharacterName(self)
+    repeat
+        local ____switch55 = self.type
+        local ____cond55 = ____switch55 == CharacterTypes.PLAYER
+        if ____cond55 then
+            return self.gameManager.player.name
+        end
+        ____cond55 = ____cond55 or ____switch55 == CharacterTypes.ENEMY
+        if ____cond55 then
+            local ____opt_6 = self.gameManager.board
+            local ____opt_4 = ____opt_6 and ____opt_6.enemy
+            return ____opt_4 and ____opt_4.name or "Enemy"
+        end
+        do
+            exhaustiveGuard(self.type)
+        end
+    until true
 end
 SortMode = SortMode or ({})
 SortMode.POWER = "POWER"

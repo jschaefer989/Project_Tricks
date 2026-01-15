@@ -108,7 +108,7 @@ function AssetManager.prototype.drawAssets(self)
         ::__continue27::
     end
     self.textManager:drawText()
-    self.gameManager.popup:drawPopup()
+    self.gameManager.popupManager:drawPopups()
     self.tooltipManager:drawTooltips()
 end
 function AssetManager.prototype.handleMousePressed(self, x, y, button)

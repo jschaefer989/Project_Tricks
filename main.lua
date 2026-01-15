@@ -50,12 +50,6 @@ end
 function love.keypressed(key, scancode, isrepeat)
     suit.keypressed(key)
     GameStateManager:keypressed(key, scancode, isrepeat)
-    
-    if gameManager.gameState ~= "MAIN_MENU" then
-        if key == "escape" then
-            gameManager:switchToPauseMenu()
-        end
-    end
 end
 
 function love.keyreleased(key, scancode)

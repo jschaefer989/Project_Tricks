@@ -1,10 +1,11 @@
 import Asset from "Assets/Asset";
 import FontWithPosition from "Assets/Fonts/FontWithPosition";
 import Card from "Cards/Card";
-import { CharacterTypes, TextIds } from "Enums";
+import { CharacterTypes, PopupIds, TextIds } from "Enums";
 import GameManager from "GameManager";
-import { isEmpty } from "Helpers";
+import { exhaustiveGuard, isEmpty } from "Helpers";
 import * as lovelyToasts from "Libraries.Lovely-Toasts-main.lovelyToasts";
+import { PopupSizes } from "Screens/Popup/Popup";
 
 export default class Character {
   gameManager: GameManager;
@@ -130,7 +131,7 @@ export default class Character {
   }
 
   showDeckContents(): void {
-    this.gameManager.popup.open([]);
+    this.gameManager.popupManager.open(PopupIds.DECK_CONTENTS, `${this.getCharacterName()} Deck`, PopupSizes.MENU);
   }
 
   sortCards(): void {
@@ -214,6 +215,17 @@ export default class Character {
       cardAssets.redrawCard(card);
     }
     this.gameManager.board.cardAssets.disableAllCards(false);
+  }
+
+  getCharacterName(): string {
+    switch (this.type) {
+      case CharacterTypes.PLAYER:
+        return this.gameManager.player.name;
+      case CharacterTypes.ENEMY:
+        return this.gameManager.board?.enemy?.name ?? "Enemy";
+      default:
+        exhaustiveGuard(this.type) ;
+    }
   }
 }
 

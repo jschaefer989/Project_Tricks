@@ -47,10 +47,6 @@ function BackgroundManager.prototype.getBackgroundImage(self, gameState)
         if ____cond6 then
             return love.graphics.newImage(self.gameManager.biome.boardBackgroundImagePath)
         end
-        ____cond6 = ____cond6 or ____switch6 == GameStates.PAUSE_MENU
-        if ____cond6 then
-            return
-        end
         ____cond6 = ____cond6 or ____switch6 == GameStates.WIN_SCREEN
         if ____cond6 then
             return

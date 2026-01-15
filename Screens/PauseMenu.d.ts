@@ -2,10 +2,13 @@
 import GameManager from "GameManager";
 export default class PauseMenu {
     gameManager: GameManager;
+    button: import("love.graphics").Image;
+    isOpen: boolean;
     constructor(gameManager: GameManager);
-    drawScreen(): void;
-    renderDisplayTitle(panelX: number): void;
-    renderContinueButton(panelX: number): number;
-    renderSaveButton(panelX: number, continueBtnY: number): number;
-    renderQuitButton(panelX: number, saveBtnY: number): void;
+    showPauseMenu(): void;
+    buildContinueButton(): number;
+    buildSaveButton(continueButtonY: number): number;
+    buildQuitButton(saveButtonY: number): void;
+    canSave(): boolean;
+    promptToQuit(): void;
 }

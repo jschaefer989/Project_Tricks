@@ -17,61 +17,54 @@ function MusicPlayer.prototype.play(self, gameState, biome)
     end
     self.gameState = gameState
     self.biome = biome
-    if gameState == GameStates.PAUSE_MENU then
-        local ____opt_0 = self.currentlyPlaying
-        if ____opt_0 ~= nil then
-            ____opt_0:setVolume(0.2)
-        end
-        return
-    end
-    local ____opt_2 = self.currentlyPlaying
-    if ____opt_2 and ____opt_2:isPlaying() then
+    local ____opt_0 = self.currentlyPlaying
+    if ____opt_0 and ____opt_0:isPlaying() then
         self.currentlyPlaying:stop()
     end
     repeat
-        local ____switch7 = gameState
-        local ____cond7 = ____switch7 == GameStates.BOARD
-        if ____cond7 then
+        local ____switch6 = gameState
+        local ____cond6 = ____switch6 == GameStates.BOARD
+        if ____cond6 then
             self:playBoardMusic(biome)
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.MAIN_MENU
-        if ____cond7 then
+        ____cond6 = ____cond6 or ____switch6 == GameStates.MAIN_MENU
+        if ____cond6 then
             self:playMainMenuMusic()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.LEVEL_UP
-        if ____cond7 then
+        ____cond6 = ____cond6 or ____switch6 == GameStates.LEVEL_UP
+        if ____cond6 then
             self:playLevelUpMusic()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.LOSE_SCREEN
-        if ____cond7 then
+        ____cond6 = ____cond6 or ____switch6 == GameStates.LOSE_SCREEN
+        if ____cond6 then
             self:playGameOverMusic()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.WIN_SCREEN
-        if ____cond7 then
+        ____cond6 = ____cond6 or ____switch6 == GameStates.WIN_SCREEN
+        if ____cond6 then
             self:playVictoryMusic()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.PERKS
-        if ____cond7 then
+        ____cond6 = ____cond6 or ____switch6 == GameStates.PERKS
+        if ____cond6 then
             self:playPerkSelectionMusic()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.SHOP
-        if ____cond7 then
+        ____cond6 = ____cond6 or ____switch6 == GameStates.SHOP
+        if ____cond6 then
             self:playShopMusic()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.MAP
-        if ____cond7 then
+        ____cond6 = ____cond6 or ____switch6 == GameStates.MAP
+        if ____cond6 then
             self:playMapMusic()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.NEW_GAME_MENU
-        if ____cond7 then
+        ____cond6 = ____cond6 or ____switch6 == GameStates.NEW_GAME_MENU
+        if ____cond6 then
             self:playNewGameMenuMusic()
             break
         end

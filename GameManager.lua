@@ -51,21 +51,22 @@ local ShaderManager = ____ShaderManager.default
 local ____FontWithPosition = require("Assets.Fonts.FontWithPosition")
 local Fonts = ____FontWithPosition.Fonts
 local lovelyToasts = require("Libraries.Lovely-Toasts-main.lovelyToasts")
-local ____Popup = require("Screens.Popup")
-local Popup = ____Popup.default
+local ____PopupManager = require("Screens.Popup.PopupManager")
+local PopupManager = ____PopupManager.default
 ____exports.default = __TS__Class()
 local GameManager = ____exports.default
 GameManager.name = "GameManager"
 function GameManager.prototype.____constructor(self)
     self.player = __TS__New(Player, self)
     self.settings = __TS__New(Settings)
+    self.pauseMenu = __TS__New(PauseMenu, self)
     self.map = __TS__New(Map, self)
     self.assetManager = __TS__New(AssetManager, self)
     self.animationManager = __TS__New(AnimationManager, self)
     self.musicPlayer = __TS__New(MusicPlayer, self)
     self.backgroundManager = __TS__New(BackgroundManager, self)
     self.shaderManager = __TS__New(ShaderManager, self)
-    self.popup = __TS__New(Popup, self)
+    self.popupManager = __TS__New(PopupManager, self)
     self.devMode = false
     self.gameState = GameStates.MAIN_MENU
     self.biome = __TS__New(Grass)
@@ -114,11 +115,6 @@ function GameManager.prototype.switchBasedOnGameState(self, gameState, enemy)
         ____cond7 = ____cond7 or ____switch7 == GameStates.BOARD
         if ____cond7 then
             self:switchToBoard(enemy)
-            break
-        end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.PAUSE_MENU
-        if ____cond7 then
-            self:switchToPauseMenu()
             break
         end
         ____cond7 = ____cond7 or ____switch7 == GameStates.WIN_SCREEN
@@ -188,18 +184,6 @@ function GameManager.prototype.switchToNewGameMenu(self)
     end
     GameStateManager:setState(newGameMenuState)
 end
-function GameManager.prototype.switchToPauseMenu(self)
-    local pauseMenuState = {update = function(____, dt)
-        local ____opt_8 = self.pauseMenu
-        if ____opt_8 ~= nil then
-            ____opt_8:drawScreen()
-        end
-    end}
-    if isEmpty(self.pauseMenu) then
-        self.pauseMenu = __TS__New(PauseMenu, self)
-    end
-    GameStateManager:setState(pauseMenuState)
-end
 function GameManager.prototype.switchToBoard(self, enemy)
     local shadowShader = love.graphics.newShader("Shaders/Shadow.glsl")
     shadowShader:send("shadow_strength", 0.6)
@@ -216,16 +200,25 @@ function GameManager.prototype.switchToBoard(self, enemy)
             push:finish()
         end,
         mousepressed = function(____, x, y, button)
-            if self.popup:handleMousePressed(x, y, button) then
+            if self.popupManager:handleMousePressed(x, y, button) then
                 return
             end
             self.assetManager:handleMousePressed(x, y, button)
         end,
         mousereleased = function(____, x, y, button)
-            if self.popup:handleMouseReleased(x, y, button) then
+            if self.popupManager:handleMouseReleased(x, y, button) then
                 return
             end
             self.assetManager:handleMouseReleased(x, y, button)
+        end,
+        keypressed = function(____, key, scancode, isrepeat)
+            if key == "escape" then
+                if not self.pauseMenu.isOpen then
+                    self.pauseMenu:showPauseMenu()
+                else
+                    self.popupManager:close()
+                end
+            end
         end
     }
     self.gameState = GameStates.BOARD
@@ -247,9 +240,9 @@ function GameManager.prototype.switchToBoard(self, enemy)
 end
 function GameManager.prototype.switchToWinScreen(self)
     local winState = {update = function(____, dt)
-        local ____opt_10 = self.winScreen
-        if ____opt_10 ~= nil then
-            ____opt_10:drawScreen()
+        local ____opt_8 = self.winScreen
+        if ____opt_8 ~= nil then
+            ____opt_8:drawScreen()
         end
     end}
     self.gameState = GameStates.WIN_SCREEN
@@ -264,9 +257,9 @@ function GameManager.prototype.switchToWinScreen(self)
 end
 function GameManager.prototype.switchToLoseScreen(self)
     local loseState = {update = function(____, dt)
-        local ____opt_12 = self.loseScreen
-        if ____opt_12 ~= nil then
-            ____opt_12:drawScreen()
+        local ____opt_10 = self.loseScreen
+        if ____opt_10 ~= nil then
+            ____opt_10:drawScreen()
         end
     end}
     self.gameState = GameStates.LOSE_SCREEN
@@ -300,9 +293,9 @@ function GameManager.prototype.switchToMap(self)
 end
 function GameManager.prototype.switchToShop(self)
     local shopState = {update = function(____, dt)
-        local ____opt_14 = self.shop
-        if ____opt_14 ~= nil then
-            ____opt_14:drawShop()
+        local ____opt_12 = self.shop
+        if ____opt_12 ~= nil then
+            ____opt_12:drawShop()
         end
     end}
     self.gameState = GameStates.SHOP
@@ -319,9 +312,9 @@ function GameManager.prototype.switchToShop(self)
 end
 function GameManager.prototype.switchToLevelUpScreen(self)
     local levelUpState = {update = function(____, dt)
-        local ____opt_16 = self.levelUpScreen
-        if ____opt_16 ~= nil then
-            ____opt_16:drawScreen()
+        local ____opt_14 = self.levelUpScreen
+        if ____opt_14 ~= nil then
+            ____opt_14:drawScreen()
         end
     end}
     self.gameState = GameStates.LEVEL_UP
@@ -338,9 +331,9 @@ function GameManager.prototype.switchToLevelUpScreen(self)
 end
 function GameManager.prototype.switchToPerkScreen(self)
     local perkState = {update = function(____, dt)
-        local ____opt_18 = self.perkScreen
-        if ____opt_18 ~= nil then
-            ____opt_18:drawScreen()
+        local ____opt_16 = self.perkScreen
+        if ____opt_16 ~= nil then
+            ____opt_16:drawScreen()
         end
     end}
     self.gameState = GameStates.PERKS
@@ -353,42 +346,5 @@ function GameManager.prototype.switchToPerkScreen(self)
         self.perkScreen = __TS__New(PerkScreen, self)
     end
     GameStateManager:setState(perkState)
-end
-function GameManager.prototype.getCard(self, id)
-    for ____, card in ipairs(self.player.hand) do
-        if card.id == id then
-            return card
-        end
-    end
-    for ____, card in ipairs(self.player.deck) do
-        if card.id == id then
-            return card
-        end
-    end
-    for ____, card in ipairs(self.player.discardPile) do
-        if card.id == id then
-            return card
-        end
-    end
-    local ____opt_20 = self.board
-    local enemy = ____opt_20 and ____opt_20.enemy
-    if isEmpty(enemy) then
-        return
-    end
-    for ____, card in ipairs(enemy.hand) do
-        if card.id == id then
-            return card
-        end
-    end
-    for ____, card in ipairs(enemy.deck) do
-        if card.id == id then
-            return card
-        end
-    end
-    for ____, card in ipairs(enemy.discardPile) do
-        if card.id == id then
-            return card
-        end
-    end
 end
 return ____exports

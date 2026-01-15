@@ -105,7 +105,7 @@ export default class AssetManager {
     this.textManager.drawText();
 
     // Draw popup above text and assets
-    this.gameManager.popup.drawPopup();
+    this.gameManager.popupManager.drawPopups();
 
     // Draw tooltip above assets, text and popup
     this.tooltipManager.drawTooltips();

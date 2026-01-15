@@ -1,72 +1,175 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local suit = require("Libraries.suit-master.suit")
+local ____Asset = require("Assets.Asset")
+local Asset = ____Asset.default
+local ____FontWithPosition = require("Assets.Fonts.FontWithPosition")
+local FontWithPosition = ____FontWithPosition.default
+local Format = ____FontWithPosition.Format
+local ____Enums = require("Enums")
+local AssetIds = ____Enums.AssetIds
+local HoverEffects = ____Enums.HoverEffects
+local MousePressEffects = ____Enums.MousePressEffects
+local PopupIds = ____Enums.PopupIds
+local TextIds = ____Enums.TextIds
 local ____Save = require("Save")
 local Save = ____Save.default
-local panelW = 240
-local labelY = 50
-local btnW = 200
-local btnH = 50
-local labelHeight = 36
+local ____Popup = require("Screens.Popup.Popup")
+local Popup = ____Popup.default
+local PopupSizes = ____Popup.PopupSizes
+local ____Prompt = require("Screens.Prompt")
+local Prompt = ____Prompt.default
+local buttonWidth = 192
+local buttonHeight = 64
 ____exports.default = __TS__Class()
 local PauseMenu = ____exports.default
 PauseMenu.name = "PauseMenu"
 function PauseMenu.prototype.____constructor(self, gameManager)
+    self.button = love.graphics.newImage("Assets/Images/PauseMenuButton.png")
+    self.isOpen = false
     self.gameManager = gameManager
 end
-function PauseMenu.prototype.drawScreen(self)
-    local screenW = love.graphics.getWidth()
-    local panelX = (screenW - panelW) / 2
-    self:renderDisplayTitle(panelX)
-    local continueBtnY = self:renderContinueButton(panelX)
-    local saveBtnY = self:renderSaveButton(panelX, continueBtnY)
-    self:renderQuitButton(panelX, saveBtnY)
-end
-function PauseMenu.prototype.renderDisplayTitle(self, panelX)
-    suit.layout:reset(panelX, labelY)
-    suit.Label(
+function PauseMenu.prototype.showPauseMenu(self)
+    local continueButtonY = self:buildContinueButton()
+    local saveButtonY = self:buildSaveButton(continueButtonY)
+    self:buildQuitButton(saveButtonY)
+    self.gameManager.popupManager:open(
+        PopupIds.PAUSE_MENU,
         "Paused",
-        {align = "center"},
-        suit.layout:row(panelW, labelHeight)
+        PopupSizes.MENU,
+        {onClose = function()
+            self.isOpen = false
+        end}
     )
+    self.isOpen = true
 end
-function PauseMenu.prototype.renderContinueButton(self, panelX)
-    local continueBtnY = labelY + labelHeight + 20
-    suit.layout:reset(panelX, continueBtnY)
-    local continueResult = suit.Button(
+function PauseMenu.prototype.buildContinueButton(self)
+    local continueButtonY = 50
+    local popupCenterX = Popup:getCenterOfPopup(PopupSizes.MENU)
+    local continueText = __TS__New(
+        FontWithPosition,
+        TextIds.PAUSE_CONTINUE_BUTTON_CAPTION,
+        popupCenterX,
+        continueButtonY + buttonHeight / 2 - 5,
         "Continue",
-        {},
-        suit.layout:row(btnW, btnH)
+        {format = Format.CENTER, size = 18}
     )
-    if continueResult.hit then
-        self.gameManager:switchBasedOnGameState()
-    end
-    return continueBtnY
+    local continueButton = __TS__New(
+        Asset,
+        self.gameManager,
+        AssetIds.PAUSE_CONTINUE_BUTTON,
+        self.button,
+        popupCenterX - buttonWidth / 2,
+        continueButtonY,
+        buttonWidth,
+        buttonHeight,
+        {
+            onClick = function()
+                self.gameManager.popupManager:close()
+            end,
+            associatedTexts = {continueText},
+            clickSound = self.gameManager.assetManager.buttonClickSound,
+            hoverEffect = {HoverEffects.CHANGE_COLOR},
+            mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
+        }
+    )
+    self.gameManager.assetManager.textManager:addText(TextIds.PAUSE_CONTINUE_BUTTON_CAPTION, continueText)
+    local ____self_gameManager_popupManager_popupTextIds_0 = self.gameManager.popupManager.popupTextIds
+    ____self_gameManager_popupManager_popupTextIds_0[#____self_gameManager_popupManager_popupTextIds_0 + 1] = TextIds.PAUSE_CONTINUE_BUTTON_CAPTION
+    self.gameManager.assetManager:addAsset(AssetIds.PAUSE_CONTINUE_BUTTON, continueButton)
+    local ____self_gameManager_popupManager_popupAssetIds_1 = self.gameManager.popupManager.popupAssetIds
+    ____self_gameManager_popupManager_popupAssetIds_1[#____self_gameManager_popupManager_popupAssetIds_1 + 1] = AssetIds.PAUSE_CONTINUE_BUTTON
+    return continueButtonY
 end
-function PauseMenu.prototype.renderSaveButton(self, panelX, continueBtnY)
-    local saveBtnY = continueBtnY + btnH + 10
-    suit.layout:reset(panelX, saveBtnY)
-    local saveResult = suit.Button(
+function PauseMenu.prototype.buildSaveButton(self, continueButtonY)
+    local saveButtonY = continueButtonY + buttonHeight + 10
+    local popupCenterX = Popup:getCenterOfPopup(PopupSizes.MENU)
+    local saveText = __TS__New(
+        FontWithPosition,
+        TextIds.PAUSE_SAVE_BUTTON_CAPTION,
+        popupCenterX,
+        saveButtonY + buttonHeight / 2 - 5,
         "Save",
-        {},
-        suit.layout:row(btnW, btnH)
+        {format = Format.CENTER, size = 18}
     )
-    if saveResult.hit then
-        Save:save(self.gameManager)
-    end
-    return saveBtnY
+    local saveButton = __TS__New(
+        Asset,
+        self.gameManager,
+        AssetIds.PAUSE_SAVE_BUTTON,
+        self.button,
+        popupCenterX - buttonWidth / 2,
+        saveButtonY,
+        buttonWidth,
+        buttonHeight,
+        {
+            onClick = function()
+                Save:save(self.gameManager)
+            end,
+            associatedTexts = {saveText},
+            isDisabled = not self:canSave(),
+            clickSound = self.gameManager.assetManager.buttonClickSound,
+            hoverEffect = {HoverEffects.CHANGE_COLOR},
+            mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
+        }
+    )
+    self.gameManager.assetManager.textManager:addText(TextIds.PAUSE_SAVE_BUTTON_CAPTION, saveText)
+    local ____self_gameManager_popupManager_popupTextIds_2 = self.gameManager.popupManager.popupTextIds
+    ____self_gameManager_popupManager_popupTextIds_2[#____self_gameManager_popupManager_popupTextIds_2 + 1] = TextIds.PAUSE_SAVE_BUTTON_CAPTION
+    self.gameManager.assetManager:addAsset(AssetIds.PAUSE_SAVE_BUTTON, saveButton)
+    local ____self_gameManager_popupManager_popupAssetIds_3 = self.gameManager.popupManager.popupAssetIds
+    ____self_gameManager_popupManager_popupAssetIds_3[#____self_gameManager_popupManager_popupAssetIds_3 + 1] = AssetIds.PAUSE_SAVE_BUTTON
+    return saveButtonY
 end
-function PauseMenu.prototype.renderQuitButton(self, panelX, saveBtnY)
-    local quitBtnY = saveBtnY + btnH + 10
-    suit.layout:reset(panelX, quitBtnY)
-    local quitResult = suit.Button(
+function PauseMenu.prototype.buildQuitButton(self, saveButtonY)
+    local quitButtonY = saveButtonY + buttonHeight + 10
+    local popupCenterX = Popup:getCenterOfPopup(PopupSizes.MENU)
+    local quitText = __TS__New(
+        FontWithPosition,
+        TextIds.PAUSE_QUIT_BUTTON_CAPTION,
+        popupCenterX,
+        quitButtonY + buttonHeight / 2 - 5,
         "Quit",
-        {},
-        suit.layout:row(btnW, btnH)
+        {format = Format.CENTER, size = 18}
     )
-    if quitResult.hit then
-        love.event.quit()
-    end
+    local quitButton = __TS__New(
+        Asset,
+        self.gameManager,
+        AssetIds.PAUSE_QUIT_BUTTON,
+        self.button,
+        popupCenterX - buttonWidth / 2,
+        quitButtonY,
+        buttonWidth,
+        buttonHeight,
+        {
+            onClick = function() return self:promptToQuit() end,
+            associatedTexts = {quitText},
+            clickSound = self.gameManager.assetManager.buttonClickSound,
+            hoverEffect = {HoverEffects.CHANGE_COLOR},
+            mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
+        }
+    )
+    self.gameManager.assetManager.textManager:addText(TextIds.PAUSE_QUIT_BUTTON_CAPTION, quitText)
+    local ____self_gameManager_popupManager_popupTextIds_4 = self.gameManager.popupManager.popupTextIds
+    ____self_gameManager_popupManager_popupTextIds_4[#____self_gameManager_popupManager_popupTextIds_4 + 1] = TextIds.PAUSE_QUIT_BUTTON_CAPTION
+    self.gameManager.assetManager:addAsset(AssetIds.PAUSE_QUIT_BUTTON, quitButton)
+    local ____self_gameManager_popupManager_popupAssetIds_5 = self.gameManager.popupManager.popupAssetIds
+    ____self_gameManager_popupManager_popupAssetIds_5[#____self_gameManager_popupManager_popupAssetIds_5 + 1] = AssetIds.PAUSE_QUIT_BUTTON
+end
+function PauseMenu.prototype.canSave(self)
+    return true
+end
+function PauseMenu.prototype.promptToQuit(self)
+    local prompt = __TS__New(
+        Prompt,
+        self.gameManager,
+        "Are you sure you want to quit?",
+        function()
+            love.event.quit()
+        end,
+        function() return self.gameManager.popupManager:close() end,
+        {secondaryMessage = "All unsaved progress will be lost."}
+    )
+    prompt:open(PopupIds.QUIT_PROMPT)
 end
 return ____exports

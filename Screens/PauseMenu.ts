@@ -1,69 +1,201 @@
 /** @noSelfInFile */
 
-import GameManager from "GameManager"
-import * as suit from "Libraries.suit-master.suit"
-import Save from "Save"
+import Asset from "Assets/Asset";
+import FontWithPosition, { Format } from "Assets/Fonts/FontWithPosition";
+import { AssetIds, HoverEffects, MousePressEffects, PopupIds, TextIds } from "Enums";
+import GameManager from "GameManager";
+import Save from "Save";
+import Popup, { PopupSizes } from "./Popup/Popup";
+import Prompt from "./Prompt";
 
-const panelW = 240
-const labelY = 50
-const btnW = 200
-const btnH = 50
-const labelHeight = 36
+const buttonWidth = 192;
+const buttonHeight = 64;
 
 export default class PauseMenu {
-    gameManager: GameManager
+  gameManager: GameManager;
+  button = love.graphics.newImage("Assets/Images/PauseMenuButton.png");
+  isOpen = false;
 
-    constructor(gameManager: GameManager) {
-        this.gameManager = gameManager
-    }
+  constructor(gameManager: GameManager) {
+    this.gameManager = gameManager;
+  }
 
-    drawScreen(): void {
-        const screenW = love.graphics.getWidth()
+  showPauseMenu(): void {
+    const continueButtonY = this.buildContinueButton();
+    const saveButtonY = this.buildSaveButton(continueButtonY);
+    this.buildQuitButton(saveButtonY);
 
-        const panelX = (screenW - panelW) / 2
-        this.renderDisplayTitle(panelX)
+    this.gameManager.popupManager.open(PopupIds.PAUSE_MENU, "Paused", PopupSizes.MENU, {
+      onClose: () => {
+        this.isOpen = false;
+      },
+    });
+    this.isOpen = true;
+  }
 
-        // Create a continue button below the label
-        const continueBtnY = this.renderContinueButton(panelX)
+  buildContinueButton(): number {
+    const continueButtonY = 50;
+    const popupCenterX = Popup.getCenterOfPopup(PopupSizes.MENU);
+    const continueText = new FontWithPosition(
+      TextIds.PAUSE_CONTINUE_BUTTON_CAPTION,
+      popupCenterX,
+      continueButtonY + buttonHeight / 2 - 5,
+      "Continue",
+      { format: Format.CENTER, size: 18 }
+    );
+    const continueButton = new Asset(
+      this.gameManager,
+      AssetIds.PAUSE_CONTINUE_BUTTON,
+      this.button,
+      popupCenterX - buttonWidth / 2,
+      continueButtonY,
+      buttonWidth,
+      buttonHeight,
+      {
+        onClick: () => {
+          this.gameManager.popupManager.close();
+        },
+        associatedTexts: [continueText],
+        clickSound: this.gameManager.assetManager.buttonClickSound,
+        hoverEffect: [HoverEffects.CHANGE_COLOR],
+        mousePressEffect: [
+          MousePressEffects.DARKEN,
+          MousePressEffects.SHIFT_DOWN,
+        ],
+      }
+    );
 
-        // Create a save button below the continue button
-        const saveBtnY = this.renderSaveButton(panelX, continueBtnY)
+    this.gameManager.assetManager.textManager.addText(
+      TextIds.PAUSE_CONTINUE_BUTTON_CAPTION,
+      continueText
+    );
+    this.gameManager.popupManager.popupTextIds.push(
+      TextIds.PAUSE_CONTINUE_BUTTON_CAPTION
+    );
+    this.gameManager.assetManager.addAsset(
+      AssetIds.PAUSE_CONTINUE_BUTTON,
+      continueButton
+    );
+    this.gameManager.popupManager.popupAssetIds.push(
+      AssetIds.PAUSE_CONTINUE_BUTTON
+    );
 
-        // Create a quit button below the save button
-        this.renderQuitButton(panelX, saveBtnY)
-    }
+    return continueButtonY;
+  }
 
-    renderDisplayTitle(panelX: number): void {
-        suit.layout.reset(panelX, labelY)
-        suit.Label("Paused", { align: "center" }, ...suit.layout.row(panelW, labelHeight))
-    }
+  buildSaveButton(continueButtonY: number): number {
+    const saveButtonY = continueButtonY + buttonHeight + 10;
+    const popupCenterX = Popup.getCenterOfPopup(PopupSizes.MENU);
+    const saveText = new FontWithPosition(
+      TextIds.PAUSE_SAVE_BUTTON_CAPTION,
+      popupCenterX,
+      saveButtonY + buttonHeight / 2 - 5,
+      "Save",
+      { format: Format.CENTER, size: 18 }
+    );
+    const saveButton = new Asset(
+      this.gameManager,
+      AssetIds.PAUSE_SAVE_BUTTON,
+      this.button,
+      popupCenterX - buttonWidth / 2,
+      saveButtonY,
+      buttonWidth,
+      buttonHeight,
+      {
+        onClick: () => {
+          Save.save(this.gameManager);
+        },
+        associatedTexts: [saveText],
+        isDisabled: !this.canSave(),
+        clickSound: this.gameManager.assetManager.buttonClickSound,
+        hoverEffect: [HoverEffects.CHANGE_COLOR],
+        mousePressEffect: [
+          MousePressEffects.DARKEN,
+          MousePressEffects.SHIFT_DOWN,
+        ],
+      }
+    );
 
-    renderContinueButton(panelX: number): number {
-        const continueBtnY = labelY + labelHeight + 20
-        suit.layout.reset(panelX, continueBtnY)
-        const continueResult = suit.Button("Continue", {}, ...suit.layout.row(btnW, btnH))
-        if (continueResult.hit) {
-            this.gameManager.switchBasedOnGameState()
-        }
-        return continueBtnY
-    }    
+    this.gameManager.assetManager.textManager.addText(
+      TextIds.PAUSE_SAVE_BUTTON_CAPTION,
+      saveText
+    );
+    this.gameManager.popupManager.popupTextIds.push(
+      TextIds.PAUSE_SAVE_BUTTON_CAPTION
+    );
+    this.gameManager.assetManager.addAsset(
+      AssetIds.PAUSE_SAVE_BUTTON,
+      saveButton
+    );
+    this.gameManager.popupManager.popupAssetIds.push(
+      AssetIds.PAUSE_SAVE_BUTTON
+    );
 
-    renderSaveButton(panelX: number, continueBtnY: number): number {
-        const saveBtnY = continueBtnY + btnH + 10
-        suit.layout.reset(panelX, saveBtnY)
-        const saveResult = suit.Button("Save", {}, ...suit.layout.row(btnW, btnH))
-        if (saveResult.hit) {
-            Save.save(this.gameManager)
-        }
-        return saveBtnY
-    }
+    return saveButtonY;
+  }
 
-    renderQuitButton(panelX: number, saveBtnY: number): void {
-        const quitBtnY = saveBtnY + btnH + 10
-        suit.layout.reset(panelX, quitBtnY)
-        const quitResult = suit.Button("Quit", {}, ...suit.layout.row(btnW, btnH))
-        if (quitResult.hit) {
-            love.event.quit()
-        }
-    }
+  buildQuitButton(saveButtonY: number): void {
+    const quitButtonY = saveButtonY + buttonHeight + 10;
+    const popupCenterX = Popup.getCenterOfPopup(PopupSizes.MENU);
+    const quitText = new FontWithPosition(
+      TextIds.PAUSE_QUIT_BUTTON_CAPTION,
+      popupCenterX,
+      quitButtonY + buttonHeight / 2 - 5,
+      "Quit",
+      { format: Format.CENTER, size: 18 }
+    );
+
+    const quitButton = new Asset(
+      this.gameManager,
+      AssetIds.PAUSE_QUIT_BUTTON,
+      this.button,
+      popupCenterX - buttonWidth / 2,
+      quitButtonY,
+      buttonWidth,
+      buttonHeight,
+      {
+        onClick: () => this.promptToQuit(),
+        associatedTexts: [quitText],
+        clickSound: this.gameManager.assetManager.buttonClickSound,
+        hoverEffect: [HoverEffects.CHANGE_COLOR],
+        mousePressEffect: [
+          MousePressEffects.DARKEN,
+          MousePressEffects.SHIFT_DOWN,
+        ],
+      }
+    );
+
+    this.gameManager.assetManager.textManager.addText(
+      TextIds.PAUSE_QUIT_BUTTON_CAPTION,
+      quitText
+    );
+    this.gameManager.popupManager.popupTextIds.push(
+      TextIds.PAUSE_QUIT_BUTTON_CAPTION
+    );
+    this.gameManager.assetManager.addAsset(
+      AssetIds.PAUSE_QUIT_BUTTON,
+      quitButton
+    );
+    this.gameManager.popupManager.popupAssetIds.push(
+      AssetIds.PAUSE_QUIT_BUTTON
+    );
+  }
+
+  canSave(): boolean {
+    // TODO: we'll want to control when saving is allowed
+    return true;
+  }
+
+  promptToQuit(): void {
+    const prompt = new Prompt(
+      this.gameManager,
+      "Are you sure you want to quit?",
+      () => {
+        love.event.quit();
+      },
+      () => this.gameManager.popupManager.close(),
+      { secondaryMessage: "All unsaved progress will be lost." }
+    );
+    prompt.open(PopupIds.QUIT_PROMPT);
+  }
 }
