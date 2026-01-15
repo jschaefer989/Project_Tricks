@@ -12,9 +12,11 @@ ____exports.default = __TS__Class()
 local WobbleAnimation = ____exports.default
 WobbleAnimation.name = "WobbleAnimation"
 __TS__ClassExtends(WobbleAnimation, Animation)
-function WobbleAnimation.prototype.____constructor(self, animDuration, wobbleAmount, assets, constructionOptions)
+function WobbleAnimation.prototype.____constructor(self, gameManager, id, animDuration, wobbleAmount, assets, constructionOptions)
     Animation.prototype.____constructor(
         self,
+        gameManager,
+        id,
         assets,
         __TS__ObjectAssign(
             {onFinish = function() return self:updateX(0) end},

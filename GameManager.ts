@@ -28,6 +28,7 @@ import BackgroundManager from "Screens/BackgroundManager";
 import ShaderManager from "Shaders/ShaderManager";
 import { Fonts } from "Assets/Fonts/FontWithPosition";
 import * as lovelyToasts from "Libraries.Lovely-Toasts-main.lovelyToasts";
+import Popup from "Screens/Popup";
 
 interface GameState {
   update: (dt: number) => void;
@@ -56,6 +57,7 @@ export default class GameManager {
   biome: Biome;
   backgroundManager = new BackgroundManager(this);
   shaderManager = new ShaderManager(this);
+  popup: Popup = new Popup(this);
   devMode: boolean = false; // Change if you want to test in dev mode
 
   constructor() {
@@ -188,23 +190,17 @@ export default class GameManager {
         this.shaderManager.updateShaders(dt);
       },
       draw: () => {
-        if (!this.devMode) {
-          push.start();
-          //love.graphics.setShader(shadowShader);
-          this.assetManager.drawAssets();
-          love.graphics.setShader(); // Reset shader to default
-          push.finish();
-        }
+        push.start();
+        this.assetManager.drawAssets();
+        push.finish();
       },
       mousepressed: (x: number, y: number, button: number) => {
-        if (!this.devMode) {
-          this.assetManager.handleMousePressed(x, y, button);
-        }
+        if (this.popup.handleMousePressed(x, y, button)) return;
+        this.assetManager.handleMousePressed(x, y, button);
       },
       mousereleased: (x: number, y: number, button: number) => {
-        if (!this.devMode) {
-          this.assetManager.handleMouseReleased(x, y, button);
-        }
+        if (this.popup.handleMouseReleased(x, y, button)) return;
+        this.assetManager.handleMouseReleased(x, y, button);
       },
     };
 

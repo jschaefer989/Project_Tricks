@@ -32,7 +32,8 @@ function CardAssets.prototype.____constructor(self, gameManager, board)
         clickSound = includeClickHandler and self.cardClick or nil,
         hoverSound = includeClickHandler and self.hoverSound or nil,
         isDisabled = true,
-        useDisabledAnimation = false
+        useDisabledAnimation = false,
+        showDisabledColor = false
     } end
     self.gameManager = gameManager
     self.board = board

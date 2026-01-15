@@ -12,6 +12,8 @@ local ____ShimmerShader = require("Shaders.ShimmerShader")
 local ShimmerShader = ____ShimmerShader.default
 local ____WobbleAnimation = require("Assets.Animations.WobbleAnimation")
 local WobbleAnimation = ____WobbleAnimation.default
+local disabledColor = {0.5, 0.5, 0.5, 1}
+local normalColor = {1, 1, 1, 1}
 ____exports.default = __TS__Class()
 local Asset = ____exports.default
 Asset.name = "Asset"
@@ -19,6 +21,7 @@ function Asset.prototype.____constructor(self, gameManager, id, image, x, y, wid
     self.quads = {}
     self.isDisabled = false
     self.useDisabledAnimation = true
+    self.showDisabledColor = true
     self.isHovered = false
     self.isPressed = false
     self.color = {1, 1, 1, 1}
@@ -49,6 +52,11 @@ function Asset.prototype.____constructor(self, gameManager, id, image, x, y, wid
         ____temp_23 = true
     end
     self.useDisabledAnimation = ____temp_23
+    local ____temp_26 = constructionOptions and constructionOptions.showDisabledColor
+    if ____temp_26 == nil then
+        ____temp_26 = true
+    end
+    self.showDisabledColor = ____temp_26
     self.clickSound = constructionOptions and constructionOptions.clickSound
     self.hoverSound = constructionOptions and constructionOptions.hoverSound
     self.associatedTexts = constructionOptions and constructionOptions.associatedTexts
@@ -95,39 +103,42 @@ function Asset.prototype.updatePosition(self, x, y)
     self.y = y
 end
 function Asset.prototype.setHovered(self, hovered)
+    if self.gameManager.assetManager.universallyDisabled then
+        return
+    end
     self.isHovered = hovered
     self:handleHoverEffects(hovered)
 end
 function Asset.prototype.handleHoverEffects(self, hovered)
     for ____, effect in ipairs(self.hoverEffect) do
         repeat
-            local ____switch13 = effect
-            local ____cond13 = ____switch13 == HoverEffects.NONE
-            if ____cond13 then
+            local ____switch14 = effect
+            local ____cond14 = ____switch14 == HoverEffects.NONE
+            if ____cond14 then
                 break
             end
-            ____cond13 = ____cond13 or ____switch13 == HoverEffects.CHANGE_COLOR
-            if ____cond13 then
+            ____cond14 = ____cond14 or ____switch14 == HoverEffects.CHANGE_COLOR
+            if ____cond14 then
                 self:setColor()
                 break
             end
-            ____cond13 = ____cond13 or ____switch13 == HoverEffects.SCALE_UP
-            if ____cond13 then
+            ____cond14 = ____cond14 or ____switch14 == HoverEffects.SCALE_UP
+            if ____cond14 then
                 self:scaleUp(hovered)
                 break
             end
-            ____cond13 = ____cond13 or ____switch13 == HoverEffects.SHIFT_UP
-            if ____cond13 then
+            ____cond14 = ____cond14 or ____switch14 == HoverEffects.SHIFT_UP
+            if ____cond14 then
                 self:shiftUp(hovered)
                 break
             end
-            ____cond13 = ____cond13 or ____switch13 == HoverEffects.SHIMMER
-            if ____cond13 then
+            ____cond14 = ____cond14 or ____switch14 == HoverEffects.SHIMMER
+            if ____cond14 then
                 self:shimmer(hovered)
                 break
             end
-            ____cond13 = ____cond13 or ____switch13 == HoverEffects.WOBBLE
-            if ____cond13 then
+            ____cond14 = ____cond14 or ____switch14 == HoverEffects.WOBBLE
+            if ____cond14 then
                 self:wobble(hovered)
                 break
             end
@@ -139,29 +150,32 @@ function Asset.prototype.handleHoverEffects(self, hovered)
 end
 function Asset.prototype.setMousePressed(self, pressed)
     local wasPressed = self.isPressed
+    if self.gameManager.assetManager.universallyDisabled and not wasPressed then
+        return
+    end
     self.isPressed = pressed
     self:handleMousePressEffects(pressed, wasPressed)
 end
 function Asset.prototype.handleMousePressEffects(self, pressed, wasPressed)
     for ____, effect in ipairs(self.mousePressEffect) do
         repeat
-            local ____switch18 = effect
-            local ____cond18 = ____switch18 == MousePressEffects.NONE
-            if ____cond18 then
+            local ____switch20 = effect
+            local ____cond20 = ____switch20 == MousePressEffects.NONE
+            if ____cond20 then
                 break
             end
-            ____cond18 = ____cond18 or ____switch18 == MousePressEffects.DARKEN
-            if ____cond18 then
+            ____cond20 = ____cond20 or ____switch20 == MousePressEffects.DARKEN
+            if ____cond20 then
                 self:setColor()
                 break
             end
-            ____cond18 = ____cond18 or ____switch18 == MousePressEffects.SCALE_DOWN
-            if ____cond18 then
+            ____cond20 = ____cond20 or ____switch20 == MousePressEffects.SCALE_DOWN
+            if ____cond20 then
                 self:scaleDown(pressed)
                 break
             end
-            ____cond18 = ____cond18 or ____switch18 == MousePressEffects.SHIFT_DOWN
-            if ____cond18 then
+            ____cond20 = ____cond20 or ____switch20 == MousePressEffects.SHIFT_DOWN
+            if ____cond20 then
                 self:shiftDown(pressed, wasPressed)
                 break
             end
@@ -171,19 +185,41 @@ function Asset.prototype.handleMousePressEffects(self, pressed, wasPressed)
         until true
     end
 end
-function Asset.prototype.setDisabled(self, disabled)
+function Asset.prototype.setDisabled(self, disabled, options)
     self.isDisabled = disabled
-    self:setColor()
+    local ____temp_39 = options and options.useDisabledAnimation
+    if ____temp_39 == nil then
+        ____temp_39 = true
+    end
+    self.useDisabledAnimation = ____temp_39
+    if disabled then
+        if not self.showDisabledColor and not (options and options.showDisabledColor) then
+            return
+        end
+        self.color = disabledColor
+        if not isEmpty(self.associatedTexts) then
+            for ____, text in ipairs(self.associatedTexts) do
+                text:setDisabled(true)
+            end
+        end
+    else
+        self.color = normalColor
+        if not isEmpty(self.associatedTexts) then
+            for ____, text in ipairs(self.associatedTexts) do
+                text:setDisabled(false)
+            end
+        end
+    end
 end
 function Asset.prototype.setColor(self)
     if self.isDisabled then
-        self.color = {0.5, 0.5, 0.5, 1}
+        self.color = disabledColor
     elseif self.isPressed then
         self.color = {0.7, 0.6, 0.4, 1}
     elseif self.isHovered then
         self.color = {1, 0.9, 0.7, 1}
     else
-        self.color = {1, 1, 1, 1}
+        self.color = normalColor
     end
 end
 function Asset.prototype.getWidth(self)
@@ -278,12 +314,21 @@ function Asset.prototype.wobble(self, hovered)
     if not hovered then
         return
     end
-    local wobbleId = "wobble-hover-" .. self.id
-    if not self.gameManager.animationManager.animations:has(wobbleId) then
+    if not self.gameManager.animationManager.animations:has(self.id) then
         self.gameManager.animationManager:startAnimation(
-            wobbleId,
-            __TS__New(WobbleAnimation, 0.2, 2, {self})
+            self.id,
+            __TS__New(
+                WobbleAnimation,
+                self.gameManager,
+                self.id,
+                0.2,
+                2,
+                {self}
+            )
         )
     end
+end
+function Asset.prototype.inAssetBounds(self, gameX, gameY)
+    return gameX >= self.x and gameX <= self.x + self:getWidth() and gameY >= self.y and gameY <= self.y + self:getHeight()
 end
 return ____exports

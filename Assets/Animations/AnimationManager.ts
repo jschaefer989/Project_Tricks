@@ -19,7 +19,7 @@ export default class AnimationManager {
 
   updateAnimations(dt: number): void {
     for (const [id, animation] of this.animations) {
-      if (this.shouldWaitForAnimations(animation)) {
+      if (animation.shouldWaitForAnimations() || animation.isPaused) {
         continue;
       }
       if (!isEmpty(animation.soundToPlay) && !animation.playedSound) {
@@ -34,18 +34,6 @@ export default class AnimationManager {
         animation.onFinish?.();
       }
     }
-  }
-
-  private shouldWaitForAnimations(animation: Animation): boolean {
-    if (animation.waitForAnimationIds.length > 0) {
-      for (const waitId of animation.waitForAnimationIds) {
-        const waitForAnimation = this.animations.get(waitId);
-        if (!isEmpty(waitForAnimation) && !waitForAnimation.isFinished) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   hasWobbleAnimation(): boolean {

@@ -51,6 +51,8 @@ local ShaderManager = ____ShaderManager.default
 local ____FontWithPosition = require("Assets.Fonts.FontWithPosition")
 local Fonts = ____FontWithPosition.Fonts
 local lovelyToasts = require("Libraries.Lovely-Toasts-main.lovelyToasts")
+local ____Popup = require("Screens.Popup")
+local Popup = ____Popup.default
 ____exports.default = __TS__Class()
 local GameManager = ____exports.default
 GameManager.name = "GameManager"
@@ -63,6 +65,7 @@ function GameManager.prototype.____constructor(self)
     self.musicPlayer = __TS__New(MusicPlayer, self)
     self.backgroundManager = __TS__New(BackgroundManager, self)
     self.shaderManager = __TS__New(ShaderManager, self)
+    self.popup = __TS__New(Popup, self)
     self.devMode = false
     self.gameState = GameStates.MAIN_MENU
     self.biome = __TS__New(Grass)
@@ -208,22 +211,21 @@ function GameManager.prototype.switchToBoard(self, enemy)
             self.shaderManager:updateShaders(dt)
         end,
         draw = function()
-            if not self.devMode then
-                push:start()
-                self.assetManager:drawAssets()
-                love.graphics.setShader()
-                push:finish()
-            end
+            push:start()
+            self.assetManager:drawAssets()
+            push:finish()
         end,
         mousepressed = function(____, x, y, button)
-            if not self.devMode then
-                self.assetManager:handleMousePressed(x, y, button)
+            if self.popup:handleMousePressed(x, y, button) then
+                return
             end
+            self.assetManager:handleMousePressed(x, y, button)
         end,
         mousereleased = function(____, x, y, button)
-            if not self.devMode then
-                self.assetManager:handleMouseReleased(x, y, button)
+            if self.popup:handleMouseReleased(x, y, button) then
+                return
             end
+            self.assetManager:handleMouseReleased(x, y, button)
         end
     }
     self.gameState = GameStates.BOARD

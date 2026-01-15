@@ -129,7 +129,9 @@ export default class Character {
     );
   }
 
-  showDeckContents(): void {}
+  showDeckContents(): void {
+    this.gameManager.popup.open([]);
+  }
 
   sortCards(): void {
     const now = os.time() * 1000; // Convert to milliseconds
@@ -211,7 +213,7 @@ export default class Character {
       cardAssets.repositionCard(card, targetX, y);
       cardAssets.redrawCard(card);
     }
-    cardAssets.disableAllCards(false);
+    this.gameManager.board.cardAssets.disableAllCards(false);
   }
 }
 

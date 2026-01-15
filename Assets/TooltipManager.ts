@@ -1,4 +1,4 @@
-import { AnimationIds, AssetIds } from "Enums";
+import { AssetIds } from "Enums";
 import Asset from "./Asset";
 import FontWithPosition from "./Fonts/FontWithPosition";
 import Tooltip from "./Tooltip";

@@ -17,6 +17,7 @@ export interface ConstructionOptions {
     readonly quads?: QuadWithPosition[];
     readonly isDisabled?: boolean;
     readonly useDisabledAnimation?: boolean;
+    readonly showDisabledColor?: boolean;
     readonly clickSound?: Source;
     readonly hoverSound?: Source;
     readonly associatedTexts?: FontWithPosition[];
@@ -42,6 +43,7 @@ export default class Asset {
     quads: QuadWithPosition[];
     isDisabled: boolean;
     useDisabledAnimation: boolean;
+    showDisabledColor: boolean;
     isHovered: boolean;
     isPressed: boolean;
     color: [number, number, number, number];
@@ -58,7 +60,7 @@ export default class Asset {
     private handleHoverEffects;
     setMousePressed(pressed: boolean): void;
     private handleMousePressEffects;
-    setDisabled(disabled: boolean): void;
+    setDisabled(disabled: boolean, options?: DisabledAssetOptions): void;
     setColor(): void;
     getWidth(): number;
     getHeight(): number;
@@ -68,4 +70,10 @@ export default class Asset {
     private shiftUp;
     private shimmer;
     private wobble;
+    inAssetBounds(gameX: number, gameY: number): boolean;
 }
+interface DisabledAssetOptions {
+    readonly useDisabledAnimation?: boolean;
+    readonly showDisabledColor?: boolean;
+}
+export {};

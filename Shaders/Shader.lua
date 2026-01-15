@@ -8,6 +8,7 @@ Shader.name = "Shader"
 function Shader.prototype.____constructor(self, gameManager, shader, stopCondition, assets)
     self.isShading = true
     self.elapsedTime = 0
+    self.isPaused = false
     self.gameManager = gameManager
     self.shader = shader
     self.stopCondition = stopCondition

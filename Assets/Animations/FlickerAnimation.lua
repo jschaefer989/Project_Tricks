@@ -11,8 +11,14 @@ ____exports.default = __TS__Class()
 local FlickerAnimation = ____exports.default
 FlickerAnimation.name = "FlickerAnimation"
 __TS__ClassExtends(FlickerAnimation, Animation)
-function FlickerAnimation.prototype.____constructor(self, animationAssets, constructionOptions)
-    Animation.prototype.____constructor(self, animationAssets, constructionOptions)
+function FlickerAnimation.prototype.____constructor(self, gameManager, id, animationAssets, constructionOptions)
+    Animation.prototype.____constructor(
+        self,
+        gameManager,
+        id,
+        animationAssets,
+        constructionOptions
+    )
     self.flickerInterval = 0.1
     self.flickerCount = 0
     self.maxFlickers = 6

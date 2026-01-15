@@ -11,12 +11,16 @@ local isEmpty = ____Helpers.isEmpty
 ____exports.default = __TS__Class()
 local Animation = ____exports.default
 Animation.name = "Animation"
-function Animation.prototype.____constructor(self, assets, constructionOptions)
+function Animation.prototype.____constructor(self, gameManager, id, assets, constructionOptions)
     self.animElapsed = 0
     self.isAnimating = false
+    self.hasStarted = false
     self.originalX = __TS__New(Map)
     self.originalY = __TS__New(Map)
     self.playedSound = false
+    self.isPaused = false
+    self.gameManager = gameManager
+    self.id = id
     self.animDuration = constructionOptions and constructionOptions.animDuration
     self.animElapsed = 0
     self.isAnimating = true
@@ -41,6 +45,7 @@ function Animation.prototype.____constructor(self, assets, constructionOptions)
     self.soundToPlay = constructionOptions and constructionOptions.soundToPlay
 end
 function Animation.prototype.updateAnimation(self, deltaTime)
+    self.hasStarted = true
     if not self.isAnimating then
         return
     end
@@ -78,6 +83,23 @@ function Animation.prototype.updateY(self, deltaY)
             end
         end
     )
+end
+function Animation.prototype.shouldWaitForAnimations(self)
+    if #self.waitForAnimationIds > 0 then
+        for ____, waitId in ipairs(self.waitForAnimationIds) do
+            do
+                if waitId == self.id then
+                    goto __continue18
+                end
+                local waitForAnimation = self.gameManager.animationManager.animations:get(waitId)
+                if not isEmpty(waitForAnimation) and not waitForAnimation.isFinished and waitForAnimation.hasStarted then
+                    return true
+                end
+            end
+            ::__continue18::
+        end
+    end
+    return false
 end
 __TS__SetDescriptor(
     Animation.prototype,

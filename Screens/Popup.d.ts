@@ -1,0 +1,35 @@
+import Asset from "Assets/Asset";
+import FontWithPosition from "Assets/Fonts/FontWithPosition";
+import GameManager from "GameManager";
+type PopupAssets = Asset | FontWithPosition;
+export default class Popup {
+    gameManager: GameManager;
+    isOpen: boolean;
+    associatedAssets: PopupAssets[];
+    private savedMusicVolume;
+    private pausedAnimationIds;
+    private pausedAssetIds;
+    private pausedShaderIds;
+    private pausedSources;
+    private pausedTextIds;
+    private popupBackground;
+    constructor(gameManager: GameManager);
+    open(associatedAssets: PopupAssets[]): void;
+    close(): void;
+    buildCaches(): void;
+    pauseAllAnimations(): void;
+    pauseAllShaders(): void;
+    disableAllAssets(): void;
+    disableAllText(): void;
+    lowerMusicVolume(): void;
+    restoreMusicVolume(): void;
+    resumeAllAnimations(): void;
+    resumeAllShaders(): void;
+    enableAllAssets(): void;
+    enableAllText(): void;
+    playPausedSounds(): void;
+    drawPopup(): void;
+    handleMousePressed(x: number, y: number, button: number): boolean;
+    handleMouseReleased(x: number, y: number, button: number): boolean;
+}
+export {};

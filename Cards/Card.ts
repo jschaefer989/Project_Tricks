@@ -6,7 +6,7 @@ import FontWithPosition from "Assets/Fonts/FontWithPosition";
 import IconAsset from "Assets/IconAsset";
 import GameManager from "GameManager";
 import { exhaustiveGuard, isEmpty } from "Helpers";
-import { AnimationIds, AssetIds, Ranks, Suits, TextIds } from "../Enums";
+import { AssetIds, Ranks, Suits, TextIds } from "../Enums";
 
 export interface CardData {
   id: string;
@@ -52,7 +52,7 @@ export default abstract class Card {
     rankAssetPath: string,
     edelConstructionOptions?: EdelConstructionOptions
   ) {
-    this.id = `${suit}_${rank}_${love.math.random(1000)}`;
+    this.id = `CARD_${suit}_${rank}_${love.math.random(1000)}`;
     this.gameManager = gameManager;
     this.suit = suit;
     this.rank = rank;
@@ -128,8 +128,8 @@ export default abstract class Card {
       this.gameManager.board?.cardAssets.getCardAssetList(this);
 
     this.gameManager.animationManager.startAnimation(
-      AnimationIds.CARD_SELECT + this.id,
-      new SlideAnimation(0.15, 0, -20, slideAssets)
+      this.id,
+      new SlideAnimation(this.gameManager, this.id, 0.15, 0, -20, slideAssets)
     );
 
     this.gameManager.board?.updatePrimaryButtonStates();
@@ -149,8 +149,8 @@ export default abstract class Card {
       this.gameManager.board?.cardAssets.getCardAssetList(this);
 
     this.gameManager.animationManager.startAnimation(
-      AnimationIds.CARD_SELECT + this.id,
-      new SlideAnimation(0.15, 0, 20, slideAssets)
+      this.id,
+      new SlideAnimation(this.gameManager, this.id, 0.15, 0, 20, slideAssets)
     );
 
     this.gameManager.board?.updatePrimaryButtonStates();

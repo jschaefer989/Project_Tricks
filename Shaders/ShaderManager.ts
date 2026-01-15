@@ -20,6 +20,10 @@ export default class ShaderManager {
 
   updateShaders(dt: number): void {
     for (const [id, shader] of this.shaders) {
+      if (shader.isPaused) {
+        continue;
+      }
+
       shader.updateShader(dt);
       if (shader.isFinished) {
         this.shaders.delete(id);

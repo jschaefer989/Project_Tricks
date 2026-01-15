@@ -13,8 +13,14 @@ ____exports.default = __TS__Class()
 local GlowAnimation = ____exports.default
 GlowAnimation.name = "GlowAnimation"
 __TS__ClassExtends(GlowAnimation, Animation)
-function GlowAnimation.prototype.____constructor(self, stopCondition, assets, constructionOptions)
-    Animation.prototype.____constructor(self, assets, constructionOptions)
+function GlowAnimation.prototype.____constructor(self, gameManager, id, stopCondition, assets, constructionOptions)
+    Animation.prototype.____constructor(
+        self,
+        gameManager,
+        id,
+        assets,
+        constructionOptions
+    )
     self.originalColors = __TS__New(Map)
     self.glowStrength = 2
     self.pulsePeriod = 1.5

@@ -2,6 +2,7 @@ import { isEmpty } from "Helpers";
 import Asset from "../Asset";
 import FontWithPosition from "Assets/Fonts/FontWithPosition";
 import { Source } from "love.audio";
+import GameManager from "GameManager";
 
 export interface AnimationOptions {
   readonly animDuration?: number;
@@ -14,9 +15,12 @@ export interface AnimationOptions {
 export type AnimationAssets = Asset | FontWithPosition;
 
 export default abstract class Animation {
+  gameManager: GameManager;
+  id: string;
   animDuration?: number;
   animElapsed = 0;
   isAnimating = false;
+  hasStarted = false;
   assets: AnimationAssets[];
   originalX: Map<string, number> = new Map<string, number>();
   originalY: Map<string, number> = new Map<string, number>();
@@ -24,12 +28,17 @@ export default abstract class Animation {
   waitForAnimationIds: string[];
   stopAnimationCondition?: () => boolean;
   soundToPlay?: Source;
-  playedSound: boolean = false;
+  playedSound = false;
+  isPaused = false;
 
   constructor(
+    gameManager: GameManager,
+    id: string,
     assets: AnimationAssets[],
     constructionOptions?: AnimationOptions
   ) {
+    this.gameManager = gameManager;
+    this.id = id;
     this.animDuration = constructionOptions?.animDuration;
     this.animElapsed = 0;
     this.isAnimating = true;
@@ -43,6 +52,8 @@ export default abstract class Animation {
   }
 
   updateAnimation(deltaTime: number): void {
+    this.hasStarted = true;
+
     if (!this.isAnimating) {
       return;
     }
@@ -54,7 +65,7 @@ export default abstract class Animation {
 
     this.animElapsed += deltaTime;
 
-    if (!isEmpty(this.animDuration) &&this.animElapsed >= this.animDuration) {
+    if (!isEmpty(this.animDuration) && this.animElapsed >= this.animDuration) {
       // Animation complete
       this.animElapsed = this.animDuration;
       this.isAnimating = false;
@@ -85,5 +96,26 @@ export default abstract class Animation {
         asset.y = originalY + deltaY;
       }
     });
+  }
+
+  shouldWaitForAnimations(): boolean {
+    if (this.waitForAnimationIds.length > 0) {
+      for (const waitId of this.waitForAnimationIds) {
+        if (waitId === this.id) {
+          continue;
+        }
+
+        const waitForAnimation =
+          this.gameManager.animationManager.animations.get(waitId);
+        if (
+          !isEmpty(waitForAnimation) &&
+          !waitForAnimation.isFinished &&
+          waitForAnimation.hasStarted
+        ) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }

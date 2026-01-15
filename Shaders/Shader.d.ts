@@ -10,6 +10,7 @@ export default class Shader {
     isShading: boolean;
     elapsedTime: number;
     shader: LoveShader;
+    isPaused: boolean;
     constructor(gameManager: GameManager, shader: LoveShader, stopCondition: () => boolean, assets: ShaderAssets[]);
     updateShader(deltaTime: number): void;
     get isFinished(): boolean;

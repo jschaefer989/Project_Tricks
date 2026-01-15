@@ -33,7 +33,7 @@ export default class Dealer {
     startDiscardAnimation(characterType: CharacterTypes, cards: Card[]): void;
     private getDiscardPosition;
     startReturnToDeckAnimation(characterType: CharacterTypes, cards: Card[], onFinish?: () => void): void;
-    finishUpAnimation(card: Card, onFinish?: () => void): void;
+    finishUpRemoveCardAnimation(card: Card, onFinish?: () => void): void;
     initializeEnemyDeck(): void;
     determineEdelSuit(): void;
     getLootCards(): Card[];

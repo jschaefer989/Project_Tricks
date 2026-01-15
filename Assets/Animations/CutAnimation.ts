@@ -2,18 +2,21 @@ import Asset from "Assets/Asset";
 import { AnimationAssets, AnimationOptions } from "./Animation";
 import SlideAnimation from "./SlideAnimation";
 import QuadWithPosition from "Assets/QuadWithPosition";
+import GameManager from "GameManager";
 
 export default class CutAnimation extends SlideAnimation {
     topQuads: QuadWithPosition[] = []
 
   constructor(
+    gameMangager: GameManager,
+    id: string,
     animDuration: number,
     offsetX: number,
     offsetY: number,
     animationAssets: AnimationAssets[],
     constructionOptions?: AnimationOptions
   ) {
-    super(animDuration, offsetX, offsetY, animationAssets, constructionOptions);
+    super(gameMangager, id, animDuration, offsetX, offsetY, animationAssets, constructionOptions);
 
     for (const asset of this.assets) {
         if (!(asset instanceof Asset)) {

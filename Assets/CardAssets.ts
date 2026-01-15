@@ -33,9 +33,10 @@ export default class CardAssets {
     onHover: (asset: Asset) => card.onHover(asset),
     onUnhover: (asset: Asset) => card.onUnhover(asset),
     clickSound: includeClickHandler ? this.cardClick : undefined,
-    hoverSound: includeClickHandler ? this.hoverSound : undefined,
-    isDisabled: true, // Disabled by default, enabled after animations complete
+    hoverSound: includeClickHandler ? this.hoverSound : undefined,    
+    isDisabled: true, // Start disabled and enable when animations finish
     useDisabledAnimation: false,
+    showDisabledColor: false,
   });
 
   constructor(gameManager: GameManager, board: Board) {

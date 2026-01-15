@@ -21,10 +21,16 @@ function ShaderManager.prototype.updateShaders(self, dt)
     for ____, ____value in __TS__Iterator(self.shaders) do
         local id = ____value[1]
         local shader = ____value[2]
-        shader:updateShader(dt)
-        if shader.isFinished then
-            self.shaders:delete(id)
+        do
+            if shader.isPaused then
+                goto __continue6
+            end
+            shader:updateShader(dt)
+            if shader.isFinished then
+                self.shaders:delete(id)
+            end
         end
+        ::__continue6::
     end
 end
 function ShaderManager.prototype.applyShaders(self, asset)

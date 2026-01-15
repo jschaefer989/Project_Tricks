@@ -10,6 +10,9 @@ import QuadWithPosition from "./QuadWithPosition";
 
 export type AssetCallback = (asset: Asset) => void;
 
+const disabledColor: [number, number, number, number] = [0.5, 0.5, 0.5, 1];
+const normalColor: [number, number, number, number] = [1, 1, 1, 1];
+
 export interface ConstructionOptions {
   readonly onClick?: () => void;
   readonly onHover?: AssetCallback;
@@ -22,6 +25,7 @@ export interface ConstructionOptions {
   readonly quads?: QuadWithPosition[];
   readonly isDisabled?: boolean;
   readonly useDisabledAnimation?: boolean;
+  readonly showDisabledColor?: boolean;
   readonly clickSound?: Source;
   readonly hoverSound?: Source;
   readonly associatedTexts?: FontWithPosition[];
@@ -48,6 +52,7 @@ export default class Asset {
   quads: QuadWithPosition[] = [];
   isDisabled = false;
   useDisabledAnimation = true;
+  showDisabledColor = true;
   isHovered = false;
   isPressed = false;
   color: [number, number, number, number] = [1, 1, 1, 1];
@@ -87,6 +92,8 @@ export default class Asset {
     this.isDisabled = constructionOptions?.isDisabled ?? false;
     this.useDisabledAnimation =
       constructionOptions?.useDisabledAnimation ?? true;
+    this.showDisabledColor =
+      constructionOptions?.showDisabledColor ?? true;
     this.clickSound = constructionOptions?.clickSound;
     this.hoverSound = constructionOptions?.hoverSound;
     this.associatedTexts = constructionOptions?.associatedTexts;
@@ -141,6 +148,7 @@ export default class Asset {
   }
 
   setHovered(hovered: boolean): void {
+    if (this.gameManager.assetManager.universallyDisabled) return;
     this.isHovered = hovered;
     this.handleHoverEffects(hovered);
   }
@@ -174,6 +182,7 @@ export default class Asset {
 
   setMousePressed(pressed: boolean): void {
     const wasPressed = this.isPressed;
+    if (this.gameManager.assetManager.universallyDisabled && !wasPressed) return;
     this.isPressed = pressed;
     this.handleMousePressEffects(pressed, wasPressed);
   }
@@ -199,20 +208,40 @@ export default class Asset {
     }
   }
 
-  setDisabled(disabled: boolean): void {
-    this.isDisabled = disabled;
-    this.setColor();
+  setDisabled(disabled: boolean, options?: DisabledAssetOptions): void {
+    this.isDisabled = disabled;    
+    this.useDisabledAnimation = options?.useDisabledAnimation ?? true;
+
+    if (disabled) {
+      if (!this.showDisabledColor && !options?.showDisabledColor) {
+        return;
+      }
+
+      this.color = disabledColor;
+      if (!isEmpty(this.associatedTexts)) {
+        for (const text of this.associatedTexts) {
+          text.setDisabled(true);
+        }
+      }
+    } else {
+      this.color = normalColor;
+      if (!isEmpty(this.associatedTexts)) {
+        for (const text of this.associatedTexts) {
+          text.setDisabled(false);
+        }
+      }
+    }
   }
 
   setColor(): void {
     if (this.isDisabled) {
-      this.color = [0.5, 0.5, 0.5, 1];
+      this.color = disabledColor;
     } else if (this.isPressed) {
       this.color = [0.7, 0.6, 0.4, 1];
     } else if (this.isHovered) {
       this.color = [1, 0.9, 0.7, 1];
     } else {
-      this.color = [1, 1, 1, 1];
+      this.color = normalColor;
     }
   }
 
@@ -305,9 +334,8 @@ export default class Asset {
   }
 
   private shimmer(hovered: boolean): void {
-    if (!hovered) {
-      return;
-    }    
+    if (!hovered) return;
+    
     this.gameManager.shaderManager.addShader(
       this.id,
       new ShimmerShader(this.gameManager, () => !this.isHovered, [this])
@@ -315,16 +343,27 @@ export default class Asset {
   }
 
   private wobble(hovered: boolean): void {
-    if (!hovered) {
-      return;
-    }
+    if (!hovered) return;
     
-    const wobbleId = `wobble-hover-${this.id}`;
-    if (!this.gameManager.animationManager.animations.has(wobbleId)) {
+    if (!this.gameManager.animationManager.animations.has(this.id)) {
       this.gameManager.animationManager.startAnimation(
-        wobbleId,
-        new WobbleAnimation(0.2, 2, [this])
+        this.id,
+        new WobbleAnimation(this.gameManager, this.id, 0.2, 2, [this])
       );
     }
   }
+
+  inAssetBounds(gameX: number, gameY: number): boolean {
+    return (
+      gameX >= this.x &&
+      gameX <= this.x + this.getWidth() &&
+      gameY >= this.y &&
+      gameY <= this.y + this.getHeight()
+    );
+  }
+}
+
+interface DisabledAssetOptions {
+  readonly useDisabledAnimation?: boolean;
+  readonly showDisabledColor?: boolean;
 }

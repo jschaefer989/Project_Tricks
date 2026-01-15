@@ -21,7 +21,6 @@ import { Image } from "love.graphics";
 import ShimmerShader from "Shaders/ShimmerShader";
 import Dealer from "../Dealer";
 import {
-  AnimationIds,
   AssetIds,
   CharacterTypes,
   GameStates,
@@ -118,7 +117,7 @@ export default class Board {
       TextIds.LETS_FIGHT_BUTTON_CAPTION
     );
 
-    this.gameManager.board?.cardAssets.disableAllCards(true);
+    this.gameManager.assetManager.disableAllClickableAssets(true);
     this.dealer.dealHandAtStartOfFight();
     this.hideEdelBoard();
   }
@@ -133,12 +132,8 @@ export default class Board {
   handleAttack(): void {
     if (!this.gameManager.player.anySelectedCards()) return;
 
-    this.gameManager.board?.cardAssets.disableAllCards(true);
-
-    if (this.enemy.deck.length === 0) {
-      this.endFight();
-      return;
-    }
+    this.gameManager.assetManager.disableAllClickableAssets(true);
+    this.disablePrimaryButtons(); // Manually disable primary buttons during attack
 
     if (this.playerPower > this.enemyPower) {
       // Mark all enemy cards as cut and update the assets
@@ -193,10 +188,18 @@ export default class Board {
     }
 
     this.gameManager.animationManager.startAnimation(
-      AnimationIds.CARD_CUT + card.id,
-      new CutAnimation(0.15, 0, -40, cutAnimationAssets, {
-        onFinish: () => this.startFlickerAnimation(card, winner, loser),
-      })
+      card.id + "_cut",
+      new CutAnimation(
+        this.gameManager,
+        card.id + "_cut",
+        0.15,
+        0,
+        -40,
+        cutAnimationAssets,
+        {
+          onFinish: () => this.startFlickerAnimation(card, winner, loser),
+        }
+      )
     );
 
     // Just slide the top suit, don't cut it
@@ -206,10 +209,15 @@ export default class Board {
     }
 
     this.gameManager.animationManager.startAnimation(
-      AnimationIds.CARD_SUIT_SLIDE + card.id,
-      new SlideAnimation(0.15, 0, -40, slideAnimationAssets, {
-        drawSeparately: true,
-      })
+      card.id + "_slide",
+      new SlideAnimation(
+        this.gameManager,
+        card.id + "_slide",
+        0.15,
+        0,
+        -40,
+        slideAnimationAssets,
+      )
     );
 
     // Leave the bottom suit where it is
@@ -221,11 +229,16 @@ export default class Board {
     loser: CharacterTypes
   ): void {
     this.gameManager.animationManager.startAnimation(
-      AnimationIds.CARD_FLICKER + card.id,
-      new FlickerAnimation(this.cardAssets.getCardAssetList(card), {
-        onFinish: () => this.wrapUpAttack(winner, loser),
-        animDuration: 0.6,
-      })
+      card.id,
+      new FlickerAnimation(
+        this.gameManager,
+        card.id,
+        this.cardAssets.getCardAssetList(card),
+        {
+          onFinish: () => this.wrapUpAttack(winner, loser),
+          animDuration: 0.6,
+        }
+      )
     );
   }
 
@@ -236,8 +249,12 @@ export default class Board {
 
     this.hideSlainCards(loser);
     this.addPoints(winner);
-    this.dealer.dealNextHand();
     this.clearEnemyStats();
+    if (this.enemy.deck.length === 0) {
+      this.endFight();
+    } else {
+      this.dealer.dealNextHand();
+    }
   }
 
   private hideSlainCards(characterType: CharacterTypes): void {
@@ -292,14 +309,17 @@ export default class Board {
       return; // wait for deal animations to finish
     }
 
+    this.gameManager.assetManager.disableAllClickableAssets(false);
     this.cardAssets.disableAllCards(false);
     this.buildLetsFightButton();
     this.buildEdelBoard();
 
     if (!isEmpty(this.edelCard)) {
       this.gameManager.animationManager.startAnimation(
-        AnimationIds.EDEL_CARD,
+        this.edelCard.id,
         new GlowAnimation(
+          this.gameManager,
+          this.edelCard.id,
           () => !this.gameManager.board?.showingEdelView,
           [...this.cardAssets.getCardAssetList(this.edelCard)],
           { glowPeriodSeconds: 3 }
@@ -323,6 +343,7 @@ export default class Board {
       return; // wait for deal animations to finish
     }
 
+    this.gameManager.assetManager.disableAllClickableAssets(false);
     this.cardAssets.disableAllCards(false);
     this.buildPrimaryButtons();
     this.buildPointBoard();
@@ -335,7 +356,8 @@ export default class Board {
     if (!this.gameManager.player.anySelectedCards()) return;
     if (this.getRemainingDiscards() <= 0) return;
 
-    this.gameManager.board?.cardAssets.disableAllCards(true);
+    this.gameManager.assetManager.disableAllClickableAssets(true);
+    this.disablePrimaryButtons(); // Manually disable primary buttons during discard
 
     const removedIndices = this.dealer.discardCards(
       CharacterTypes.PLAYER,
@@ -454,6 +476,7 @@ export default class Board {
     this.buildEnemyPortrait();
     this.buildDeck(CharacterTypes.PLAYER);
     this.buildDeck(CharacterTypes.ENEMY);
+    this.gameManager.assetManager.disableAllClickableAssets(true);
     this.dealer.dealEdel();
   }
 
@@ -520,9 +543,14 @@ export default class Board {
     const buttonX = Math.floor((push.getWidth() - totalW) / 2);
     this.buildAttackButton(buttonX, buttonY, btnW, btnH);
     const discardX = this.buildDiscardButton(buttonX, buttonY, btnW, btnH, gap);
-    const deselectX = this.buildDeselectButton(discardX, buttonY, btnW, btnH, gap);
+    const deselectX = this.buildDeselectButton(
+      discardX,
+      buttonY,
+      btnW,
+      btnH,
+      gap
+    );
     this.buildSortButton(deselectX, buttonY, btnW, btnH);
-
 
     // Disable buttons initially since no cards are selected
     this.updatePrimaryButtonStates();
@@ -698,10 +726,10 @@ export default class Board {
     deselectX: number,
     buttonY: number,
     btnW: number,
-    btnH: number,
+    btnH: number
   ): void {
     const centerX = deselectX + btnW / 2;
-    const centerY = buttonY + btnH / 4 + (btnH / 2) + 1;
+    const centerY = buttonY + btnH / 4 + btnH / 2 + 1;
     const sortButtonCaptionText = new FontWithPosition(
       TextIds.SORT_BUTTON_CAPTION,
       centerX,
@@ -728,7 +756,10 @@ export default class Board {
         btnW,
         btnH / 2,
         {
-          onClick: () => { this.gameManager.player.sortCards(); this.enemy.sortCards(); },
+          onClick: () => {
+            this.gameManager.player.sortCards();
+            this.enemy.sortCards();
+          },
           associatedTexts: [sortButtonCaptionText],
           hoverEffect: [HoverEffects.CHANGE_COLOR],
           mousePressEffect: [
@@ -745,21 +776,26 @@ export default class Board {
     const hasSelectedCards = this.gameManager.player.anySelectedCards();
 
     if (hasSelectedCards) {
-      this.enableAttackButton();
-      this.enableDiscardButton();
-      this.enableDeselectButton();
+      this.enablePrimaryButtons();
     } else {
-      this.disableAttackButton();
-      this.disableDiscardButton();
-      this.disableDeselectButton();
+      this.disablePrimaryButtons();
     }
+  }
+
+  enablePrimaryButtons(): void {
+    this.enableAttackButton();
+    this.enableDiscardButton();
+    this.enableDeselectButton();
+  }
+
+  disablePrimaryButtons(): void {
+    this.disableAttackButton();
+    this.disableDiscardButton();
+    this.disableDeselectButton();
   }
 
   enableAttackButton(): void {
     this.gameManager.assetManager.enableAsset(AssetIds.ATTACK_BUTTON);
-    this.gameManager.assetManager.textManager.enableText(
-      TextIds.ATTACK_BUTTON_CAPTION
-    );
   }
 
   enableDiscardButton(): void {
@@ -768,43 +804,22 @@ export default class Board {
     }
 
     this.gameManager.assetManager.enableAsset(AssetIds.DISCARD_BUTTON);
-    this.gameManager.assetManager.textManager.enableText(
-      TextIds.DISCARD_BUTTON_CAPTION
-    );
-    this.gameManager.assetManager.textManager.enableText(
-      TextIds.DISCARD_BUTTON_COUNTER
-    );
   }
 
   enableDeselectButton(): void {
     this.gameManager.assetManager.enableAsset(AssetIds.DESELECT_BUTTON);
-    this.gameManager.assetManager.textManager.enableText(
-      TextIds.DESELECT_BUTTON_CAPTION
-    );
   }
 
   disableAttackButton(): void {
     this.gameManager.assetManager.disableAsset(AssetIds.ATTACK_BUTTON);
-    this.gameManager.assetManager.textManager.disableText(
-      TextIds.ATTACK_BUTTON_CAPTION
-    );
   }
 
   disableDiscardButton(): void {
     this.gameManager.assetManager.disableAsset(AssetIds.DISCARD_BUTTON);
-    this.gameManager.assetManager.textManager.disableText(
-      TextIds.DISCARD_BUTTON_CAPTION
-    );
-    this.gameManager.assetManager.textManager.disableText(
-      TextIds.DISCARD_BUTTON_COUNTER
-    );
   }
 
   disableDeselectButton(): void {
     this.gameManager.assetManager.disableAsset(AssetIds.DESELECT_BUTTON);
-    this.gameManager.assetManager.textManager.disableText(
-      TextIds.DESELECT_BUTTON_CAPTION
-    );
   }
 
   private buildPointBoard(): void {
@@ -1140,15 +1155,15 @@ export default class Board {
     }
 
     const deckPosition = this.dealer.getDeckPosition(characterType);
-    this.gameManager.assetManager.addAsset(
+    const assetId =
       characterType === CharacterTypes.PLAYER
         ? AssetIds.PLAYER_DECK
-        : AssetIds.ENEMY_DECK,
+        : AssetIds.ENEMY_DECK;
+    this.gameManager.assetManager.addAsset(
+      assetId,
       new Asset(
         this.gameManager,
-        characterType === CharacterTypes.PLAYER
-          ? AssetIds.PLAYER_DECK
-          : AssetIds.ENEMY_DECK,
+        assetId,
         love.graphics.newImage("Assets/Images/BaseCardBack.png"),
         deckPosition.x,
         deckPosition.y,
@@ -1163,6 +1178,7 @@ export default class Board {
           mousePressEffect: [MousePressEffects.SHIFT_DOWN],
           clickSound: this.cardAssets.cardClick,
           hoverSound: this.cardAssets.hoverSound,
+          showDisabledColor: false,
         }
       )
     );

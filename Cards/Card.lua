@@ -13,7 +13,6 @@ local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
 local ____Enums = require("Enums")
-local AnimationIds = ____Enums.AnimationIds
 local AssetIds = ____Enums.AssetIds
 local Suits = ____Enums.Suits
 local TextIds = ____Enums.TextIds
@@ -22,7 +21,7 @@ local Card = ____exports.default
 Card.name = "Card"
 function Card.prototype.____constructor(self, gameManager, suit, rank, power, value, name, rankAssetPath, edelConstructionOptions)
     self.isSelected = false
-    self.id = (((suit .. "_") .. rank) .. "_") .. tostring(love.math.random(1000))
+    self.id = (((("CARD_" .. suit) .. "_") .. rank) .. "_") .. tostring(love.math.random(1000))
     self.gameManager = gameManager
     self.suit = suit
     self.rank = rank
@@ -86,9 +85,11 @@ function Card.prototype.onSelect(self)
     local ____opt_0 = self.gameManager.board
     local slideAssets = ____opt_0 and ____opt_0.cardAssets:getCardAssetList(self)
     self.gameManager.animationManager:startAnimation(
-        AnimationIds.CARD_SELECT .. self.id,
+        self.id,
         __TS__New(
             SlideAnimation,
+            self.gameManager,
+            self.id,
             0.15,
             0,
             -20,
@@ -110,9 +111,11 @@ function Card.prototype.onUnselect(self)
     local ____opt_4 = self.gameManager.board
     local slideAssets = ____opt_4 and ____opt_4.cardAssets:getCardAssetList(self)
     self.gameManager.animationManager:startAnimation(
-        AnimationIds.CARD_SELECT .. self.id,
+        self.id,
         __TS__New(
             SlideAnimation,
+            self.gameManager,
+            self.id,
             0.15,
             0,
             20,

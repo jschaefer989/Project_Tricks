@@ -1,5 +1,6 @@
 import Asset from "Assets/Asset";
 import Animation, { AnimationAssets, AnimationOptions } from "./Animation";
+import GameManager from "GameManager";
 
 export default class FlickerAnimation extends Animation {
   flickerInterval = 0.1; // Time between flickers
@@ -7,10 +8,12 @@ export default class FlickerAnimation extends Animation {
   maxFlickers = 6; // Total number of visibility toggles
 
   constructor(
+    gameManager: GameManager,
+    id: string,
     animationAssets: AnimationAssets[],
     constructionOptions?: AnimationOptions
   ) {
-    super(animationAssets, constructionOptions);
+    super(gameManager, id, animationAssets, constructionOptions);
   }
 
   updateAnimation(deltaTime: number): void {
@@ -28,7 +31,7 @@ export default class FlickerAnimation extends Animation {
 
     // Calculate how many flickers have occurred
     const currentFlickers = Math.floor(this.animElapsed / this.flickerInterval);
-    
+
     if (currentFlickers > this.flickerCount) {
       this.flickerCount = currentFlickers;
       // Toggle visibility on each flicker

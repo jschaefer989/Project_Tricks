@@ -13,7 +13,6 @@ local ____CardGenerator = require("Cards.CardGenerator")
 local CardGenerator = ____CardGenerator.default
 local push = require("Libraries.push")
 local ____Enums = require("Enums")
-local AnimationIds = ____Enums.AnimationIds
 local AssetIds = ____Enums.AssetIds
 local CharacterTypes = ____Enums.CharacterTypes
 local Ranks = ____Enums.Ranks
@@ -53,7 +52,7 @@ function Dealer.prototype.dealHandAtStartOfFight(self)
     )
 end
 function Dealer.prototype.dealAtStartOfFightForCharacter(self, character)
-    self.board.cardAssets:disableAllCards(true)
+    self.gameManager.assetManager:disableAllClickableAssets(true)
     ____exports.default:shuffle(self.gameManager, character)
     self:dealCards(character)
     if character == CharacterTypes.ENEMY then
@@ -161,16 +160,23 @@ end
 function Dealer.prototype.redrawDeck(self, characterType)
     repeat
         local ____switch31 = characterType
+        local playerDeck, enemyDeck
         local ____cond31 = ____switch31 == CharacterTypes.PLAYER
         if ____cond31 then
+            playerDeck = self.gameManager.assetManager:getAsset(AssetIds.PLAYER_DECK, AssetIds.PLAYER_DECK)
             self.gameManager.assetManager:removeAssets(AssetIds.PLAYER_DECK)
-            self.board:buildDeck(CharacterTypes.PLAYER)
+            if not isEmpty(playerDeck) then
+                self.gameManager.assetManager:addAsset(AssetIds.PLAYER_DECK, playerDeck)
+            end
             break
         end
         ____cond31 = ____cond31 or ____switch31 == CharacterTypes.ENEMY
         if ____cond31 then
+            enemyDeck = self.gameManager.assetManager:getAsset(AssetIds.ENEMY_DECK, AssetIds.ENEMY_DECK)
             self.gameManager.assetManager:removeAssets(AssetIds.ENEMY_DECK)
-            self.board:buildDeck(CharacterTypes.ENEMY)
+            if not isEmpty(enemyDeck) then
+                self.gameManager.assetManager:addAsset(AssetIds.ENEMY_DECK, enemyDeck)
+            end
             break
         end
         do
@@ -189,13 +195,13 @@ function Dealer.prototype.discardCards(self, characterType, cards)
 end
 function Dealer.prototype.discardForCharacter(self, characterType)
     repeat
-        local ____switch35 = characterType
-        local ____cond35 = ____switch35 == CharacterTypes.PLAYER
-        if ____cond35 then
+        local ____switch37 = characterType
+        local ____cond37 = ____switch37 == CharacterTypes.PLAYER
+        if ____cond37 then
             return self.gameManager.player:discard()
         end
-        ____cond35 = ____cond35 or ____switch35 == CharacterTypes.ENEMY
-        if ____cond35 then
+        ____cond37 = ____cond37 or ____switch37 == CharacterTypes.ENEMY
+        if ____cond37 then
             return self.board.enemy:discard() or ({})
         end
         do
@@ -217,13 +223,13 @@ function Dealer.prototype.getDeckPosition(self, characterType)
     local screenH = push:getHeight()
     local portraitPosition = self.board:getPortraitPosition(characterType)
     repeat
-        local ____switch38 = characterType
-        local ____cond38 = ____switch38 == CharacterTypes.PLAYER
-        if ____cond38 then
+        local ____switch40 = characterType
+        local ____cond40 = ____switch40 == CharacterTypes.PLAYER
+        if ____cond40 then
             return {x = screenW - cardWidth - 5, y = portraitPosition or screenH - 5}
         end
-        ____cond38 = ____cond38 or ____switch38 == CharacterTypes.ENEMY
-        if ____cond38 then
+        ____cond40 = ____cond40 or ____switch40 == CharacterTypes.ENEMY
+        if ____cond40 then
             return {x = screenW - cardWidth - 5, y = portraitPosition or 5}
         end
         do
@@ -249,9 +255,11 @@ function Dealer.prototype.startDealAnimation(self, characterType, card, targetX,
     local offsetX = targetX - startX
     local offsetY = targetY - startY
     self.gameManager.animationManager:startAnimation(
-        AnimationIds.CARD_DEAL .. card.id,
+        card.id,
         __TS__New(
             SlideAnimation,
+            self.gameManager,
+            card.id,
             self.gameManager.settings.dealerSpeed,
             offsetX,
             offsetY,
@@ -277,7 +285,9 @@ function Dealer.prototype.finishDeal(self, characterType)
     if self.gameManager.animationManager:hasAnimations() then
         return
     end
+    self.gameManager.assetManager:disableAllClickableAssets(false)
     self.board.cardAssets:disableAllCards(false)
+    self.board:updatePrimaryButtonStates()
     if characterType == CharacterTypes.ENEMY then
         self.board:tallyEnemyPowerAndValue()
     end
@@ -292,15 +302,17 @@ function Dealer.prototype.startDiscardAnimation(self, characterType, cards)
         local offsetX = 0
         local offsetY = targetY - startY
         self.gameManager.animationManager:startAnimation(
-            AnimationIds.CARD_DISCARD .. card.id,
+            card.id,
             __TS__New(
                 SlideAnimation,
+                self.gameManager,
+                card.id,
                 self.gameManager.settings.dealerSpeed,
                 offsetX,
                 offsetY,
                 slideAssets,
                 {
-                    onFinish = function() return self:finishUpAnimation(card) end,
+                    onFinish = function() return self:finishUpRemoveCardAnimation(card) end,
                     waitForAnimationIds = self.gameManager.animationManager:getCardAnimationIds()
                 }
             )
@@ -310,13 +322,13 @@ end
 function Dealer.prototype.getDiscardPosition(self, characterType)
     local screenH = push:getHeight()
     repeat
-        local ____switch56 = characterType
-        local ____cond56 = ____switch56 == CharacterTypes.PLAYER
-        if ____cond56 then
+        local ____switch58 = characterType
+        local ____cond58 = ____switch58 == CharacterTypes.PLAYER
+        if ____cond58 then
             return screenH + cardHeight + 40
         end
-        ____cond56 = ____cond56 or ____switch56 == CharacterTypes.ENEMY
-        if ____cond56 then
+        ____cond58 = ____cond58 or ____switch58 == CharacterTypes.ENEMY
+        if ____cond58 then
             return -cardHeight - 40
         end
         do
@@ -335,15 +347,17 @@ function Dealer.prototype.startReturnToDeckAnimation(self, characterType, cards,
         local offsetX = deckPosition.x - startX
         local offsetY = deckPosition.y - startY
         self.gameManager.animationManager:startAnimation(
-            AnimationIds.CARD_RETURN_TO_DECK .. card.id,
+            card.id,
             __TS__New(
                 SlideAnimation,
+                self.gameManager,
+                card.id,
                 self.gameManager.settings.dealerSpeed,
                 offsetX,
                 offsetY,
                 slideAssets,
                 {
-                    onFinish = function() return self:finishUpAnimation(card, onFinish) end,
+                    onFinish = function() return self:finishUpRemoveCardAnimation(card, onFinish) end,
                     waitForAnimationIds = self.gameManager.animationManager:getCardAnimationIds(),
                     soundToPlay = self.dealSound
                 }
@@ -351,10 +365,12 @@ function Dealer.prototype.startReturnToDeckAnimation(self, characterType, cards,
         )
     end
 end
-function Dealer.prototype.finishUpAnimation(self, card, onFinish)
+function Dealer.prototype.finishUpRemoveCardAnimation(self, card, onFinish)
     self.board.cardAssets:removeCardAssets(card)
     if not self.gameManager.animationManager:hasAnimations() then
+        self.gameManager.assetManager:disableAllClickableAssets(false)
         self.board.cardAssets:disableAllCards(false)
+        self.board:updatePrimaryButtonStates()
         if onFinish ~= nil then
             onFinish()
         end

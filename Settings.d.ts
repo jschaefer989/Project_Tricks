@@ -3,6 +3,8 @@ declare enum WindowOptions {
     WINDOWED = "WINDOWED",
     FULLSCREEN = "FULLSCREEN"
 }
+export declare const gameWidth = 640;
+export declare const gameHeight = 360;
 export default class Settings {
     playMusic: boolean;
     playSoundEffects: boolean;

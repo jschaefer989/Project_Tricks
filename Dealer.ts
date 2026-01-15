@@ -6,7 +6,7 @@ import Card from "Cards/Card";
 import CardGenerator from "Cards/CardGenerator";
 import * as push from "Libraries.push";
 import Board from "Screens/Board";
-import { AnimationIds, AssetIds, CharacterTypes, Ranks, Suits } from "./Enums";
+import { AssetIds, CharacterTypes, Ranks, Suits } from "./Enums";
 import GameManager from "./GameManager";
 import { exhaustiveGuard, getRandomElementFromArray, isEmpty } from "./Helpers";
 import Point from "./Point";
@@ -49,7 +49,7 @@ export default class Dealer {
   }
 
   dealAtStartOfFightForCharacter(character: CharacterTypes): void {
-    this.board.cardAssets.disableAllCards(true);
+    this.gameManager.assetManager.disableAllClickableAssets(true);
     Dealer.shuffle(this.gameManager, character);
     this.dealCards(character);
 
@@ -180,12 +180,30 @@ export default class Dealer {
   redrawDeck(characterType: CharacterTypes): void {
     switch (characterType) {
       case CharacterTypes.PLAYER:
+        const playerDeck = this.gameManager.assetManager.getAsset(
+          AssetIds.PLAYER_DECK,
+          AssetIds.PLAYER_DECK
+        );
         this.gameManager.assetManager.removeAssets(AssetIds.PLAYER_DECK);
-        this.board.buildDeck(CharacterTypes.PLAYER);
+        if (!isEmpty(playerDeck)) {
+          this.gameManager.assetManager.addAsset(
+            AssetIds.PLAYER_DECK,
+            playerDeck
+          );
+        }
         break;
       case CharacterTypes.ENEMY:
+        const enemyDeck = this.gameManager.assetManager.getAsset(
+          AssetIds.ENEMY_DECK,
+          AssetIds.ENEMY_DECK
+        );
         this.gameManager.assetManager.removeAssets(AssetIds.ENEMY_DECK);
-        this.board.buildDeck(CharacterTypes.ENEMY);
+        if (!isEmpty(enemyDeck)) {
+          this.gameManager.assetManager.addAsset(
+            AssetIds.ENEMY_DECK,
+            enemyDeck
+          );
+        }
         break;
       default:
         exhaustiveGuard(characterType);
@@ -283,8 +301,10 @@ export default class Dealer {
     const offsetY = targetY - startY;
 
     this.gameManager.animationManager.startAnimation(
-      AnimationIds.CARD_DEAL + card.id,
+      card.id,
       new SlideAnimation(
+        this.gameManager,
+        card.id,
         this.gameManager.settings.dealerSpeed,
         offsetX,
         offsetY,
@@ -316,7 +336,9 @@ export default class Dealer {
     if (this.gameManager.animationManager.hasAnimations()) {
       return;
     }
+    this.gameManager.assetManager.disableAllClickableAssets(false);
     this.board.cardAssets.disableAllCards(false);
+    this.board.updatePrimaryButtonStates();
     if (characterType === CharacterTypes.ENEMY) {
       this.board.tallyEnemyPowerAndValue();
     }
@@ -334,14 +356,16 @@ export default class Dealer {
       const offsetY = targetY - startY;
 
       this.gameManager.animationManager.startAnimation(
-        AnimationIds.CARD_DISCARD + card.id,
+        card.id,
         new SlideAnimation(
+          this.gameManager,
+          card.id,
           this.gameManager.settings.dealerSpeed,
           offsetX,
           offsetY,
           slideAssets,
           {
-            onFinish: () => this.finishUpAnimation(card),
+            onFinish: () => this.finishUpRemoveCardAnimation(card),
             waitForAnimationIds:
               this.gameManager.animationManager.getCardAnimationIds(),
           }
@@ -379,28 +403,32 @@ export default class Dealer {
       const offsetY = deckPosition.y - startY;
 
       this.gameManager.animationManager.startAnimation(
-        AnimationIds.CARD_RETURN_TO_DECK + card.id,
+        card.id,
         new SlideAnimation(
+          this.gameManager, 
+          card.id,
           this.gameManager.settings.dealerSpeed,
           offsetX,
           offsetY,
           slideAssets,
           {
-            onFinish: () => this.finishUpAnimation(card, onFinish),
+            onFinish: () => this.finishUpRemoveCardAnimation(card, onFinish),
             waitForAnimationIds:
               this.gameManager.animationManager.getCardAnimationIds(),
-              soundToPlay: this.dealSound,
+            soundToPlay: this.dealSound,
           }
         )
       );
     }
   }
 
-  finishUpAnimation(card: Card, onFinish?: () => void): void {
+  finishUpRemoveCardAnimation(card: Card, onFinish?: () => void): void {
     this.board.cardAssets.removeCardAssets(card);
 
     if (!this.gameManager.animationManager.hasAnimations()) {
+      this.gameManager.assetManager.disableAllClickableAssets(false);
       this.board.cardAssets.disableAllCards(false);
+      this.board.updatePrimaryButtonStates();
       onFinish?.();
     }
   }

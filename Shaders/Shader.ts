@@ -12,6 +12,7 @@ export default class Shader {
     isShading: boolean = true;
     elapsedTime = 0;
     shader: LoveShader;
+    isPaused = false;
     
     constructor(gameManager: GameManager, shader: LoveShader, stopCondition: () => boolean, assets: ShaderAssets[]) {
         this.gameManager = gameManager;

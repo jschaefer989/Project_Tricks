@@ -37,7 +37,6 @@ local ShimmerShader = ____ShimmerShader.default
 local ____Dealer = require("Dealer")
 local Dealer = ____Dealer.default
 local ____Enums = require("Enums")
-local AnimationIds = ____Enums.AnimationIds
 local AssetIds = ____Enums.AssetIds
 local CharacterTypes = ____Enums.CharacterTypes
 local GameStates = ____Enums.GameStates
@@ -112,10 +111,7 @@ function Board.prototype.handleStartFight(self)
     self.showingEdelView = false
     self.gameManager.assetManager:removeAssets(AssetIds.LETS_FIGHT_BUTTON)
     self.gameManager.assetManager.textManager:hideText(TextIds.LETS_FIGHT_BUTTON_CAPTION)
-    local ____opt_1 = self.gameManager.board
-    if ____opt_1 ~= nil then
-        ____opt_1.cardAssets:disableAllCards(true)
-    end
+    self.gameManager.assetManager:disableAllClickableAssets(true)
     self.dealer:dealHandAtStartOfFight()
     self:hideEdelBoard()
 end
@@ -129,14 +125,8 @@ function Board.prototype.handleAttack(self)
     if not self.gameManager.player:anySelectedCards() then
         return
     end
-    local ____opt_3 = self.gameManager.board
-    if ____opt_3 ~= nil then
-        ____opt_3.cardAssets:disableAllCards(true)
-    end
-    if #self.enemy.deck == 0 then
-        self:endFight()
-        return
-    end
+    self.gameManager.assetManager:disableAllClickableAssets(true)
+    self:disablePrimaryButtons()
     if self.playerPower > self.enemyPower then
         for ____, card in ipairs(self:getSlainCards(CharacterTypes.ENEMY)) do
             self.cardAssets:redrawCard(card)
@@ -152,16 +142,16 @@ function Board.prototype.handleAttack(self)
 end
 function Board.prototype.getSlainCards(self, characterType)
     repeat
-        local ____switch21 = characterType
-        local ____cond21 = ____switch21 == CharacterTypes.PLAYER
-        if ____cond21 then
+        local ____switch20 = characterType
+        local ____cond20 = ____switch20 == CharacterTypes.PLAYER
+        if ____cond20 then
             return __TS__ArrayFilter(
                 self.gameManager.player.hand,
                 function(____, card) return card.isSelected end
             )
         end
-        ____cond21 = ____cond21 or ____switch21 == CharacterTypes.ENEMY
-        if ____cond21 then
+        ____cond20 = ____cond20 or ____switch20 == CharacterTypes.ENEMY
+        if ____cond20 then
             return self.enemy.hand
         end
         do
@@ -170,10 +160,10 @@ function Board.prototype.getSlainCards(self, characterType)
     until true
 end
 function Board.prototype.startCutAnimation(self, card, winner, loser)
-    local ____temp_5 = self.cardAssets:getCardAssets(card)
-    local baseAsset = ____temp_5.baseAsset
-    local suitAssets = ____temp_5.suitAssets
-    local rankAsset = ____temp_5.rankAsset
+    local ____temp_1 = self.cardAssets:getCardAssets(card)
+    local baseAsset = ____temp_1.baseAsset
+    local suitAssets = ____temp_1.suitAssets
+    local rankAsset = ____temp_1.rankAsset
     local normalSuitAsset = suitAssets[1]
     local cutAnimationAssets = {}
     if not isEmpty(baseAsset) then
@@ -183,9 +173,11 @@ function Board.prototype.startCutAnimation(self, card, winner, loser)
         cutAnimationAssets[#cutAnimationAssets + 1] = rankAsset
     end
     self.gameManager.animationManager:startAnimation(
-        AnimationIds.CARD_CUT .. card.id,
+        card.id .. "_cut",
         __TS__New(
             CutAnimation,
+            self.gameManager,
+            card.id .. "_cut",
             0.15,
             0,
             -40,
@@ -198,22 +190,25 @@ function Board.prototype.startCutAnimation(self, card, winner, loser)
         slideAnimationAssets[#slideAnimationAssets + 1] = normalSuitAsset
     end
     self.gameManager.animationManager:startAnimation(
-        AnimationIds.CARD_SUIT_SLIDE .. card.id,
+        card.id .. "_slide",
         __TS__New(
             SlideAnimation,
+            self.gameManager,
+            card.id .. "_slide",
             0.15,
             0,
             -40,
-            slideAnimationAssets,
-            {drawSeparately = true}
+            slideAnimationAssets
         )
     )
 end
 function Board.prototype.startFlickerAnimation(self, card, winner, loser)
     self.gameManager.animationManager:startAnimation(
-        AnimationIds.CARD_FLICKER .. card.id,
+        card.id,
         __TS__New(
             FlickerAnimation,
+            self.gameManager,
+            card.id,
             self.cardAssets:getCardAssetList(card),
             {
                 onFinish = function() return self:wrapUpAttack(winner, loser) end,
@@ -228,8 +223,12 @@ function Board.prototype.wrapUpAttack(self, winner, loser)
     end
     self:hideSlainCards(loser)
     self:addPoints(winner)
-    self.dealer:dealNextHand()
     self:clearEnemyStats()
+    if #self.enemy.deck == 0 then
+        self:endFight()
+    else
+        self.dealer:dealNextHand()
+    end
 end
 function Board.prototype.hideSlainCards(self, characterType)
     for ____, card in ipairs(self:getSlainCards(characterType)) do
@@ -255,14 +254,14 @@ function Board.prototype.getAllCardsInPlay(self)
 end
 function Board.prototype.addPoints(self, winner)
     repeat
-        local ____switch42 = winner
-        local ____cond42 = ____switch42 == CharacterTypes.PLAYER
-        if ____cond42 then
+        local ____switch43 = winner
+        local ____cond43 = ____switch43 == CharacterTypes.PLAYER
+        if ____cond43 then
             self:addPlayerPoints(self:getPlayerPoints())
             break
         end
-        ____cond42 = ____cond42 or ____switch42 == CharacterTypes.ENEMY
-        if ____cond42 then
+        ____cond43 = ____cond43 or ____switch43 == CharacterTypes.ENEMY
+        if ____cond43 then
             self:addEnemyPoints(self:getEnemyPoints())
             break
         end
@@ -282,24 +281,27 @@ function Board.prototype.displayEdel(self)
     if self.gameManager.animationManager:hasAnimations() then
         return
     end
+    self.gameManager.assetManager:disableAllClickableAssets(false)
     self.cardAssets:disableAllCards(false)
     self:buildLetsFightButton()
     self:buildEdelBoard()
     if not isEmpty(self.edelCard) then
         self.gameManager.animationManager:startAnimation(
-            AnimationIds.EDEL_CARD,
+            self.edelCard.id,
             __TS__New(
                 GlowAnimation,
+                self.gameManager,
+                self.edelCard.id,
                 function()
-                    local ____opt_6 = self.gameManager.board
-                    return not (____opt_6 and ____opt_6.showingEdelView)
+                    local ____opt_2 = self.gameManager.board
+                    return not (____opt_2 and ____opt_2.showingEdelView)
                 end,
                 {unpack(self.cardAssets:getCardAssetList(self.edelCard))},
                 {glowPeriodSeconds = 3}
             )
         )
-        local ____temp_8 = self.cardAssets:getCardAssets(self.edelCard)
-        local baseAsset = ____temp_8.baseAsset
+        local ____temp_4 = self.cardAssets:getCardAssets(self.edelCard)
+        local baseAsset = ____temp_4.baseAsset
         if not isEmpty(baseAsset) then
             self.gameManager.shaderManager:addShader(
                 baseAsset.id,
@@ -317,6 +319,7 @@ function Board.prototype.displayFight(self)
     if self.gameManager.animationManager:hasAnimations() then
         return
     end
+    self.gameManager.assetManager:disableAllClickableAssets(false)
     self.cardAssets:disableAllCards(false)
     self:buildPrimaryButtons()
     self:buildPointBoard()
@@ -331,10 +334,8 @@ function Board.prototype.handleDiscard(self)
     if self:getRemainingDiscards() <= 0 then
         return
     end
-    local ____opt_9 = self.gameManager.board
-    if ____opt_9 ~= nil then
-        ____opt_9.cardAssets:disableAllCards(true)
-    end
+    self.gameManager.assetManager:disableAllClickableAssets(true)
+    self:disablePrimaryButtons()
     local removedIndices = self.dealer:discardCards(
         CharacterTypes.PLAYER,
         self.gameManager.player:getSelectedCards()
@@ -345,9 +346,9 @@ function Board.prototype.handleDiscard(self)
     if remaining <= 0 then
         self:disableDiscardButton()
     end
-    local ____opt_11 = self.gameManager.board
-    if ____opt_11 ~= nil then
-        ____opt_11.dealer:dealCards(CharacterTypes.PLAYER, removedIndices)
+    local ____opt_5 = self.gameManager.board
+    if ____opt_5 ~= nil then
+        ____opt_5.dealer:dealCards(CharacterTypes.PLAYER, removedIndices)
     end
 end
 function Board.prototype.updateDiscardCounter(self, remainingNumberOfDiscards)
@@ -434,6 +435,7 @@ function Board.prototype.start(self)
     self:buildEnemyPortrait()
     self:buildDeck(CharacterTypes.PLAYER)
     self:buildDeck(CharacterTypes.ENEMY)
+    self.gameManager.assetManager:disableAllClickableAssets(true)
     self.dealer:dealEdel()
 end
 function Board.prototype.buildLetsFightButton(self)
@@ -652,43 +654,41 @@ end
 function Board.prototype.updatePrimaryButtonStates(self)
     local hasSelectedCards = self.gameManager.player:anySelectedCards()
     if hasSelectedCards then
-        self:enableAttackButton()
-        self:enableDiscardButton()
-        self:enableDeselectButton()
+        self:enablePrimaryButtons()
     else
-        self:disableAttackButton()
-        self:disableDiscardButton()
-        self:disableDeselectButton()
+        self:disablePrimaryButtons()
     end
+end
+function Board.prototype.enablePrimaryButtons(self)
+    self:enableAttackButton()
+    self:enableDiscardButton()
+    self:enableDeselectButton()
+end
+function Board.prototype.disablePrimaryButtons(self)
+    self:disableAttackButton()
+    self:disableDiscardButton()
+    self:disableDeselectButton()
 end
 function Board.prototype.enableAttackButton(self)
     self.gameManager.assetManager:enableAsset(AssetIds.ATTACK_BUTTON)
-    self.gameManager.assetManager.textManager:enableText(TextIds.ATTACK_BUTTON_CAPTION)
 end
 function Board.prototype.enableDiscardButton(self)
     if self:getRemainingDiscards() <= 0 then
         return
     end
     self.gameManager.assetManager:enableAsset(AssetIds.DISCARD_BUTTON)
-    self.gameManager.assetManager.textManager:enableText(TextIds.DISCARD_BUTTON_CAPTION)
-    self.gameManager.assetManager.textManager:enableText(TextIds.DISCARD_BUTTON_COUNTER)
 end
 function Board.prototype.enableDeselectButton(self)
     self.gameManager.assetManager:enableAsset(AssetIds.DESELECT_BUTTON)
-    self.gameManager.assetManager.textManager:enableText(TextIds.DESELECT_BUTTON_CAPTION)
 end
 function Board.prototype.disableAttackButton(self)
     self.gameManager.assetManager:disableAsset(AssetIds.ATTACK_BUTTON)
-    self.gameManager.assetManager.textManager:disableText(TextIds.ATTACK_BUTTON_CAPTION)
 end
 function Board.prototype.disableDiscardButton(self)
     self.gameManager.assetManager:disableAsset(AssetIds.DISCARD_BUTTON)
-    self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_CAPTION)
-    self.gameManager.assetManager.textManager:disableText(TextIds.DISCARD_BUTTON_COUNTER)
 end
 function Board.prototype.disableDeselectButton(self)
     self.gameManager.assetManager:disableAsset(AssetIds.DESELECT_BUTTON)
-    self.gameManager.assetManager.textManager:disableText(TextIds.DESELECT_BUTTON_CAPTION)
 end
 function Board.prototype.buildPointBoard(self)
     local boardWidth = 250
@@ -752,13 +752,13 @@ function Board.prototype.buildPointBoard(self)
     end
 end
 function Board.prototype.buildPowerAndValues(self, characterType, portraitHeight)
-    local ____temp_13
+    local ____temp_7
     if characterType == CharacterTypes.PLAYER then
-        ____temp_13 = self.gameManager.assetManager.textManager:getText(TextIds.PLAYER_PORTRAIT_LEVEL)
+        ____temp_7 = self.gameManager.assetManager.textManager:getText(TextIds.PLAYER_PORTRAIT_LEVEL)
     else
-        ____temp_13 = self.gameManager.assetManager.textManager:getText(TextIds.ENEMY_PORTRAIT_LEVEL)
+        ____temp_7 = self.gameManager.assetManager.textManager:getText(TextIds.ENEMY_PORTRAIT_LEVEL)
     end
-    local levelText = ____temp_13
+    local levelText = ____temp_7
     if isEmpty(levelText) then
         return
     end
@@ -954,12 +954,13 @@ function Board.prototype.buildDeck(self, characterType)
         return
     end
     local deckPosition = self.dealer:getDeckPosition(characterType)
+    local assetId = characterType == CharacterTypes.PLAYER and AssetIds.PLAYER_DECK or AssetIds.ENEMY_DECK
     self.gameManager.assetManager:addAsset(
-        characterType == CharacterTypes.PLAYER and AssetIds.PLAYER_DECK or AssetIds.ENEMY_DECK,
+        assetId,
         __TS__New(
             Asset,
             self.gameManager,
-            characterType == CharacterTypes.PLAYER and AssetIds.PLAYER_DECK or AssetIds.ENEMY_DECK,
+            assetId,
             love.graphics.newImage("Assets/Images/BaseCardBack.png"),
             deckPosition.x,
             deckPosition.y,
@@ -972,7 +973,8 @@ function Board.prototype.buildDeck(self, characterType)
                 hoverEffect = {HoverEffects.WOBBLE, HoverEffects.SHIMMER},
                 mousePressEffect = {MousePressEffects.SHIFT_DOWN},
                 clickSound = self.cardAssets.cardClick,
-                hoverSound = self.cardAssets.hoverSound
+                hoverSound = self.cardAssets.hoverSound,
+                showDisabledColor = false
             }
         )
     )

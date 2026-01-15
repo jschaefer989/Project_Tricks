@@ -15,9 +15,11 @@ ____exports.default = __TS__Class()
 local CutAnimation = ____exports.default
 CutAnimation.name = "CutAnimation"
 __TS__ClassExtends(CutAnimation, SlideAnimation)
-function CutAnimation.prototype.____constructor(self, animDuration, offsetX, offsetY, animationAssets, constructionOptions)
+function CutAnimation.prototype.____constructor(self, gameMangager, id, animDuration, offsetX, offsetY, animationAssets, constructionOptions)
     SlideAnimation.prototype.____constructor(
         self,
+        gameMangager,
+        id,
         animDuration,
         offsetX,
         offsetY,

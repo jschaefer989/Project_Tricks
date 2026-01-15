@@ -9,6 +9,8 @@ local push = require("Libraries.push")
 local WindowOptions = WindowOptions or ({})
 WindowOptions.WINDOWED = "WINDOWED"
 WindowOptions.FULLSCREEN = "FULLSCREEN"
+____exports.gameWidth = 640
+____exports.gameHeight = 360
 ____exports.default = __TS__Class()
 local Settings = ____exports.default
 Settings.name = "Settings"
@@ -38,32 +40,22 @@ function Settings.prototype.apply(self)
     self.playMusic = false
 end
 function Settings.prototype.setupWindowedMode(self)
-    local gameWidth = 640
-    local gameHeight = 360
     local windowWidth, windowHeight = love.window.getDesktopDimensions()
     windowWidth = windowWidth - 25
-    windowHeight = windowHeight - 60
+    windowHeight = windowHeight - 80
     push:setupScreen(
-        gameWidth,
-        gameHeight,
+        ____exports.gameWidth,
+        ____exports.gameHeight,
         windowWidth,
         windowHeight,
         {fullscreen = false}
     )
 end
 function Settings.prototype.setupFullscreenMode(self)
-    local gameWidth = 1920
-    local gameHeight = 1080
     local windowWidth, windowHeight = love.window.getDesktopDimensions()
-    if not windowWidth or windowWidth == 0 then
-        windowWidth = gameWidth
-    end
-    if not windowHeight or windowHeight == 0 then
-        windowHeight = gameHeight
-    end
     push:setupScreen(
-        gameWidth,
-        gameHeight,
+        ____exports.gameWidth,
+        ____exports.gameHeight,
         windowWidth,
         windowHeight,
         {fullscreen = true}

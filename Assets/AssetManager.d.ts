@@ -2,6 +2,10 @@ import TextManager from "Assets/Fonts/TextManager";
 import GameManager from "GameManager";
 import Asset from "./Asset";
 import TooltipManager from "./TooltipManager";
+export interface DisabledStateCache {
+    isDisabled: boolean;
+    useDisabledAnimation: boolean;
+}
 export default class AssetManager {
     gameManager: GameManager;
     assets: Map<string, Asset[]>;
@@ -9,6 +13,8 @@ export default class AssetManager {
     textManager: TextManager;
     disabledSound: import("love.audio").Source;
     buttonClickSound: import("love.audio").Source;
+    disabledAssets: Map<string, DisabledStateCache>;
+    universallyDisabled: boolean;
     constructor(gameManager: GameManager);
     addAsset(id: string, asset: Asset): void;
     getAssets(baseId: string): Asset[] | undefined;
@@ -26,4 +32,5 @@ export default class AssetManager {
     triggerWobbleAnimation(assets: Asset[]): void;
     handleAssetClick(asset: Asset): void;
     handleMouseHover(): void;
+    disableAllClickableAssets(disable: boolean): void;
 }

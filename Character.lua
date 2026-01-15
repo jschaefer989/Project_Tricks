@@ -134,6 +134,7 @@ function Character.prototype.showDeckOverview(self, asset)
     )
 end
 function Character.prototype.showDeckContents(self)
+    self.gameManager.popup:open({})
 end
 function Character.prototype.sortCards(self)
     local now = os.time() * 1000
@@ -226,7 +227,7 @@ function Character.prototype.redrawHand(self)
             index = index + 1
         end
     end
-    cardAssets:disableAllCards(false)
+    self.gameManager.board.cardAssets:disableAllCards(false)
 end
 SortMode = SortMode or ({})
 SortMode.POWER = "POWER"

@@ -72,6 +72,8 @@ export default class Board {
     private buildDeselectButton;
     private buildSortButton;
     updatePrimaryButtonStates(): void;
+    enablePrimaryButtons(): void;
+    disablePrimaryButtons(): void;
     enableAttackButton(): void;
     enableDiscardButton(): void;
     enableDeselectButton(): void;

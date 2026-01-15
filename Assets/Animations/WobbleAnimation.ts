@@ -1,3 +1,4 @@
+import GameManager from "GameManager";
 import Animation, { AnimationAssets, AnimationOptions } from "./Animation";
 
 export default class WobbleAnimation extends Animation {
@@ -6,12 +7,17 @@ export default class WobbleAnimation extends Animation {
   animDuration: number;
 
   constructor(
+    gameManager: GameManager,
+    id: string,
     animDuration: number,
     wobbleAmount: number,
     assets: AnimationAssets[],
     constructionOptions?: AnimationOptions
   ) {
-    super(assets, { onFinish: () => this.updateX(0), ...constructionOptions });
+    super(gameManager, id, assets, {
+      onFinish: () => this.updateX(0),
+      ...constructionOptions,
+    });
     this.originalX = new Map(assets.map((asset) => [asset.id, asset.x]));
     this.wobbleAmount = wobbleAmount;
     this.animDuration = animDuration;

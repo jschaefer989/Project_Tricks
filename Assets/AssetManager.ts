@@ -6,19 +6,23 @@ import WobbleAnimation from "./Animations/WobbleAnimation";
 import Asset from "./Asset";
 import TooltipManager from "./TooltipManager";
 
+export interface DisabledStateCache {
+  isDisabled: boolean;
+  useDisabledAnimation: boolean;
+}
+
 export default class AssetManager {
   gameManager: GameManager;
   assets: Map<string, Asset[]> = new Map<string, Asset[]>();
   tooltipManager: TooltipManager;
   textManager = new TextManager();
-  disabledSound = love.audio.newSource(
-    "Assets/Sounds/Disabled.wav",
-    "static"
-  );
+  disabledSound = love.audio.newSource("Assets/Sounds/Disabled.wav", "static");
   buttonClickSound = love.audio.newSource(
     "Assets/Sounds/ButtonClick.mp3",
     "static"
   );
+  disabledAssets = new Map<string, DisabledStateCache>();
+  universallyDisabled = false;
 
   constructor(gameManager: GameManager) {
     this.gameManager = gameManager;
@@ -100,7 +104,10 @@ export default class AssetManager {
     // Draw text above assets
     this.textManager.drawText();
 
-    // Draw hover content above assets and text
+    // Draw popup above text and assets
+    this.gameManager.popup.drawPopup();
+
+    // Draw tooltip above assets, text and popup
     this.tooltipManager.drawTooltips();
   }
 
@@ -119,12 +126,7 @@ export default class AssetManager {
         continue;
       }
 
-      if (
-        gameX >= asset.x &&
-        gameX <= asset.x + asset.getWidth() &&
-        gameY >= asset.y &&
-        gameY <= asset.y + asset.getHeight()
-      ) {
+      if (asset.inAssetBounds(gameX, gameY)) {
         for (const a of assets) {
           a.setMousePressed(true);
         }
@@ -149,12 +151,7 @@ export default class AssetManager {
         continue;
       }
 
-      if (
-        gameX >= asset.x &&
-        gameX <= asset.x + asset.getWidth() &&
-        gameY >= asset.y &&
-        gameY <= asset.y + asset.getHeight()
-      ) {
+      if (asset.inAssetBounds(gameX, gameY)) {
         if (asset.isDisabled) {
           this.handleDisabledAssetClick(assets);
         } else {
@@ -168,6 +165,10 @@ export default class AssetManager {
   }
 
   handleDisabledAssetClick(assets: Asset[]): void {
+    if (this.universallyDisabled) {
+      return;
+    }
+
     if (!assets[0].useDisabledAnimation) {
       return;
     }
@@ -184,21 +185,19 @@ export default class AssetManager {
 
   triggerWobbleAnimation(assets: Asset[]): void {
     for (const assetToWobble of assets) {
-      const wobbleId = `wobble-${assetToWobble.id}`;
-      if (!this.gameManager.animationManager.animations.has(wobbleId)) {
+      if (!this.gameManager.animationManager.animations.has(assetToWobble.id)) {
         this.gameManager.animationManager.startAnimation(
-          wobbleId,
-          new WobbleAnimation(0.5, 10, [assetToWobble])
+          assetToWobble.id,
+          new WobbleAnimation(this.gameManager, assetToWobble.id, 0.5, 10, [assetToWobble])
         );
       }
 
       if (!isEmpty(assetToWobble.associatedTexts)) {
         for (const text of assetToWobble.associatedTexts) {
-          const wobbleTextId = `wobble-${text}`;
-          if (!this.gameManager.animationManager.animations.has(wobbleTextId)) {
+          if (!this.gameManager.animationManager.animations.has(text.id)) {
             this.gameManager.animationManager.startAnimation(
-              wobbleTextId,
-              new WobbleAnimation(0.5, 10, [text])
+              text.id,
+              new WobbleAnimation(this.gameManager, text.id, 0.5, 10, [text])
             );
           }
         }
@@ -231,12 +230,7 @@ export default class AssetManager {
         continue;
       }
 
-      if (
-        gameX >= asset.x &&
-        gameX <= asset.x + asset.getWidth() &&
-        gameY >= asset.y &&
-        gameY <= asset.y + asset.getHeight()
-      ) {
+      if (asset.inAssetBounds(gameX, gameY)) {
         if (!asset.isHovered) {
           for (const a of assets) {
             a.setHovered(true);
@@ -252,6 +246,35 @@ export default class AssetManager {
         }
         asset.onUnhover?.(asset);
       }
+    }
+  }
+
+  disableAllClickableAssets(disable: boolean): void {
+    this.universallyDisabled = disable;
+
+    for (const baseAsset of this.assets.values()) {
+      if (isEmpty(baseAsset)) continue;
+      if (isEmpty(baseAsset[0].onClick)) continue;
+
+      for (const asset of baseAsset) {
+        if (disable) {
+          this.disabledAssets.set(asset.id, {
+            isDisabled: asset.isDisabled,
+            useDisabledAnimation: asset.useDisabledAnimation,
+          });
+          asset.setDisabled(true);
+          asset.useDisabledAnimation = false;
+        } else if (this.disabledAssets.has(asset.id)) {
+          const cachedState = this.disabledAssets.get(asset.id);
+          if (isEmpty(cachedState)) continue;
+
+          asset.setDisabled(cachedState.isDisabled);
+          asset.useDisabledAnimation = cachedState.useDisabledAnimation;
+        }
+      }
+    }
+    if (!disable) {
+      this.disabledAssets.clear();
     }
   }
 }

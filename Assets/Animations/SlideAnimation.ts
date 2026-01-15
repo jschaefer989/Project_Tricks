@@ -1,8 +1,8 @@
+import GameManager from "GameManager";
 import Animation, { AnimationAssets, AnimationOptions } from "./Animation";
 
 export interface SlideOptions extends AnimationOptions {
   readonly animDuration?: number;
-  readonly drawSeparately?: boolean;
 }
 
 export default class SlideAnimation extends Animation {
@@ -13,13 +13,15 @@ export default class SlideAnimation extends Animation {
   animDuration: number;
 
   constructor(
+    gameManager: GameManager,
+    id: string,
     animDuration: number,
     offsetX: number,
     offsetY: number,
     assets: AnimationAssets[],
     constructionOptions?: SlideOptions
   ) {
-    super(assets, constructionOptions);
+    super(gameManager, id, assets, constructionOptions);
     this.animTargetOffsetX = offsetX;
     this.animTargetOffsetY = offsetY;
     this.animDuration = animDuration;

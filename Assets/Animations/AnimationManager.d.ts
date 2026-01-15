@@ -6,7 +6,6 @@ export default class AnimationManager {
     constructor(gameManager: GameManager);
     startAnimation(id: string, animation: Animation): void;
     updateAnimations(dt: number): void;
-    private shouldWaitForAnimations;
     hasWobbleAnimation(): boolean;
     hasCutAnimation(): boolean;
     hasFlickerAnimation(): boolean;

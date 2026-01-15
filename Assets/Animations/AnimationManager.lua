@@ -31,7 +31,7 @@ function AnimationManager.prototype.updateAnimations(self, dt)
         local id = ____value[1]
         local animation = ____value[2]
         do
-            if self:shouldWaitForAnimations(animation) then
+            if animation:shouldWaitForAnimations() or animation.isPaused then
                 goto __continue5
             end
             if not isEmpty(animation.soundToPlay) and not animation.playedSound then
@@ -51,17 +51,6 @@ function AnimationManager.prototype.updateAnimations(self, dt)
         end
         ::__continue5::
     end
-end
-function AnimationManager.prototype.shouldWaitForAnimations(self, animation)
-    if #animation.waitForAnimationIds > 0 then
-        for ____, waitId in ipairs(animation.waitForAnimationIds) do
-            local waitForAnimation = self.animations:get(waitId)
-            if not isEmpty(waitForAnimation) and not waitForAnimation.isFinished then
-                return true
-            end
-        end
-    end
-    return false
 end
 function AnimationManager.prototype.hasWobbleAnimation(self)
     for ____, animation in __TS__Iterator(self.animations:values()) do

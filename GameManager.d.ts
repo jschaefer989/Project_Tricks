@@ -21,6 +21,7 @@ import MusicPlayer from "Assets/Music/MusicPlayer";
 import Biome from "Biomes/Biome";
 import BackgroundManager from "Screens/BackgroundManager";
 import ShaderManager from "Shaders/ShaderManager";
+import Popup from "Screens/Popup";
 export default class GameManager {
     gameState: GameStates;
     player: Player;
@@ -41,6 +42,7 @@ export default class GameManager {
     biome: Biome;
     backgroundManager: BackgroundManager;
     shaderManager: ShaderManager;
+    popup: Popup;
     devMode: boolean;
     constructor();
     getCharacter(characterType: string): Character | undefined;
