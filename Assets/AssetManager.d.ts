@@ -3,12 +3,7 @@ import GameManager from "GameManager";
 import Asset from "./Asset";
 import TooltipManager from "./TooltipManager";
 import AssetLoader from "./AssetLoader";
-export interface DisabledStateCache {
-    isDisabled: boolean;
-    useDisabledAnimation: boolean;
-    color: [number, number, number, number];
-    showDisabledColor: boolean;
-}
+import DisabledStateCache from "./DisabledStateCache";
 export default class AssetManager {
     gameManager: GameManager;
     assets: Map<string, Asset[]>;
@@ -17,7 +12,7 @@ export default class AssetManager {
     assetLoader: AssetLoader;
     disabledSound: import("love.audio").Source;
     buttonClickSound: import("love.audio").Source;
-    disabledAssets: Map<string, DisabledStateCache>;
+    disabledAssetCache: DisabledStateCache;
     constructor(gameManager: GameManager);
     addAsset(id: string, asset: Asset): void;
     getAssets(baseId: string): Asset[] | undefined;

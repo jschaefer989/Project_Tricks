@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
+local Map = ____lualib.Map
 local __TS__Iterator = ____lualib.__TS__Iterator
 local __TS__ArrayIncludes = ____lualib.__TS__ArrayIncludes
 local ____exports = {}
@@ -20,6 +20,8 @@ local ____Helpers = require("Helpers")
 local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
 local push = require("Libraries.push")
+local ____DisabledStateCache = require("Assets.DisabledStateCache")
+local DisabledStateCache = ____DisabledStateCache.default
 ____exports.PopupSizes = PopupSizes or ({})
 ____exports.PopupSizes.MESSAGE_BOX = "MESSAGE_BOX"
 ____exports.PopupSizes.MENU = "MENU"
@@ -32,7 +34,6 @@ function Popup.prototype.____constructor(self, gameManager, id, popupSize, title
     self.associatedTextIds = {}
     self.savedMusicVolume = 1
     self.pausedAnimationIds = {}
-    self.pausedAssetIds = __TS__New(Map)
     self.pausedShaderIds = {}
     self.pausedSources = {}
     self.pausedTextIds = __TS__New(Map)
@@ -41,6 +42,7 @@ function Popup.prototype.____constructor(self, gameManager, id, popupSize, title
     self.popupSize = popupSize
     self.associatedAssetIds = associatedAssetIds
     self.associatedTextIds = associatedTextIds
+    self.disabledStateCache = __TS__New(DisabledStateCache, self.gameManager)
     self.onClose = options and options.onClose
     self:buildCaches()
     self:disableAllAssets()
@@ -174,7 +176,7 @@ function Popup.prototype.buildCaches(self)
             if __TS__ArrayIncludes(self.associatedAssetIds, baseId) then
                 goto __continue22
             end
-            self.pausedAssetIds:set(baseId, {isDisabled = assets[1].isDisabled, useDisabledAnimation = assets[1].useDisabledAnimation, color = assets[1].color, showDisabledColor = assets[1].showDisabledColor})
+            self.disabledStateCache:cacheState(assets[1])
         end
         ::__continue22::
     end
@@ -281,23 +283,7 @@ function Popup.prototype.resumeAllShaders(self)
     end
 end
 function Popup.prototype.enableAllAssets(self)
-    for ____, ____value in __TS__Iterator(self.pausedAssetIds) do
-        local baseId = ____value[1]
-        local disabledState = ____value[2]
-        do
-            if __TS__ArrayIncludes(self.associatedAssetIds, baseId) then
-                goto __continue58
-            end
-            local assets = self.gameManager.assetManager.assets:get(baseId)
-            if not isEmpty(assets) then
-                for ____, asset in ipairs(assets) do
-                    asset.color = disabledState.color
-                    asset:setDisabled(disabledState.isDisabled, {useDisabledAnimation = disabledState.useDisabledAnimation, showDisabledColor = disabledState.showDisabledColor})
-                end
-            end
-        end
-        ::__continue58::
-    end
+    self.disabledStateCache:restore(self.associatedAssetIds)
 end
 function Popup.prototype.enableAllText(self)
     for ____, ____value in __TS__Iterator(self.pausedTextIds) do
@@ -305,14 +291,14 @@ function Popup.prototype.enableAllText(self)
         local isDisabled = ____value[2]
         do
             if __TS__ArrayIncludes(self.associatedTextIds, id) then
-                goto __continue65
+                goto __continue59
             end
             local font = self.gameManager.assetManager.textManager.texts:get(id)
             if not isEmpty(font) then
                 font:setDisabled(isDisabled)
             end
         end
-        ::__continue65::
+        ::__continue59::
     end
 end
 function Popup.prototype.playPausedSounds(self)
@@ -376,27 +362,27 @@ function Popup.prototype.drawPopup(self)
     for ____, id in ipairs(self.associatedAssetIds) do
         do
             if id == self:getPopupBackgroundId() then
-                goto __continue84
+                goto __continue78
             end
             local asset = self.gameManager.assetManager:getAssets(id)
             if isEmpty(asset) then
-                goto __continue84
+                goto __continue78
             end
             for ____, a in ipairs(asset) do
                 a:drawAsset()
             end
         end
-        ::__continue84::
+        ::__continue78::
     end
     for ____, id in ipairs(self.associatedTextIds) do
         do
             local text = self.gameManager.assetManager.textManager.texts:get(id)
             if isEmpty(text) then
-                goto __continue90
+                goto __continue84
             end
             text:printText()
         end
-        ::__continue90::
+        ::__continue84::
     end
 end
 function Popup.prototype.removeAssets(self)
@@ -412,13 +398,13 @@ function Popup.prototype.removeTexts(self)
 end
 function Popup.getPopupWidth(self, popupSize)
     repeat
-        local ____switch100 = popupSize
-        local ____cond100 = ____switch100 == ____exports.PopupSizes.MESSAGE_BOX
-        if ____cond100 then
+        local ____switch94 = popupSize
+        local ____cond94 = ____switch94 == ____exports.PopupSizes.MESSAGE_BOX
+        if ____cond94 then
             return 264
         end
-        ____cond100 = ____cond100 or ____switch100 == ____exports.PopupSizes.MENU
-        if ____cond100 then
+        ____cond94 = ____cond94 or ____switch94 == ____exports.PopupSizes.MENU
+        if ____cond94 then
             return 400
         end
         do
@@ -428,13 +414,13 @@ function Popup.getPopupWidth(self, popupSize)
 end
 function Popup.getPopupHeight(self, popupSize)
     repeat
-        local ____switch102 = popupSize
-        local ____cond102 = ____switch102 == ____exports.PopupSizes.MESSAGE_BOX
-        if ____cond102 then
+        local ____switch96 = popupSize
+        local ____cond96 = ____switch96 == ____exports.PopupSizes.MESSAGE_BOX
+        if ____cond96 then
             return 264
         end
-        ____cond102 = ____cond102 or ____switch102 == ____exports.PopupSizes.MENU
-        if ____cond102 then
+        ____cond96 = ____cond96 or ____switch96 == ____exports.PopupSizes.MENU
+        if ____cond96 then
             return 350
         end
         do

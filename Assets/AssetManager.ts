@@ -6,13 +6,7 @@ import WobbleAnimation from "./Animations/WobbleAnimation";
 import Asset from "./Asset";
 import TooltipManager from "./TooltipManager";
 import AssetLoader from "./AssetLoader";
-
-export interface DisabledStateCache {
-  isDisabled: boolean;
-  useDisabledAnimation: boolean;
-  color: [number, number, number, number];
-  showDisabledColor: boolean;
-}
+import DisabledStateCache from "./DisabledStateCache";
 
 export default class AssetManager {
   gameManager: GameManager;
@@ -25,10 +19,11 @@ export default class AssetManager {
     "Assets/Sounds/ButtonClick.mp3",
     "static"
   );
-  disabledAssets = new Map<string, DisabledStateCache>();
+  disabledAssetCache: DisabledStateCache;
 
   constructor(gameManager: GameManager) {
     this.gameManager = gameManager;
+    this.disabledAssetCache = new DisabledStateCache(gameManager);
     this.tooltipManager = new TooltipManager(gameManager);
   }
 
@@ -254,27 +249,12 @@ export default class AssetManager {
 
       for (const asset of baseAsset) {
         if (disable) {
-          this.disabledAssets.set(asset.id, {
-            isDisabled: asset.isDisabled,
-            useDisabledAnimation: asset.useDisabledAnimation,
-            color: asset.color,
-            showDisabledColor: asset.showDisabledColor,
-          });
+          this.disabledAssetCache.cacheState(asset);
           asset.setDisabled(true, { useDisabledAnimation: false });
-        } else if (this.disabledAssets.has(asset.id)) {
-          const cachedState = this.disabledAssets.get(asset.id);
-          if (isEmpty(cachedState)) continue;
-
-          asset.setDisabled(cachedState.isDisabled, {
-            useDisabledAnimation: cachedState.useDisabledAnimation,
-            color: cachedState.color,
-            showDisabledColor: cachedState.showDisabledColor,
-          });
+        } else {
+          this.disabledAssetCache.restore();
         }
       }
-    }
-    if (!disable) {
-      this.disabledAssets.clear();
     }
   }
 }

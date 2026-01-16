@@ -17,7 +17,7 @@ export default class Popup {
     popupSize: PopupSizes;
     private savedMusicVolume;
     private pausedAnimationIds;
-    private pausedAssetIds;
+    private disabledStateCache;
     private pausedShaderIds;
     private pausedSources;
     private pausedTextIds;

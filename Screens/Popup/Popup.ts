@@ -1,6 +1,5 @@
 import SlideAnimation from "Assets/Animations/SlideAnimation";
 import Asset from "Assets/Asset";
-import { DisabledStateCache } from "Assets/AssetManager";
 import FontWithPosition, { Fonts, Format } from "Assets/Fonts/FontWithPosition";
 import { AssetIds, TextIds } from "Enums";
 import GameManager from "GameManager";
@@ -8,6 +7,7 @@ import { exhaustiveGuard, isEmpty } from "Helpers";
 import * as push from "Libraries.push";
 import { Source } from "love.audio";
 import { Image } from "love.graphics";
+import DisabledStateCache from "Assets/DisabledStateCache";
 
 export enum PopupSizes {
   MESSAGE_BOX = "MESSAGE_BOX",
@@ -28,7 +28,7 @@ export default class Popup {
   popupSize: PopupSizes;
   private savedMusicVolume: number = 1.0;
   private pausedAnimationIds: string[] = [];
-  private pausedAssetIds = new Map<string, DisabledStateCache>();
+  private disabledStateCache: DisabledStateCache;
   private pausedShaderIds: string[] = [];
   private pausedSources: Source[] = [];
   private pausedTextIds = new Map<string, boolean>();
@@ -48,6 +48,7 @@ export default class Popup {
     this.popupSize = popupSize;
     this.associatedAssetIds = associatedAssetIds;
     this.associatedTextIds = associatedTextIds;
+    this.disabledStateCache = new DisabledStateCache(this.gameManager);
     this.onClose = options?.onClose;
     this.buildCaches();
     this.disableAllAssets();
@@ -168,13 +169,7 @@ export default class Popup {
     }
     for (const [baseId, assets] of this.gameManager.assetManager.assets) {
       if (this.associatedAssetIds.includes(baseId)) continue;
-      
-      this.pausedAssetIds.set(baseId, {
-        isDisabled: assets[0].isDisabled,
-        useDisabledAnimation: assets[0].useDisabledAnimation,
-        color: assets[0].color,
-        showDisabledColor: assets[0].showDisabledColor,
-      });
+      this.disabledStateCache.cacheState(assets[0]);
     }
     for (const [id, font] of this.gameManager.assetManager.textManager.texts) {
       if (this.associatedTextIds.includes(id)) continue;
@@ -265,21 +260,7 @@ export default class Popup {
   }
 
   enableAllAssets() {
-    for (const [baseId, disabledState] of this.pausedAssetIds) {
-      if (this.associatedAssetIds.includes(baseId)) continue;
-      const assets = this.gameManager.assetManager.assets.get(baseId);
-      if (!isEmpty(assets)) {
-        for (const asset of assets) {
-          // Restore the color directly first
-          asset.color = disabledState.color;
-          // Then set disabled state without applying color changes
-          asset.setDisabled(disabledState.isDisabled, {
-            useDisabledAnimation: disabledState.useDisabledAnimation,
-            showDisabledColor: disabledState.showDisabledColor,
-          });
-        }
-      }
-    }
+    this.disabledStateCache.restore(this.associatedAssetIds);
   }
 
   enableAllText() {

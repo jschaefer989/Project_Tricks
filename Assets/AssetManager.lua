@@ -19,6 +19,8 @@ local ____TooltipManager = require("Assets.TooltipManager")
 local TooltipManager = ____TooltipManager.default
 local ____AssetLoader = require("Assets.AssetLoader")
 local AssetLoader = ____AssetLoader.default
+local ____DisabledStateCache = require("Assets.DisabledStateCache")
+local DisabledStateCache = ____DisabledStateCache.default
 ____exports.default = __TS__Class()
 local AssetManager = ____exports.default
 AssetManager.name = "AssetManager"
@@ -28,8 +30,8 @@ function AssetManager.prototype.____constructor(self, gameManager)
     self.assetLoader = __TS__New(AssetLoader)
     self.disabledSound = love.audio.newSource("Assets/Sounds/Disabled.wav", "static")
     self.buttonClickSound = love.audio.newSource("Assets/Sounds/ButtonClick.mp3", "static")
-    self.disabledAssets = __TS__New(Map)
     self.gameManager = gameManager
+    self.disabledAssetCache = __TS__New(DisabledStateCache, gameManager)
     self.tooltipManager = __TS__New(TooltipManager, gameManager)
 end
 function AssetManager.prototype.addAsset(self, id, asset)
@@ -279,25 +281,15 @@ function AssetManager.prototype.disableAllClickableAssets(self, disable)
                 goto __continue79
             end
             for ____, asset in ipairs(baseAsset) do
-                do
-                    if disable then
-                        self.disabledAssets:set(asset.id, {isDisabled = asset.isDisabled, useDisabledAnimation = asset.useDisabledAnimation, color = asset.color, showDisabledColor = asset.showDisabledColor})
-                        asset:setDisabled(true, {useDisabledAnimation = false})
-                    elseif self.disabledAssets:has(asset.id) then
-                        local cachedState = self.disabledAssets:get(asset.id)
-                        if isEmpty(cachedState) then
-                            goto __continue83
-                        end
-                        asset:setDisabled(cachedState.isDisabled, {useDisabledAnimation = cachedState.useDisabledAnimation, color = cachedState.color, showDisabledColor = cachedState.showDisabledColor})
-                    end
+                if disable then
+                    self.disabledAssetCache:cacheState(asset)
+                    asset:setDisabled(true, {useDisabledAnimation = false})
+                else
+                    self.disabledAssetCache:restore()
                 end
-                ::__continue83::
             end
         end
         ::__continue79::
-    end
-    if not disable then
-        self.disabledAssets:clear()
     end
 end
 return ____exports
