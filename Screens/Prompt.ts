@@ -41,12 +41,9 @@ export default class Prompt {
         constructionOptions.secondaryMessage,
         { format: Format.CENTER, size: 9 }
       );
-      this.gameManager.assetManager.textManager.addText(
+      this.gameManager.popupManager.addText(
         TextIds.PROMPT_SECONDARY_MESSAGE,
         secondaryMessageText
-      );
-      this.gameManager.popupManager.popupTextIds.push(
-        TextIds.PROMPT_SECONDARY_MESSAGE
       );
     }
   }
@@ -62,20 +59,16 @@ export default class Prompt {
 
   buildYesButton(): void {
     const popupCenterX = Popup.getCenterOfPopup(PopupSizes.MESSAGE_BOX);
+
     const yesText = new FontWithPosition(
       TextIds.YES_BUTTON_CAPTION,
       popupCenterX,
-      Popup.getTopOfPopup(PopupSizes.MESSAGE_BOX) + 60 + buttonHeight / 2,
+      Popup.getTopOfPopup(PopupSizes.MESSAGE_BOX) + 61 + buttonHeight / 2,
       "Yes",
       { format: Format.CENTER, size: 9 }
     );
-    this.gameManager.assetManager.textManager.addText(
-      TextIds.YES_BUTTON_CAPTION,
-      yesText
-    );
-    this.gameManager.assetManager.addAsset(
-      AssetIds.YES_BUTTON,
-      new Asset(
+
+    const button = new Asset(
         this.gameManager,
         AssetIds.YES_BUTTON,
         this.button,
@@ -93,30 +86,26 @@ export default class Prompt {
             MousePressEffects.SHIFT_DOWN,
           ],
         }
-      )
-    );
-    this.gameManager.popupManager.popupTextIds.push(TextIds.YES_BUTTON_CAPTION);
-    this.gameManager.popupManager.popupAssetIds.push(AssetIds.YES_BUTTON);
+      );
+
+    this.gameManager.popupManager.addAsset(AssetIds.YES_BUTTON, button);
+    this.gameManager.popupManager.addText(TextIds.YES_BUTTON_CAPTION, yesText);    
   }
 
   buildNoButton(): void {
     const popupCenterX = Popup.getCenterOfPopup(PopupSizes.MESSAGE_BOX);
     const buttonY =
       Popup.getTopOfPopup(PopupSizes.MESSAGE_BOX) + 60 + buttonHeight + 10;
+      
     const noText = new FontWithPosition(
       TextIds.NO_BUTTON_CAPTION,
       popupCenterX,
-      buttonY + buttonHeight / 2,
+      buttonY + buttonHeight / 2 + 1,
       "No",
       { format: Format.CENTER, size: 9 }
     );
-    this.gameManager.assetManager.textManager.addText(
-      TextIds.NO_BUTTON_CAPTION,
-      noText
-    );
-    this.gameManager.assetManager.addAsset(
-      AssetIds.NO_BUTTON,
-      new Asset(
+
+    const button = new Asset(
         this.gameManager,
         AssetIds.NO_BUTTON,
         this.button,
@@ -135,8 +124,8 @@ export default class Prompt {
           ],
         }
       )
-    );
-    this.gameManager.popupManager.popupTextIds.push(TextIds.NO_BUTTON_CAPTION);
-    this.gameManager.popupManager.popupAssetIds.push(AssetIds.NO_BUTTON);
+
+    this.gameManager.popupManager.addAsset(AssetIds.NO_BUTTON, button);
+    this.gameManager.popupManager.addText(TextIds.NO_BUTTON_CAPTION, noText);
   }
 }

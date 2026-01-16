@@ -1,6 +1,8 @@
 import GameManager from "GameManager";
 import Popup, { PopupConstructionOptions, PopupSizes } from "./Popup";
 import { isEmpty } from "Helpers";
+import Asset from "Assets/Asset";
+import FontWithPosition from "Assets/Fonts/FontWithPosition";
 
 export default class PopupManager {
   gameManager: GameManager;
@@ -51,5 +53,15 @@ export default class PopupManager {
     for (const popup of this.popups) {
       popup.drawPopup();
     }
+  }
+
+  addAsset(id: string, asset: Asset): void {
+    this.gameManager.assetManager.addAsset(id, asset);
+    this.gameManager.popupManager.popupAssetIds.push(id);
+  }
+
+  addText(id: string, text: FontWithPosition): void {
+    this.gameManager.assetManager.textManager.addText(id, text);
+    this.gameManager.popupManager.popupTextIds.push(id);
   }
 }

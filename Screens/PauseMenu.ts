@@ -36,13 +36,15 @@ export default class PauseMenu {
   buildContinueButton(): number {
     const continueButtonY = 50;
     const popupCenterX = Popup.getCenterOfPopup(PopupSizes.MENU);
+
     const continueText = new FontWithPosition(
       TextIds.PAUSE_CONTINUE_BUTTON_CAPTION,
       popupCenterX,
-      continueButtonY + buttonHeight / 2 - 5,
+      continueButtonY + buttonHeight / 2 - 1,
       "Continue",
       { format: Format.CENTER, size: 18 }
     );
+
     const continueButton = new Asset(
       this.gameManager,
       AssetIds.PAUSE_CONTINUE_BUTTON,
@@ -65,19 +67,13 @@ export default class PauseMenu {
       }
     );
 
-    this.gameManager.assetManager.textManager.addText(
+    this.gameManager.popupManager.addText(
       TextIds.PAUSE_CONTINUE_BUTTON_CAPTION,
       continueText
     );
-    this.gameManager.popupManager.popupTextIds.push(
-      TextIds.PAUSE_CONTINUE_BUTTON_CAPTION
-    );
-    this.gameManager.assetManager.addAsset(
+    this.gameManager.popupManager.addAsset(
       AssetIds.PAUSE_CONTINUE_BUTTON,
       continueButton
-    );
-    this.gameManager.popupManager.popupAssetIds.push(
-      AssetIds.PAUSE_CONTINUE_BUTTON
     );
 
     return continueButtonY;
@@ -86,13 +82,15 @@ export default class PauseMenu {
   buildSaveButton(continueButtonY: number): number {
     const saveButtonY = continueButtonY + buttonHeight + 10;
     const popupCenterX = Popup.getCenterOfPopup(PopupSizes.MENU);
+
     const saveText = new FontWithPosition(
       TextIds.PAUSE_SAVE_BUTTON_CAPTION,
       popupCenterX,
-      saveButtonY + buttonHeight / 2 - 5,
+      saveButtonY + buttonHeight / 2 - 1,
       "Save",
       { format: Format.CENTER, size: 18 }
     );
+
     const saveButton = new Asset(
       this.gameManager,
       AssetIds.PAUSE_SAVE_BUTTON,
@@ -116,19 +114,13 @@ export default class PauseMenu {
       }
     );
 
-    this.gameManager.assetManager.textManager.addText(
+    this.gameManager.popupManager.addText(
       TextIds.PAUSE_SAVE_BUTTON_CAPTION,
       saveText
     );
-    this.gameManager.popupManager.popupTextIds.push(
-      TextIds.PAUSE_SAVE_BUTTON_CAPTION
-    );
-    this.gameManager.assetManager.addAsset(
+    this.gameManager.popupManager.addAsset(
       AssetIds.PAUSE_SAVE_BUTTON,
       saveButton
-    );
-    this.gameManager.popupManager.popupAssetIds.push(
-      AssetIds.PAUSE_SAVE_BUTTON
     );
 
     return saveButtonY;
@@ -137,10 +129,11 @@ export default class PauseMenu {
   buildQuitButton(saveButtonY: number): void {
     const quitButtonY = saveButtonY + buttonHeight + 10;
     const popupCenterX = Popup.getCenterOfPopup(PopupSizes.MENU);
+
     const quitText = new FontWithPosition(
       TextIds.PAUSE_QUIT_BUTTON_CAPTION,
       popupCenterX,
-      quitButtonY + buttonHeight / 2 - 5,
+      quitButtonY + buttonHeight / 2 - 1,
       "Quit",
       { format: Format.CENTER, size: 18 }
     );
@@ -165,19 +158,13 @@ export default class PauseMenu {
       }
     );
 
-    this.gameManager.assetManager.textManager.addText(
+    this.gameManager.popupManager.addText(
       TextIds.PAUSE_QUIT_BUTTON_CAPTION,
       quitText
     );
-    this.gameManager.popupManager.popupTextIds.push(
-      TextIds.PAUSE_QUIT_BUTTON_CAPTION
-    );
-    this.gameManager.assetManager.addAsset(
+    this.gameManager.popupManager.addAsset(
       AssetIds.PAUSE_QUIT_BUTTON,
       quitButton
-    );
-    this.gameManager.popupManager.popupAssetIds.push(
-      AssetIds.PAUSE_QUIT_BUTTON
     );
   }
 
@@ -190,9 +177,7 @@ export default class PauseMenu {
     const prompt = new Prompt(
       this.gameManager,
       "Are you sure you want to quit?",
-      () => {
-        love.event.quit();
-      },
+      () =>  love.event.quit(),
       () => this.gameManager.popupManager.close(),
       { secondaryMessage: "All unsaved progress will be lost." }
     );

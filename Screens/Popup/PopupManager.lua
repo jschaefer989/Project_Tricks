@@ -74,4 +74,14 @@ function PopupManager.prototype.drawPopups(self)
         popup:drawPopup()
     end
 end
+function PopupManager.prototype.addAsset(self, id, asset)
+    self.gameManager.assetManager:addAsset(id, asset)
+    local ____self_gameManager_popupManager_popupAssetIds_3 = self.gameManager.popupManager.popupAssetIds
+    ____self_gameManager_popupManager_popupAssetIds_3[#____self_gameManager_popupManager_popupAssetIds_3 + 1] = id
+end
+function PopupManager.prototype.addText(self, id, text)
+    self.gameManager.assetManager.textManager:addText(id, text)
+    local ____self_gameManager_popupManager_popupTextIds_4 = self.gameManager.popupManager.popupTextIds
+    ____self_gameManager_popupManager_popupTextIds_4[#____self_gameManager_popupManager_popupTextIds_4 + 1] = id
+end
 return ____exports

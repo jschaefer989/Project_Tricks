@@ -40,9 +40,7 @@ function Prompt.prototype.____constructor(self, gameManager, message, onYesClick
             constructionOptions.secondaryMessage,
             {format = Format.CENTER, size = 9}
         )
-        self.gameManager.assetManager.textManager:addText(TextIds.PROMPT_SECONDARY_MESSAGE, secondaryMessageText)
-        local ____self_gameManager_popupManager_popupTextIds_2 = self.gameManager.popupManager.popupTextIds
-        ____self_gameManager_popupManager_popupTextIds_2[#____self_gameManager_popupManager_popupTextIds_2 + 1] = TextIds.PROMPT_SECONDARY_MESSAGE
+        self.gameManager.popupManager:addText(TextIds.PROMPT_SECONDARY_MESSAGE, secondaryMessageText)
     end
 end
 function Prompt.prototype.open(self, id)
@@ -54,35 +52,29 @@ function Prompt.prototype.buildYesButton(self)
         FontWithPosition,
         TextIds.YES_BUTTON_CAPTION,
         popupCenterX,
-        Popup:getTopOfPopup(PopupSizes.MESSAGE_BOX) + 60 + buttonHeight / 2,
+        Popup:getTopOfPopup(PopupSizes.MESSAGE_BOX) + 61 + buttonHeight / 2,
         "Yes",
         {format = Format.CENTER, size = 9}
     )
-    self.gameManager.assetManager.textManager:addText(TextIds.YES_BUTTON_CAPTION, yesText)
-    self.gameManager.assetManager:addAsset(
+    local button = __TS__New(
+        Asset,
+        self.gameManager,
         AssetIds.YES_BUTTON,
-        __TS__New(
-            Asset,
-            self.gameManager,
-            AssetIds.YES_BUTTON,
-            self.button,
-            popupCenterX - buttonWidth / 2,
-            Popup:getTopOfPopup(PopupSizes.MESSAGE_BOX) + 60,
-            buttonWidth,
-            buttonHeight,
-            {
-                onClick = self.onYesClick,
-                associatedTexts = {yesText},
-                clickSound = self.gameManager.assetManager.buttonClickSound,
-                hoverEffect = {HoverEffects.CHANGE_COLOR},
-                mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
-            }
-        )
+        self.button,
+        popupCenterX - buttonWidth / 2,
+        Popup:getTopOfPopup(PopupSizes.MESSAGE_BOX) + 60,
+        buttonWidth,
+        buttonHeight,
+        {
+            onClick = self.onYesClick,
+            associatedTexts = {yesText},
+            clickSound = self.gameManager.assetManager.buttonClickSound,
+            hoverEffect = {HoverEffects.CHANGE_COLOR},
+            mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
+        }
     )
-    local ____self_gameManager_popupManager_popupTextIds_3 = self.gameManager.popupManager.popupTextIds
-    ____self_gameManager_popupManager_popupTextIds_3[#____self_gameManager_popupManager_popupTextIds_3 + 1] = TextIds.YES_BUTTON_CAPTION
-    local ____self_gameManager_popupManager_popupAssetIds_4 = self.gameManager.popupManager.popupAssetIds
-    ____self_gameManager_popupManager_popupAssetIds_4[#____self_gameManager_popupManager_popupAssetIds_4 + 1] = AssetIds.YES_BUTTON
+    self.gameManager.popupManager:addAsset(AssetIds.YES_BUTTON, button)
+    self.gameManager.popupManager:addText(TextIds.YES_BUTTON_CAPTION, yesText)
 end
 function Prompt.prototype.buildNoButton(self)
     local popupCenterX = Popup:getCenterOfPopup(PopupSizes.MESSAGE_BOX)
@@ -91,34 +83,28 @@ function Prompt.prototype.buildNoButton(self)
         FontWithPosition,
         TextIds.NO_BUTTON_CAPTION,
         popupCenterX,
-        buttonY + buttonHeight / 2,
+        buttonY + buttonHeight / 2 + 1,
         "No",
         {format = Format.CENTER, size = 9}
     )
-    self.gameManager.assetManager.textManager:addText(TextIds.NO_BUTTON_CAPTION, noText)
-    self.gameManager.assetManager:addAsset(
+    local button = __TS__New(
+        Asset,
+        self.gameManager,
         AssetIds.NO_BUTTON,
-        __TS__New(
-            Asset,
-            self.gameManager,
-            AssetIds.NO_BUTTON,
-            self.button,
-            popupCenterX - buttonWidth / 2,
-            buttonY,
-            buttonWidth,
-            buttonHeight,
-            {
-                onClick = self.onNoClick,
-                associatedTexts = {noText},
-                clickSound = self.gameManager.assetManager.buttonClickSound,
-                hoverEffect = {HoverEffects.CHANGE_COLOR},
-                mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
-            }
-        )
+        self.button,
+        popupCenterX - buttonWidth / 2,
+        buttonY,
+        buttonWidth,
+        buttonHeight,
+        {
+            onClick = self.onNoClick,
+            associatedTexts = {noText},
+            clickSound = self.gameManager.assetManager.buttonClickSound,
+            hoverEffect = {HoverEffects.CHANGE_COLOR},
+            mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
+        }
     )
-    local ____self_gameManager_popupManager_popupTextIds_5 = self.gameManager.popupManager.popupTextIds
-    ____self_gameManager_popupManager_popupTextIds_5[#____self_gameManager_popupManager_popupTextIds_5 + 1] = TextIds.NO_BUTTON_CAPTION
-    local ____self_gameManager_popupManager_popupAssetIds_6 = self.gameManager.popupManager.popupAssetIds
-    ____self_gameManager_popupManager_popupAssetIds_6[#____self_gameManager_popupManager_popupAssetIds_6 + 1] = AssetIds.NO_BUTTON
+    self.gameManager.popupManager:addAsset(AssetIds.NO_BUTTON, button)
+    self.gameManager.popupManager:addText(TextIds.NO_BUTTON_CAPTION, noText)
 end
 return ____exports

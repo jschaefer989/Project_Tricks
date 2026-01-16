@@ -51,7 +51,7 @@ function PauseMenu.prototype.buildContinueButton(self)
         FontWithPosition,
         TextIds.PAUSE_CONTINUE_BUTTON_CAPTION,
         popupCenterX,
-        continueButtonY + buttonHeight / 2 - 5,
+        continueButtonY + buttonHeight / 2 - 1,
         "Continue",
         {format = Format.CENTER, size = 18}
     )
@@ -74,12 +74,8 @@ function PauseMenu.prototype.buildContinueButton(self)
             mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
         }
     )
-    self.gameManager.assetManager.textManager:addText(TextIds.PAUSE_CONTINUE_BUTTON_CAPTION, continueText)
-    local ____self_gameManager_popupManager_popupTextIds_0 = self.gameManager.popupManager.popupTextIds
-    ____self_gameManager_popupManager_popupTextIds_0[#____self_gameManager_popupManager_popupTextIds_0 + 1] = TextIds.PAUSE_CONTINUE_BUTTON_CAPTION
-    self.gameManager.assetManager:addAsset(AssetIds.PAUSE_CONTINUE_BUTTON, continueButton)
-    local ____self_gameManager_popupManager_popupAssetIds_1 = self.gameManager.popupManager.popupAssetIds
-    ____self_gameManager_popupManager_popupAssetIds_1[#____self_gameManager_popupManager_popupAssetIds_1 + 1] = AssetIds.PAUSE_CONTINUE_BUTTON
+    self.gameManager.popupManager:addText(TextIds.PAUSE_CONTINUE_BUTTON_CAPTION, continueText)
+    self.gameManager.popupManager:addAsset(AssetIds.PAUSE_CONTINUE_BUTTON, continueButton)
     return continueButtonY
 end
 function PauseMenu.prototype.buildSaveButton(self, continueButtonY)
@@ -89,7 +85,7 @@ function PauseMenu.prototype.buildSaveButton(self, continueButtonY)
         FontWithPosition,
         TextIds.PAUSE_SAVE_BUTTON_CAPTION,
         popupCenterX,
-        saveButtonY + buttonHeight / 2 - 5,
+        saveButtonY + buttonHeight / 2 - 1,
         "Save",
         {format = Format.CENTER, size = 18}
     )
@@ -113,12 +109,8 @@ function PauseMenu.prototype.buildSaveButton(self, continueButtonY)
             mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
         }
     )
-    self.gameManager.assetManager.textManager:addText(TextIds.PAUSE_SAVE_BUTTON_CAPTION, saveText)
-    local ____self_gameManager_popupManager_popupTextIds_2 = self.gameManager.popupManager.popupTextIds
-    ____self_gameManager_popupManager_popupTextIds_2[#____self_gameManager_popupManager_popupTextIds_2 + 1] = TextIds.PAUSE_SAVE_BUTTON_CAPTION
-    self.gameManager.assetManager:addAsset(AssetIds.PAUSE_SAVE_BUTTON, saveButton)
-    local ____self_gameManager_popupManager_popupAssetIds_3 = self.gameManager.popupManager.popupAssetIds
-    ____self_gameManager_popupManager_popupAssetIds_3[#____self_gameManager_popupManager_popupAssetIds_3 + 1] = AssetIds.PAUSE_SAVE_BUTTON
+    self.gameManager.popupManager:addText(TextIds.PAUSE_SAVE_BUTTON_CAPTION, saveText)
+    self.gameManager.popupManager:addAsset(AssetIds.PAUSE_SAVE_BUTTON, saveButton)
     return saveButtonY
 end
 function PauseMenu.prototype.buildQuitButton(self, saveButtonY)
@@ -128,7 +120,7 @@ function PauseMenu.prototype.buildQuitButton(self, saveButtonY)
         FontWithPosition,
         TextIds.PAUSE_QUIT_BUTTON_CAPTION,
         popupCenterX,
-        quitButtonY + buttonHeight / 2 - 5,
+        quitButtonY + buttonHeight / 2 - 1,
         "Quit",
         {format = Format.CENTER, size = 18}
     )
@@ -149,12 +141,8 @@ function PauseMenu.prototype.buildQuitButton(self, saveButtonY)
             mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
         }
     )
-    self.gameManager.assetManager.textManager:addText(TextIds.PAUSE_QUIT_BUTTON_CAPTION, quitText)
-    local ____self_gameManager_popupManager_popupTextIds_4 = self.gameManager.popupManager.popupTextIds
-    ____self_gameManager_popupManager_popupTextIds_4[#____self_gameManager_popupManager_popupTextIds_4 + 1] = TextIds.PAUSE_QUIT_BUTTON_CAPTION
-    self.gameManager.assetManager:addAsset(AssetIds.PAUSE_QUIT_BUTTON, quitButton)
-    local ____self_gameManager_popupManager_popupAssetIds_5 = self.gameManager.popupManager.popupAssetIds
-    ____self_gameManager_popupManager_popupAssetIds_5[#____self_gameManager_popupManager_popupAssetIds_5 + 1] = AssetIds.PAUSE_QUIT_BUTTON
+    self.gameManager.popupManager:addText(TextIds.PAUSE_QUIT_BUTTON_CAPTION, quitText)
+    self.gameManager.popupManager:addAsset(AssetIds.PAUSE_QUIT_BUTTON, quitButton)
 end
 function PauseMenu.prototype.canSave(self)
     return true
@@ -164,9 +152,7 @@ function PauseMenu.prototype.promptToQuit(self)
         Prompt,
         self.gameManager,
         "Are you sure you want to quit?",
-        function()
-            love.event.quit()
-        end,
+        function() return love.event.quit() end,
         function() return self.gameManager.popupManager:close() end,
         {secondaryMessage = "All unsaved progress will be lost."}
     )
