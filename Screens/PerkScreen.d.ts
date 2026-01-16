@@ -3,5 +3,7 @@ import GameManager from "../GameManager";
 export default class PerkScreen {
     gameManager: GameManager;
     constructor(gameManager: GameManager);
-    drawScreen(): void;
+    showPerks(): void;
+    buildPerks(): void;
+    buildReturnButton(): number;
 }

@@ -14,6 +14,7 @@ local isEmpty = ____Helpers.isEmpty
 local push = require("Libraries.push")
 local ____Asset = require("Assets.Asset")
 local Asset = ____Asset.default
+local normalColor = ____Asset.normalColor
 ____exports.padding = 5
 ____exports.cardWidth = 70
 ____exports.cardHeight = 96
@@ -21,8 +22,6 @@ ____exports.default = __TS__Class()
 local CardAssets = ____exports.default
 CardAssets.name = "CardAssets"
 function CardAssets.prototype.____constructor(self, gameManager, board)
-    self.baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png")
-    self.edelCard = love.graphics.newImage("Assets/Images/EdelCard.png")
     self.cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static")
     self.hoverSound = love.audio.newSource("Assets/Sounds/CardHover.wav", "static")
     self.cardAssetConstructionOptions = function(____, includeClickHandler, card) return {
@@ -47,7 +46,7 @@ function CardAssets.prototype.addAsset(self, card, cardX, cardY, includeClickHan
         Asset,
         self.gameManager,
         assetId,
-        card.isEdel and self.edelCard or self.baseCard,
+        card.isEdel and self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/EdelCard.png") or self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/BaseCardTemplate.png"),
         cardX,
         cardY,
         ____exports.cardWidth,
@@ -75,7 +74,7 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
         Asset,
         self.gameManager,
         normalAssetId,
-        love.graphics.newImage(suitImagePath),
+        self.gameManager.assetManager.assetLoader:loadImage(suitImagePath),
         normalPosition.x,
         normalPosition.y,
         16,
@@ -95,7 +94,7 @@ function CardAssets.prototype.addSuitAsset(self, card, x, y, includeClickHandler
         Asset,
         self.gameManager,
         flippedAssetId,
-        love.graphics.newImage(suitImagePath),
+        self.gameManager.assetManager.assetLoader:loadImage(suitImagePath),
         flippedPosition.x,
         flippedPosition.y,
         16,
@@ -120,7 +119,7 @@ function CardAssets.prototype.addRankAsset(self, card, x, y, includeClickHandler
     if includeClickHandler == nil then
         includeClickHandler = true
     end
-    local rankImage = love.graphics.newImage(card:getRankAssetPath())
+    local rankImage = self.gameManager.assetManager.assetLoader:loadImage(card:getRankAssetPath())
     local assetId = ____exports.default:getRankAssetId(card, 0)
     local rankPosition = self:getRankPosition(x, y, rankImage)
     local asset = __TS__New(
@@ -280,7 +279,12 @@ function CardAssets.prototype.disableAllCards(self, disable)
     end
     for ____, card in ipairs(self.gameManager.board:getAllCardsInPlay()) do
         for ____, asset in ipairs(self:getCardAssetList(card)) do
-            asset.isDisabled = disable
+            if disable then
+                asset.isDisabled = true
+            else
+                asset.isDisabled = false
+                asset.color = normalColor
+            end
         end
     end
 end

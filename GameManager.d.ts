@@ -1,26 +1,26 @@
 /** @noSelfInFile */
-import { GameStates } from "./Enums";
-import MainMenu from "Screens/MainMenu";
-import NewGameMenu from "Screens/NewGameMenu";
-import PauseMenu from "Screens/PauseMenu";
-import Board from "Screens/Board";
-import WinScreen from "Screens/WinScreen";
-import LoseScreen from "Screens/LoseScreen";
-import Settings from "Settings";
-import Character from "Character";
-import Player from "Player";
-import Map from "Screens/Map/Map";
-import Enemy from "Enemies/Enemy";
-import Shop from "Screens/Shop";
-import LevelUpScreen from "Screens/LevelUpScreen";
-import PerkScreen from "Screens/PerkScreen";
-import AssetManager from "Assets/AssetManager";
 import AnimationManager from "Assets/Animations/AnimationManager";
+import AssetManager from "Assets/AssetManager";
 import MusicPlayer from "Assets/Music/MusicPlayer";
 import Biome from "Biomes/Biome";
+import Character from "Character";
+import Enemy from "Enemies/Enemy";
+import Player from "Player";
 import BackgroundManager from "Screens/BackgroundManager";
-import ShaderManager from "Shaders/ShaderManager";
+import Board from "Screens/Board";
+import LevelUpScreen from "Screens/LevelUpScreen";
+import LoseScreen from "Screens/LoseScreen";
+import MainMenu from "Screens/MainMenu";
+import Map from "Screens/Map/Map";
+import NewGameMenu from "Screens/NewGameMenu";
+import PauseMenu from "Screens/PauseMenu";
+import PerkScreen from "Screens/PerkScreen";
 import PopupManager from "Screens/Popup/PopupManager";
+import Shop from "Screens/Shop";
+import WinScreen from "Screens/WinScreen";
+import Settings from "Settings";
+import ShaderManager from "Shaders/ShaderManager";
+import { GameStates } from "./Enums";
 export default class GameManager {
     gameState: GameStates;
     player: Player;
@@ -34,7 +34,7 @@ export default class GameManager {
     map: Map;
     shop?: Shop;
     levelUpScreen?: LevelUpScreen;
-    perkScreen?: PerkScreen;
+    perkScreen: PerkScreen;
     assetManager: AssetManager;
     animationManager: AnimationManager;
     musicPlayer: MusicPlayer;
@@ -54,5 +54,4 @@ export default class GameManager {
     private switchToMap;
     private switchToShop;
     private switchToLevelUpScreen;
-    private switchToPerkScreen;
 }

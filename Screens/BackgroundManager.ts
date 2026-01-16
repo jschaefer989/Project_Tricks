@@ -38,7 +38,7 @@ export default class BackgroundManager {
         return;
       //return this.gameManager.assetManager.getImage("background_main_menu");
       case GameStates.BOARD:
-        return love.graphics.newImage(
+        return this.gameManager.assetManager.assetLoader.loadImage(
           this.gameManager.biome.boardBackgroundImagePath
         );
       case GameStates.WIN_SCREEN:
@@ -56,9 +56,6 @@ export default class BackgroundManager {
       case GameStates.LEVEL_UP:
         return;
       //return this.gameManager.assetManager.getImage("background_level_up");
-      case GameStates.PERKS:
-        return;
-      //return this.gameManager.assetManager.getImage("background_perks");
       case GameStates.NEW_GAME_MENU:
         return;
       //return this.gameManager.assetManager.getImage("background_new_game_menu");

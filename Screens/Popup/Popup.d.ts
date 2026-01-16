@@ -50,6 +50,7 @@ export default class Popup {
     static getPopupHeight(popupSize: PopupSizes): number;
     static getTopOfPopup(popupSize: PopupSizes): number;
     static getCenterOfPopup(popupSize: PopupSizes): number;
+    static getBottomOfPopup(popupSize: PopupSizes): number;
     getPopupBackgroundId(): string;
     getPopupTitleId(): string;
 }

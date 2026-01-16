@@ -1,6 +1,6 @@
+import SlideAnimation from "Assets/Animations/SlideAnimation";
 import Asset from "Assets/Asset";
 import { DisabledStateCache } from "Assets/AssetManager";
-import SlideAnimation from "Assets/Animations/SlideAnimation";
 import FontWithPosition, { Fonts, Format } from "Assets/Fonts/FontWithPosition";
 import { AssetIds, TextIds } from "Enums";
 import GameManager from "GameManager";
@@ -101,9 +101,13 @@ export default class Popup {
   getPopupBackground(): Image {
     switch (this.popupSize) {
       case PopupSizes.MESSAGE_BOX:
-        return love.graphics.newImage("Assets/Images/PopupMessageBox.png");
+        return this.gameManager.assetManager.assetLoader.loadImage(
+          "Assets/Images/PopupMessageBox.png"
+        );
       case PopupSizes.MENU:
-        return love.graphics.newImage("Assets/Images/PopupMenu.png");
+        return this.gameManager.assetManager.assetLoader.loadImage(
+          "Assets/Images/PopupMenu.png"
+        );
     }
   }
 
@@ -164,9 +168,12 @@ export default class Popup {
     }
     for (const [baseId, assets] of this.gameManager.assetManager.assets) {
       if (this.associatedAssetIds.includes(baseId)) continue;
+      
       this.pausedAssetIds.set(baseId, {
         isDisabled: assets[0].isDisabled,
         useDisabledAnimation: assets[0].useDisabledAnimation,
+        color: assets[0].color,
+        showDisabledColor: assets[0].showDisabledColor,
       });
     }
     for (const [id, font] of this.gameManager.assetManager.textManager.texts) {
@@ -263,8 +270,12 @@ export default class Popup {
       const assets = this.gameManager.assetManager.assets.get(baseId);
       if (!isEmpty(assets)) {
         for (const asset of assets) {
+          // Restore the color directly first
+          asset.color = disabledState.color;
+          // Then set disabled state without applying color changes
           asset.setDisabled(disabledState.isDisabled, {
             useDisabledAnimation: disabledState.useDisabledAnimation,
+            showDisabledColor: disabledState.showDisabledColor,
           });
         }
       }
@@ -389,6 +400,10 @@ export default class Popup {
   static getCenterOfPopup(popupSize: PopupSizes): number {
     const popupWidth = Popup.getPopupWidth(popupSize);
     return popupWidth / 2 + (push.getWidth() - popupWidth) / 2;
+  }
+
+  static getBottomOfPopup(popupSize: PopupSizes): number {
+    return Popup.getTopOfPopup(popupSize) + Popup.getPopupHeight(popupSize);
   }
 
   getPopupBackgroundId(): string {

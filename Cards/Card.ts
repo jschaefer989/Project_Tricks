@@ -156,6 +156,15 @@ export default abstract class Card {
     this.gameManager.board?.updatePrimaryButtonStates();
   }
 
+  onDiscard(): void {
+    if (isEmpty(this.gameManager.board)) {
+      return;
+    }
+
+    this.gameManager.board.addPlayerPower(-this.getPower());
+    this.gameManager.board.addPlayerValue(-this.getValue());
+  }
+
   onHover(asset: Asset): void {
     this.gameManager.assetManager.tooltipManager.addTooltip(
       [

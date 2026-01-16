@@ -127,6 +127,13 @@ function Card.prototype.onUnselect(self)
         ____opt_6:updatePrimaryButtonStates()
     end
 end
+function Card.prototype.onDiscard(self)
+    if isEmpty(self.gameManager.board) then
+        return
+    end
+    self.gameManager.board:addPlayerPower(-self:getPower())
+    self.gameManager.board:addPlayerValue(-self:getValue())
+end
 function Card.prototype.onHover(self, asset)
     self.gameManager.assetManager.tooltipManager:addTooltip(
         {
@@ -162,21 +169,21 @@ function Card.prototype.onUnhover(self, asset)
 end
 function Card.getSuitName(self, suit)
     repeat
-        local ____switch19 = suit
-        local ____cond19 = ____switch19 == Suits.HEARTS
-        if ____cond19 then
+        local ____switch21 = suit
+        local ____cond21 = ____switch21 == Suits.HEARTS
+        if ____cond21 then
             return "Hearts"
         end
-        ____cond19 = ____cond19 or ____switch19 == Suits.ACORNS
-        if ____cond19 then
+        ____cond21 = ____cond21 or ____switch21 == Suits.ACORNS
+        if ____cond21 then
             return "Acorns"
         end
-        ____cond19 = ____cond19 or ____switch19 == Suits.LEAVES
-        if ____cond19 then
+        ____cond21 = ____cond21 or ____switch21 == Suits.LEAVES
+        if ____cond21 then
             return "Leaves"
         end
-        ____cond19 = ____cond19 or ____switch19 == Suits.BELLS
-        if ____cond19 then
+        ____cond21 = ____cond21 or ____switch21 == Suits.BELLS
+        if ____cond21 then
             return "Bells"
         end
         do

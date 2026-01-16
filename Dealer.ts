@@ -28,7 +28,7 @@ export default class Dealer {
     if (this.gameManager.player.deck.length === 0) {
       Dealer.initializePlayerDeck(this.gameManager);
     }
-    this.gameManager.player.deselectAllCards();
+    this.gameManager.player.unselectCards();
     this.initializeEnemyDeck();
   }
 
@@ -39,6 +39,7 @@ export default class Dealer {
   }
 
   dealHandAtStartOfFight(): void {
+    this.board.cardAssets.disableAllCards(true);
     const playerHandBefore = this.getCharacterHand(CharacterTypes.PLAYER);
     this.putCharacterHandBackInDeck(CharacterTypes.PLAYER);
     this.startReturnToDeckAnimation(
@@ -49,7 +50,6 @@ export default class Dealer {
   }
 
   dealAtStartOfFightForCharacter(character: CharacterTypes): void {
-    this.gameManager.assetManager.disableAllClickableAssets(true);
     Dealer.shuffle(this.gameManager, character);
     this.dealCards(character);
 
@@ -405,7 +405,7 @@ export default class Dealer {
       this.gameManager.animationManager.startAnimation(
         card.id,
         new SlideAnimation(
-          this.gameManager, 
+          this.gameManager,
           card.id,
           this.gameManager.settings.dealerSpeed,
           offsetX,
@@ -426,10 +426,7 @@ export default class Dealer {
     this.board.cardAssets.removeCardAssets(card);
 
     if (!this.gameManager.animationManager.hasAnimations()) {
-      this.gameManager.assetManager.disableAllClickableAssets(false);
-      this.board.cardAssets.disableAllCards(false);
-      this.board.updatePrimaryButtonStates();
-      onFinish?.();
+        onFinish?.();
     }
   }
 
@@ -491,7 +488,7 @@ export default class Dealer {
 
   deselectLootCards(): void {
     for (const card of this.lootCards) {
-      card.onUnselect();
+      card.onDiscard();
     }
   }
 

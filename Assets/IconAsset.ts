@@ -17,10 +17,10 @@ export default class IconAsset extends Asset {
     }
 
     static getPowerIconAsset(gameManager: GameManager, id: string): IconAsset {
-        return new IconAsset(gameManager, id, love.graphics.newImage("Assets/Images/AttackPower.png"),  9, 9)
+        return new IconAsset(gameManager, id, gameManager.assetManager.assetLoader.loadImage("Assets/Images/AttackPower.png"),  9, 9)
     }
 
     static getValueIconAsset(gameManager: GameManager, id: string): IconAsset {
-        return new IconAsset(gameManager, id, love.graphics.newImage("Assets/Images/Value.png"), 9, 9)
+        return new IconAsset(gameManager, id, gameManager.assetManager.assetLoader.loadImage("Assets/Images/Value.png"), 9, 9)
     }
 }

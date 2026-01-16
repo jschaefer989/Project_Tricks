@@ -16,8 +16,6 @@ interface AssetsForCard {
 export default class CardAssets {
     gameManager: GameManager;
     board: Board;
-    baseCard: Image;
-    edelCard: Image;
     cardClick: import("love.audio").Source;
     hoverSound: import("love.audio").Source;
     cardAssetConstructionOptions: (includeClickHandler: boolean, card: Card) => ConstructionOptions;

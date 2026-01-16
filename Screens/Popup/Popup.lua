@@ -5,10 +5,10 @@ local __TS__New = ____lualib.__TS__New
 local __TS__Iterator = ____lualib.__TS__Iterator
 local __TS__ArrayIncludes = ____lualib.__TS__ArrayIncludes
 local ____exports = {}
-local ____Asset = require("Assets.Asset")
-local Asset = ____Asset.default
 local ____SlideAnimation = require("Assets.Animations.SlideAnimation")
 local SlideAnimation = ____SlideAnimation.default
+local ____Asset = require("Assets.Asset")
+local Asset = ____Asset.default
 local ____FontWithPosition = require("Assets.Fonts.FontWithPosition")
 local FontWithPosition = ____FontWithPosition.default
 local Fonts = ____FontWithPosition.Fonts
@@ -97,11 +97,11 @@ function Popup.prototype.getPopupBackground(self)
         local ____switch7 = self.popupSize
         local ____cond7 = ____switch7 == ____exports.PopupSizes.MESSAGE_BOX
         if ____cond7 then
-            return love.graphics.newImage("Assets/Images/PopupMessageBox.png")
+            return self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/PopupMessageBox.png")
         end
         ____cond7 = ____cond7 or ____switch7 == ____exports.PopupSizes.MENU
         if ____cond7 then
-            return love.graphics.newImage("Assets/Images/PopupMenu.png")
+            return self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/PopupMenu.png")
         end
     until true
 end
@@ -174,7 +174,7 @@ function Popup.prototype.buildCaches(self)
             if __TS__ArrayIncludes(self.associatedAssetIds, baseId) then
                 goto __continue22
             end
-            self.pausedAssetIds:set(baseId, {isDisabled = assets[1].isDisabled, useDisabledAnimation = assets[1].useDisabledAnimation})
+            self.pausedAssetIds:set(baseId, {isDisabled = assets[1].isDisabled, useDisabledAnimation = assets[1].useDisabledAnimation, color = assets[1].color, showDisabledColor = assets[1].showDisabledColor})
         end
         ::__continue22::
     end
@@ -291,7 +291,8 @@ function Popup.prototype.enableAllAssets(self)
             local assets = self.gameManager.assetManager.assets:get(baseId)
             if not isEmpty(assets) then
                 for ____, asset in ipairs(assets) do
-                    asset:setDisabled(disabledState.isDisabled, {useDisabledAnimation = disabledState.useDisabledAnimation})
+                    asset.color = disabledState.color
+                    asset:setDisabled(disabledState.isDisabled, {useDisabledAnimation = disabledState.useDisabledAnimation, showDisabledColor = disabledState.showDisabledColor})
                 end
             end
         end
@@ -447,6 +448,9 @@ end
 function Popup.getCenterOfPopup(self, popupSize)
     local popupWidth = ____exports.default:getPopupWidth(popupSize)
     return popupWidth / 2 + (push:getWidth() - popupWidth) / 2
+end
+function Popup.getBottomOfPopup(self, popupSize)
+    return ____exports.default:getTopOfPopup(popupSize) + ____exports.default:getPopupHeight(popupSize)
 end
 function Popup.prototype.getPopupBackgroundId(self)
     return AssetIds.POPUP_BACKGROUND .. self.id

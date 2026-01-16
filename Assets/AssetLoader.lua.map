@@ -1,0 +1,1 @@
+{"version":3,"sources":["AssetLoader.ts"],"names":["this"],"mappings":";;;;;AAEA;MAAqB,0BAArB;AAAA;AAAA;AACE,wBAAmC,UAAI;AADzC;AAGE,+CAAU;OACJ,AAAAA,kBAAkB,IAAI;AACxB,eAAO,AAAAA,kBAAkB,IAAI;;AAEzB,kBAAQ,uBAAuB;IACrC,AAAAA,kBAAkB,IAAI,MAAM;AAC5B,WAAO;AANT","file":"AssetLoader.lua","sourceRoot":""}

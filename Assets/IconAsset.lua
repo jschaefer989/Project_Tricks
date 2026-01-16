@@ -27,7 +27,7 @@ function IconAsset.getPowerIconAsset(self, gameManager, id)
         ____exports.default,
         gameManager,
         id,
-        love.graphics.newImage("Assets/Images/AttackPower.png"),
+        gameManager.assetManager.assetLoader:loadImage("Assets/Images/AttackPower.png"),
         9,
         9
     )
@@ -37,7 +37,7 @@ function IconAsset.getValueIconAsset(self, gameManager, id)
         ____exports.default,
         gameManager,
         id,
-        love.graphics.newImage("Assets/Images/Value.png"),
+        gameManager.assetManager.assetLoader:loadImage("Assets/Images/Value.png"),
         9,
         9
     )

@@ -26,7 +26,6 @@ ____exports.default = __TS__Class()
 local PauseMenu = ____exports.default
 PauseMenu.name = "PauseMenu"
 function PauseMenu.prototype.____constructor(self, gameManager)
-    self.button = love.graphics.newImage("Assets/Images/PauseMenuButton.png")
     self.isOpen = false
     self.gameManager = gameManager
 end
@@ -59,7 +58,7 @@ function PauseMenu.prototype.buildContinueButton(self)
         Asset,
         self.gameManager,
         AssetIds.PAUSE_CONTINUE_BUTTON,
-        self.button,
+        self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/PauseMenuButton.png"),
         popupCenterX - buttonWidth / 2,
         continueButtonY,
         buttonWidth,
@@ -93,7 +92,7 @@ function PauseMenu.prototype.buildSaveButton(self, continueButtonY)
         Asset,
         self.gameManager,
         AssetIds.PAUSE_SAVE_BUTTON,
-        self.button,
+        self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/PauseMenuButton.png"),
         popupCenterX - buttonWidth / 2,
         saveButtonY,
         buttonWidth,
@@ -128,7 +127,7 @@ function PauseMenu.prototype.buildQuitButton(self, saveButtonY)
         Asset,
         self.gameManager,
         AssetIds.PAUSE_QUIT_BUTTON,
-        self.button,
+        self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/PauseMenuButton.png"),
         popupCenterX - buttonWidth / 2,
         quitButtonY,
         buttonWidth,

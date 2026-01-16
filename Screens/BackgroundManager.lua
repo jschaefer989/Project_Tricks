@@ -45,7 +45,7 @@ function BackgroundManager.prototype.getBackgroundImage(self, gameState)
         end
         ____cond6 = ____cond6 or ____switch6 == GameStates.BOARD
         if ____cond6 then
-            return love.graphics.newImage(self.gameManager.biome.boardBackgroundImagePath)
+            return self.gameManager.assetManager.assetLoader:loadImage(self.gameManager.biome.boardBackgroundImagePath)
         end
         ____cond6 = ____cond6 or ____switch6 == GameStates.WIN_SCREEN
         if ____cond6 then
@@ -64,10 +64,6 @@ function BackgroundManager.prototype.getBackgroundImage(self, gameState)
             return
         end
         ____cond6 = ____cond6 or ____switch6 == GameStates.LEVEL_UP
-        if ____cond6 then
-            return
-        end
-        ____cond6 = ____cond6 or ____switch6 == GameStates.PERKS
         if ____cond6 then
             return
         end

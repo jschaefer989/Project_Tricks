@@ -14,7 +14,6 @@ export default class MusicPlayer {
     private playLevelUpMusic;
     private playGameOverMusic;
     private playVictoryMusic;
-    private playPerkSelectionMusic;
     private playShopMusic;
     private playMapMusic;
     private playNewGameMenuMusic;

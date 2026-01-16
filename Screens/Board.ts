@@ -133,7 +133,6 @@ export default class Board {
     if (!this.gameManager.player.anySelectedCards()) return;
 
     this.gameManager.assetManager.disableAllClickableAssets(true);
-    this.disablePrimaryButtons(); // Manually disable primary buttons during attack
 
     if (this.playerPower > this.enemyPower) {
       // Mark all enemy cards as cut and update the assets
@@ -216,7 +215,7 @@ export default class Board {
         0.15,
         0,
         -40,
-        slideAnimationAssets,
+        slideAnimationAssets
       )
     );
 
@@ -357,7 +356,6 @@ export default class Board {
     if (this.getRemainingDiscards() <= 0) return;
 
     this.gameManager.assetManager.disableAllClickableAssets(true);
-    this.disablePrimaryButtons(); // Manually disable primary buttons during discard
 
     const removedIndices = this.dealer.discardCards(
       CharacterTypes.PLAYER,
@@ -400,7 +398,7 @@ export default class Board {
 
   endFight(): void {
     this.clearStats();
-    this.gameManager.player.deselectAllCards();
+    this.gameManager.player.unselectCards();
     const winner = this.getWinner();
     if (winner === CharacterTypes.PLAYER) {
       this.enemy.removeAllCardsFromHand();
@@ -512,7 +510,9 @@ export default class Board {
       new Asset(
         this.gameManager,
         AssetIds.LETS_FIGHT_BUTTON,
-        love.graphics.newImage("Assets/Images/LetsFightButton.png"),
+        this.gameManager.assetManager.assetLoader.loadImage(
+          "Assets/Images/LetsFightButton.png"
+        ),
         buttonX,
         centerY - buttonHeight / 2,
         buttonWidth,
@@ -584,7 +584,9 @@ export default class Board {
       new Asset(
         this.gameManager,
         AssetIds.ATTACK_BUTTON,
-        love.graphics.newImage("Assets/Images/AttackButton.png"),
+        this.gameManager.assetManager.assetLoader.loadImage(
+          "Assets/Images/AttackButton.png"
+        ),
         buttonX,
         buttonY,
         btnW,
@@ -650,7 +652,9 @@ export default class Board {
       new Asset(
         this.gameManager,
         AssetIds.DISCARD_BUTTON,
-        love.graphics.newImage("Assets/Images/DiscardButton.png"),
+        this.gameManager.assetManager.assetLoader.loadImage(
+          "Assets/Images/DiscardButton.png"
+        ),
         discardX,
         buttonY,
         btnW,
@@ -702,7 +706,9 @@ export default class Board {
       new Asset(
         this.gameManager,
         AssetIds.DESELECT_BUTTON,
-        love.graphics.newImage("Assets/Images/DeselectButton.png"),
+        this.gameManager.assetManager.assetLoader.loadImage(
+          "Assets/Images/DeselectButton.png"
+        ),
         deselectX,
         buttonY,
         btnW,
@@ -750,7 +756,9 @@ export default class Board {
       new Asset(
         this.gameManager,
         AssetIds.SORT_BUTTON,
-        love.graphics.newImage("Assets/Images/SortButton.png"),
+        this.gameManager.assetManager.assetLoader.loadImage(
+          "Assets/Images/SortButton.png"
+        ),
         deselectX,
         buttonY + btnH / 2 + 1,
         btnW,
@@ -832,7 +840,9 @@ export default class Board {
       new Asset(
         this.gameManager,
         AssetIds.POINT_DISPLAY,
-        love.graphics.newImage("Assets/Images/PointBoard.png"),
+        this.gameManager.assetManager.assetLoader.loadImage(
+          "Assets/Images/PointBoard.png"
+        ),
         buttonX,
         5,
         boardWidth,
@@ -876,7 +886,7 @@ export default class Board {
     );
 
     if (!isEmpty(this.edelCard)) {
-      const suitImage = love.graphics.newImage(
+      const suitImage = this.gameManager.assetManager.assetLoader.loadImage(
         CardAssets.getSuitAssetPath(this.edelCard.suit)
       );
       this.gameManager.assetManager.addAsset(
@@ -1012,7 +1022,9 @@ export default class Board {
       new Asset(
         this.gameManager,
         portraitBackgroundAssetId,
-        love.graphics.newImage("Assets/Images/PortraitBackground.png"),
+        this.gameManager.assetManager.assetLoader.loadImage(
+          "Assets/Images/PortraitBackground.png"
+        ),
         5,
         portraitPosition,
         portraitBackgroundW,
@@ -1031,7 +1043,9 @@ export default class Board {
       new Asset(
         this.gameManager,
         portraitAssetId,
-        love.graphics.newImage("Assets/Images/Portrait.png"),
+        this.gameManager.assetManager.assetLoader.loadImage(
+          "Assets/Images/Portrait.png"
+        ),
         5,
         portraitPosition,
         portraitW,
@@ -1106,14 +1120,15 @@ export default class Board {
         new Asset(
           this.gameManager,
           AssetIds.PERKS_BUTTON,
-          love.graphics.newImage("Assets/Images/PerksButton.png"),
+          this.gameManager.assetManager.assetLoader.loadImage(
+            "Assets/Images/PerksButton.png"
+          ),
           portraitW + 8,
           portraitPosition + 10,
           39,
           18,
           {
-            onClick: () =>
-              this.gameManager.switchBasedOnGameState(GameStates.PERKS),
+            onClick: () => this.gameManager.perkScreen.showPerks(),
             clickSound: this.gameManager.assetManager.buttonClickSound,
             associatedTexts: [perksText],
             hoverEffect: [HoverEffects.CHANGE_COLOR],
@@ -1121,6 +1136,7 @@ export default class Board {
               MousePressEffects.DARKEN,
               MousePressEffects.SHIFT_DOWN,
             ],
+            alwaysEnabled: true,
           }
         )
       );
@@ -1137,7 +1153,9 @@ export default class Board {
             icon: new IconAsset(
               this.gameManager,
               AssetIds.MONEY_ICON,
-              love.graphics.newImage("Assets/Images/Mark.png"),
+              this.gameManager.assetManager.assetLoader.loadImage(
+                "Assets/Images/Mark.png"
+              ),
               9,
               9
             ),
@@ -1164,7 +1182,9 @@ export default class Board {
       new Asset(
         this.gameManager,
         assetId,
-        love.graphics.newImage("Assets/Images/BaseCardBack.png"),
+        this.gameManager.assetManager.assetLoader.loadImage(
+          "Assets/Images/BaseCardBack.png"
+        ),
         deckPosition.x,
         deckPosition.y,
         cardWidth,
@@ -1198,7 +1218,9 @@ export default class Board {
       new Asset(
         this.gameManager,
         AssetIds.EDEL_BOARD,
-        love.graphics.newImage("Assets/Images/EdelBoard.png"),
+        this.gameManager.assetManager.assetLoader.loadImage(
+          "Assets/Images/EdelBoard.png"
+        ),
         boardX,
         5,
         boardWidth,
@@ -1223,7 +1245,7 @@ export default class Board {
       )
     );
 
-    const suitImage = love.graphics.newImage(
+    const suitImage = this.gameManager.assetManager.assetLoader.loadImage(
       CardAssets.getSuitAssetPath(this.edelCard.suit)
     );
     this.gameManager.assetManager.addAsset(
@@ -1339,7 +1361,9 @@ export default class Board {
 
   private getWinFireSprite(): Image {
     // TODO: render different fire sprites and animations based on how hard the player is about to win
-    return love.graphics.newImage("Assets/Images/BasicWinFire.png");
+    return this.gameManager.assetManager.assetLoader.loadImage(
+      "Assets/Images/BasicWinFire.png"
+    );
   }
 
   getPortraitPosition(characterType: CharacterTypes): number {

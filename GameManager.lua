@@ -2,57 +2,57 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____Enums = require("Enums")
-local GameStates = ____Enums.GameStates
-local CharacterTypes = ____Enums.CharacterTypes
-local ____MainMenu = require("Screens.MainMenu")
-local MainMenu = ____MainMenu.default
-local ____NewGameMenu = require("Screens.NewGameMenu")
-local NewGameMenu = ____NewGameMenu.default
-local ____PauseMenu = require("Screens.PauseMenu")
-local PauseMenu = ____PauseMenu.default
-local ____Board = require("Screens.Board")
-local Board = ____Board.default
-local ____WinScreen = require("Screens.WinScreen")
-local WinScreen = ____WinScreen.default
-local ____LoseScreen = require("Screens.LoseScreen")
-local LoseScreen = ____LoseScreen.default
-local ____Settings = require("Settings")
-local Settings = ____Settings.default
-local ____Helpers = require("Helpers")
-local exhaustiveGuard = ____Helpers.exhaustiveGuard
-local isEmpty = ____Helpers.isEmpty
-local GameStateManager = require("Libraries.GameStateManager-main.gamestateManager")
-local ____Player = require("Player")
-local Player = ____Player.default
-local ____Map = require("Screens.Map.Map")
-local Map = ____Map.default
-local ____Enemy = require("Enemies.Enemy")
-local Enemy = ____Enemy.default
-local ____Shop = require("Screens.Shop")
-local Shop = ____Shop.default
-local ____LevelUpScreen = require("Screens.LevelUpScreen")
-local LevelUpScreen = ____LevelUpScreen.default
-local ____PerkScreen = require("Screens.PerkScreen")
-local PerkScreen = ____PerkScreen.default
-local push = require("Libraries.push")
-local ____AssetManager = require("Assets.AssetManager")
-local AssetManager = ____AssetManager.default
 local ____AnimationManager = require("Assets.Animations.AnimationManager")
 local AnimationManager = ____AnimationManager.default
+local ____AssetManager = require("Assets.AssetManager")
+local AssetManager = ____AssetManager.default
+local ____FontWithPosition = require("Assets.Fonts.FontWithPosition")
+local Fonts = ____FontWithPosition.Fonts
 local ____MusicPlayer = require("Assets.Music.MusicPlayer")
 local MusicPlayer = ____MusicPlayer.default
 local ____Grass = require("Biomes.Grass")
 local Grass = ____Grass.default
+local ____Enemy = require("Enemies.Enemy")
+local Enemy = ____Enemy.default
+local ____Helpers = require("Helpers")
+local exhaustiveGuard = ____Helpers.exhaustiveGuard
+local isEmpty = ____Helpers.isEmpty
+local GameStateManager = require("Libraries.GameStateManager-main.gamestateManager")
+local lovelyToasts = require("Libraries.Lovely-Toasts-main.lovelyToasts")
+local push = require("Libraries.push")
+local ____Player = require("Player")
+local Player = ____Player.default
 local ____BackgroundManager = require("Screens.BackgroundManager")
 local BackgroundManager = ____BackgroundManager.default
-local ____ShaderManager = require("Shaders.ShaderManager")
-local ShaderManager = ____ShaderManager.default
-local ____FontWithPosition = require("Assets.Fonts.FontWithPosition")
-local Fonts = ____FontWithPosition.Fonts
-local lovelyToasts = require("Libraries.Lovely-Toasts-main.lovelyToasts")
+local ____Board = require("Screens.Board")
+local Board = ____Board.default
+local ____LevelUpScreen = require("Screens.LevelUpScreen")
+local LevelUpScreen = ____LevelUpScreen.default
+local ____LoseScreen = require("Screens.LoseScreen")
+local LoseScreen = ____LoseScreen.default
+local ____MainMenu = require("Screens.MainMenu")
+local MainMenu = ____MainMenu.default
+local ____Map = require("Screens.Map.Map")
+local Map = ____Map.default
+local ____NewGameMenu = require("Screens.NewGameMenu")
+local NewGameMenu = ____NewGameMenu.default
+local ____PauseMenu = require("Screens.PauseMenu")
+local PauseMenu = ____PauseMenu.default
+local ____PerkScreen = require("Screens.PerkScreen")
+local PerkScreen = ____PerkScreen.default
 local ____PopupManager = require("Screens.Popup.PopupManager")
 local PopupManager = ____PopupManager.default
+local ____Shop = require("Screens.Shop")
+local Shop = ____Shop.default
+local ____WinScreen = require("Screens.WinScreen")
+local WinScreen = ____WinScreen.default
+local ____Settings = require("Settings")
+local Settings = ____Settings.default
+local ____ShaderManager = require("Shaders.ShaderManager")
+local ShaderManager = ____ShaderManager.default
+local ____Enums = require("Enums")
+local CharacterTypes = ____Enums.CharacterTypes
+local GameStates = ____Enums.GameStates
 ____exports.default = __TS__Class()
 local GameManager = ____exports.default
 GameManager.name = "GameManager"
@@ -61,6 +61,7 @@ function GameManager.prototype.____constructor(self)
     self.settings = __TS__New(Settings)
     self.pauseMenu = __TS__New(PauseMenu, self)
     self.map = __TS__New(Map, self)
+    self.perkScreen = __TS__New(PerkScreen, self)
     self.assetManager = __TS__New(AssetManager, self)
     self.animationManager = __TS__New(AnimationManager, self)
     self.musicPlayer = __TS__New(MusicPlayer, self)
@@ -142,11 +143,6 @@ function GameManager.prototype.switchBasedOnGameState(self, gameState, enemy)
             self:switchToLevelUpScreen()
             break
         end
-        ____cond7 = ____cond7 or ____switch7 == GameStates.PERKS
-        if ____cond7 then
-            self:switchToPerkScreen()
-            break
-        end
         do
             exhaustiveGuard(gameState)
         end
@@ -165,7 +161,6 @@ function GameManager.prototype.switchToMainMenu(self)
     self.loseScreen = nil
     self.shop = nil
     self.levelUpScreen = nil
-    self.perkScreen = nil
     if isEmpty(self.mainMenu) then
         self.mainMenu = __TS__New(MainMenu, self)
     end
@@ -226,7 +221,6 @@ function GameManager.prototype.switchToBoard(self, enemy)
     self.loseScreen = nil
     self.shop = nil
     self.levelUpScreen = nil
-    self.perkScreen = nil
     if isEmpty(self.board) then
         self.board = __TS__New(
             Board,
@@ -249,7 +243,6 @@ function GameManager.prototype.switchToWinScreen(self)
     self.loseScreen = nil
     self.shop = nil
     self.levelUpScreen = nil
-    self.perkScreen = nil
     if isEmpty(self.winScreen) then
         self.winScreen = __TS__New(WinScreen, self)
     end
@@ -267,7 +260,6 @@ function GameManager.prototype.switchToLoseScreen(self)
     self.winScreen = nil
     self.shop = nil
     self.levelUpScreen = nil
-    self.perkScreen = nil
     if isEmpty(self.loseScreen) then
         self.loseScreen = __TS__New(LoseScreen)
     end
@@ -288,7 +280,6 @@ function GameManager.prototype.switchToMap(self)
     self.loseScreen = nil
     self.shop = nil
     self.levelUpScreen = nil
-    self.perkScreen = nil
     GameStateManager:setState(mapState)
 end
 function GameManager.prototype.switchToShop(self)
@@ -303,7 +294,6 @@ function GameManager.prototype.switchToShop(self)
     self.winScreen = nil
     self.loseScreen = nil
     self.levelUpScreen = nil
-    self.perkScreen = nil
     if isEmpty(self.shop) then
         self.shop = __TS__New(Shop, self)
         self.shop:setup()
@@ -322,29 +312,10 @@ function GameManager.prototype.switchToLevelUpScreen(self)
     self.winScreen = nil
     self.loseScreen = nil
     self.shop = nil
-    self.perkScreen = nil
     if isEmpty(self.levelUpScreen) then
         self.levelUpScreen = __TS__New(LevelUpScreen, self)
         self.levelUpScreen:setup()
     end
     GameStateManager:setState(levelUpState)
-end
-function GameManager.prototype.switchToPerkScreen(self)
-    local perkState = {update = function(____, dt)
-        local ____opt_16 = self.perkScreen
-        if ____opt_16 ~= nil then
-            ____opt_16:drawScreen()
-        end
-    end}
-    self.gameState = GameStates.PERKS
-    self.board = nil
-    self.winScreen = nil
-    self.loseScreen = nil
-    self.shop = nil
-    self.levelUpScreen = nil
-    if isEmpty(self.perkScreen) then
-        self.perkScreen = __TS__New(PerkScreen, self)
-    end
-    GameStateManager:setState(perkState)
 end
 return ____exports

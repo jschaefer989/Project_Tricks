@@ -34,7 +34,7 @@ function Dealer.prototype.setup(self)
     if #self.gameManager.player.deck == 0 then
         ____exports.default:initializePlayerDeck(self.gameManager)
     end
-    self.gameManager.player:deselectAllCards()
+    self.gameManager.player:unselectCards()
     self:initializeEnemyDeck()
 end
 function Dealer.prototype.dealEdel(self)
@@ -43,6 +43,7 @@ function Dealer.prototype.dealEdel(self)
     self:determineEdelSuit()
 end
 function Dealer.prototype.dealHandAtStartOfFight(self)
+    self.board.cardAssets:disableAllCards(true)
     local playerHandBefore = self:getCharacterHand(CharacterTypes.PLAYER)
     self:putCharacterHandBackInDeck(CharacterTypes.PLAYER)
     self:startReturnToDeckAnimation(
@@ -52,7 +53,6 @@ function Dealer.prototype.dealHandAtStartOfFight(self)
     )
 end
 function Dealer.prototype.dealAtStartOfFightForCharacter(self, character)
-    self.gameManager.assetManager:disableAllClickableAssets(true)
     ____exports.default:shuffle(self.gameManager, character)
     self:dealCards(character)
     if character == CharacterTypes.ENEMY then
@@ -368,9 +368,6 @@ end
 function Dealer.prototype.finishUpRemoveCardAnimation(self, card, onFinish)
     self.board.cardAssets:removeCardAssets(card)
     if not self.gameManager.animationManager:hasAnimations() then
-        self.gameManager.assetManager:disableAllClickableAssets(false)
-        self.board.cardAssets:disableAllCards(false)
-        self.board:updatePrimaryButtonStates()
         if onFinish ~= nil then
             onFinish()
         end
@@ -439,7 +436,7 @@ function Dealer.prototype.hasLootCard(self, card)
 end
 function Dealer.prototype.deselectLootCards(self)
     for ____, card in ipairs(self.lootCards) do
-        card:onUnselect()
+        card:onDiscard()
     end
 end
 function Dealer.prototype.addLootCardsToPlayer(self)

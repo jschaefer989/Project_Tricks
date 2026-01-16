@@ -1,34 +1,33 @@
 /** @noSelfInFile */
 
-import { GameStates, CharacterTypes } from "./Enums";
-import MainMenu from "Screens/MainMenu";
-import NewGameMenu from "Screens/NewGameMenu";
-import PauseMenu from "Screens/PauseMenu";
-import Board from "Screens/Board";
-import WinScreen from "Screens/WinScreen";
-import LoseScreen from "Screens/LoseScreen";
-import Settings from "Settings";
-import Character from "Character";
-import { exhaustiveGuard, isEmpty } from "Helpers";
-import * as GameStateManager from "Libraries.GameStateManager-main.gamestateManager";
-import Player from "Player";
-import Map from "Screens/Map/Map";
-import Enemy from "Enemies/Enemy";
-import Shop from "Screens/Shop";
-import LevelUpScreen from "Screens/LevelUpScreen";
-import PerkScreen from "Screens/PerkScreen";
-import * as push from "Libraries.push";
-import AssetManager from "Assets/AssetManager";
-import Card from "Cards/Card";
 import AnimationManager from "Assets/Animations/AnimationManager";
+import AssetManager from "Assets/AssetManager";
+import { Fonts } from "Assets/Fonts/FontWithPosition";
 import MusicPlayer from "Assets/Music/MusicPlayer";
 import Biome from "Biomes/Biome";
 import Grass from "Biomes/Grass";
-import BackgroundManager from "Screens/BackgroundManager";
-import ShaderManager from "Shaders/ShaderManager";
-import { Fonts } from "Assets/Fonts/FontWithPosition";
+import Character from "Character";
+import Enemy from "Enemies/Enemy";
+import { exhaustiveGuard, isEmpty } from "Helpers";
+import * as GameStateManager from "Libraries.GameStateManager-main.gamestateManager";
 import * as lovelyToasts from "Libraries.Lovely-Toasts-main.lovelyToasts";
+import * as push from "Libraries.push";
+import Player from "Player";
+import BackgroundManager from "Screens/BackgroundManager";
+import Board from "Screens/Board";
+import LevelUpScreen from "Screens/LevelUpScreen";
+import LoseScreen from "Screens/LoseScreen";
+import MainMenu from "Screens/MainMenu";
+import Map from "Screens/Map/Map";
+import NewGameMenu from "Screens/NewGameMenu";
+import PauseMenu from "Screens/PauseMenu";
+import PerkScreen from "Screens/PerkScreen";
 import PopupManager from "Screens/Popup/PopupManager";
+import Shop from "Screens/Shop";
+import WinScreen from "Screens/WinScreen";
+import Settings from "Settings";
+import ShaderManager from "Shaders/ShaderManager";
+import { CharacterTypes, GameStates } from "./Enums";
 
 interface GameState {
   update: (dt: number) => void;
@@ -51,7 +50,7 @@ export default class GameManager {
   map: Map = new Map(this);
   shop?: Shop;
   levelUpScreen?: LevelUpScreen;
-  perkScreen?: PerkScreen;
+  perkScreen = new PerkScreen(this);
   assetManager = new AssetManager(this);
   animationManager = new AnimationManager(this);
   musicPlayer = new MusicPlayer(this);
@@ -113,9 +112,6 @@ export default class GameManager {
       case GameStates.LEVEL_UP:
         this.switchToLevelUpScreen();
         break;
-      case GameStates.PERKS:
-        this.switchToPerkScreen();
-        break;
       default:
         exhaustiveGuard(gameState);
     }
@@ -134,7 +130,6 @@ export default class GameManager {
     this.loseScreen = undefined;
     this.shop = undefined;
     this.levelUpScreen = undefined;
-    this.perkScreen = undefined;
 
     if (isEmpty(this.mainMenu)) {
       this.mainMenu = new MainMenu(this);
@@ -199,7 +194,6 @@ export default class GameManager {
     this.loseScreen = undefined;
     this.shop = undefined;
     this.levelUpScreen = undefined;
-    this.perkScreen = undefined;
 
     if (isEmpty(this.board)) {
       this.board = new Board(this, enemy ?? new Enemy(this));
@@ -224,7 +218,6 @@ export default class GameManager {
     this.loseScreen = undefined;
     this.shop = undefined;
     this.levelUpScreen = undefined;
-    this.perkScreen = undefined;
 
     if (isEmpty(this.winScreen)) {
       this.winScreen = new WinScreen(this);
@@ -245,7 +238,6 @@ export default class GameManager {
     this.winScreen = undefined;
     this.shop = undefined;
     this.levelUpScreen = undefined;
-    this.perkScreen = undefined;
 
     if (isEmpty(this.loseScreen)) {
       this.loseScreen = new LoseScreen();
@@ -271,7 +263,6 @@ export default class GameManager {
     this.loseScreen = undefined;
     this.shop = undefined;
     this.levelUpScreen = undefined;
-    this.perkScreen = undefined;
 
     GameStateManager.setState(mapState);
   }
@@ -289,7 +280,6 @@ export default class GameManager {
     this.winScreen = undefined;
     this.loseScreen = undefined;
     this.levelUpScreen = undefined;
-    this.perkScreen = undefined;
 
     if (isEmpty(this.shop)) {
       this.shop = new Shop(this);
@@ -312,7 +302,6 @@ export default class GameManager {
     this.winScreen = undefined;
     this.loseScreen = undefined;
     this.shop = undefined;
-    this.perkScreen = undefined;
 
     if (isEmpty(this.levelUpScreen)) {
       this.levelUpScreen = new LevelUpScreen(this);
@@ -320,27 +309,5 @@ export default class GameManager {
     }
 
     GameStateManager.setState(levelUpState);
-  }
-
-  private switchToPerkScreen(): void {
-    const perkState: GameState = {
-      update: (dt: number) => {
-        this.perkScreen?.drawScreen();
-      },
-    };
-
-    this.gameState = GameStates.PERKS;
-
-    this.board = undefined;
-    this.winScreen = undefined;
-    this.loseScreen = undefined;
-    this.shop = undefined;
-    this.levelUpScreen = undefined;
-
-    if (isEmpty(this.perkScreen)) {
-      this.perkScreen = new PerkScreen(this);
-    }
-
-    GameStateManager.setState(perkState);
   }
 }

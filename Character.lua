@@ -65,11 +65,6 @@ function Character.prototype.addDiscardsToDeck(self)
     end
     self.discardPile = {}
 end
-function Character.prototype.deselectAllCards(self)
-    for ____, card in ipairs(self.hand) do
-        card:onUnselect()
-    end
-end
 function Character.prototype.getCardPower(self)
     local power = 0
     for ____, card in ipairs(self.hand) do
@@ -111,7 +106,7 @@ function Character.prototype.putHandBackInDeck(self)
     for ____, card in ipairs(self.hand) do
         self:addToDeck(card)
         if card.isSelected then
-            card:onUnselect()
+            card:onDiscard()
         end
     end
     self.hand = {}
@@ -156,19 +151,19 @@ end
 function Character.prototype.getSortMode(self, timeSinceLastSort, threshold)
     if timeSinceLastSort < threshold then
         repeat
-            local ____switch40 = self.sortMode
-            local ____cond40 = ____switch40 == SortMode.POWER
-            if ____cond40 then
+            local ____switch37 = self.sortMode
+            local ____cond37 = ____switch37 == SortMode.POWER
+            if ____cond37 then
                 self.sortMode = SortMode.VALUE
                 break
             end
-            ____cond40 = ____cond40 or ____switch40 == SortMode.VALUE
-            if ____cond40 then
+            ____cond37 = ____cond37 or ____switch37 == SortMode.VALUE
+            if ____cond37 then
                 self.sortMode = SortMode.SUIT
                 break
             end
-            ____cond40 = ____cond40 or ____switch40 == SortMode.SUIT
-            if ____cond40 then
+            ____cond37 = ____cond37 or ____switch37 == SortMode.SUIT
+            if ____cond37 then
                 self.sortMode = SortMode.POWER
                 break
             end
@@ -179,19 +174,19 @@ function Character.prototype.getSortMode(self, timeSinceLastSort, threshold)
 end
 function Character.prototype.applySort(self)
     repeat
-        local ____switch43 = self.sortMode
-        local ____cond43 = ____switch43 == SortMode.POWER
-        if ____cond43 then
+        local ____switch40 = self.sortMode
+        local ____cond40 = ____switch40 == SortMode.POWER
+        if ____cond40 then
             self:sortByPower()
             break
         end
-        ____cond43 = ____cond43 or ____switch43 == SortMode.VALUE
-        if ____cond43 then
+        ____cond40 = ____cond40 or ____switch40 == SortMode.VALUE
+        if ____cond40 then
             self:sortByValue()
             break
         end
-        ____cond43 = ____cond43 or ____switch43 == SortMode.SUIT
-        if ____cond43 then
+        ____cond40 = ____cond40 or ____switch40 == SortMode.SUIT
+        if ____cond40 then
             self:sortBySuit()
             break
         end
@@ -239,13 +234,13 @@ function Character.prototype.redrawHand(self)
 end
 function Character.prototype.getCharacterName(self)
     repeat
-        local ____switch55 = self.type
-        local ____cond55 = ____switch55 == CharacterTypes.PLAYER
-        if ____cond55 then
+        local ____switch52 = self.type
+        local ____cond52 = ____switch52 == CharacterTypes.PLAYER
+        if ____cond52 then
             return self.gameManager.player.name
         end
-        ____cond55 = ____cond55 or ____switch55 == CharacterTypes.ENEMY
-        if ____cond55 then
+        ____cond52 = ____cond52 or ____switch52 == CharacterTypes.ENEMY
+        if ____cond52 then
             local ____opt_6 = self.gameManager.board
             local ____opt_4 = ____opt_6 and ____opt_6.enemy
             return ____opt_4 and ____opt_4.name or "Enemy"

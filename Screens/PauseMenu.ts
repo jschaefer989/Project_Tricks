@@ -13,7 +13,6 @@ const buttonHeight = 64;
 
 export default class PauseMenu {
   gameManager: GameManager;
-  button = love.graphics.newImage("Assets/Images/PauseMenuButton.png");
   isOpen = false;
 
   constructor(gameManager: GameManager) {
@@ -48,7 +47,7 @@ export default class PauseMenu {
     const continueButton = new Asset(
       this.gameManager,
       AssetIds.PAUSE_CONTINUE_BUTTON,
-      this.button,
+      this.gameManager.assetManager.assetLoader.loadImage("Assets/Images/PauseMenuButton.png"),
       popupCenterX - buttonWidth / 2,
       continueButtonY,
       buttonWidth,
@@ -94,7 +93,7 @@ export default class PauseMenu {
     const saveButton = new Asset(
       this.gameManager,
       AssetIds.PAUSE_SAVE_BUTTON,
-      this.button,
+      this.gameManager.assetManager.assetLoader.loadImage("Assets/Images/PauseMenuButton.png"),
       popupCenterX - buttonWidth / 2,
       saveButtonY,
       buttonWidth,
@@ -141,7 +140,7 @@ export default class PauseMenu {
     const quitButton = new Asset(
       this.gameManager,
       AssetIds.PAUSE_QUIT_BUTTON,
-      this.button,
+      this.gameManager.assetManager.assetLoader.loadImage("Assets/Images/PauseMenuButton.png"),
       popupCenterX - buttonWidth / 2,
       quitButtonY,
       buttonWidth,

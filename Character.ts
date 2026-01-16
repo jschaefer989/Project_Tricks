@@ -59,12 +59,6 @@ export default class Character {
     this.discardPile = [];
   }
 
-  deselectAllCards(): void {
-    for (const card of this.hand) {
-      card.onUnselect();
-    }
-  }
-
   getCardPower(): number {
     let power = 0;
     for (const card of this.hand) {
@@ -102,7 +96,7 @@ export default class Character {
     for (const card of this.hand) {
       this.addToDeck(card);
       if (card.isSelected) {
-        card.onUnselect();
+        card.onDiscard();
       }
     }
     this.hand = [];

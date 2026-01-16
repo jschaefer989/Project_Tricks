@@ -126,7 +126,6 @@ function Board.prototype.handleAttack(self)
         return
     end
     self.gameManager.assetManager:disableAllClickableAssets(true)
-    self:disablePrimaryButtons()
     if self.playerPower > self.enemyPower then
         for ____, card in ipairs(self:getSlainCards(CharacterTypes.ENEMY)) do
             self.cardAssets:redrawCard(card)
@@ -335,7 +334,6 @@ function Board.prototype.handleDiscard(self)
         return
     end
     self.gameManager.assetManager:disableAllClickableAssets(true)
-    self:disablePrimaryButtons()
     local removedIndices = self.dealer:discardCards(
         CharacterTypes.PLAYER,
         self.gameManager.player:getSelectedCards()
@@ -369,7 +367,7 @@ function Board.prototype.getWinner(self)
 end
 function Board.prototype.endFight(self)
     self:clearStats()
-    self.gameManager.player:deselectAllCards()
+    self.gameManager.player:unselectCards()
     local winner = self:getWinner()
     if winner == CharacterTypes.PLAYER then
         self.enemy:removeAllCardsFromHand()
@@ -462,7 +460,7 @@ function Board.prototype.buildLetsFightButton(self)
             Asset,
             self.gameManager,
             AssetIds.LETS_FIGHT_BUTTON,
-            love.graphics.newImage("Assets/Images/LetsFightButton.png"),
+            self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/LetsFightButton.png"),
             buttonX,
             centerY - buttonHeight / 2,
             buttonWidth,
@@ -520,7 +518,7 @@ function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW, btnH)
             Asset,
             self.gameManager,
             AssetIds.ATTACK_BUTTON,
-            love.graphics.newImage("Assets/Images/AttackButton.png"),
+            self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/AttackButton.png"),
             buttonX,
             buttonY,
             btnW,
@@ -564,7 +562,7 @@ function Board.prototype.buildDiscardButton(self, buttonX, buttonY, btnW, btnH, 
             Asset,
             self.gameManager,
             AssetIds.DISCARD_BUTTON,
-            love.graphics.newImage("Assets/Images/DiscardButton.png"),
+            self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/DiscardButton.png"),
             discardX,
             buttonY,
             btnW,
@@ -599,7 +597,7 @@ function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, btnH
             Asset,
             self.gameManager,
             AssetIds.DESELECT_BUTTON,
-            love.graphics.newImage("Assets/Images/DeselectButton.png"),
+            self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/DeselectButton.png"),
             deselectX,
             buttonY,
             btnW,
@@ -633,7 +631,7 @@ function Board.prototype.buildSortButton(self, deselectX, buttonY, btnW, btnH)
             Asset,
             self.gameManager,
             AssetIds.SORT_BUTTON,
-            love.graphics.newImage("Assets/Images/SortButton.png"),
+            self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/SortButton.png"),
             deselectX,
             buttonY + btnH / 2 + 1,
             btnW,
@@ -701,7 +699,7 @@ function Board.prototype.buildPointBoard(self)
             Asset,
             self.gameManager,
             AssetIds.POINT_DISPLAY,
-            love.graphics.newImage("Assets/Images/PointBoard.png"),
+            self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/PointBoard.png"),
             buttonX,
             5,
             boardWidth,
@@ -735,7 +733,7 @@ function Board.prototype.buildPointBoard(self)
         )
     )
     if not isEmpty(self.edelCard) then
-        local suitImage = love.graphics.newImage(CardAssets:getSuitAssetPath(self.edelCard.suit))
+        local suitImage = self.gameManager.assetManager.assetLoader:loadImage(CardAssets:getSuitAssetPath(self.edelCard.suit))
         self.gameManager.assetManager:addAsset(
             AssetIds.EDEL_ICON,
             __TS__New(
@@ -834,7 +832,7 @@ function Board.prototype.buildPortrait(self, characterType)
             Asset,
             self.gameManager,
             portraitBackgroundAssetId,
-            love.graphics.newImage("Assets/Images/PortraitBackground.png"),
+            self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/PortraitBackground.png"),
             5,
             portraitPosition,
             portraitBackgroundW,
@@ -850,7 +848,7 @@ function Board.prototype.buildPortrait(self, characterType)
             Asset,
             self.gameManager,
             portraitAssetId,
-            love.graphics.newImage("Assets/Images/Portrait.png"),
+            self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/Portrait.png"),
             5,
             portraitPosition,
             portraitW,
@@ -910,17 +908,18 @@ function Board.prototype.buildPortrait(self, characterType)
                 Asset,
                 self.gameManager,
                 AssetIds.PERKS_BUTTON,
-                love.graphics.newImage("Assets/Images/PerksButton.png"),
+                self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/PerksButton.png"),
                 portraitW + 8,
                 portraitPosition + 10,
                 39,
                 18,
                 {
-                    onClick = function() return self.gameManager:switchBasedOnGameState(GameStates.PERKS) end,
+                    onClick = function() return self.gameManager.perkScreen:showPerks() end,
                     clickSound = self.gameManager.assetManager.buttonClickSound,
                     associatedTexts = {perksText},
                     hoverEffect = {HoverEffects.CHANGE_COLOR},
-                    mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN}
+                    mousePressEffect = {MousePressEffects.DARKEN, MousePressEffects.SHIFT_DOWN},
+                    alwaysEnabled = true
                 }
             )
         )
@@ -938,7 +937,7 @@ function Board.prototype.buildPortrait(self, characterType)
                         IconAsset,
                         self.gameManager,
                         AssetIds.MONEY_ICON,
-                        love.graphics.newImage("Assets/Images/Mark.png"),
+                        self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/Mark.png"),
                         9,
                         9
                     ),
@@ -961,7 +960,7 @@ function Board.prototype.buildDeck(self, characterType)
             Asset,
             self.gameManager,
             assetId,
-            love.graphics.newImage("Assets/Images/BaseCardBack.png"),
+            self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/BaseCardBack.png"),
             deckPosition.x,
             deckPosition.y,
             cardWidth,
@@ -993,7 +992,7 @@ function Board.prototype.buildEdelBoard(self)
             Asset,
             self.gameManager,
             AssetIds.EDEL_BOARD,
-            love.graphics.newImage("Assets/Images/EdelBoard.png"),
+            self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/EdelBoard.png"),
             boardX,
             5,
             boardWidth,
@@ -1012,7 +1011,7 @@ function Board.prototype.buildEdelBoard(self)
             {size = 16, format = Format.CENTER, font = Fonts.ELOQUENT}
         )
     )
-    local suitImage = love.graphics.newImage(CardAssets:getSuitAssetPath(self.edelCard.suit))
+    local suitImage = self.gameManager.assetManager.assetLoader:loadImage(CardAssets:getSuitAssetPath(self.edelCard.suit))
     self.gameManager.assetManager:addAsset(
         AssetIds.EDEL_SUIT_ICON_LEFT,
         __TS__New(
@@ -1116,7 +1115,7 @@ function Board.prototype.removeWinFire(self)
     self.gameManager.assetManager.textManager:hideText(TextIds.POINTS)
 end
 function Board.prototype.getWinFireSprite(self)
-    return love.graphics.newImage("Assets/Images/BasicWinFire.png")
+    return self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/BasicWinFire.png")
 end
 function Board.prototype.getPortraitPosition(self, characterType)
     return characterType == CharacterTypes.PLAYER and (self.portraitPosition or self.cardAssets:getHandYCoordinate(characterType)) or 5

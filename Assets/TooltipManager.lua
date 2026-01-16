@@ -43,6 +43,9 @@ function TooltipManager.prototype.drawTooltips(self)
     end
 end
 function TooltipManager.prototype.addTooltip(self, texts, associatedAsset)
+    if associatedAsset.isDisabled or associatedAsset.isHidden then
+        return
+    end
     local padding = 10
     local tooltipWidth = 128
     local screenW = push:getWidth()
@@ -80,10 +83,10 @@ function TooltipManager.prototype.addTooltip(self, texts, associatedAsset)
 end
 function TooltipManager.prototype.getTooltipBackground(self, texts)
     if #texts == 2 then
-        return love.graphics.newImage("Assets/Images/TooltipTwo.png")
+        return self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/TooltipTwo.png")
     end
     if #texts == 3 then
-        return love.graphics.newImage("Assets/Images/TooltipThree.png")
+        return self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/TooltipThree.png")
     end
 end
 function TooltipManager.prototype.getTooltipHeight(self, texts)

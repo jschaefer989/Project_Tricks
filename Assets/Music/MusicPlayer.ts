@@ -41,10 +41,7 @@ export default class MusicPlayer {
                 break;
             case GameStates.WIN_SCREEN:
                 this.playVictoryMusic();
-                break;
-            case GameStates.PERKS:
-                this.playPerkSelectionMusic();
-                break;            
+                break;           
             case GameStates.SHOP:
                 this.playShopMusic();
                 break;
@@ -78,10 +75,6 @@ export default class MusicPlayer {
     }
 
     private playVictoryMusic(): void {
-
-    }
-
-    private playPerkSelectionMusic(): void {
 
     }
 

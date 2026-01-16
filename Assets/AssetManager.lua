@@ -17,16 +17,18 @@ local ____WobbleAnimation = require("Assets.Animations.WobbleAnimation")
 local WobbleAnimation = ____WobbleAnimation.default
 local ____TooltipManager = require("Assets.TooltipManager")
 local TooltipManager = ____TooltipManager.default
+local ____AssetLoader = require("Assets.AssetLoader")
+local AssetLoader = ____AssetLoader.default
 ____exports.default = __TS__Class()
 local AssetManager = ____exports.default
 AssetManager.name = "AssetManager"
 function AssetManager.prototype.____constructor(self, gameManager)
     self.assets = __TS__New(Map)
     self.textManager = __TS__New(TextManager)
+    self.assetLoader = __TS__New(AssetLoader)
     self.disabledSound = love.audio.newSource("Assets/Sounds/Disabled.wav", "static")
     self.buttonClickSound = love.audio.newSource("Assets/Sounds/ButtonClick.mp3", "static")
     self.disabledAssets = __TS__New(Map)
-    self.universallyDisabled = false
     self.gameManager = gameManager
     self.tooltipManager = __TS__New(TooltipManager, gameManager)
 end
@@ -122,7 +124,7 @@ function AssetManager.prototype.handleMousePressed(self, x, y, button)
                 goto __continue34
             end
             local asset = assets[1]
-            if asset.isHidden then
+            if asset.isHidden or asset.isDisabled then
                 goto __continue34
             end
             if asset:inAssetBounds(gameX, gameY) then
@@ -163,9 +165,6 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
     end
 end
 function AssetManager.prototype.handleDisabledAssetClick(self, assets)
-    if self.universallyDisabled then
-        return
-    end
     if not assets[1].useDisabledAnimation then
         return
     end
@@ -179,34 +178,30 @@ function AssetManager.prototype.handleDisabledAssetClick(self, assets)
 end
 function AssetManager.prototype.triggerWobbleAnimation(self, assets)
     for ____, assetToWobble in ipairs(assets) do
-        if not self.gameManager.animationManager.animations:has(assetToWobble.id) then
-            self.gameManager.animationManager:startAnimation(
+        self.gameManager.animationManager:startAnimation(
+            assetToWobble.id,
+            __TS__New(
+                WobbleAnimation,
+                self.gameManager,
                 assetToWobble.id,
-                __TS__New(
-                    WobbleAnimation,
-                    self.gameManager,
-                    assetToWobble.id,
-                    0.5,
-                    10,
-                    {assetToWobble}
-                )
+                0.5,
+                10,
+                {assetToWobble}
             )
-        end
+        )
         if not isEmpty(assetToWobble.associatedTexts) then
             for ____, text in ipairs(assetToWobble.associatedTexts) do
-                if not self.gameManager.animationManager.animations:has(text.id) then
-                    self.gameManager.animationManager:startAnimation(
+                self.gameManager.animationManager:startAnimation(
+                    text.id,
+                    __TS__New(
+                        WobbleAnimation,
+                        self.gameManager,
                         text.id,
-                        __TS__New(
-                            WobbleAnimation,
-                            self.gameManager,
-                            text.id,
-                            0.5,
-                            10,
-                            {text}
-                        )
+                        0.5,
+                        10,
+                        {text}
                     )
-                end
+                )
             end
         end
     end
@@ -235,11 +230,11 @@ function AssetManager.prototype.handleMouseHover(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue69
+                goto __continue66
             end
             local asset = assets[1]
             if asset.isDisabled or asset.isHidden then
-                goto __continue69
+                goto __continue66
             end
             if asset:inAssetBounds(gameX, gameY) then
                 if not asset.isHovered then
@@ -268,38 +263,38 @@ function AssetManager.prototype.handleMouseHover(self)
                 end
             end
         end
-        ::__continue69::
+        ::__continue66::
     end
 end
 function AssetManager.prototype.disableAllClickableAssets(self, disable)
-    self.universallyDisabled = disable
     for ____, baseAsset in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(baseAsset) then
-                goto __continue82
+                goto __continue79
             end
             if isEmpty(baseAsset[1].onClick) then
-                goto __continue82
+                goto __continue79
+            end
+            if baseAsset[1].alwaysEnabled then
+                goto __continue79
             end
             for ____, asset in ipairs(baseAsset) do
                 do
                     if disable then
-                        self.disabledAssets:set(asset.id, {isDisabled = asset.isDisabled, useDisabledAnimation = asset.useDisabledAnimation})
-                        asset:setDisabled(true)
-                        asset.useDisabledAnimation = false
+                        self.disabledAssets:set(asset.id, {isDisabled = asset.isDisabled, useDisabledAnimation = asset.useDisabledAnimation, color = asset.color, showDisabledColor = asset.showDisabledColor})
+                        asset:setDisabled(true, {useDisabledAnimation = false})
                     elseif self.disabledAssets:has(asset.id) then
                         local cachedState = self.disabledAssets:get(asset.id)
                         if isEmpty(cachedState) then
-                            goto __continue85
+                            goto __continue83
                         end
-                        asset:setDisabled(cachedState.isDisabled)
-                        asset.useDisabledAnimation = cachedState.useDisabledAnimation
+                        asset:setDisabled(cachedState.isDisabled, {useDisabledAnimation = cachedState.useDisabledAnimation, color = cachedState.color, showDisabledColor = cachedState.showDisabledColor})
                     end
                 end
-                ::__continue85::
+                ::__continue83::
             end
         end
-        ::__continue82::
+        ::__continue79::
     end
     if not disable then
         self.disabledAssets:clear()

@@ -1,55 +1,117 @@
 /** @noSelfInFile */
 
-import * as suit from "Libraries.suit-master.suit"
-import GameManager from "../GameManager"
+import GameManager from "../GameManager";
+import {
+  AssetIds,
+  HoverEffects,
+  MousePressEffects,
+  PopupIds,
+  TextIds,
+} from "Enums";
+import Popup, { PopupSizes } from "./Popup/Popup";
+import Asset from "Assets/Asset";
+import FontWithPosition, { Format } from "Assets/Fonts/FontWithPosition";
+
+const buttonWidth = 78;
+const buttonHeight = 27;
 
 export default class PerkScreen {
-    gameManager: GameManager
+  gameManager: GameManager;
 
-    constructor(gameManager: GameManager) {
-        this.gameManager = gameManager
+  constructor(gameManager: GameManager) {
+    this.gameManager = gameManager;
+  }
+
+  showPerks(): void {
+    this.buildPerks();
+    this.buildReturnButton();
+
+    this.gameManager.popupManager.open(
+      PopupIds.PERKS,
+      "Perks",
+      PopupSizes.MENU
+    );
+  }
+
+  buildPerks(): void {
+    const perks = this.gameManager.player.perks;
+    if (perks.length === 0) {
+      const noPerksText = new FontWithPosition(
+        TextIds.PERKS_NO_PERKS_TEXT,
+        Popup.getCenterOfPopup(PopupSizes.MENU),
+        Popup.getTopOfPopup(PopupSizes.MENU) + 100,
+        "No perks acquired yet.",
+        { format: Format.CENTER, size: 18 }
+      );
+      this.gameManager.popupManager.addText(
+        TextIds.PERKS_NO_PERKS_TEXT,
+        noPerksText
+      );
+      return;
     }
-
-    drawScreen(): void {
-        const screenW = love.graphics.getWidth()
-        const panelW = 400
-        const labelY = 50
-
-        const panelX = (screenW - panelW) / 2
-        const labelHeight = 36
-
-        // Display title
-        suit.layout.reset(panelX, labelY)
-        suit.Label("Perks", { align: "center" }, ...suit.layout.row(panelW, labelHeight))
-
-        // Display perks
-        const perkStartY = labelY + labelHeight + 30
-        const perkHeight = 30
-        const perkPadding = 10
-
-        let currentY = perkStartY
-        
-        if (this.gameManager.player.perks.length === 0) {
-            suit.layout.reset(panelX, currentY)
-            suit.Label("No perks yet", { align: "center" }, ...suit.layout.row(panelW, perkHeight))
-        } else {
-            for (const perk of this.gameManager.player.perks) {
-                suit.layout.reset(panelX, currentY)
-                suit.Label("• " + perk.getPerkName(), { align: "left" }, ...suit.layout.row(panelW, perkHeight))
-                currentY += perkHeight + perkPadding
-            }
-        }
-
-        // Back button
-        const backBtnY = currentY + 30
-        const btnW = 200
-        const btnH = 50
-        const backBtnX = (screenW - btnW) / 2
-        
-        suit.layout.reset(backBtnX, backBtnY)
-        const backResult = suit.Button("Back", {}, ...suit.layout.row(btnW, btnH))
-        if (backResult.hit) {
-            this.gameManager.switchBasedOnGameState()
-        }
+    let currentY = Popup.getTopOfPopup(PopupSizes.MENU) + 50;
+    const centerX = Popup.getCenterOfPopup(PopupSizes.MENU);
+    for (const perk of perks) {
+      const perkText = new FontWithPosition(
+        perk.perkType,
+        centerX,
+        currentY,
+        perk.getPerkName(),
+        { format: Format.CENTER, size: 9 }
+        );
+        this.gameManager.popupManager.addText(
+            perk.perkType,
+            perkText
+        );
+        currentY += 30;
     }
+  }
+
+  buildReturnButton(): number {
+    const returnButtonY = Popup.getBottomOfPopup(PopupSizes.MENU) - 50;
+    const popupCenterX = Popup.getCenterOfPopup(PopupSizes.MENU);
+
+    const returnText = new FontWithPosition(
+      TextIds.PERKS_RETURN_BUTTON_CAPTION,
+      popupCenterX,
+      returnButtonY + buttonHeight / 2 - 1,
+      "Return",
+      { format: Format.CENTER, size: 9 }
+    );
+
+    const returnButton = new Asset(
+      this.gameManager,
+      AssetIds.PERKS_RETURN_BUTTON,
+      this.gameManager.assetManager.assetLoader.loadImage(
+        "Assets/Images/MessageBoxButton.png"
+      ),
+      popupCenterX - buttonWidth / 2,
+      returnButtonY,
+      buttonWidth,
+      buttonHeight,
+      {
+        onClick: () => {
+          this.gameManager.popupManager.close();
+        },
+        associatedTexts: [returnText],
+        clickSound: this.gameManager.assetManager.buttonClickSound,
+        hoverEffect: [HoverEffects.CHANGE_COLOR],
+        mousePressEffect: [
+          MousePressEffects.DARKEN,
+          MousePressEffects.SHIFT_DOWN,
+        ],
+      }
+    );
+
+    this.gameManager.popupManager.addText(
+      TextIds.PERKS_RETURN_BUTTON_CAPTION,
+      returnText
+    );
+    this.gameManager.popupManager.addAsset(
+      AssetIds.PERKS_RETURN_BUTTON,
+      returnButton
+    );
+
+    return returnButtonY;
+  }
 }

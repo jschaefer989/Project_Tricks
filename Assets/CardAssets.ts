@@ -6,7 +6,7 @@ import { Image } from "love.graphics";
 import Point from "Point";
 import Board from "Screens/Board";
 import Card from "../Cards/Card";
-import Asset, { ConstructionOptions } from "./Asset";
+import Asset, { ConstructionOptions, normalColor } from "./Asset";
 
 export const padding = 5;
 export const cardWidth = 70;
@@ -21,8 +21,6 @@ interface AssetsForCard {
 export default class CardAssets {
   gameManager: GameManager;
   board: Board;
-  baseCard = love.graphics.newImage("Assets/Images/BaseCardTemplate.png");
-  edelCard = love.graphics.newImage("Assets/Images/EdelCard.png");
   cardClick = love.audio.newSource("Assets/Sounds/CardClick.wav", "static");
   hoverSound = love.audio.newSource("Assets/Sounds/CardHover.wav", "static");
   cardAssetConstructionOptions: (
@@ -54,7 +52,7 @@ export default class CardAssets {
     const baseCardAsset = new Asset(
       this.gameManager,
       assetId,
-      card.isEdel ? this.edelCard : this.baseCard,
+      card.isEdel ? this.gameManager.assetManager.assetLoader.loadImage("Assets/Images/EdelCard.png") : this.gameManager.assetManager.assetLoader.loadImage("Assets/Images/BaseCardTemplate.png"),
       cardX,
       cardY,
       cardWidth,
@@ -88,7 +86,7 @@ export default class CardAssets {
     const normalAsset = new Asset(
       this.gameManager,
       normalAssetId,
-      love.graphics.newImage(suitImagePath),
+      this.gameManager.assetManager.assetLoader.loadImage(suitImagePath),
       normalPosition.x,
       normalPosition.y,
       16,
@@ -109,7 +107,7 @@ export default class CardAssets {
     const flippedAsset = new Asset(
       this.gameManager,
       flippedAssetId,
-      love.graphics.newImage(suitImagePath),
+      this.gameManager.assetManager.assetLoader.loadImage(suitImagePath),
       flippedPosition.x,
       flippedPosition.y,
       16,
@@ -144,7 +142,7 @@ export default class CardAssets {
     y: number,
     includeClickHandler: boolean = true
   ): void {
-    const rankImage = love.graphics.newImage(card.getRankAssetPath());
+    const rankImage = this.gameManager.assetManager.assetLoader.loadImage(card.getRankAssetPath());
     const assetId = CardAssets.getRankAssetId(card, 0);
     const rankPosition = this.getRankPosition(x, y, rankImage);
     const asset = new Asset(
@@ -322,7 +320,12 @@ export default class CardAssets {
 
     for (const card of this.gameManager.board.getAllCardsInPlay()) {
       for (const asset of this.getCardAssetList(card)) {
-        asset.isDisabled = disable;
+        if (disable) {
+          asset.isDisabled = true;
+        } else {
+          asset.isDisabled = false;
+          asset.color = normalColor;
+        }
       }
     }
   }

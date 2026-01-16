@@ -182,7 +182,7 @@ function Player.prototype.discard(self)
         while index < #self.hand do
             local card = self.hand[index + 1]
             if card.isSelected then
-                card:onUnselect()
+                card:onDiscard()
                 self:addToDiscards(card)
                 removedIndices[#removedIndices + 1] = index
             else

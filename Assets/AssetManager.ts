@@ -5,10 +5,13 @@ import * as push from "Libraries.push";
 import WobbleAnimation from "./Animations/WobbleAnimation";
 import Asset from "./Asset";
 import TooltipManager from "./TooltipManager";
+import AssetLoader from "./AssetLoader";
 
 export interface DisabledStateCache {
   isDisabled: boolean;
   useDisabledAnimation: boolean;
+  color: [number, number, number, number];
+  showDisabledColor: boolean;
 }
 
 export default class AssetManager {
@@ -16,13 +19,13 @@ export default class AssetManager {
   assets: Map<string, Asset[]> = new Map<string, Asset[]>();
   tooltipManager: TooltipManager;
   textManager = new TextManager();
+  assetLoader = new AssetLoader();
   disabledSound = love.audio.newSource("Assets/Sounds/Disabled.wav", "static");
   buttonClickSound = love.audio.newSource(
     "Assets/Sounds/ButtonClick.mp3",
     "static"
   );
   disabledAssets = new Map<string, DisabledStateCache>();
-  universallyDisabled = false;
 
   constructor(gameManager: GameManager) {
     this.gameManager = gameManager;
@@ -122,7 +125,7 @@ export default class AssetManager {
       }
       const asset = assets[0]; // Assume click area is the same for all assets with the same ID
 
-      if (asset.isHidden) {
+      if (asset.isHidden || asset.isDisabled) {
         continue;
       }
 
@@ -165,10 +168,6 @@ export default class AssetManager {
   }
 
   handleDisabledAssetClick(assets: Asset[]): void {
-    if (this.universallyDisabled) {
-      return;
-    }
-
     if (!assets[0].useDisabledAnimation) {
       return;
     }
@@ -185,21 +184,19 @@ export default class AssetManager {
 
   triggerWobbleAnimation(assets: Asset[]): void {
     for (const assetToWobble of assets) {
-      if (!this.gameManager.animationManager.animations.has(assetToWobble.id)) {
-        this.gameManager.animationManager.startAnimation(
-          assetToWobble.id,
-          new WobbleAnimation(this.gameManager, assetToWobble.id, 0.5, 10, [assetToWobble])
-        );
-      }
+      this.gameManager.animationManager.startAnimation(
+        assetToWobble.id,
+        new WobbleAnimation(this.gameManager, assetToWobble.id, 0.5, 10, [
+          assetToWobble,
+        ])
+      );
 
       if (!isEmpty(assetToWobble.associatedTexts)) {
         for (const text of assetToWobble.associatedTexts) {
-          if (!this.gameManager.animationManager.animations.has(text.id)) {
-            this.gameManager.animationManager.startAnimation(
-              text.id,
-              new WobbleAnimation(this.gameManager, text.id, 0.5, 10, [text])
-            );
-          }
+          this.gameManager.animationManager.startAnimation(
+            text.id,
+            new WobbleAnimation(this.gameManager, text.id, 0.5, 10, [text])
+          );
         }
       }
     }
@@ -250,26 +247,29 @@ export default class AssetManager {
   }
 
   disableAllClickableAssets(disable: boolean): void {
-    this.universallyDisabled = disable;
-
     for (const baseAsset of this.assets.values()) {
       if (isEmpty(baseAsset)) continue;
       if (isEmpty(baseAsset[0].onClick)) continue;
+      if (baseAsset[0].alwaysEnabled) continue;
 
       for (const asset of baseAsset) {
         if (disable) {
           this.disabledAssets.set(asset.id, {
             isDisabled: asset.isDisabled,
             useDisabledAnimation: asset.useDisabledAnimation,
+            color: asset.color,
+            showDisabledColor: asset.showDisabledColor,
           });
-          asset.setDisabled(true);
-          asset.useDisabledAnimation = false;
+          asset.setDisabled(true, { useDisabledAnimation: false });
         } else if (this.disabledAssets.has(asset.id)) {
           const cachedState = this.disabledAssets.get(asset.id);
           if (isEmpty(cachedState)) continue;
 
-          asset.setDisabled(cachedState.isDisabled);
-          asset.useDisabledAnimation = cachedState.useDisabledAnimation;
+          asset.setDisabled(cachedState.isDisabled, {
+            useDisabledAnimation: cachedState.useDisabledAnimation,
+            color: cachedState.color,
+            showDisabledColor: cachedState.showDisabledColor,
+          });
         }
       }
     }

@@ -5,6 +5,8 @@ import { Image } from "love.graphics";
 import FontWithPosition from "./Fonts/FontWithPosition";
 import QuadWithPosition from "./QuadWithPosition";
 export type AssetCallback = (asset: Asset) => void;
+export declare const disabledColor: [number, number, number, number];
+export declare const normalColor: [number, number, number, number];
 export interface ConstructionOptions {
     readonly onClick?: () => void;
     readonly onHover?: AssetCallback;
@@ -17,12 +19,13 @@ export interface ConstructionOptions {
     readonly quads?: QuadWithPosition[];
     readonly isDisabled?: boolean;
     readonly useDisabledAnimation?: boolean;
-    readonly showDisabledColor?: boolean;
     readonly clickSound?: Source;
     readonly hoverSound?: Source;
     readonly associatedTexts?: FontWithPosition[];
     readonly hoverEffect?: HoverEffects[];
     readonly mousePressEffect?: MousePressEffects[];
+    readonly alwaysEnabled?: boolean;
+    readonly showDisabledColor?: boolean;
 }
 export default class Asset {
     gameManager: GameManager;
@@ -43,7 +46,6 @@ export default class Asset {
     quads: QuadWithPosition[];
     isDisabled: boolean;
     useDisabledAnimation: boolean;
-    showDisabledColor: boolean;
     isHovered: boolean;
     isPressed: boolean;
     color: [number, number, number, number];
@@ -53,6 +55,8 @@ export default class Asset {
     hoverEffect: HoverEffects[];
     mousePressEffect: MousePressEffects[];
     isHidden: boolean;
+    alwaysEnabled: boolean;
+    showDisabledColor: boolean;
     constructor(gameManager: GameManager, id: string, image: Image, x: number, y: number, width: number, height: number, constructionOptions?: ConstructionOptions);
     drawAsset(): void;
     updatePosition(x: number, y: number): void;
@@ -74,6 +78,7 @@ export default class Asset {
 }
 interface DisabledAssetOptions {
     readonly useDisabledAnimation?: boolean;
+    readonly color?: [number, number, number, number];
     readonly showDisabledColor?: boolean;
 }
 export {};

@@ -48,11 +48,6 @@ function MusicPlayer.prototype.play(self, gameState, biome)
             self:playVictoryMusic()
             break
         end
-        ____cond6 = ____cond6 or ____switch6 == GameStates.PERKS
-        if ____cond6 then
-            self:playPerkSelectionMusic()
-            break
-        end
         ____cond6 = ____cond6 or ____switch6 == GameStates.SHOP
         if ____cond6 then
             self:playShopMusic()
@@ -85,8 +80,6 @@ end
 function MusicPlayer.prototype.playGameOverMusic(self)
 end
 function MusicPlayer.prototype.playVictoryMusic(self)
-end
-function MusicPlayer.prototype.playPerkSelectionMusic(self)
 end
 function MusicPlayer.prototype.playShopMusic(self)
 end

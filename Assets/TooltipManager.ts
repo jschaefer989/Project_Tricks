@@ -30,6 +30,10 @@ export default class TooltipManager {
   }
 
   addTooltip(texts: FontWithPosition[], associatedAsset: Asset): void {
+    if (associatedAsset.isDisabled || associatedAsset.isHidden) {
+      return;
+    }
+
     const padding = 10;
     const tooltipWidth = 128;
 
@@ -72,10 +76,10 @@ export default class TooltipManager {
 
   private getTooltipBackground(texts: FontWithPosition[]): Image | undefined {
     if (texts.length === 2) {
-      return love.graphics.newImage("Assets/Images/TooltipTwo.png");
+      return  this.gameManager.assetManager.assetLoader.loadImage("Assets/Images/TooltipTwo.png");
     }
     if (texts.length === 3) {
-      return love.graphics.newImage("Assets/Images/TooltipThree.png");
+      return this.gameManager.assetManager.assetLoader.loadImage("Assets/Images/TooltipThree.png");
     }
   }
 

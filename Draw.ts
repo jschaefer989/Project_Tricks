@@ -91,9 +91,6 @@ export default class Draw {
         
         const btnH = 30
         const perkResult = suit.Button("Perks", {}, ...suit.layout.row(panelW, btnH))
-        if (perkResult.hit) {
-            gameManager.switchBasedOnGameState(GameStates.PERKS)
-        }
     }
 
     static playerDeck(player: Player, options?: PlayerDeckOptions): void {

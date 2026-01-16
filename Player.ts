@@ -171,7 +171,7 @@ export default class Player extends Character {
     for (let index = 0; index < this.hand.length; index++) {
       const card = this.hand[index];
       if (card.isSelected) {
-        card.onUnselect();
+        card.onDiscard();
         this.addToDiscards(card);
         removedIndices.push(index);
       } else {

@@ -17,7 +17,6 @@ export default class Prompt {
   private message: string;
   private onYesClick: () => void;
   private onNoClick: () => void;
-  private button = love.graphics.newImage("Assets/Images/MessageBoxButton.png");
 
   constructor(
     gameManager: GameManager,
@@ -71,7 +70,7 @@ export default class Prompt {
     const button = new Asset(
         this.gameManager,
         AssetIds.YES_BUTTON,
-        this.button,
+        this.gameManager.assetManager.assetLoader.loadImage("Assets/Images/MessageBoxButton.png"),
         popupCenterX - buttonWidth / 2,
         Popup.getTopOfPopup(PopupSizes.MESSAGE_BOX) + 60,
         buttonWidth,
@@ -108,7 +107,7 @@ export default class Prompt {
     const button = new Asset(
         this.gameManager,
         AssetIds.NO_BUTTON,
-        this.button,
+        this.gameManager.assetManager.assetLoader.loadImage("Assets/Images/MessageBoxButton.png"),
         popupCenterX - buttonWidth / 2,
         buttonY,
         buttonWidth,

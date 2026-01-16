@@ -23,7 +23,6 @@ ____exports.default = __TS__Class()
 local Prompt = ____exports.default
 Prompt.name = "Prompt"
 function Prompt.prototype.____constructor(self, gameManager, message, onYesClick, onNoClick, constructionOptions)
-    self.button = love.graphics.newImage("Assets/Images/MessageBoxButton.png")
     self.gameManager = gameManager
     self.message = message
     self.onYesClick = onYesClick
@@ -60,7 +59,7 @@ function Prompt.prototype.buildYesButton(self)
         Asset,
         self.gameManager,
         AssetIds.YES_BUTTON,
-        self.button,
+        self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/MessageBoxButton.png"),
         popupCenterX - buttonWidth / 2,
         Popup:getTopOfPopup(PopupSizes.MESSAGE_BOX) + 60,
         buttonWidth,
@@ -91,7 +90,7 @@ function Prompt.prototype.buildNoButton(self)
         Asset,
         self.gameManager,
         AssetIds.NO_BUTTON,
-        self.button,
+        self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/MessageBoxButton.png"),
         popupCenterX - buttonWidth / 2,
         buttonY,
         buttonWidth,

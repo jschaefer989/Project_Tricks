@@ -4,8 +4,6 @@ local ____exports = {}
 local suit = require("Libraries.suit-master.suit")
 local ____Helpers = require("Helpers")
 local isEmpty = ____Helpers.isEmpty
-local ____Enums = require("Enums")
-local GameStates = ____Enums.GameStates
 ____exports.default = __TS__Class()
 local Draw = ____exports.default
 Draw.name = "Draw"
@@ -100,9 +98,6 @@ function Draw.playerInfo(self, player, gameManager)
         {},
         suit.layout:row(panelW, btnH)
     )
-    if perkResult.hit then
-        gameManager:switchBasedOnGameState(GameStates.PERKS)
-    end
 end
 function Draw.playerDeck(self, player, options)
     local deckSize = #player.deck

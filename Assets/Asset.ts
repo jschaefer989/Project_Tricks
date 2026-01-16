@@ -10,8 +10,8 @@ import QuadWithPosition from "./QuadWithPosition";
 
 export type AssetCallback = (asset: Asset) => void;
 
-const disabledColor: [number, number, number, number] = [0.5, 0.5, 0.5, 1];
-const normalColor: [number, number, number, number] = [1, 1, 1, 1];
+export const disabledColor: [number, number, number, number] = [0.5, 0.5, 0.5, 1];
+export const normalColor: [number, number, number, number] = [1, 1, 1, 1];
 
 export interface ConstructionOptions {
   readonly onClick?: () => void;
@@ -25,12 +25,13 @@ export interface ConstructionOptions {
   readonly quads?: QuadWithPosition[];
   readonly isDisabled?: boolean;
   readonly useDisabledAnimation?: boolean;
-  readonly showDisabledColor?: boolean;
   readonly clickSound?: Source;
   readonly hoverSound?: Source;
   readonly associatedTexts?: FontWithPosition[];
   readonly hoverEffect?: HoverEffects[];
   readonly mousePressEffect?: MousePressEffects[];
+  readonly alwaysEnabled?: boolean; // Only used in disableAllClickableAssets
+  readonly showDisabledColor?: boolean;
 }
 
 export default class Asset {
@@ -52,7 +53,6 @@ export default class Asset {
   quads: QuadWithPosition[] = [];
   isDisabled = false;
   useDisabledAnimation = true;
-  showDisabledColor = true;
   isHovered = false;
   isPressed = false;
   color: [number, number, number, number] = [1, 1, 1, 1];
@@ -62,6 +62,8 @@ export default class Asset {
   hoverEffect: HoverEffects[];
   mousePressEffect: MousePressEffects[];
   isHidden = false;
+  alwaysEnabled = false; // Only used in disableAllClickableAssets
+  showDisabledColor = true;
 
   constructor(
     gameManager: GameManager,
@@ -92,8 +94,6 @@ export default class Asset {
     this.isDisabled = constructionOptions?.isDisabled ?? false;
     this.useDisabledAnimation =
       constructionOptions?.useDisabledAnimation ?? true;
-    this.showDisabledColor =
-      constructionOptions?.showDisabledColor ?? true;
     this.clickSound = constructionOptions?.clickSound;
     this.hoverSound = constructionOptions?.hoverSound;
     this.associatedTexts = constructionOptions?.associatedTexts;
@@ -101,6 +101,8 @@ export default class Asset {
     this.mousePressEffect = constructionOptions?.mousePressEffect ?? [
       MousePressEffects.NONE,
     ];
+    this.alwaysEnabled = constructionOptions?.alwaysEnabled ?? false;
+    this.showDisabledColor = constructionOptions?.showDisabledColor ?? true;
   }
 
   drawAsset(): void {
@@ -148,7 +150,6 @@ export default class Asset {
   }
 
   setHovered(hovered: boolean): void {
-    if (this.gameManager.assetManager.universallyDisabled) return;
     this.isHovered = hovered;
     this.handleHoverEffects(hovered);
   }
@@ -182,7 +183,6 @@ export default class Asset {
 
   setMousePressed(pressed: boolean): void {
     const wasPressed = this.isPressed;
-    if (this.gameManager.assetManager.universallyDisabled && !wasPressed) return;
     this.isPressed = pressed;
     this.handleMousePressEffects(pressed, wasPressed);
   }
@@ -231,6 +231,8 @@ export default class Asset {
         }
       }
     }
+
+    this.color = options?.color ?? this.color;
   }
 
   setColor(): void {
@@ -365,5 +367,6 @@ export default class Asset {
 
 interface DisabledAssetOptions {
   readonly useDisabledAnimation?: boolean;
+  readonly color?: [number, number, number, number];
   readonly showDisabledColor?: boolean;
 }

@@ -7,7 +7,6 @@ export default class Prompt {
     private message;
     private onYesClick;
     private onNoClick;
-    private button;
     constructor(gameManager: GameManager, message: string, onYesClick: () => void, onNoClick: () => void, constructionOptions?: ConstructorOptions);
     open(id: string): void;
     buildYesButton(): void;

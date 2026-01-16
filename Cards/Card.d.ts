@@ -42,6 +42,7 @@ export default abstract class Card {
     onClick(): void;
     onSelect(): void;
     onUnselect(): void;
+    onDiscard(): void;
     onHover(asset: Asset): void;
     onUnhover(asset: Asset): void;
     static getSuitName(suit: Suits): string;

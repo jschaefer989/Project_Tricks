@@ -17,7 +17,6 @@ export default class Character {
     addToDeck(card: Card): void;
     addToDiscards(card: Card): void;
     addDiscardsToDeck(): void;
-    deselectAllCards(): void;
     getCardPower(): number;
     getCardValue(): number;
     removeAllCardsFromHand(): void;
