@@ -108,15 +108,13 @@ export default class Character {
     const tooltipLines: FontWithPosition[] = [
       new FontWithPosition(
         TextIds.TOOLTIP_DECK_OVERVIEW_CARDS,
-        5,
+        0,
         10,
-        `Deck: ${this.deck.length}/${
-          this.deck.length + this.discardPile.length + this.hand.length
-        }`
+        ` Deck: ${this.deck.length}/${this.getTotalCards()}`
       ),
       new FontWithPosition(
         TextIds.TOOLTIP_DECK_OVERVIEW_DISCARDS,
-        5,
+        0,
         20,
         `Discards: ${this.discardPile.length}`
       ),
@@ -127,7 +125,7 @@ export default class Character {
       const cardsToShow = this.deck.slice(this.deck.length - this.numberOfHeldCards, this.deck.length);
 
       for (const card of cardsToShow) {
-        const cardTooltip = card.getShortCardInfo(5, yOffset);
+        const cardTooltip = card.getShortCardInfo(0, yOffset);
         tooltipLines.push(...cardTooltip);
         yOffset += 35; // Offset for card name + power + value
       }
@@ -137,6 +135,10 @@ export default class Character {
       tooltipLines,
       asset
     );
+  }
+
+  getTotalCards(): number {
+    return this.deck.length + this.hand.length + this.discardPile.length;
   }
 
   showDeckContents(): void {

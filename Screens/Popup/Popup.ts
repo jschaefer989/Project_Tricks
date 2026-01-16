@@ -183,7 +183,7 @@ export default class Popup {
       Popup.getCenterOfPopup(this.popupSize),
       Popup.getTopOfPopup(this.popupSize) + this.getTitleOffset(),
       title,
-      { font: Fonts.FANTASY, size: 16, format: Format.CENTER }
+      { font: Fonts.FANTASY, size: 16, xLocation: Format.CENTER }
     );
     this.gameManager.assetManager.textManager.addText(
       this.getPopupTitleId(),

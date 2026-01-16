@@ -2,7 +2,7 @@
 
 import SlideAnimation from "Assets/Animations/SlideAnimation";
 import Asset from "Assets/Asset";
-import FontWithPosition from "Assets/Fonts/FontWithPosition";
+import FontWithPosition, { Highlights } from "Assets/Fonts/FontWithPosition";
 import IconAsset from "Assets/IconAsset";
 import GameManager from "GameManager";
 import { exhaustiveGuard, isEmpty } from "Helpers";
@@ -167,7 +167,7 @@ export default abstract class Card {
 
   onHover(asset: Asset): void {
     this.gameManager.assetManager.tooltipManager.addTooltip(
-      this.getShortCardInfo(5, 10),
+      this.getShortCardInfo(0, 10),
       asset
     );
   }
@@ -214,13 +214,13 @@ export default abstract class Card {
   static getSuitName(suit: Suits): string {
     switch (suit) {
       case Suits.HEARTS:
-        return "Hearts";
+        return `${Highlights.HEARTS}Hearts`;
       case Suits.ACORNS:
-        return "Acorns";
+        return `${Highlights.ACORNS}Acorns`;
       case Suits.LEAVES:
-        return "Leaves";
+        return `${Highlights.LEAVES}Leaves`;
       case Suits.BELLS:
-        return "Bells";
+        return `${Highlights.BELLS}  Bells`;
       default:
         exhaustiveGuard(suit);
     }
@@ -230,6 +230,7 @@ export default abstract class Card {
     return (
       !this.gameManager.board?.showingEdelView &&
       this.gameManager.board?.edelCard?.suit === this.suit &&
+      !isEmpty(this.edelName) &&
       this.edelName !== this.name
     );
   }
@@ -247,12 +248,25 @@ export default abstract class Card {
   }
 
   getName(): string {
-    return this.isEdel && !isEmpty(this.edelName) ? this.edelName : this.name;
+    return this.isEdel && !isEmpty(this.edelName) ? this.parseEdelName() : this.name;
   }
 
   getRankAssetPath(): string {
     return this.isEdel && !isEmpty(this.edelRankAssetPath)
       ? this.edelRankAssetPath
       : this.rankAssetPath;
+  }
+
+  private parseEdelName(): string {
+    if (isEmpty(this.edelName)) {
+      return "";
+    }
+
+    const newSegments: string[] = [];
+    const segments = this.edelName.split(" ");
+    for (const segment of segments) {
+      newSegments.push(`${Highlights.EDEL}${segment}`)
+    }
+    return newSegments.join(" ");
   }
 }

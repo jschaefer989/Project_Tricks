@@ -1,5 +1,5 @@
 /** @noSelfInFile */
-import { AlignMode, Font } from "love.graphics";
+import { Font } from "love.graphics";
 import IconAsset from "../IconAsset";
 export declare enum Format {
     LEFT = 0,
@@ -16,24 +16,31 @@ export declare enum Fonts {
     FANTASY = "Assets/Fonts/dpcomic.ttf",
     ELOQUENT = "Assets/Fonts/Bitmgothic.ttf"
 }
+export declare enum Highlights {
+    HEARTS = "//HEARTS//",
+    BELLS = "//BELLS//",
+    ACORNS = "//ACORNS//",
+    LEAVES = "//LEAVES//",
+    EDEL = "//EDEL//"
+}
 interface ConstructionOptions {
     font?: Fonts;
     size?: number;
-    format?: Format;
+    xLocation?: Format;
     icon?: IconAsset;
     iconFormat?: Omit<Format, Format.CENTER>;
     isDisabled?: boolean;
     outlineThickness?: OutlineThickness;
     color?: [number, number, number, number];
     limit?: number;
-    alignMode?: AlignMode;
+    alignMode?: Omit<Format, Format.RIGHT>;
 }
 export default class FontWithPosition {
     id: string;
     x: number;
     y: number;
     text: string;
-    format: Format;
+    xLocation: Format;
     font: Font;
     icon?: IconAsset;
     iconFormat: Omit<Format, Format.CENTER>;
@@ -41,12 +48,17 @@ export default class FontWithPosition {
     color: [number, number, number, number];
     outlineThickness: OutlineThickness;
     limit?: number;
-    alignMode?: AlignMode;
+    alignMode?: Omit<Format, Format.RIGHT>;
     constructor(id: string, x: number, y: number, text: string, options?: ConstructionOptions);
     setDisabled(disabled: boolean): void;
     printText(): void;
+    private parseHighlights;
+    private extractNextWord;
+    private textHasHighlights;
+    private stripHighlights;
     private printOutline;
     private getFormatOffset;
     private renderIcon;
+    private getColorForHighlight;
 }
 export {};

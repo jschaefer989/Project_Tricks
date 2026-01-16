@@ -52,7 +52,7 @@ function PauseMenu.prototype.buildContinueButton(self)
         popupCenterX,
         continueButtonY + buttonHeight / 2 - 1,
         "Continue",
-        {format = Format.CENTER, size = 18}
+        {xLocation = Format.CENTER, size = 18}
     )
     local continueButton = __TS__New(
         Asset,
@@ -86,7 +86,7 @@ function PauseMenu.prototype.buildSaveButton(self, continueButtonY)
         popupCenterX,
         saveButtonY + buttonHeight / 2 - 1,
         "Save",
-        {format = Format.CENTER, size = 18}
+        {xLocation = Format.CENTER, size = 18}
     )
     local saveButton = __TS__New(
         Asset,
@@ -121,7 +121,7 @@ function PauseMenu.prototype.buildQuitButton(self, saveButtonY)
         popupCenterX,
         quitButtonY + buttonHeight / 2 - 1,
         "Quit",
-        {format = Format.CENTER, size = 18}
+        {xLocation = Format.CENTER, size = 18}
     )
     local quitButton = __TS__New(
         Asset,

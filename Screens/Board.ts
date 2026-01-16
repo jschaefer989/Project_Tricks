@@ -26,6 +26,7 @@ import {
   GameStates,
   HoverEffects,
   MousePressEffects,
+  Suits,
   TextIds,
 } from "../Enums";
 import type GameManager from "../GameManager";
@@ -497,7 +498,7 @@ export default class Board {
       "Let's Fight!",
       {
         size: 42,
-        format: Format.CENTER,
+        xLocation: Format.CENTER,
         outlineThickness: OutlineThickness.THICK,
         font: Fonts.FANTASY,
       }
@@ -573,7 +574,7 @@ export default class Board {
       "Attack",
       {
         size: 18,
-        format: Format.CENTER,
+        xLocation: Format.CENTER,
       }
     );
     this.gameManager.assetManager.textManager.addText(
@@ -625,7 +626,7 @@ export default class Board {
       "Discard",
       {
         size: 18,
-        format: Format.CENTER,
+        xLocation: Format.CENTER,
       }
     );
     this.gameManager.assetManager.textManager.addText(
@@ -641,7 +642,7 @@ export default class Board {
       `${remaining}/${this.gameManager.player.discards}`,
       {
         size: 9,
-        format: Format.CENTER,
+        xLocation: Format.CENTER,
       }
     );
     this.gameManager.assetManager.textManager.addText(
@@ -695,7 +696,7 @@ export default class Board {
       "Deselect",
       {
         size: 9,
-        format: Format.CENTER,
+        xLocation: Format.CENTER,
       }
     );
     this.gameManager.assetManager.textManager.addText(
@@ -745,7 +746,7 @@ export default class Board {
       "Sort",
       {
         size: 9,
-        format: Format.CENTER,
+        xLocation: Format.CENTER,
       }
     );
     this.gameManager.assetManager.textManager.addText(
@@ -882,7 +883,7 @@ export default class Board {
         enemyText,
         {
           size: 9,
-          format: Format.RIGHT,
+          xLocation: Format.RIGHT,
         }
       )
     );
@@ -980,17 +981,20 @@ export default class Board {
 
     const centerX = screenW / 2;
 
+    const suitName = Card.getSuitName(this.edelCard.suit);
     this.gameManager.assetManager.textManager.addText(
       TextIds.EDEL_LABEL,
       new FontWithPosition(
         TextIds.EDEL_LABEL,
         centerX,
         18,
-        Card.getSuitName(this.edelCard.suit),
+        suitName,
         {
           size: 16,
-          format: Format.CENTER,
+          xLocation: Format.CENTER,
           font: Fonts.ELOQUENT,
+          alignMode: Format.CENTER,
+          limit: boardWidth - suitName.length,
         }
       )
     );
@@ -1069,7 +1073,7 @@ export default class Board {
         "You are winning!",
         {
           size: 9,
-          format: Format.CENTER,
+          xLocation: Format.CENTER,
           outlineThickness: OutlineThickness.THICK,
         }
       )
@@ -1084,7 +1088,7 @@ export default class Board {
           portraitCenterX + 15,
           centerY + 32,
           "But you'll get no points...",
-          { size: 9, format: Format.CENTER }
+          { size: 9, xLocation: Format.CENTER }
         )
       );
     } else {
@@ -1095,7 +1099,7 @@ export default class Board {
           portraitCenterX + 10,
           centerY + 32,
           "Points: " + points,
-          { size: 9, format: Format.CENTER }
+          { size: 9, xLocation: Format.CENTER }
         )
       );
     }

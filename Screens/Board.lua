@@ -457,7 +457,7 @@ function Board.prototype.buildLetsFightButton(self)
         centerX + 14,
         centerY,
         "Let's Fight!",
-        {size = 42, format = Format.CENTER, outlineThickness = OutlineThickness.THICK, font = Fonts.FANTASY}
+        {size = 42, xLocation = Format.CENTER, outlineThickness = OutlineThickness.THICK, font = Fonts.FANTASY}
     )
     self.gameManager.assetManager.textManager:addText(TextIds.LETS_FIGHT_BUTTON_CAPTION, letsFightButtonText)
     self.gameManager.assetManager:addAsset(
@@ -515,7 +515,7 @@ function Board.prototype.buildAttackButton(self, buttonX, buttonY, btnW, btnH)
         centerX,
         centerY,
         "Attack",
-        {size = 18, format = Format.CENTER}
+        {size = 18, xLocation = Format.CENTER}
     )
     self.gameManager.assetManager.textManager:addText(TextIds.ATTACK_BUTTON_CAPTION, attackButtonText)
     self.gameManager.assetManager:addAsset(
@@ -549,7 +549,7 @@ function Board.prototype.buildDiscardButton(self, buttonX, buttonY, btnW, btnH, 
         centerX,
         centerY,
         "Discard",
-        {size = 18, format = Format.CENTER}
+        {size = 18, xLocation = Format.CENTER}
     )
     self.gameManager.assetManager.textManager:addText(TextIds.DISCARD_BUTTON_CAPTION, discardButtonCaptionText)
     local remaining = self.gameManager.player.discards - self.discardUsed
@@ -559,7 +559,7 @@ function Board.prototype.buildDiscardButton(self, buttonX, buttonY, btnW, btnH, 
         centerX,
         centerY + 12,
         (tostring(remaining) .. "/") .. tostring(self.gameManager.player.discards),
-        {size = 9, format = Format.CENTER}
+        {size = 9, xLocation = Format.CENTER}
     )
     self.gameManager.assetManager.textManager:addText(TextIds.DISCARD_BUTTON_COUNTER, discardButtonCounterText)
     self.gameManager.assetManager:addAsset(
@@ -594,7 +594,7 @@ function Board.prototype.buildDeselectButton(self, discardX, buttonY, btnW, btnH
         centerX,
         centerY,
         "Deselect",
-        {size = 9, format = Format.CENTER}
+        {size = 9, xLocation = Format.CENTER}
     )
     self.gameManager.assetManager.textManager:addText(TextIds.DESELECT_BUTTON_CAPTION, deselectButtonCaptionText)
     self.gameManager.assetManager:addAsset(
@@ -628,7 +628,7 @@ function Board.prototype.buildSortButton(self, deselectX, buttonY, btnW, btnH)
         centerX,
         centerY,
         "Sort",
-        {size = 9, format = Format.CENTER}
+        {size = 9, xLocation = Format.CENTER}
     )
     self.gameManager.assetManager.textManager:addText(TextIds.SORT_BUTTON_CAPTION, sortButtonCaptionText)
     self.gameManager.assetManager:addAsset(
@@ -735,7 +735,7 @@ function Board.prototype.buildPointBoard(self)
             centerX + boardWidth / 2 - 5,
             textY,
             enemyText,
-            {size = 9, format = Format.RIGHT}
+            {size = 9, xLocation = Format.RIGHT}
         )
     )
     if not isEmpty(self.edelCard) then
@@ -816,6 +816,7 @@ function Board.prototype.buildEdelBoard(self)
         )
     )
     local centerX = screenW / 2
+    local suitName = Card:getSuitName(self.edelCard.suit)
     self.gameManager.assetManager.textManager:addText(
         TextIds.EDEL_LABEL,
         __TS__New(
@@ -823,8 +824,14 @@ function Board.prototype.buildEdelBoard(self)
             TextIds.EDEL_LABEL,
             centerX,
             18,
-            Card:getSuitName(self.edelCard.suit),
-            {size = 16, format = Format.CENTER, font = Fonts.ELOQUENT}
+            suitName,
+            {
+                size = 16,
+                xLocation = Format.CENTER,
+                font = Fonts.ELOQUENT,
+                alignMode = Format.CENTER,
+                limit = boardWidth - #suitName
+            }
         )
     )
     local suitImage = self.gameManager.assetManager.assetLoader:loadImage(CardAssets:getSuitAssetPath(self.edelCard.suit))
@@ -894,7 +901,7 @@ function Board.prototype.buildWinFire(self)
             portraitCenterX + 20,
             centerY + 20,
             "You are winning!",
-            {size = 9, format = Format.CENTER, outlineThickness = OutlineThickness.THICK}
+            {size = 9, xLocation = Format.CENTER, outlineThickness = OutlineThickness.THICK}
         )
     )
     local points = self:getPlayerPoints()
@@ -907,7 +914,7 @@ function Board.prototype.buildWinFire(self)
                 portraitCenterX + 15,
                 centerY + 32,
                 "But you'll get no points...",
-                {size = 9, format = Format.CENTER}
+                {size = 9, xLocation = Format.CENTER}
             )
         )
     else
@@ -919,7 +926,7 @@ function Board.prototype.buildWinFire(self)
                 portraitCenterX + 10,
                 centerY + 32,
                 "Points: " .. tostring(points),
-                {size = 9, format = Format.CENTER}
+                {size = 9, xLocation = Format.CENTER}
             )
         )
     end

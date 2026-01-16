@@ -38,7 +38,7 @@ export default class Prompt {
         popupCenterX,
         Popup.getTopOfPopup(PopupSizes.MESSAGE_BOX) + 40,
         constructionOptions.secondaryMessage,
-        { format: Format.CENTER, size: 9 }
+        { xLocation: Format.CENTER, size: 9 }
       );
       this.gameManager.popupManager.addText(
         TextIds.PROMPT_SECONDARY_MESSAGE,
@@ -64,7 +64,7 @@ export default class Prompt {
       popupCenterX,
       Popup.getTopOfPopup(PopupSizes.MESSAGE_BOX) + 61 + buttonHeight / 2,
       "Yes",
-      { format: Format.CENTER, size: 9 }
+      { xLocation: Format.CENTER, size: 9 }
     );
 
     const button = new Asset(
@@ -101,7 +101,7 @@ export default class Prompt {
       popupCenterX,
       buttonY + buttonHeight / 2 + 1,
       "No",
-      { format: Format.CENTER, size: 9 }
+      { xLocation: Format.CENTER, size: 9 }
     );
 
     const button = new Asset(

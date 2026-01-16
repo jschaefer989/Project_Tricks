@@ -1,6 +1,6 @@
 import { AssetIds } from "Enums";
 import Asset from "./Asset";
-import FontWithPosition from "./Fonts/FontWithPosition";
+import FontWithPosition, { Format } from "./Fonts/FontWithPosition";
 import Tooltip from "./Tooltip";
 import { isEmpty } from "Helpers";
 import { Image } from "love.graphics";
@@ -50,8 +50,8 @@ export default class TooltipManager {
       text.x = text.x + tooltipX;
       text.y = text.y + tooltipY;
 
-      text.limit = 120;
-      text.alignMode = "center";
+      text.limit = tooltipWidth;
+      text.alignMode = Format.CENTER;
     }
 
     // Draw background with dynamic sizing

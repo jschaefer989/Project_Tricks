@@ -53,5 +53,6 @@ export default abstract class Card {
     getValue(): number;
     getName(): string;
     getRankAssetPath(): string;
+    private parseEdelName;
 }
 export {};

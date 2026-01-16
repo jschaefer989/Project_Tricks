@@ -119,14 +119,14 @@ function Character.prototype.showDeckOverview(self, asset)
         __TS__New(
             FontWithPosition,
             TextIds.TOOLTIP_DECK_OVERVIEW_CARDS,
-            5,
+            0,
             10,
-            (("Deck: " .. tostring(#self.deck)) .. "/") .. tostring(#self.deck + #self.discardPile + #self.hand)
+            ((" Deck: " .. tostring(#self.deck)) .. "/") .. tostring(self:getTotalCards())
         ),
         __TS__New(
             FontWithPosition,
             TextIds.TOOLTIP_DECK_OVERVIEW_DISCARDS,
-            5,
+            0,
             20,
             "Discards: " .. tostring(#self.discardPile)
         )
@@ -135,12 +135,15 @@ function Character.prototype.showDeckOverview(self, asset)
         local yOffset = 35
         local cardsToShow = __TS__ArraySlice(self.deck, #self.deck - self.numberOfHeldCards, #self.deck)
         for ____, card in ipairs(cardsToShow) do
-            local cardTooltip = card:getShortCardInfo(5, yOffset)
+            local cardTooltip = card:getShortCardInfo(0, yOffset)
             __TS__ArrayPushArray(tooltipLines, cardTooltip)
             yOffset = yOffset + 35
         end
     end
     self.gameManager.assetManager.tooltipManager:addTooltip(tooltipLines, asset)
+end
+function Character.prototype.getTotalCards(self)
+    return #self.deck + #self.hand + #self.discardPile
 end
 function Character.prototype.showDeckContents(self)
     self.gameManager.popupManager:open(PopupIds.DECK_CONTENTS, self.name .. " Deck", PopupSizes.MENU)
@@ -157,19 +160,19 @@ end
 function Character.prototype.getSortMode(self, timeSinceLastSort, threshold)
     if timeSinceLastSort < threshold then
         repeat
-            local ____switch40 = self.sortMode
-            local ____cond40 = ____switch40 == SortMode.POWER
-            if ____cond40 then
+            local ____switch41 = self.sortMode
+            local ____cond41 = ____switch41 == SortMode.POWER
+            if ____cond41 then
                 self.sortMode = SortMode.VALUE
                 break
             end
-            ____cond40 = ____cond40 or ____switch40 == SortMode.VALUE
-            if ____cond40 then
+            ____cond41 = ____cond41 or ____switch41 == SortMode.VALUE
+            if ____cond41 then
                 self.sortMode = SortMode.SUIT
                 break
             end
-            ____cond40 = ____cond40 or ____switch40 == SortMode.SUIT
-            if ____cond40 then
+            ____cond41 = ____cond41 or ____switch41 == SortMode.SUIT
+            if ____cond41 then
                 self.sortMode = SortMode.POWER
                 break
             end
@@ -180,19 +183,19 @@ function Character.prototype.getSortMode(self, timeSinceLastSort, threshold)
 end
 function Character.prototype.applySort(self)
     repeat
-        local ____switch43 = self.sortMode
-        local ____cond43 = ____switch43 == SortMode.POWER
-        if ____cond43 then
+        local ____switch44 = self.sortMode
+        local ____cond44 = ____switch44 == SortMode.POWER
+        if ____cond44 then
             self:sortByPower()
             break
         end
-        ____cond43 = ____cond43 or ____switch43 == SortMode.VALUE
-        if ____cond43 then
+        ____cond44 = ____cond44 or ____switch44 == SortMode.VALUE
+        if ____cond44 then
             self:sortByValue()
             break
         end
-        ____cond43 = ____cond43 or ____switch43 == SortMode.SUIT
-        if ____cond43 then
+        ____cond44 = ____cond44 or ____switch44 == SortMode.SUIT
+        if ____cond44 then
             self:sortBySuit()
             break
         end

@@ -1,12 +1,14 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
+local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
 local ____SlideAnimation = require("Assets.Animations.SlideAnimation")
 local SlideAnimation = ____SlideAnimation.default
 local ____FontWithPosition = require("Assets.Fonts.FontWithPosition")
 local FontWithPosition = ____FontWithPosition.default
+local Highlights = ____FontWithPosition.Highlights
 local ____IconAsset = require("Assets.IconAsset")
 local IconAsset = ____IconAsset.default
 local ____Helpers = require("Helpers")
@@ -136,7 +138,7 @@ function Card.prototype.onDiscard(self)
 end
 function Card.prototype.onHover(self, asset)
     self.gameManager.assetManager.tooltipManager:addTooltip(
-        self:getShortCardInfo(5, 10),
+        self:getShortCardInfo(0, 10),
         asset
     )
 end
@@ -175,19 +177,19 @@ function Card.getSuitName(self, suit)
         local ____switch22 = suit
         local ____cond22 = ____switch22 == Suits.HEARTS
         if ____cond22 then
-            return "Hearts"
+            return Highlights.HEARTS .. "Hearts"
         end
         ____cond22 = ____cond22 or ____switch22 == Suits.ACORNS
         if ____cond22 then
-            return "Acorns"
+            return Highlights.ACORNS .. "Acorns"
         end
         ____cond22 = ____cond22 or ____switch22 == Suits.LEAVES
         if ____cond22 then
-            return "Leaves"
+            return Highlights.LEAVES .. "Leaves"
         end
         ____cond22 = ____cond22 or ____switch22 == Suits.BELLS
         if ____cond22 then
-            return "Bells"
+            return Highlights.BELLS .. "  Bells"
         end
         do
             exhaustiveGuard(suit)
@@ -201,10 +203,21 @@ function Card.prototype.getValue(self)
     return self.isEdel and not isEmpty(self.edelValue) and self.edelValue or self.value
 end
 function Card.prototype.getName(self)
-    return self.isEdel and not isEmpty(self.edelName) and self.edelName or self.name
+    return self.isEdel and not isEmpty(self.edelName) and self:parseEdelName() or self.name
 end
 function Card.prototype.getRankAssetPath(self)
     return self.isEdel and not isEmpty(self.edelRankAssetPath) and self.edelRankAssetPath or self.rankAssetPath
+end
+function Card.prototype.parseEdelName(self)
+    if isEmpty(self.edelName) then
+        return ""
+    end
+    local newSegments = {}
+    local segments = __TS__StringSplit(self.edelName, " ")
+    for ____, segment in ipairs(segments) do
+        newSegments[#newSegments + 1] = Highlights.EDEL .. segment
+    end
+    return table.concat(newSegments, " ")
 end
 __TS__SetDescriptor(
     Card.prototype,
@@ -217,7 +230,7 @@ __TS__SetDescriptor(
             local ____opt_10 = ____opt_12 and ____opt_12.edelCard
             ____temp_14 = (____opt_10 and ____opt_10.suit) == self.suit
         end
-        return ____temp_14 and self.edelName ~= self.name
+        return ____temp_14 and not isEmpty(self.edelName) and self.edelName ~= self.name
     end},
     true
 )

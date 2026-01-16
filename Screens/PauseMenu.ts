@@ -41,7 +41,7 @@ export default class PauseMenu {
       popupCenterX,
       continueButtonY + buttonHeight / 2 - 1,
       "Continue",
-      { format: Format.CENTER, size: 18 }
+      { xLocation: Format.CENTER, size: 18 }
     );
 
     const continueButton = new Asset(
@@ -87,7 +87,7 @@ export default class PauseMenu {
       popupCenterX,
       saveButtonY + buttonHeight / 2 - 1,
       "Save",
-      { format: Format.CENTER, size: 18 }
+      { xLocation: Format.CENTER, size: 18 }
     );
 
     const saveButton = new Asset(
@@ -134,7 +134,7 @@ export default class PauseMenu {
       popupCenterX,
       quitButtonY + buttonHeight / 2 - 1,
       "Quit",
-      { format: Format.CENTER, size: 18 }
+      { xLocation: Format.CENTER, size: 18 }
     );
 
     const quitButton = new Asset(

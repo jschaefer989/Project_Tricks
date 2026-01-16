@@ -199,7 +199,7 @@ function Popup.prototype.addTitle(self, title)
         ____exports.default:getCenterOfPopup(self.popupSize),
         ____exports.default:getTopOfPopup(self.popupSize) + self:getTitleOffset(),
         title,
-        {font = Fonts.FANTASY, size = 16, format = Format.CENTER}
+        {font = Fonts.FANTASY, size = 16, xLocation = Format.CENTER}
     )
     self.gameManager.assetManager.textManager:addText(
         self:getPopupTitleId(),

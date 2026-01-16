@@ -125,7 +125,7 @@ export default class CharacterInfoPanel {
         portraitBackgroundW,
         levelY,
         `${this.gameManager.player.experience} xp`,
-        { size: 9, format: Format.RIGHT }
+        { size: 9, xLocation: Format.RIGHT }
       )
     );
   }
@@ -189,7 +189,7 @@ export default class CharacterInfoPanel {
             9,
             9
           ),
-          format: Format.RIGHT,
+          xLocation: Format.RIGHT,
         }
       )
     );

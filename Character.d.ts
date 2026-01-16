@@ -25,6 +25,7 @@ export default class Character {
     removeFromDeck(card: Card): void;
     putHandBackInDeck(): void;
     showDeckOverview(asset: Asset): void;
+    getTotalCards(): number;
     showDeckContents(): void;
     sortCards(): void;
     private getSortMode;

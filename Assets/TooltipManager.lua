@@ -14,6 +14,8 @@ local ____Enums = require("Enums")
 local AssetIds = ____Enums.AssetIds
 local ____Asset = require("Assets.Asset")
 local Asset = ____Asset.default
+local ____FontWithPosition = require("Assets.Fonts.FontWithPosition")
+local Format = ____FontWithPosition.Format
 local ____Tooltip = require("Assets.Tooltip")
 local Tooltip = ____Tooltip.default
 local ____Helpers = require("Helpers")
@@ -56,8 +58,8 @@ function TooltipManager.prototype.addTooltip(self, texts, associatedAsset)
     for ____, text in ipairs(texts) do
         text.x = text.x + tooltipX
         text.y = text.y + tooltipY
-        text.limit = 120
-        text.alignMode = "center"
+        text.limit = tooltipWidth
+        text.alignMode = Format.CENTER
     end
     local tooltipImage = self:getTooltipBackground(texts)
     if isEmpty(tooltipImage) then

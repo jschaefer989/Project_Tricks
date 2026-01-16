@@ -127,7 +127,7 @@ function CharacterInfoPanel.prototype.buildPlayerExperience(self, levelY)
             portraitBackgroundW,
             levelY,
             tostring(self.gameManager.player.experience) .. " xp",
-            {size = 9, format = Format.RIGHT}
+            {size = 9, xLocation = Format.RIGHT}
         )
     )
 end
@@ -182,7 +182,7 @@ function CharacterInfoPanel.prototype.buildPlayerMoney(self, nameY)
                     9,
                     9
                 ),
-                format = Format.RIGHT
+                xLocation = Format.RIGHT
             }
         )
     )

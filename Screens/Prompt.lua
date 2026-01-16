@@ -37,7 +37,7 @@ function Prompt.prototype.____constructor(self, gameManager, message, onYesClick
             popupCenterX,
             Popup:getTopOfPopup(PopupSizes.MESSAGE_BOX) + 40,
             constructionOptions.secondaryMessage,
-            {format = Format.CENTER, size = 9}
+            {xLocation = Format.CENTER, size = 9}
         )
         self.gameManager.popupManager:addText(TextIds.PROMPT_SECONDARY_MESSAGE, secondaryMessageText)
     end
@@ -53,7 +53,7 @@ function Prompt.prototype.buildYesButton(self)
         popupCenterX,
         Popup:getTopOfPopup(PopupSizes.MESSAGE_BOX) + 61 + buttonHeight / 2,
         "Yes",
-        {format = Format.CENTER, size = 9}
+        {xLocation = Format.CENTER, size = 9}
     )
     local button = __TS__New(
         Asset,
@@ -84,7 +84,7 @@ function Prompt.prototype.buildNoButton(self)
         popupCenterX,
         buttonY + buttonHeight / 2 + 1,
         "No",
-        {format = Format.CENTER, size = 9}
+        {xLocation = Format.CENTER, size = 9}
     )
     local button = __TS__New(
         Asset,

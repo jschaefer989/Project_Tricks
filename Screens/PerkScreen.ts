@@ -41,7 +41,7 @@ export default class PerkScreen {
         Popup.getCenterOfPopup(PopupSizes.MENU),
         Popup.getTopOfPopup(PopupSizes.MENU) + 100,
         "No perks acquired yet.",
-        { format: Format.CENTER, size: 18 }
+        { xLocation: Format.CENTER, size: 18 }
       );
       this.gameManager.popupManager.addText(
         TextIds.PERKS_NO_PERKS_TEXT,
@@ -57,7 +57,7 @@ export default class PerkScreen {
         centerX,
         currentY,
         perk.getPerkName(),
-        { format: Format.CENTER, size: 9 }
+        { xLocation: Format.CENTER, size: 9 }
         );
         this.gameManager.popupManager.addText(
             perk.perkType,
@@ -76,7 +76,7 @@ export default class PerkScreen {
       popupCenterX,
       returnButtonY + buttonHeight / 2 - 1,
       "Return",
-      { format: Format.CENTER, size: 9 }
+      { xLocation: Format.CENTER, size: 9 }
     );
 
     const returnButton = new Asset(

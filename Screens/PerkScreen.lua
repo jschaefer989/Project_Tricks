@@ -38,7 +38,7 @@ function PerkScreen.prototype.buildPerks(self)
             Popup:getCenterOfPopup(PopupSizes.MENU),
             Popup:getTopOfPopup(PopupSizes.MENU) + 100,
             "No perks acquired yet.",
-            {format = Format.CENTER, size = 18}
+            {xLocation = Format.CENTER, size = 18}
         )
         self.gameManager.popupManager:addText(TextIds.PERKS_NO_PERKS_TEXT, noPerksText)
         return
@@ -52,7 +52,7 @@ function PerkScreen.prototype.buildPerks(self)
             centerX,
             currentY,
             perk:getPerkName(),
-            {format = Format.CENTER, size = 9}
+            {xLocation = Format.CENTER, size = 9}
         )
         self.gameManager.popupManager:addText(perk.perkType, perkText)
         currentY = currentY + 30
@@ -67,7 +67,7 @@ function PerkScreen.prototype.buildReturnButton(self)
         popupCenterX,
         returnButtonY + buttonHeight / 2 - 1,
         "Return",
-        {format = Format.CENTER, size = 9}
+        {xLocation = Format.CENTER, size = 9}
     )
     local returnButton = __TS__New(
         Asset,
