@@ -58,7 +58,6 @@ function CardAssets.prototype.addAsset(self, card, cardX, cardY, includeClickHan
     )
     self.gameManager.assetManager:addAsset(assetId, baseCardAsset)
     self:addSuitAsset(card, cardX, cardY, includeClickHandler)
-    self:addRankAsset(card, cardX, cardY, includeClickHandler)
 end
 function CardAssets.getBaseAssetId(self, card)
     return (AssetIds.BASE_CARD_TEMPLATE .. "-") .. card.id

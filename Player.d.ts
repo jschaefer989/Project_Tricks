@@ -17,10 +17,8 @@ interface PlayerData {
     perks: PerkData[];
 }
 export default class Player extends Character {
-    name: string;
     money: number;
     experience: number;
-    level: number;
     discards: number;
     numberOfLootCards: number;
     perks: Perk[];

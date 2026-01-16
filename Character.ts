@@ -14,6 +14,8 @@ export default class Character {
   discardPile: Card[];
   numberOfHeldCards: number;
   type: CharacterTypes;
+  name: string = "Character";
+  level: number = 1;
   private lastSortTime = 0;
   private sortMode: SortMode = SortMode.POWER;
 
@@ -125,7 +127,7 @@ export default class Character {
   }
 
   showDeckContents(): void {
-    this.gameManager.popupManager.open(PopupIds.DECK_CONTENTS, `${this.getCharacterName()} Deck`, PopupSizes.MENU);
+    this.gameManager.popupManager.open(PopupIds.DECK_CONTENTS, `${this.name} Deck`, PopupSizes.MENU);
   }
 
   sortCards(): void {
@@ -209,17 +211,6 @@ export default class Character {
       cardAssets.redrawCard(card);
     }
     this.gameManager.board.cardAssets.disableAllCards(false);
-  }
-
-  getCharacterName(): string {
-    switch (this.type) {
-      case CharacterTypes.PLAYER:
-        return this.gameManager.player.name;
-      case CharacterTypes.ENEMY:
-        return this.gameManager.board?.enemy?.name ?? "Enemy";
-      default:
-        exhaustiveGuard(this.type) ;
-    }
   }
 }
 

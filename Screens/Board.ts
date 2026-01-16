@@ -29,8 +29,7 @@ import {
   TextIds,
 } from "../Enums";
 import type GameManager from "../GameManager";
-
-const portraitGap = 12;
+import CharacterInfoPanel from "./CharacterInfoPanel";
 
 interface BoardData {
   discardUsed: number;
@@ -57,6 +56,8 @@ export default class Board {
   playerValue = 0;
   enemyPower = 0;
   enemyValue = 0;
+  playerInfoPanel: CharacterInfoPanel;
+  enemyInfoPanel: CharacterInfoPanel;
   showingEdelView = true;
   cardAssets: CardAssets;
   portraitPosition: number | undefined; // Saved off so it can be restored on resume
@@ -67,6 +68,8 @@ export default class Board {
     this.enemy = enemy ?? new Enemy(gameManager);
     this.dealer = new Dealer(gameManager, this);
     this.cardAssets = new CardAssets(gameManager, this);
+    this.playerInfoPanel = new CharacterInfoPanel(gameManager, gameManager.player);
+    this.enemyInfoPanel = new CharacterInfoPanel(gameManager, this.enemy);
   }
 
   load(data: BoardData): void {
@@ -346,9 +349,6 @@ export default class Board {
     this.cardAssets.disableAllCards(false);
     this.buildPrimaryButtons();
     this.buildPointBoard();
-    const portraitHeight = this.getPortraitHeight() ?? 0;
-    this.buildPowerAndValues(CharacterTypes.PLAYER, portraitHeight);
-    this.buildPowerAndValues(CharacterTypes.ENEMY, portraitHeight);
   }
 
   handleDiscard(): void {
@@ -904,266 +904,12 @@ export default class Board {
     }
   }
 
-  private buildPowerAndValues(
-    characterType: CharacterTypes,
-    portraitHeight: number
-  ): void {
-    const levelText =
-      characterType === CharacterTypes.PLAYER
-        ? this.gameManager.assetManager.textManager.getText(
-            TextIds.PLAYER_PORTRAIT_LEVEL
-          )
-        : this.gameManager.assetManager.textManager.getText(
-            TextIds.ENEMY_PORTRAIT_LEVEL
-          );
-    if (isEmpty(levelText)) {
-      return;
-    }
-
-    const powerId =
-      characterType === CharacterTypes.PLAYER
-        ? TextIds.PLAYER_POWER
-        : TextIds.ENEMY_POWER;
-    const powerValue =
-      characterType === CharacterTypes.PLAYER
-        ? this.playerPower
-        : this.enemyPower;
-    const attackPowerAssetId =
-      characterType === CharacterTypes.PLAYER
-        ? AssetIds.PLAYER_ATTACK_POWER_ICON
-        : AssetIds.ENEMY_ATTACK_POWER_ICON;
-    const powerY = levelText.y + portraitGap;
-    this.gameManager.assetManager.textManager.addText(
-      powerId,
-      new FontWithPosition(powerId, 20, powerY, powerValue.toString(), {
-        icon: IconAsset.getPowerIconAsset(this.gameManager, attackPowerAssetId),
-      })
-    );
-
-    const valueAssetId =
-      characterType === CharacterTypes.PLAYER
-        ? AssetIds.PLAYER_VALUE_ICON
-        : AssetIds.ENEMY_VALUE_ICON;
-    const valueId =
-      characterType === CharacterTypes.PLAYER
-        ? TextIds.PLAYER_VALUE
-        : TextIds.ENEMY_VALUE;
-    const valueValue =
-      characterType === CharacterTypes.PLAYER
-        ? this.playerValue
-        : this.enemyValue;
-    this.gameManager.assetManager.textManager.addText(
-      valueId,
-      new FontWithPosition(
-        valueId,
-        20,
-        powerY + portraitGap,
-        valueValue.toString(),
-        { icon: IconAsset.getValueIconAsset(this.gameManager, valueAssetId) }
-      )
-    );
-  }
-
   private buildPlayerPortrait(): void {
-    this.buildPortrait(CharacterTypes.PLAYER);
-    this.buildPowerAndValues(
-      CharacterTypes.PLAYER,
-      this.getPortraitHeight() ?? 0
-    );
-  }
-
-  private getPortraitHeight(): number | undefined {
-    const portraitAsset = this.gameManager.assetManager.getAsset(
-      AssetIds.PLAYER_PORTRAIT,
-      AssetIds.PLAYER_PORTRAIT
-    );
-    if (isEmpty(portraitAsset)) {
-      return;
-    }
-    return portraitAsset.getHeight();
-  }
-
-  private getPortraitWidth(): number | undefined {
-    const portraitAsset = this.gameManager.assetManager.getAsset(
-      AssetIds.PLAYER_PORTRAIT,
-      AssetIds.PLAYER_PORTRAIT
-    );
-    if (isEmpty(portraitAsset)) {
-      return;
-    }
-    return portraitAsset.getWidth();
+    this.playerInfoPanel.showPortrait();
   }
 
   private buildEnemyPortrait(): void {
-    this.buildPortrait(CharacterTypes.ENEMY);
-    this.buildPowerAndValues(
-      CharacterTypes.ENEMY,
-      this.getPortraitHeight() ?? 0
-    );
-  }
-
-  private buildPortrait(characterType: CharacterTypes): void {
-    if (
-      this.portraitPosition === undefined &&
-      characterType === CharacterTypes.PLAYER
-    ) {
-      this.portraitPosition = this.cardAssets.getHandYCoordinate(characterType);
-    }
-    const portraitPosition = this.getPortraitPosition(characterType);
-
-    const portraitBackgroundW = 99;
-    const portraitBackgroundH = 106;
-    const portraitBackgroundAssetId =
-      characterType === CharacterTypes.PLAYER
-        ? AssetIds.PLAYER_PORTRAIT_BACKGROUND
-        : AssetIds.ENEMY_PORTRAIT_BACKGROUND;
-    this.gameManager.assetManager.addAsset(
-      portraitBackgroundAssetId,
-      new Asset(
-        this.gameManager,
-        portraitBackgroundAssetId,
-        this.gameManager.assetManager.assetLoader.loadImage(
-          "Assets/Images/PortraitBackground.png"
-        ),
-        5,
-        portraitPosition,
-        portraitBackgroundW,
-        portraitBackgroundH
-      )
-    );
-
-    const portraitW = 54;
-    const portraitH = 53;
-    const portraitAssetId =
-      characterType === CharacterTypes.PLAYER
-        ? AssetIds.PLAYER_PORTRAIT
-        : AssetIds.ENEMY_PORTRAIT;
-    this.gameManager.assetManager.addAsset(
-      portraitAssetId,
-      new Asset(
-        this.gameManager,
-        portraitAssetId,
-        this.gameManager.assetManager.assetLoader.loadImage(
-          "Assets/Images/Portrait.png"
-        ),
-        5,
-        portraitPosition,
-        portraitW,
-        portraitH
-      )
-    );
-
-    const portraitNameId =
-      characterType === CharacterTypes.PLAYER
-        ? TextIds.PLAYER_PORTRAIT_NAME
-        : TextIds.ENEMY_PORTRAIT_NAME;
-    const nameY = portraitH + portraitPosition + 10;
-    this.gameManager.assetManager.textManager.addText(
-      portraitNameId,
-      new FontWithPosition(
-        portraitNameId,
-        10,
-        nameY,
-        characterType === CharacterTypes.PLAYER
-          ? this.gameManager.player.name
-          : this.enemy.name,
-        { size: 16, font: Fonts.FANTASY }
-      )
-    );
-
-    const portraitLevelId =
-      characterType === CharacterTypes.PLAYER
-        ? TextIds.PLAYER_PORTRAIT_LEVEL
-        : TextIds.ENEMY_PORTRAIT_LEVEL;
-    const levelY = nameY + portraitGap;
-    this.gameManager.assetManager.textManager.addText(
-      portraitLevelId,
-      new FontWithPosition(
-        portraitLevelId,
-        10,
-        levelY,
-        `Lvl ${
-          characterType === CharacterTypes.PLAYER
-            ? this.gameManager.player.level
-            : this.enemy.level
-        }`,
-        { size: 9 }
-      )
-    );
-
-    if (characterType === CharacterTypes.PLAYER) {
-      this.gameManager.assetManager.textManager.addText(
-        TextIds.PLAYER_PORTRAIT_EXPERIENCE,
-        new FontWithPosition(
-          TextIds.PLAYER_PORTRAIT_EXPERIENCE,
-          portraitBackgroundW,
-          levelY,
-          `${this.gameManager.player.experience} xp`,
-          { size: 9, format: Format.RIGHT }
-        )
-      );
-
-      const perksText = new FontWithPosition(
-        TextIds.PLAYER_PERKS,
-        portraitW + 13,
-        portraitPosition + 20,
-        "Perks",
-        { size: 9 }
-      );
-      this.gameManager.assetManager.textManager.addText(
-        TextIds.PLAYER_PERKS,
-        perksText
-      );
-
-      this.gameManager.assetManager.addAsset(
-        AssetIds.PERKS_BUTTON,
-        new Asset(
-          this.gameManager,
-          AssetIds.PERKS_BUTTON,
-          this.gameManager.assetManager.assetLoader.loadImage(
-            "Assets/Images/PerksButton.png"
-          ),
-          portraitW + 8,
-          portraitPosition + 10,
-          39,
-          18,
-          {
-            onClick: () => this.gameManager.perkScreen.showPerks(),
-            clickSound: this.gameManager.assetManager.buttonClickSound,
-            associatedTexts: [perksText],
-            hoverEffect: [HoverEffects.CHANGE_COLOR],
-            mousePressEffect: [
-              MousePressEffects.DARKEN,
-              MousePressEffects.SHIFT_DOWN,
-            ],
-            alwaysEnabled: true,
-          }
-        )
-      );
-
-      this.gameManager.assetManager.textManager.addText(
-        TextIds.PLAYER_PORTRAIT_MONEY,
-        new FontWithPosition(
-          TextIds.PLAYER_PORTRAIT_MONEY,
-          portraitBackgroundW - 2,
-          nameY,
-          `${this.gameManager.player.money}`,
-          {
-            size: 9,
-            icon: new IconAsset(
-              this.gameManager,
-              AssetIds.MONEY_ICON,
-              this.gameManager.assetManager.assetLoader.loadImage(
-                "Assets/Images/Mark.png"
-              ),
-              9,
-              9
-            ),
-            format: Format.RIGHT,
-          }
-        )
-      );
-    }
+    this.enemyInfoPanel.showPortrait();
   }
 
   buildDeck(characterType: CharacterTypes): void {
@@ -1286,11 +1032,11 @@ export default class Board {
     }
 
     const fireSprite = this.getWinFireSprite();
-    const portraitWidth = this.getPortraitWidth() ?? 0;
-    const portraitHeight = this.getPortraitHeight() ?? 0;
+    const portraitWidth = this.playerInfoPanel.getPortraitWidth() ?? 0;
+    const portraitHeight = this.playerInfoPanel.getPortraitHeight() ?? 0;
 
-    const playerPortraitY = this.getPortraitPosition(CharacterTypes.PLAYER);
-    const enemyPortraitY = this.getPortraitPosition(CharacterTypes.ENEMY);
+    const playerPortraitY = this.playerInfoPanel.getPortraitPosition();
+    const enemyPortraitY = this.enemyInfoPanel.getPortraitPosition();
 
     const portraitCenterX = 5 + portraitWidth / 2;
     const playerCenterY = playerPortraitY + portraitHeight / 2;
@@ -1366,15 +1112,41 @@ export default class Board {
     );
   }
 
-  getPortraitPosition(characterType: CharacterTypes): number {
-    return characterType === CharacterTypes.PLAYER
-      ? this.portraitPosition ??
-          this.cardAssets.getHandYCoordinate(characterType)
-      : 5;
-  }
-
   tallyEnemyPowerAndValue(): void {
     this.addEnemyPower(this.enemy.getCardPower());
     this.addEnemyValue(this.enemy.getCardValue());
+  }
+
+  getCharacterPower(characterType: CharacterTypes): number {
+    switch (characterType) {
+      case CharacterTypes.PLAYER:
+        return this.playerPower;
+      case CharacterTypes.ENEMY:
+        return this.enemyPower;
+      default:
+        exhaustiveGuard(characterType);
+    }
+  }
+
+  getCharacterValue(characterType: CharacterTypes): number {
+    switch (characterType) {
+      case CharacterTypes.PLAYER:
+        return this.playerValue;
+      case CharacterTypes.ENEMY:
+        return this.enemyValue;
+      default:
+        exhaustiveGuard(characterType);
+    }
+  }
+
+  getInfoPanel(characterType: CharacterTypes): CharacterInfoPanel {
+    switch (characterType) {
+      case CharacterTypes.PLAYER:
+        return this.playerInfoPanel;
+      case CharacterTypes.ENEMY:
+        return this.enemyInfoPanel;
+      default:
+        exhaustiveGuard(characterType);
+    }
   }
 }

@@ -12,7 +12,6 @@ local CharacterTypes = ____Enums.CharacterTypes
 local PopupIds = ____Enums.PopupIds
 local TextIds = ____Enums.TextIds
 local ____Helpers = require("Helpers")
-local exhaustiveGuard = ____Helpers.exhaustiveGuard
 local isEmpty = ____Helpers.isEmpty
 local lovelyToasts = require("Libraries.Lovely-Toasts-main.lovelyToasts")
 local ____Popup = require("Screens.Popup.Popup")
@@ -21,6 +20,8 @@ ____exports.default = __TS__Class()
 local Character = ____exports.default
 Character.name = "Character"
 function Character.prototype.____constructor(self, gameManager, ____type)
+    self.name = "Character"
+    self.level = 1
     self.lastSortTime = 0
     self.sortMode = SortMode.POWER
     self.gameManager = gameManager
@@ -133,11 +134,7 @@ function Character.prototype.showDeckOverview(self, asset)
     )
 end
 function Character.prototype.showDeckContents(self)
-    self.gameManager.popupManager:open(
-        PopupIds.DECK_CONTENTS,
-        self:getCharacterName() .. " Deck",
-        PopupSizes.MENU
-    )
+    self.gameManager.popupManager:open(PopupIds.DECK_CONTENTS, self.name .. " Deck", PopupSizes.MENU)
 end
 function Character.prototype.sortCards(self)
     local now = os.time() * 1000
@@ -231,24 +228,6 @@ function Character.prototype.redrawHand(self)
         end
     end
     self.gameManager.board.cardAssets:disableAllCards(false)
-end
-function Character.prototype.getCharacterName(self)
-    repeat
-        local ____switch52 = self.type
-        local ____cond52 = ____switch52 == CharacterTypes.PLAYER
-        if ____cond52 then
-            return self.gameManager.player.name
-        end
-        ____cond52 = ____cond52 or ____switch52 == CharacterTypes.ENEMY
-        if ____cond52 then
-            local ____opt_6 = self.gameManager.board
-            local ____opt_4 = ____opt_6 and ____opt_6.enemy
-            return ____opt_4 and ____opt_4.name or "Enemy"
-        end
-        do
-            exhaustiveGuard(self.type)
-        end
-    until true
 end
 SortMode = SortMode or ({})
 SortMode.POWER = "POWER"

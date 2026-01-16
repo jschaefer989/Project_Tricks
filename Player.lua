@@ -20,10 +20,8 @@ Player.name = "Player"
 __TS__ClassExtends(Player, Character)
 function Player.prototype.____constructor(self, gameManager)
     Character.prototype.____constructor(self, gameManager, CharacterTypes.PLAYER)
-    self.name = "Player"
     self.money = 0
     self.experience = 0
-    self.level = 1
     self.discards = 3
     self.numberOfLootCards = 3
     self.perks = {}

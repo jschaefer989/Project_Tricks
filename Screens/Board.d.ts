@@ -5,6 +5,7 @@ import Enemy, { EnemyData } from "Enemies/Enemy";
 import Dealer from "../Dealer";
 import { CharacterTypes } from "../Enums";
 import type GameManager from "../GameManager";
+import CharacterInfoPanel from "./CharacterInfoPanel";
 interface BoardData {
     discardUsed: number;
     playerPoints: number;
@@ -29,6 +30,8 @@ export default class Board {
     playerValue: number;
     enemyPower: number;
     enemyValue: number;
+    playerInfoPanel: CharacterInfoPanel;
+    enemyInfoPanel: CharacterInfoPanel;
     showingEdelView: boolean;
     cardAssets: CardAssets;
     portraitPosition: number | undefined;
@@ -81,19 +84,17 @@ export default class Board {
     disableDiscardButton(): void;
     disableDeselectButton(): void;
     private buildPointBoard;
-    private buildPowerAndValues;
     private buildPlayerPortrait;
-    private getPortraitHeight;
-    private getPortraitWidth;
     private buildEnemyPortrait;
-    private buildPortrait;
     buildDeck(characterType: CharacterTypes): void;
     private buildEdelBoard;
     private playWinFireSound;
     private buildWinFire;
     private removeWinFire;
     private getWinFireSprite;
-    getPortraitPosition(characterType: CharacterTypes): number;
     tallyEnemyPowerAndValue(): void;
+    getCharacterPower(characterType: CharacterTypes): number;
+    getCharacterValue(characterType: CharacterTypes): number;
+    getInfoPanel(characterType: CharacterTypes): CharacterInfoPanel;
 }
 export {};

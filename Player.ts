@@ -21,10 +21,8 @@ interface PlayerData {
 }
 
 export default class Player extends Character {
-  name = "Player";
   money = 0;
   experience = 0;
-  level = 1;
   discards = 3;
   numberOfLootCards = 3;
   perks: Perk[] = [];

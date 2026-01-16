@@ -66,7 +66,7 @@ export default class CardAssets {
     );
     this.gameManager.assetManager.addAsset(assetId, baseCardAsset);
     this.addSuitAsset(card, cardX, cardY, includeClickHandler);
-    this.addRankAsset(card, cardX, cardY, includeClickHandler);
+    //this.addRankAsset(card, cardX, cardY, includeClickHandler);
   }
 
   static getBaseAssetId(card: Card): string {

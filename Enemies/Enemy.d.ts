@@ -16,10 +16,8 @@ export interface EnemyData {
 export default class Enemy extends Character {
     numberOfHeldCards: number;
     numberOfCardsInDeck: number;
-    level: number;
     enemyType: EnemyTypes;
     experience: number;
-    name: string;
     constructor(gameManager: GameManager, level?: number, enemyType?: EnemyTypes, experience?: number, name?: string, numberOfHeldCards?: number, numberOfCardsInDeck?: number);
     load(gameManager: GameManager, data?: EnemyData): void;
     save(): EnemyData;

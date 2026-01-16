@@ -248,7 +248,7 @@ export default class Dealer {
   getDeckPosition(characterType: CharacterTypes): Point {
     const screenW = push.getWidth();
     const screenH = push.getHeight();
-    const portraitPosition = this.board.getPortraitPosition(characterType);
+    const portraitPosition = this.board.getInfoPanel(characterType).getPortraitPosition();
 
     // Position decks on the sides of the screen
     switch (characterType) {

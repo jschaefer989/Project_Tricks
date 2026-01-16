@@ -9,6 +9,8 @@ export default class Character {
     discardPile: Card[];
     numberOfHeldCards: number;
     type: CharacterTypes;
+    name: string;
+    level: number;
     private lastSortTime;
     private sortMode;
     constructor(gameManager: GameManager, type: CharacterTypes);
@@ -31,5 +33,4 @@ export default class Character {
     sortByValue(): void;
     sortBySuit(): void;
     redrawHand(): void;
-    getCharacterName(): string;
 }

@@ -221,7 +221,7 @@ end
 function Dealer.prototype.getDeckPosition(self, characterType)
     local screenW = push:getWidth()
     local screenH = push:getHeight()
-    local portraitPosition = self.board:getPortraitPosition(characterType)
+    local portraitPosition = self.board:getInfoPanel(characterType):getPortraitPosition()
     repeat
         local ____switch40 = characterType
         local ____cond40 = ____switch40 == CharacterTypes.PLAYER
