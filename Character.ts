@@ -105,23 +105,36 @@ export default class Character {
   }
 
   showDeckOverview(asset: Asset): void {
+    const tooltipLines: FontWithPosition[] = [
+      new FontWithPosition(
+        TextIds.TOOLTIP_DECK_OVERVIEW_CARDS,
+        5,
+        10,
+        `Deck: ${this.deck.length}/${
+          this.deck.length + this.discardPile.length + this.hand.length
+        }`
+      ),
+      new FontWithPosition(
+        TextIds.TOOLTIP_DECK_OVERVIEW_DISCARDS,
+        5,
+        20,
+        `Discards: ${this.discardPile.length}`
+      ),
+    ];
+
+    if (this.type === CharacterTypes.ENEMY) {
+      let yOffset = 35;
+      const cardsToShow = this.deck.slice(this.deck.length - this.numberOfHeldCards, this.deck.length);
+
+      for (const card of cardsToShow) {
+        const cardTooltip = card.getShortCardInfo(5, yOffset);
+        tooltipLines.push(...cardTooltip);
+        yOffset += 35; // Offset for card name + power + value
+      }
+    }
+
     this.gameManager.assetManager.tooltipManager.addTooltip(
-      [
-        new FontWithPosition(
-          TextIds.TOOLTIP_DECK_OVERVIEW_CARDS,
-          5,
-          10,
-          `Deck: ${this.deck.length}/${
-            this.deck.length + this.discardPile.length + this.hand.length
-          }`
-        ),
-        new FontWithPosition(
-          TextIds.TOOLTIP_DECK_OVERVIEW_DISCARDS,
-          5,
-          20,
-          `Discards: ${this.discardPile.length}`
-        ),
-      ],
+      tooltipLines,
       asset
     );
   }

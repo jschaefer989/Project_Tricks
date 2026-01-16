@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 import Asset from "Assets/Asset";
+import FontWithPosition from "Assets/Fonts/FontWithPosition";
 import GameManager from "GameManager";
 import { Ranks, Suits } from "../Enums";
 export interface CardData {
@@ -45,6 +46,7 @@ export default abstract class Card {
     onDiscard(): void;
     onHover(asset: Asset): void;
     onUnhover(asset: Asset): void;
+    getShortCardInfo(x: number, y: number): FontWithPosition[];
     static getSuitName(suit: Suits): string;
     get isEdel(): boolean;
     getPower(): number;

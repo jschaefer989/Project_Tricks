@@ -189,7 +189,7 @@ function Asset.prototype.setDisabled(self, disabled, options)
     self.isDisabled = disabled
     local ____temp_42 = options and options.useDisabledAnimation
     if ____temp_42 == nil then
-        ____temp_42 = true
+        ____temp_42 = self.useDisabledAnimation
     end
     self.useDisabledAnimation = ____temp_42
     if disabled then

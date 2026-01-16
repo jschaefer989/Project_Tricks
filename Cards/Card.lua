@@ -136,54 +136,57 @@ function Card.prototype.onDiscard(self)
 end
 function Card.prototype.onHover(self, asset)
     self.gameManager.assetManager.tooltipManager:addTooltip(
-        {
-            __TS__New(
-                FontWithPosition,
-                TextIds.TOOLTIP_CARD_NAME,
-                5,
-                10,
-                (self:getName() .. " of ") .. ____exports.default:getSuitName(self.suit)
-            ),
-            __TS__New(
-                FontWithPosition,
-                TextIds.TOOLTIP_CARD_POWER,
-                5,
-                20,
-                tostring(self:getPower()),
-                {icon = IconAsset:getPowerIconAsset(self.gameManager, AssetIds.TOOLTIP_POWER_ICON)}
-            ),
-            __TS__New(
-                FontWithPosition,
-                TextIds.TOOLTIP_CARD_VALUE,
-                5,
-                30,
-                tostring(self:getValue()),
-                {icon = IconAsset:getValueIconAsset(self.gameManager, AssetIds.TOOLTIP_VALUE_ICON)}
-            )
-        },
+        self:getShortCardInfo(5, 10),
         asset
     )
 end
 function Card.prototype.onUnhover(self, asset)
     self.gameManager.assetManager.tooltipManager:hideTooltip()
 end
+function Card.prototype.getShortCardInfo(self, x, y)
+    return {
+        __TS__New(
+            FontWithPosition,
+            TextIds.TOOLTIP_CARD_NAME,
+            x,
+            y,
+            (self:getName() .. " of ") .. ____exports.default:getSuitName(self.suit)
+        ),
+        __TS__New(
+            FontWithPosition,
+            TextIds.TOOLTIP_CARD_POWER,
+            x,
+            y + 10,
+            tostring(self:getPower()),
+            {icon = IconAsset:getPowerIconAsset(self.gameManager, AssetIds.TOOLTIP_POWER_ICON)}
+        ),
+        __TS__New(
+            FontWithPosition,
+            TextIds.TOOLTIP_CARD_VALUE,
+            x,
+            y + 20,
+            tostring(self:getValue()),
+            {icon = IconAsset:getValueIconAsset(self.gameManager, AssetIds.TOOLTIP_VALUE_ICON)}
+        )
+    }
+end
 function Card.getSuitName(self, suit)
     repeat
-        local ____switch21 = suit
-        local ____cond21 = ____switch21 == Suits.HEARTS
-        if ____cond21 then
+        local ____switch22 = suit
+        local ____cond22 = ____switch22 == Suits.HEARTS
+        if ____cond22 then
             return "Hearts"
         end
-        ____cond21 = ____cond21 or ____switch21 == Suits.ACORNS
-        if ____cond21 then
+        ____cond22 = ____cond22 or ____switch22 == Suits.ACORNS
+        if ____cond22 then
             return "Acorns"
         end
-        ____cond21 = ____cond21 or ____switch21 == Suits.LEAVES
-        if ____cond21 then
+        ____cond22 = ____cond22 or ____switch22 == Suits.LEAVES
+        if ____cond22 then
             return "Leaves"
         end
-        ____cond21 = ____cond21 or ____switch21 == Suits.BELLS
-        if ____cond21 then
+        ____cond22 = ____cond22 or ____switch22 == Suits.BELLS
+        if ____cond22 then
             return "Bells"
         end
         do

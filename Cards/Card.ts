@@ -167,44 +167,48 @@ export default abstract class Card {
 
   onHover(asset: Asset): void {
     this.gameManager.assetManager.tooltipManager.addTooltip(
-      [
-        new FontWithPosition(
-          TextIds.TOOLTIP_CARD_NAME,
-          5,
-          10,
-          `${this.getName()} of ${Card.getSuitName(this.suit)}`
-        ),
-        new FontWithPosition(
-          TextIds.TOOLTIP_CARD_POWER,
-          5,
-          20,
-          this.getPower().toString(),
-          {
-            icon: IconAsset.getPowerIconAsset(
-              this.gameManager,
-              AssetIds.TOOLTIP_POWER_ICON
-            ),
-          }
-        ),
-        new FontWithPosition(
-          TextIds.TOOLTIP_CARD_VALUE,
-          5,
-          30,
-          this.getValue().toString(),
-          {
-            icon: IconAsset.getValueIconAsset(
-              this.gameManager,
-              AssetIds.TOOLTIP_VALUE_ICON
-            ),
-          }
-        ),
-      ],
+      this.getShortCardInfo(5, 10),
       asset
     );
   }
 
   onUnhover(asset: Asset): void {
     this.gameManager.assetManager.tooltipManager.hideTooltip();
+  }
+
+  getShortCardInfo(x: number, y: number): FontWithPosition[] {
+    return [
+      new FontWithPosition(
+        TextIds.TOOLTIP_CARD_NAME,
+        x,
+        y,
+        `${this.getName()} of ${Card.getSuitName(this.suit)}`
+      ),
+      new FontWithPosition(
+        TextIds.TOOLTIP_CARD_POWER,
+        x,
+        y + 10,
+        this.getPower().toString(),
+        {
+          icon: IconAsset.getPowerIconAsset(
+            this.gameManager,
+            AssetIds.TOOLTIP_POWER_ICON
+          ),
+        }
+      ),
+      new FontWithPosition(
+        TextIds.TOOLTIP_CARD_VALUE,
+        x,
+        y + 20,
+        this.getValue().toString(),
+        {
+          icon: IconAsset.getValueIconAsset(
+            this.gameManager,
+            AssetIds.TOOLTIP_VALUE_ICON
+          ),
+        }
+      ),
+    ];
   }
 
   static getSuitName(suit: Suits): string {

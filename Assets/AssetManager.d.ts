@@ -16,7 +16,7 @@ export default class AssetManager {
     constructor(gameManager: GameManager);
     addAsset(id: string, asset: Asset): void;
     getAssets(baseId: string): Asset[] | undefined;
-    getAsset(baseId: string, assetId: string): Asset | undefined;
+    getAsset(baseId: string, assetId?: string): Asset | undefined;
     removeAssets(id: string): void;
     removeAsset(baseId: string, assetId: string): void;
     disableAsset(baseId: string): void;

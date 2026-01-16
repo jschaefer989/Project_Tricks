@@ -112,6 +112,14 @@ function Board.prototype.handleStartFight(self)
     self.showingEdelView = false
     self.gameManager.assetManager:removeAssets(AssetIds.LETS_FIGHT_BUTTON)
     self.gameManager.assetManager.textManager:hideText(TextIds.LETS_FIGHT_BUTTON_CAPTION)
+    local ____opt_1 = self.gameManager.assetManager:getAsset(AssetIds.PLAYER_DECK)
+    if ____opt_1 ~= nil then
+        ____opt_1:setDisabled(false, {useDisabledAnimation = true})
+    end
+    local ____opt_3 = self.gameManager.assetManager:getAsset(AssetIds.ENEMY_DECK)
+    if ____opt_3 ~= nil then
+        ____opt_3:setDisabled(false, {useDisabledAnimation = true})
+    end
     self.gameManager.assetManager:disableAllClickableAssets(true)
     self.dealer:dealHandAtStartOfFight()
     self:hideEdelBoard()
@@ -160,10 +168,10 @@ function Board.prototype.getSlainCards(self, characterType)
     until true
 end
 function Board.prototype.startCutAnimation(self, card, winner, loser)
-    local ____temp_1 = self.cardAssets:getCardAssets(card)
-    local baseAsset = ____temp_1.baseAsset
-    local suitAssets = ____temp_1.suitAssets
-    local rankAsset = ____temp_1.rankAsset
+    local ____temp_5 = self.cardAssets:getCardAssets(card)
+    local baseAsset = ____temp_5.baseAsset
+    local suitAssets = ____temp_5.suitAssets
+    local rankAsset = ____temp_5.rankAsset
     local normalSuitAsset = suitAssets[1]
     local cutAnimationAssets = {}
     if not isEmpty(baseAsset) then
@@ -293,15 +301,15 @@ function Board.prototype.displayEdel(self)
                 self.gameManager,
                 self.edelCard.id,
                 function()
-                    local ____opt_2 = self.gameManager.board
-                    return not (____opt_2 and ____opt_2.showingEdelView)
+                    local ____opt_6 = self.gameManager.board
+                    return not (____opt_6 and ____opt_6.showingEdelView)
                 end,
                 {unpack(self.cardAssets:getCardAssetList(self.edelCard))},
                 {glowPeriodSeconds = 3}
             )
         )
-        local ____temp_4 = self.cardAssets:getCardAssets(self.edelCard)
-        local baseAsset = ____temp_4.baseAsset
+        local ____temp_8 = self.cardAssets:getCardAssets(self.edelCard)
+        local baseAsset = ____temp_8.baseAsset
         if not isEmpty(baseAsset) then
             self.gameManager.shaderManager:addShader(
                 baseAsset.id,
@@ -342,9 +350,9 @@ function Board.prototype.handleDiscard(self)
     if remaining <= 0 then
         self:disableDiscardButton()
     end
-    local ____opt_5 = self.gameManager.board
-    if ____opt_5 ~= nil then
-        ____opt_5.dealer:dealCards(CharacterTypes.PLAYER, removedIndices)
+    local ____opt_9 = self.gameManager.board
+    if ____opt_9 ~= nil then
+        ____opt_9.dealer:dealCards(CharacterTypes.PLAYER, removedIndices)
     end
 end
 function Board.prototype.updateDiscardCounter(self, remainingNumberOfDiscards)
@@ -779,7 +787,9 @@ function Board.prototype.buildDeck(self, characterType)
                 mousePressEffect = {MousePressEffects.SHIFT_DOWN},
                 clickSound = self.cardAssets.cardClick,
                 hoverSound = self.cardAssets.hoverSound,
-                showDisabledColor = false
+                showDisabledColor = false,
+                isDisabled = self.showingEdelView,
+                useDisabledAnimation = not self.showingEdelView
             }
         )
     )

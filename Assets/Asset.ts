@@ -210,7 +210,7 @@ export default class Asset {
 
   setDisabled(disabled: boolean, options?: DisabledAssetOptions): void {
     this.isDisabled = disabled;    
-    this.useDisabledAnimation = options?.useDisabledAnimation ?? true;
+    this.useDisabledAnimation = options?.useDisabledAnimation ?? this.useDisabledAnimation;
 
     if (disabled) {
       if (!this.showDisabledColor && !options?.showDisabledColor) {

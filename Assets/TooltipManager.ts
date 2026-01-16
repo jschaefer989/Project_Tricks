@@ -81,6 +81,7 @@ export default class TooltipManager {
     if (texts.length === 3) {
       return this.gameManager.assetManager.assetLoader.loadImage("Assets/Images/TooltipThree.png");
     }
+    return this.gameManager.assetManager.assetLoader.loadImage("Assets/Images/TooltipThree.png");
   }
 
   private getTooltipHeight(texts: FontWithPosition[]): number {

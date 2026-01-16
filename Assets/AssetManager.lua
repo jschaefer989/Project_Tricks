@@ -49,8 +49,12 @@ function AssetManager.prototype.getAssets(self, baseId)
     return self.assets:get(baseId)
 end
 function AssetManager.prototype.getAsset(self, baseId, assetId)
-    local ____opt_2 = self:getAssets(baseId)
-    return ____opt_2 and __TS__ArrayFind(
+    if isEmpty(assetId) then
+        local ____opt_2 = self:getAssets(baseId)
+        return ____opt_2 and ____opt_2[1]
+    end
+    local ____opt_4 = self:getAssets(baseId)
+    return ____opt_4 and __TS__ArrayFind(
         self:getAssets(baseId),
         function(____, asset) return asset.id == assetId end
     )
@@ -103,13 +107,13 @@ function AssetManager.prototype.drawAssets(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue27
+                goto __continue28
             end
             for ____, asset in ipairs(assets) do
                 asset:drawAsset()
             end
         end
-        ::__continue27::
+        ::__continue28::
     end
     self.textManager:drawText()
     self.gameManager.popupManager:drawPopups()
@@ -123,11 +127,11 @@ function AssetManager.prototype.handleMousePressed(self, x, y, button)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue34
+                goto __continue35
             end
             local asset = assets[1]
             if asset.isHidden or asset.isDisabled then
-                goto __continue34
+                goto __continue35
             end
             if asset:inAssetBounds(gameX, gameY) then
                 for ____, a in ipairs(assets) do
@@ -135,7 +139,7 @@ function AssetManager.prototype.handleMousePressed(self, x, y, button)
                 end
             end
         end
-        ::__continue34::
+        ::__continue35::
     end
 end
 function AssetManager.prototype.handleMouseReleased(self, x, y, button)
@@ -146,11 +150,11 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue43
+                goto __continue44
             end
             local asset = assets[1]
             if asset.isHidden then
-                goto __continue43
+                goto __continue44
             end
             if asset:inAssetBounds(gameX, gameY) then
                 if asset.isDisabled then
@@ -163,7 +167,7 @@ function AssetManager.prototype.handleMouseReleased(self, x, y, button)
                 a:setMousePressed(false)
             end
         end
-        ::__continue43::
+        ::__continue44::
     end
 end
 function AssetManager.prototype.handleDisabledAssetClick(self, assets)
@@ -209,17 +213,17 @@ function AssetManager.prototype.triggerWobbleAnimation(self, assets)
     end
 end
 function AssetManager.prototype.handleAssetClick(self, asset)
-    local ____this_5
-    ____this_5 = asset
-    local ____opt_4 = ____this_5.onClick
-    if ____opt_4 ~= nil then
-        ____opt_4(____this_5)
+    local ____this_7
+    ____this_7 = asset
+    local ____opt_6 = ____this_7.onClick
+    if ____opt_6 ~= nil then
+        ____opt_6(____this_7)
     end
-    local ____opt_6 = asset.clickSound
-    if not (____opt_6 and ____opt_6:isPlaying()) then
-        local ____opt_8 = asset.clickSound
-        if ____opt_8 ~= nil then
-            ____opt_8:play()
+    local ____opt_8 = asset.clickSound
+    if not (____opt_8 and ____opt_8:isPlaying()) then
+        local ____opt_10 = asset.clickSound
+        if ____opt_10 ~= nil then
+            ____opt_10:play()
         end
     end
 end
@@ -232,26 +236,26 @@ function AssetManager.prototype.handleMouseHover(self)
     for ____, assets in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(assets) or #assets == 0 then
-                goto __continue66
+                goto __continue67
             end
             local asset = assets[1]
             if asset.isDisabled or asset.isHidden then
-                goto __continue66
+                goto __continue67
             end
             if asset:inAssetBounds(gameX, gameY) then
                 if not asset.isHovered then
                     for ____, a in ipairs(assets) do
                         a:setHovered(true)
                     end
-                    local ____opt_10 = asset.onHover
-                    if ____opt_10 ~= nil then
-                        ____opt_10(asset, asset)
+                    local ____opt_12 = asset.onHover
+                    if ____opt_12 ~= nil then
+                        ____opt_12(asset, asset)
                     end
-                    local ____opt_12 = asset.hoverSound
-                    if not (____opt_12 and ____opt_12:isPlaying()) then
-                        local ____opt_14 = asset.hoverSound
-                        if ____opt_14 ~= nil then
-                            ____opt_14:play()
+                    local ____opt_14 = asset.hoverSound
+                    if not (____opt_14 and ____opt_14:isPlaying()) then
+                        local ____opt_16 = asset.hoverSound
+                        if ____opt_16 ~= nil then
+                            ____opt_16:play()
                         end
                     end
                 end
@@ -259,26 +263,26 @@ function AssetManager.prototype.handleMouseHover(self)
                 for ____, a in ipairs(assets) do
                     a:setHovered(false)
                 end
-                local ____opt_16 = asset.onUnhover
-                if ____opt_16 ~= nil then
-                    ____opt_16(asset, asset)
+                local ____opt_18 = asset.onUnhover
+                if ____opt_18 ~= nil then
+                    ____opt_18(asset, asset)
                 end
             end
         end
-        ::__continue66::
+        ::__continue67::
     end
 end
 function AssetManager.prototype.disableAllClickableAssets(self, disable)
     for ____, baseAsset in __TS__Iterator(self.assets:values()) do
         do
             if isEmpty(baseAsset) then
-                goto __continue79
+                goto __continue80
             end
             if isEmpty(baseAsset[1].onClick) then
-                goto __continue79
+                goto __continue80
             end
             if baseAsset[1].alwaysEnabled then
-                goto __continue79
+                goto __continue80
             end
             for ____, asset in ipairs(baseAsset) do
                 if disable then
@@ -289,7 +293,7 @@ function AssetManager.prototype.disableAllClickableAssets(self, disable)
                 end
             end
         end
-        ::__continue79::
+        ::__continue80::
     end
 end
 return ____exports

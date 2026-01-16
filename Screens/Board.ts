@@ -119,6 +119,8 @@ export default class Board {
     this.gameManager.assetManager.textManager.hideText(
       TextIds.LETS_FIGHT_BUTTON_CAPTION
     );
+    this.gameManager.assetManager.getAsset(AssetIds.PLAYER_DECK)?.setDisabled(false, { useDisabledAnimation: true });
+    this.gameManager.assetManager.getAsset(AssetIds.ENEMY_DECK)?.setDisabled(false, { useDisabledAnimation: true });
 
     this.gameManager.assetManager.disableAllClickableAssets(true);
     this.dealer.dealHandAtStartOfFight();
@@ -945,6 +947,8 @@ export default class Board {
           clickSound: this.cardAssets.cardClick,
           hoverSound: this.cardAssets.hoverSound,
           showDisabledColor: false,
+          isDisabled: this.showingEdelView,
+          useDisabledAnimation: !this.showingEdelView,
         }
       )
     );

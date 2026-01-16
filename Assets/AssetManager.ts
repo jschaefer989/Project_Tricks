@@ -40,7 +40,10 @@ export default class AssetManager {
     return this.assets.get(baseId);
   }
 
-  getAsset(baseId: string, assetId: string): Asset | undefined {
+  getAsset(baseId: string, assetId?: string): Asset | undefined {
+    if (isEmpty(assetId)) {
+      return this.getAssets(baseId)?.[0];
+    }
     return this.getAssets(baseId)?.find((asset) => asset.id === assetId);
   }
 

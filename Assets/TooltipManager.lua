@@ -88,6 +88,7 @@ function TooltipManager.prototype.getTooltipBackground(self, texts)
     if #texts == 3 then
         return self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/TooltipThree.png")
     end
+    return self.gameManager.assetManager.assetLoader:loadImage("Assets/Images/TooltipThree.png")
 end
 function TooltipManager.prototype.getTooltipHeight(self, texts)
     if #texts == 3 then
